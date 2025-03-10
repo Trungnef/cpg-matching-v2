@@ -2,9 +2,54 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Link } from 'react-router-dom';
-import ThreeScene from './ThreeScene';
-import { motion } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 import { ArrowRight, CheckCircle } from 'lucide-react';
+
+// CountUp component for animated statistics
+const CountUp = ({ end, title, duration = 2000 }) => {
+  const [count, setCount] = useState(0);
+  const countRef = useRef(null);
+  const inView = useInView(countRef, { once: true });
+  
+  useEffect(() => {
+    if (inView) {
+      let startTime;
+      let animationFrame;
+      
+      const step = (timestamp) => {
+        if (!startTime) startTime = timestamp;
+        const progress = Math.min((timestamp - startTime) / duration, 1);
+        setCount(Math.floor(progress * end));
+        
+        if (progress < 1) {
+          animationFrame = requestAnimationFrame(step);
+        }
+      };
+      
+      animationFrame = requestAnimationFrame(step);
+      
+      return () => cancelAnimationFrame(animationFrame);
+    }
+  }, [end, duration, inView]);
+  
+  return (
+    <motion.div 
+      className="text-center p-3 rounded-xl bg-card/30 backdrop-blur-sm border border-white/10 hover:shadow-lg transition-all duration-300"
+      whileHover={{ y: -5, scale: 1.03 }}
+      ref={countRef}
+    >
+      <motion.p 
+        className="text-3xl font-bold text-primary"
+        initial={{ opacity: 0 }}
+        animate={inView ? { opacity: 1 } : {}}
+        transition={{ duration: 1 }}
+      >
+        {count}{end > 100 ? "+" : "%"}
+      </motion.p>
+      <p className="text-sm text-foreground/70">{title}</p>
+    </motion.div>
+  );
+};
 
 const Hero = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -57,7 +102,7 @@ const Hero = () => {
   return (
     <section 
       ref={sectionRef}
-      className="min-h-screen pt-20 relative overflow-hidden"
+      className="min-h-screen pt-32 relative overflow-hidden" // Added more top padding
     >
       {/* Enhanced background elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
@@ -149,52 +194,13 @@ const Hero = () => {
             className="grid grid-cols-3 gap-4 mt-12"
             variants={itemVariants}
           >
-            <motion.div 
-              className="text-center p-3 rounded-xl bg-card/30 backdrop-blur-sm border border-white/10 hover:shadow-lg transition-all duration-300"
-              whileHover={{ y: -5, scale: 1.03 }}
-            >
-              <motion.p 
-                className="text-3xl font-bold text-primary"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 1 }}
-              >
-                500+
-              </motion.p>
-              <p className="text-sm text-foreground/70">Manufacturers</p>
-            </motion.div>
-            <motion.div 
-              className="text-center p-3 rounded-xl bg-card/30 backdrop-blur-sm border border-white/10 hover:shadow-lg transition-all duration-300"
-              whileHover={{ y: -5, scale: 1.03 }}
-            >
-              <motion.p 
-                className="text-3xl font-bold text-primary"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 1, delay: 0.2 }}
-              >
-                2,500+
-              </motion.p>
-              <p className="text-sm text-foreground/70">Products</p>
-            </motion.div>
-            <motion.div 
-              className="text-center p-3 rounded-xl bg-card/30 backdrop-blur-sm border border-white/10 hover:shadow-lg transition-all duration-300"
-              whileHover={{ y: -5, scale: 1.03 }}
-            >
-              <motion.p 
-                className="text-3xl font-bold text-primary"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 1, delay: 0.4 }}
-              >
-                98%
-              </motion.p>
-              <p className="text-sm text-foreground/70">Match Rate</p>
-            </motion.div>
+            <CountUp end={978} title="Manufacturers" />
+            <CountUp end={8500} title="Products" />
+            <CountUp end={98} title="Match Rate" />
           </motion.div>
         </div>
         
-        {/* Right 3D visualization with improved animation */}
+        {/* Right visual - Fixed image display issue */}
         <motion.div 
           className="flex-1 h-[500px] w-full max-w-[600px] relative z-10 perspective-1000"
           variants={itemVariants}
@@ -207,11 +213,15 @@ const Hero = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            <ThreeScene type="particles" />
+            <img 
+              src={"/placeholder.jpg"} 
+              alt="CPG Industry Matching"
+              className="w-full h-full object-cover object-center"
+            />
           </motion.div>
           <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 w-[90%] h-16 bg-black/20 filter blur-xl rounded-full"></div>
 
-          {/* Floating elements around the 3D scene for added depth */}
+          {/* Floating elements around the image for added depth */}
           <motion.div
             className="absolute top-10 left-5 h-10 w-10 rounded-lg bg-primary/30 backdrop-blur-md"
             animate={{ 

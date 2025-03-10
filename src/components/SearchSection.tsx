@@ -2,6 +2,14 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { 
+  Sheet,
+  SheetContent, 
+  SheetDescription, 
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import {
   Select,
   SelectContent,
@@ -9,202 +17,161 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Check, Search, Filter, Sliders } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { useNavigate } from "react-router-dom";
-import { 
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { useUser } from "@/contexts/UserContext";
-
-interface SearchFilter {
-  id: string;
-  label: string;
-  active: boolean;
-}
+import { ChevronDown, Filter, Search } from "lucide-react";
 
 const SearchSection = () => {
-  const navigate = useNavigate();
-  const { role } = useUser();
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("");
-  const [showAdvanced, setShowAdvanced] = useState(false);
-  const [filters, setFilters] = useState<SearchFilter[]>([
-    { id: "organic", label: "Organic", active: false },
-    { id: "gluten-free", label: "Gluten Free", active: false },
-    { id: "vegan", label: "Vegan", active: false },
-    { id: "dairy-free", label: "Dairy Free", active: false },
-    { id: "sugar-free", label: "Sugar Free", active: false },
-  ]);
 
-  const toggleFilter = (id: string) => {
-    setFilters(filters.map(filter => 
-      filter.id === id ? { ...filter, active: !filter.active } : filter
-    ));
+  // Toggle search expanded state
+  const toggleSearch = () => {
+    setIsSearchExpanded(!isSearchExpanded);
   };
 
-  const activeFilters = filters.filter(filter => filter.active);
-
-  const handleSearch = () => {
-    const params = new URLSearchParams();
-    
-    if (searchQuery) {
-      params.set('q', searchQuery);
-    }
-    
-    if (categoryFilter) {
-      params.set('category', categoryFilter);
-    }
-    
-    if (activeFilters.length > 0) {
-      params.set('filters', activeFilters.map(f => f.id).join(','));
-    }
-    
-    navigate(`/products?${params.toString()}`);
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
   };
 
-  // Role-specific placeholder text
-  const getPlaceholderText = () => {
-    switch(role) {
-      case "manufacturer":
-        return "Search for products to manufacture or packaging solutions...";
-      case "brand":
-        return "Search for manufacturers, packaging options, or retailers...";
-      case "retailer":
-        return "Search for brands, products, or packaging options...";
-      default:
-        return "Search for products, manufacturers, or packaging...";
-    }
-  };
-
-  // Role-specific category options
-  const getCategoryOptions = () => {
-    const commonOptions = [
-      <SelectItem key="food" value="food">Food & Beverage</SelectItem>,
-      <SelectItem key="personal-care" value="personal-care">Personal Care</SelectItem>,
-      <SelectItem key="household" value="household">Household Products</SelectItem>,
-    ];
-    
-    switch(role) {
-      case "manufacturer":
-        return [...commonOptions, <SelectItem key="materials" value="materials">Raw Materials</SelectItem>];
-      case "brand":
-        return [...commonOptions, <SelectItem key="packaging" value="packaging">Packaging</SelectItem>];
-      case "retailer":
-        return [...commonOptions, <SelectItem key="local" value="local">Local Products</SelectItem>];
-      default:
-        return commonOptions;
-    }
+  // Handle search submission
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    console.log("Searching for:", searchQuery);
+    // Here you would typically handle the search request
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto glass p-8 rounded-xl backdrop-blur-lg border border-white/10 shadow-lg">
-      <h3 className="text-2xl font-semibold mb-6">Find Your Perfect Match</h3>
-      
-      <div className="grid md:grid-cols-[1fr_auto_auto] gap-4 mb-6">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-          <Input
-            placeholder={getPlaceholderText()}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-          />
-        </div>
-        
-        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-full md:w-[180px]">
-            <SelectValue placeholder="Category" />
-          </SelectTrigger>
-          <SelectContent>
-            {getCategoryOptions()}
-          </SelectContent>
-        </Select>
-        
-        <Button onClick={handleSearch} className="gap-2">
-          <Search className="h-4 w-4" />
-          Search
-        </Button>
-      </div>
-      
-      <div className="flex items-center justify-between gap-2 mb-4">
+    <div className="bg-card/90 backdrop-blur-sm shadow-lg rounded-xl border border-border/50 overflow-hidden transition-all duration-300">
+      <div className="flex items-center justify-between p-4">
         <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm text-muted-foreground">Quick Filters:</span>
+          <Search className="h-5 w-5 text-muted-foreground" />
+          <h3 className="font-medium hidden sm:block">Find Your Perfect Match</h3>
         </div>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="gap-1"
-          onClick={() => setShowAdvanced(!showAdvanced)}
-        >
-          <Sliders className="h-3.5 w-3.5" />
-          Advanced
-        </Button>
-      </div>
-      
-      <div className="flex flex-wrap gap-2 mb-4">
-        {filters.map((filter) => (
-          <Button
-            key={filter.id}
-            variant={filter.active ? "default" : "outline"}
-            size="sm"
-            className="rounded-full flex items-center gap-1 h-8 transition-all"
-            onClick={() => toggleFilter(filter.id)}
-          >
-            {filter.active && <Check className="h-3 w-3" />}
-            {filter.label}
-          </Button>
-        ))}
-      </div>
-      
-      {showAdvanced && (
-        <Accordion type="single" collapsible className="w-full bg-background/50 rounded-lg p-2 mt-4">
-          <AccordionItem value="price-range">
-            <AccordionTrigger className="px-4 py-2 text-sm">Price Range</AccordionTrigger>
-            <AccordionContent className="px-4 pb-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs text-muted-foreground mb-1 block">Min Price</label>
-                  <Input type="number" placeholder="0" />
+        
+        <div className="flex items-center gap-2">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-1">
+                <Filter className="h-4 w-4" />
+                <span className="hidden sm:inline">Filters</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>Advanced Filters</SheetTitle>
+                <SheetDescription>
+                  Refine your search with advanced filtering options
+                </SheetDescription>
+              </SheetHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Category</label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="food">Food & Beverage</SelectItem>
+                      <SelectItem value="health">Health & Wellness</SelectItem>
+                      <SelectItem value="beauty">Beauty & Personal Care</SelectItem>
+                      <SelectItem value="household">Household Products</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-                <div>
-                  <label className="text-xs text-muted-foreground mb-1 block">Max Price</label>
-                  <Input type="number" placeholder="1000" />
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Certifications</label>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="outline" className="cursor-pointer hover:bg-secondary">Organic</Badge>
+                    <Badge variant="outline" className="cursor-pointer hover:bg-secondary">Non-GMO</Badge>
+                    <Badge variant="outline" className="cursor-pointer hover:bg-secondary">Fair Trade</Badge>
+                    <Badge variant="outline" className="cursor-pointer hover:bg-secondary">Vegan</Badge>
+                    <Badge variant="outline" className="cursor-pointer hover:bg-secondary">Kosher</Badge>
+                    <Badge variant="outline" className="cursor-pointer hover:bg-secondary">Gluten-Free</Badge>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Location</label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Any location" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="usa">United States</SelectItem>
+                      <SelectItem value="canada">Canada</SelectItem>
+                      <SelectItem value="europe">Europe</SelectItem>
+                      <SelectItem value="asia">Asia</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Minimum Order Quantity</label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Any quantity" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="small">Small (1-1,000 units)</SelectItem>
+                      <SelectItem value="medium">Medium (1,001-5,000 units)</SelectItem>
+                      <SelectItem value="large">Large (5,001-10,000 units)</SelectItem>
+                      <SelectItem value="xlarge">Very Large (10,000+ units)</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
-            </AccordionContent>
-          </AccordionItem>
+              <div className="flex justify-end mt-4">
+                <Button>Apply Filters</Button>
+              </div>
+            </SheetContent>
+          </Sheet>
           
-          <AccordionItem value="location">
-            <AccordionTrigger className="px-4 py-2 text-sm">Location</AccordionTrigger>
-            <AccordionContent className="px-4 pb-4">
-              <Input placeholder="Enter location" />
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      )}
-      
-      <div className="flex justify-between items-center mt-4">
-        <div className="text-sm text-muted-foreground">
-          {activeFilters.length > 0
-            ? `${activeFilters.length} active filter${activeFilters.length > 1 ? 's' : ''}`
-            : "No active filters"}
-        </div>
-        
-        {activeFilters.length > 0 && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setFilters(filters.map(f => ({ ...f, active: false })))}
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            onClick={toggleSearch}
+            aria-label={isSearchExpanded ? "Collapse search" : "Expand search"}
+            className="transition-transform duration-200"
           >
-            Clear all
+            <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isSearchExpanded ? 'rotate-180' : ''}`} />
           </Button>
-        )}
+        </div>
+      </div>
+      
+      {/* Expandable search content with improved animation and styling */}
+      <div 
+        className={`transition-all duration-300 overflow-hidden ${
+          isSearchExpanded ? 'max-h-[300px] opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <form onSubmit={handleSearchSubmit} className="p-4 pt-0 space-y-4">
+          <div className="flex flex-col sm:flex-row gap-2">
+            <div className="flex-1 relative">
+              <Input 
+                placeholder="Search by keyword, category, or company name" 
+                className="w-full pr-10"
+                value={searchQuery}
+                onChange={handleSearchChange}
+              />
+              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            </div>
+            <Button type="submit" className="flex-shrink-0">
+              <Search className="h-4 w-4 mr-2" />
+              Search
+            </Button>
+          </div>
+          
+          <div className="flex flex-wrap gap-2">
+            <div className="text-sm font-medium text-muted-foreground mr-2">Popular:</div>
+            <Badge variant="secondary" className="cursor-pointer hover:bg-primary/10 transition-colors">Organic Foods</Badge>
+            <Badge variant="secondary" className="cursor-pointer hover:bg-primary/10 transition-colors">Sustainable Packaging</Badge>
+            <Badge variant="secondary" className="cursor-pointer hover:bg-primary/10 transition-colors">Plant-Based</Badge>
+            <Badge variant="secondary" className="cursor-pointer hover:bg-primary/10 transition-colors">Cold-Pressed</Badge>
+          </div>
+        </form>
       </div>
     </div>
   );

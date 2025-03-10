@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,6 +18,19 @@ import NotFound from "./pages/NotFound";
 import Blog from "./pages/Blog";
 import CaseStudies from "./pages/CaseStudies";
 import Webinars from "./pages/Webinars";
+
+// Let's create page wrapper components to add Footer to specific pages
+import Footer from "./components/Footer";
+
+// Page wrapper component to include Footer
+const PageWithFooter = ({ Component }: { Component: React.ComponentType<any> }) => {
+  return (
+    <>
+      <Component />
+      <Footer />
+    </>
+  );
+};
 
 // Manufacturer pages
 import ManufacturerProduction from "./pages/manufacturer/Production";
@@ -62,8 +74,15 @@ const App = () => (
               } 
             />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/manufacturers" element={<Manufacturers />} />
+            
+            {/* Updated routes with Footer for all pages as requested */}
+            <Route path="/products" element={<PageWithFooter Component={Products} />} />
+            <Route path="/manufacturers" element={<PageWithFooter Component={Manufacturers} />} />
+            <Route path="/solutions" element={<PageWithFooter Component={Solutions} />} />
+            <Route path="/blog" element={<PageWithFooter Component={Blog} />} />
+            <Route path="/case-studies" element={<PageWithFooter Component={CaseStudies} />} />
+            <Route path="/webinars" element={<PageWithFooter Component={Webinars} />} />
+            
             <Route 
               path="/profile" 
               element={
@@ -73,12 +92,6 @@ const App = () => (
                 />
               } 
             />
-            <Route path="/solutions" element={<Solutions />} />
-            
-            {/* Resource pages */}
-            <Route path="/blog" element={<Blog />} />
-            <Route path="/case-studies" element={<CaseStudies />} />
-            <Route path="/webinars" element={<Webinars />} />
             
             {/* Manufacturer specific routes */}
             <Route 

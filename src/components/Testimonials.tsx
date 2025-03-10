@@ -20,7 +20,7 @@ const testimonials: Testimonial[] = [
     role: "Product Manager",
     company: "Natural Foods Co.",
     content: "The CPG Matchmaker platform has transformed how we source ingredients. We found the perfect organic supplier in just two weeks, when previously it took months.",
-    image: "/placeholder.svg"
+    image: "/placeholder.jpg"
   },
   {
     id: 2,
@@ -28,7 +28,7 @@ const testimonials: Testimonial[] = [
     role: "Operations Director",
     company: "Eco Packaging Solutions",
     content: "As a sustainable packaging manufacturer, finding the right brands to partner with was challenging. This platform's AI matching has increased our conversion rate by 65%.",
-    image: "/placeholder.svg"
+    image: "/placeholder.jpg"
   },
   {
     id: 3,
@@ -36,7 +36,7 @@ const testimonials: Testimonial[] = [
     role: "Procurement Specialist",
     company: "Wellness Brands Inc.",
     content: "The detailed filtering options and AI recommendations have streamlined our vendor selection process dramatically. We've reduced our sourcing cycle by 40%.",
-    image: "/placeholder.svg"
+    image: "/placeholder.jpg"
   }
 ];
 
@@ -67,38 +67,8 @@ const Testimonials = () => {
               <Quote className="absolute top-6 left-6 h-12 w-12 text-primary/10" />
               
               <div className="relative z-10">
-                {testimonials.map((testimonial, index) => (
-                  <div 
-                    key={testimonial.id}
-                    className={cn(
-                      "transition-opacity duration-500 absolute inset-0 p-8 md:p-12 flex flex-col",
-                      index === activeIndex ? "opacity-100 z-10" : "opacity-0 -z-10"
-                    )}
-                  >
-                    <blockquote className="text-lg md:text-xl mb-6">
-                      "{testimonial.content}"
-                    </blockquote>
-                    
-                    <div className="mt-auto flex items-center gap-4">
-                      <div className="h-12 w-12 rounded-full overflow-hidden bg-muted">
-                        <img 
-                          src={testimonial.image} 
-                          alt={testimonial.name} 
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold">{testimonial.name}</h4>
-                        <p className="text-sm text-foreground/70">{testimonial.role}, {testimonial.company}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                
-                {/* Current testimonial */}
-                <div className={cn(
-                  "transition-opacity duration-500 flex flex-col",
-                )}>
+                {/* Single testimonial view with better transition handling */}
+                <div className="flex flex-col">
                   <blockquote className="text-lg md:text-xl mb-6">
                     "{testimonials[activeIndex].content}"
                   </blockquote>

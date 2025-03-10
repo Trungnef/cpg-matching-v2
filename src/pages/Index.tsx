@@ -2,7 +2,6 @@
 import { useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
-import SearchSection from "@/components/SearchSection";
 import HowItWorks from "@/components/HowItWorks";
 import Testimonials from "@/components/Testimonials";
 import Footer from "@/components/Footer";
@@ -37,13 +36,8 @@ const Index = () => {
     <div className="min-h-screen overflow-x-hidden">
       <Navbar />
       
-      {/* Hero Section with 3D effects */}
+      {/* Hero Section with improved vertical spacing */}
       <Hero />
-      
-      {/* Search Section with improved positioning */}
-      <div className="container mx-auto px-4 -mt-20 relative z-20 mb-12">
-        <SearchSection />
-      </div>
       
       {/* How It Works with animations */}
       <HowItWorks />
@@ -51,7 +45,7 @@ const Index = () => {
       {/* Testimonials Section */}
       <Testimonials />
       
-      {/* Footer moved to a separate component */}
+      {/* Footer */}
       <Footer />
     </div>
   );
