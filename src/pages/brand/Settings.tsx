@@ -1,9 +1,8 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,15 +11,66 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
-import { Building, Lock, User, Bell, Tag, PlusCircle, X } from "lucide-react";
+import { Building, Lock, User, Bell, Tag, PlusCircle, X, Settings as SettingsIcon, ArrowLeft, Save, UserCircle, Mail, Phone, MapPin, Shield, CreditCard, AlertCircle, LogOut, Globe } from "lucide-react";
 import Footer from "@/components/Footer";
+import { useUser } from "@/hooks/use-user";
 
 const BrandSettings = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, isAuthenticated, role } = useUser();
   const [saving, setSaving] = useState(false);
   const [tags, setTags] = useState(["Organic", "Vegan", "Non-GMO", "Sustainable"]);
   const [newTag, setNewTag] = useState("");
+  
+  // Notification settings
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [messageNotifications, setMessageNotifications] = useState(true);
+  const [matchNotifications, setMatchNotifications] = useState(true);
+  const [marketingNotifications, setMarketingNotifications] = useState(false);
+  
+  // Security settings
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [activeSessions, setActiveSessions] = useState([
+    {
+      device: "Current Browser",
+      platform: "Windows • Chrome",
+      time: "Today at 10:30 AM",
+      isActive: true
+    },
+    {
+      device: "Mobile Device",
+      platform: "iOS • Safari",
+      time: "Yesterday at 3:15 PM",
+      isActive: false
+    }
+  ]);
+  
+  // Form states
+  const [companyName, setCompanyName] = useState(user?.companyName || "");
+  const [email, setEmail] = useState(user?.email || "");
+  const [userName, setUserName] = useState(user?.name || "");
+  const [phone, setPhone] = useState("+1 (555) 123-4567");
+  const [address, setAddress] = useState("123 Brand Ave");
+  const [city, setCity] = useState("San Francisco");
+  const [state, setState] = useState("CA");
+  const [zipCode, setZipCode] = useState("94103");
+  const [website, setWebsite] = useState("https://example.com");
+  const [description, setDescription] = useState("We are an innovative brand focused on creating sustainable products that meet the needs of eco-conscious consumers.");
+  
+  useEffect(() => {
+    document.title = "Account Settings - CPG Matchmaker";
+    
+    // If not authenticated or not a brand, redirect
+    if (!isAuthenticated) {
+      navigate("/auth?type=signin");
+    } else if (role !== "brand") {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate, role]);
   
   // Mock form submission
   const handleSubmit = (e) => {
@@ -49,6 +99,40 @@ const BrandSettings = () => {
   // Handle removing a tag
   const handleRemoveTag = (tagToRemove) => {
     setTags(tags.filter(tag => tag !== tagToRemove));
+  };
+  
+  const handleSaveSecurity = () => {
+    // Validate password inputs
+    if (newPassword && newPassword !== confirmPassword) {
+      toast({
+        title: "Passwords don't match",
+        description: "Please ensure your passwords match and try again.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    toast({
+      title: "Security settings saved",
+      description: "Your security preferences have been updated successfully."
+    });
+  };
+  
+  const handleLogoutAllDevices = () => {
+    // In a real app, this would call an API to invalidate all sessions
+    setActiveSessions([
+      {
+        device: "Current Browser",
+        platform: "Windows • Chrome",
+        time: "Just now",
+        isActive: true
+      }
+    ]);
+    
+    toast({
+      title: "Signed out from all devices",
+      description: "You have been signed out from all other devices."
+    });
   };
   
   return (
@@ -93,6 +177,7 @@ const BrandSettings = () => {
                 <TabsTrigger value="brand">Brand</TabsTrigger>
                 <TabsTrigger value="notifications">Notifications</TabsTrigger>
                 <TabsTrigger value="security">Security</TabsTrigger>
+                <TabsTrigger value="profile">Profile</TabsTrigger>
               </TabsList>
               
               {/* General Settings */}
@@ -340,74 +425,232 @@ const BrandSettings = () => {
               </TabsContent>
               
               {/* Security Settings */}
-              <TabsContent value="security">
+              <TabsContent value="security" className="space-y-6">
                 <Card>
                   <CardHeader>
                     <CardTitle>Security Settings</CardTitle>
+                    <CardDescription>Manage your account security and password</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-medium">Change Password</h3>
+                      <div className="grid grid-cols-1 gap-4">
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium" htmlFor="current-password">Current Password</label>
+                          <Input 
+                            id="current-password" 
+                            type="password" 
+                            value={currentPassword}
+                            onChange={(e) => setCurrentPassword(e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium" htmlFor="new-password">New Password</label>
+                          <Input 
+                            id="new-password" 
+                            type="password"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium" htmlFor="confirm-password">Confirm New Password</label>
+                          <Input 
+                            id="confirm-password" 
+                            type="password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-medium">Two-Factor Authentication</h3>
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                          <label className="text-sm font-medium">Enable Two-Factor Authentication</label>
+                          <p className="text-sm text-muted-foreground">Add an extra layer of security to your account</p>
+                        </div>
+                        <Switch 
+                          checked={twoFactorEnabled}
+                          onCheckedChange={setTwoFactorEnabled}
+                        />
+                      </div>
+                    </div>
+                    
+                    <Separator />
+                    
+                    {/* Active Sessions Section */}
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-medium">Active Sessions</h3>
+                      <div className="space-y-3">
+                        {activeSessions.map((session, index) => (
+                          <div key={index} className="p-3 border rounded-md">
+                            <div className="flex justify-between items-center">
+                              <div>
+                                <p className="font-medium">{session.device}</p>
+                                <p className="text-sm text-muted-foreground">{session.platform} • {session.time}</p>
+                              </div>
+                              {session.isActive && <Badge>Active Now</Badge>}
+                            </div>
+                          </div>
+                        ))}
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={handleLogoutAllDevices}
+                          className="flex items-center gap-2"
+                        >
+                          <LogOut className="h-4 w-4" />
+                          Sign Out All Other Devices
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                  <CardFooter>
+                    <Button onClick={handleSaveSecurity}>Save Changes</Button>
+                  </CardFooter>
+                </Card>
+              </TabsContent>
+              
+              {/* Profile Settings */}
+              <TabsContent value="profile">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Brand Profile</CardTitle>
                     <CardDescription>
-                      Manage your account security and access preferences
+                      Update your brand information and company details
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-6">
-                      <div className="space-y-4">
-                        <h3 className="text-lg font-medium">Change Password</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                         <div className="space-y-2">
-                          <Label htmlFor="current-password">Current Password</Label>
+                          <Label htmlFor="userName">Name</Label>
+                          <div className="relative">
+                            <User className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                            <Input 
+                              id="userName" 
+                              value={userName}
+                              onChange={e => setUserName(e.target.value)}
+                              className="pl-9"
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="companyName">Company Name</Label>
+                          <div className="relative">
+                            <Building className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                            <Input 
+                              id="companyName" 
+                              value={companyName}
+                              onChange={e => setCompanyName(e.target.value)}
+                              className="pl-9"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div className="space-y-2">
+                          <Label htmlFor="email">Email Address</Label>
+                          <div className="relative">
+                            <Mail className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                            <Input 
+                              id="email" 
+                              type="email"
+                              value={email}
+                              onChange={e => setEmail(e.target.value)}
+                              className="pl-9"
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="phone">Phone Number</Label>
+                          <div className="relative">
+                            <Phone className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                            <Input 
+                              id="phone" 
+                              value={phone}
+                              onChange={e => setPhone(e.target.value)}
+                              className="pl-9"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div className="space-y-2">
+                          <Label htmlFor="website">Website</Label>
+                          <div className="relative">
+                            <Globe className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                            <Input 
+                              id="website" 
+                              value={website}
+                              onChange={e => setWebsite(e.target.value)}
+                              className="pl-9"
+                              placeholder="https://example.com"
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="address">Street Address</Label>
+                          <div className="relative">
+                            <MapPin className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                            <Input 
+                              id="address" 
+                              value={address}
+                              onChange={e => setAddress(e.target.value)}
+                              className="pl-9"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div className="space-y-2">
+                          <Label htmlFor="city">City</Label>
                           <Input 
-                            id="current-password" 
-                            type="password" 
-                            placeholder="Enter your current password"
+                            id="city" 
+                            value={city}
+                            onChange={e => setCity(e.target.value)}
                           />
                         </div>
                         
                         <div className="space-y-2">
-                          <Label htmlFor="new-password">New Password</Label>
+                          <Label htmlFor="state">State</Label>
                           <Input 
-                            id="new-password" 
-                            type="password" 
-                            placeholder="Enter your new password"
+                            id="state" 
+                            value={state}
+                            onChange={e => setState(e.target.value)}
                           />
                         </div>
                         
                         <div className="space-y-2">
-                          <Label htmlFor="confirm-password">Confirm New Password</Label>
+                          <Label htmlFor="zipCode">Zip Code</Label>
                           <Input 
-                            id="confirm-password" 
-                            type="password" 
-                            placeholder="Confirm your new password"
+                            id="zipCode" 
+                            value={zipCode}
+                            onChange={e => setZipCode(e.target.value)}
                           />
                         </div>
                       </div>
                       
-                      <Separator className="my-6" />
-                      
-                      <div className="space-y-4">
-                        <h3 className="text-lg font-medium">Two-Factor Authentication</h3>
-                        <div className="flex items-center justify-between">
-                          <div className="space-y-0.5">
-                            <Label htmlFor="two-factor">Enable Two-Factor Authentication</Label>
-                            <p className="text-sm text-muted-foreground">
-                              Add an extra layer of security to your account
-                            </p>
-                          </div>
-                          <Switch id="two-factor" defaultChecked={false} />
-                        </div>
-                      </div>
-                      
-                      <Separator className="my-6" />
-                      
-                      <div className="space-y-4">
-                        <h3 className="text-lg font-medium">Data Privacy</h3>
-                        <div className="flex items-center justify-between">
-                          <div className="space-y-0.5">
-                            <Label htmlFor="api-access">API Access</Label>
-                            <p className="text-sm text-muted-foreground">
-                              Allow third-party applications to access your data
-                            </p>
-                          </div>
-                          <Switch id="api-access" defaultChecked={true} />
-                        </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="description">Company Description</Label>
+                        <Textarea 
+                          id="description" 
+                          value={description}
+                          onChange={e => setDescription(e.target.value)}
+                          className="min-h-[120px]"
+                          placeholder="Tell us about your company..."
+                        />
                       </div>
                       
                       <div className="flex justify-end">

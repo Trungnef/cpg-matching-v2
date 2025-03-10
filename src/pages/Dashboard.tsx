@@ -14,7 +14,9 @@ import {
   LogOut,
   Truck,
   Warehouse,
-  Handshake
+  Handshake,
+  User,
+  Shield
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -233,7 +235,7 @@ const Dashboard = () => {
             <div className="pt-4 mt-4 border-t">
               <Button variant="ghost" className="w-full justify-start gap-2" asChild>
                 <Link to="/profile">
-                  <Users className="h-4 w-4" />
+                  <User className="h-4 w-4" />
                   Profile
                 </Link>
               </Button>

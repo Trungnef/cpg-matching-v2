@@ -23,7 +23,7 @@ import Webinars from "./pages/Webinars";
 import Footer from "./components/Footer";
 
 // Page wrapper component to include Footer
-const PageWithFooter = ({ Component }: { Component: React.ComponentType<any> }) => {
+const PageWithFooter = ({ Component }: { Component: React.ComponentType }) => {
   return (
     <>
       <Component />
