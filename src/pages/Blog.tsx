@@ -1,13 +1,48 @@
-
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clock, ArrowRight, Search, Tag } from "lucide-react";
+import { 
+  Clock, 
+  ArrowRight, 
+  Search, 
+  Tag, 
+  Share2,
+  Bookmark,
+  BookmarkCheck,
+  ChevronRight,
+  Filter,
+  SlidersHorizontal,
+  Calendar,
+  User
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetFooter,
+} from "@/components/ui/sheet";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // Mock blog post data
 const blogPosts = [
@@ -106,14 +141,96 @@ const popularTags = [
   "Partnerships"
 ];
 
+const fadeInUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: {
+      duration: 0.5
+    }
+  }
+};
+
+const staggerContainer = {
+  visible: {
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
 const Blog = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [savedPosts, setSavedPosts] = useState<number[]>([]);
+  const [sortBy, setSortBy] = useState("latest");
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
   useEffect(() => {
     document.title = "Blog - CPG Matchmaker";
     window.scrollTo(0, 0);
+    
+    // Load saved posts from localStorage
+    const saved = localStorage.getItem("savedPosts");
+    if (saved) {
+      setSavedPosts(JSON.parse(saved));
+    }
   }, []);
 
-  const featuredPosts = blogPosts.filter(post => post.featured);
-  const recentPosts = blogPosts.filter(post => !post.featured).slice(0, 4);
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleTagSelect = (tag: string) => {
+    setSelectedTags(prev => 
+      prev.includes(tag) 
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    );
+  };
+
+  const handleSavePost = (postId: number) => {
+    setSavedPosts(prev => {
+      const newSaved = prev.includes(postId)
+        ? prev.filter(id => id !== postId)
+        : [...prev, postId];
+      
+      localStorage.setItem("savedPosts", JSON.stringify(newSaved));
+      return newSaved;
+    });
+  };
+
+  const handleShare = (post: typeof blogPosts[0]) => {
+    if (navigator.share) {
+      navigator.share({
+        title: post.title,
+        text: post.excerpt,
+        url: window.location.href,
+      });
+    }
+  };
+
+  const filteredPosts = blogPosts
+    .filter(post => {
+      const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = selectedCategory === "All" || post.category === selectedCategory;
+      const matchesTags = selectedTags.length === 0 || 
+                         selectedTags.every(tag => post.tags.includes(tag));
+      
+      return matchesSearch && matchesCategory && matchesTags;
+    })
+    .sort((a, b) => {
+      if (sortBy === "latest") {
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      }
+      return 0;
+    });
+
+  const featuredPosts = filteredPosts.filter(post => post.featured);
+  const recentPosts = filteredPosts.filter(post => !post.featured);
 
   return (
     <div className="min-h-screen bg-background">
@@ -121,48 +238,240 @@ const Blog = () => {
       
       <div className="pt-20">
         {/* Hero section */}
-        <div className="bg-secondary/50">
-          <div className="container mx-auto px-4 py-16">
-            <div className="max-w-3xl mx-auto text-center">
-              <h1 className="text-4xl font-bold mb-4">CPG Matchmaker Blog</h1>
-              <p className="text-xl text-muted-foreground mb-8">
+        <motion.div 
+          className="bg-secondary/50 relative overflow-hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+        >
+          {/* Background Patterns */}
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/5 to-accent/5" />
+            <motion.div
+              className="absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full filter blur-3xl"
+              animate={{
+                scale: [1, 1.2, 1],
+                opacity: [0.3, 0.2, 0.3],
+              }}
+              transition={{
+                duration: 8,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
+            <motion.div
+              className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent/10 rounded-full filter blur-3xl"
+              animate={{
+                scale: [1, 1.1, 1],
+                opacity: [0.3, 0.1, 0.3],
+              }}
+              transition={{
+                duration: 6,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 1
+              }}
+            />
+          </div>
+
+          <div className="container mx-auto px-4 py-16 relative">
+            <motion.div 
+              className="max-w-3xl mx-auto text-center"
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
+            >
+              <motion.h1 
+                className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent"
+                variants={fadeInUp}
+              >
+                CPG Matchmaker Blog
+              </motion.h1>
+              <motion.p 
+                className="text-xl text-muted-foreground mb-8"
+                variants={fadeInUp}
+              >
                 Insights, trends, and strategies for the CPG manufacturing industry
-              </p>
+              </motion.p>
               
-              <div className="relative max-w-md mx-auto">
+              <motion.div 
+                className="relative max-w-md mx-auto"
+                variants={fadeInUp}
+              >
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input 
                   placeholder="Search articles..." 
-                  className="pl-10 pr-4 py-6" 
+                  className="pl-10 pr-4 py-6 rounded-full"
+                  value={searchQuery}
+                  onChange={handleSearch}
                 />
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="icon"
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full"
+                    >
+                      <SlidersHorizontal className="h-4 w-4" />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent>
+                    <SheetHeader>
+                      <SheetTitle>Filter Articles</SheetTitle>
+                      <SheetDescription>
+                        Refine your search with these filters
+                      </SheetDescription>
+                    </SheetHeader>
+                    <div className="py-4 space-y-4">
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-medium">Sort By</h4>
+                        <Select
+                          value={sortBy}
+                          onValueChange={setSortBy}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Sort by" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="latest">Latest First</SelectItem>
+                            <SelectItem value="popular">Most Popular</SelectItem>
+                            <SelectItem value="trending">Trending</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-medium">Categories</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {categories.map((category) => (
+                            <Badge
+                              key={category}
+                              variant={selectedCategory === category ? "default" : "outline"}
+                              className="cursor-pointer"
+                              onClick={() => setSelectedCategory(category)}
+                            >
+                              {category}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-medium">Tags</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {popularTags.map((tag) => (
+                            <Badge
+                              key={tag}
+                              variant={selectedTags.includes(tag) ? "default" : "outline"}
+                              className="cursor-pointer"
+                              onClick={() => handleTagSelect(tag)}
+                            >
+                              <Tag className="h-3 w-3 mr-1" />
+                              {tag}
+                            </Badge>
+                          ))}
               </div>
             </div>
           </div>
+                    <SheetFooter>
+                      <Button 
+                        variant="outline" 
+                        onClick={() => {
+                          setSelectedCategory("All");
+                          setSelectedTags([]);
+                          setSortBy("latest");
+                        }}
+                      >
+                        Reset Filters
+                      </Button>
+                      <Button onClick={() => setIsFiltersOpen(false)}>
+                        Apply Filters
+                      </Button>
+                    </SheetFooter>
+                  </SheetContent>
+                </Sheet>
+              </motion.div>
+            </motion.div>
         </div>
+        </motion.div>
         
         <div className="container mx-auto px-4 py-12">
           {/* Featured posts */}
-          <div className="mb-16">
-            <h2 className="text-2xl font-bold mb-8">Featured Articles</h2>
+          <motion.div 
+            className="mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-2xl font-bold">Featured Articles</h2>
+              <Button variant="ghost" className="gap-2" asChild>
+                <Link to="/blog/featured">
+                  View All <ChevronRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {featuredPosts.map((post) => (
-                <Card key={post.id} className="overflow-hidden transition-all hover:shadow-md">
-                  <div className="aspect-video bg-muted">
+                <motion.div
+                  key={post.id}
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Card className="overflow-hidden transition-all hover:shadow-lg">
+                    <div className="aspect-video bg-muted relative group">
                     <img 
                       src={post.image} 
                       alt={post.title} 
-                      className="w-full h-full object-cover" 
+                        className="w-full h-full object-cover transition-transform group-hover:scale-105" 
                     />
+                      <div className="absolute top-4 right-4 flex gap-2">
+                        <Button
+                          variant="secondary"
+                          size="icon"
+                          className="h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleSavePost(post.id);
+                          }}
+                        >
+                          {savedPosts.includes(post.id) ? (
+                            <BookmarkCheck className="h-4 w-4" />
+                          ) : (
+                            <Bookmark className="h-4 w-4" />
+                          )}
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          size="icon"
+                          className="h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleShare(post);
+                          }}
+                        >
+                          <Share2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                   </div>
                   <CardHeader>
                     <div className="flex items-center gap-2 mb-2">
                       <Badge variant="secondary">{post.category}</Badge>
-                      <span className="text-sm text-muted-foreground">
+                        <span className="text-sm text-muted-foreground flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
                         {post.date}
                       </span>
+                        <span className="text-sm text-muted-foreground flex items-center gap-1">
+                          <User className="h-3 w-3" />
+                          {post.author}
+                      </span>
                     </div>
-                    <CardTitle className="text-xl">{post.title}</CardTitle>
+                      <Link to={`/blog/${post.id}`}>
+                        <CardTitle className="text-xl hover:text-primary transition-colors">
+                          {post.title}
+                        </CardTitle>
+                      </Link>
                     <CardDescription>{post.excerpt}</CardDescription>
                   </CardHeader>
                   <CardFooter className="flex justify-between">
@@ -177,9 +486,10 @@ const Blog = () => {
                     </Button>
                   </CardFooter>
                 </Card>
+                </motion.div>
               ))}
             </div>
-          </div>
+          </motion.div>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main content */}
@@ -189,65 +499,78 @@ const Blog = () => {
                   <h2 className="text-2xl font-bold">Latest Articles</h2>
                   <TabsList>
                     {categories.slice(0, 4).map((category) => (
-                      <TabsTrigger key={category} value={category}>
+                      <TabsTrigger 
+                        key={category} 
+                        value={category}
+                        onClick={() => setSelectedCategory(category)}
+                      >
                         {category}
                       </TabsTrigger>
                     ))}
                   </TabsList>
                 </div>
                 
-                <TabsContent value="All" className="mt-0">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {recentPosts.map((post) => (
-                      <Card key={post.id} className="overflow-hidden hover:shadow-sm transition-all">
-                        <CardHeader>
-                          <div className="flex items-center gap-2 mb-2">
-                            <Badge variant="outline">{post.category}</Badge>
-                            <span className="text-sm text-muted-foreground">
-                              {post.date}
-                            </span>
-                          </div>
-                          <CardTitle className="text-lg">{post.title}</CardTitle>
-                          <CardDescription>{post.excerpt}</CardDescription>
-                        </CardHeader>
-                        <CardFooter className="flex justify-between">
-                          <div className="flex items-center">
-                            <Clock className="h-4 w-4 mr-1 text-muted-foreground" />
-                            <span className="text-sm text-muted-foreground">{post.readTime} read</span>
-                          </div>
-                          <Button variant="ghost" size="sm" className="gap-1" asChild>
-                            <Link to={`/blog/${post.id}`}>
-                              Read <ArrowRight className="h-3 w-3" />
-                            </Link>
-                          </Button>
-                        </CardFooter>
-                      </Card>
-                    ))}
-                  </div>
-                </TabsContent>
-                
-                {/* Create content for other tabs */}
-                {categories.slice(1, 4).map((category) => (
-                  <TabsContent key={category} value={category} className="mt-0">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={selectedCategory}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                  >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {blogPosts
-                        .filter(post => post.category === category)
-                        .map((post) => (
-                          <Card key={post.id} className="overflow-hidden hover:shadow-sm transition-all">
+                      {recentPosts.map((post) => (
+                        <motion.div
+                          key={post.id}
+                          whileHover={{ scale: 1.02 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <Card className="overflow-hidden hover:shadow-lg transition-all group">
                             <CardHeader>
                               <div className="flex items-center gap-2 mb-2">
                                 <Badge variant="outline">{post.category}</Badge>
-                                <span className="text-sm text-muted-foreground">
+                                <span className="text-sm text-muted-foreground flex items-center gap-1">
+                                  <Calendar className="h-3 w-3" />
                                   {post.date}
                                 </span>
                               </div>
-                              <CardTitle className="text-lg">{post.title}</CardTitle>
+                              <Link to={`/blog/${post.id}`}>
+                                <CardTitle className="text-lg hover:text-primary transition-colors">
+                                  {post.title}
+                                </CardTitle>
+                              </Link>
                               <CardDescription>{post.excerpt}</CardDescription>
+                              <div className="flex flex-wrap gap-2 mt-2">
+                                {post.tags.map((tag) => (
+                                  <Badge 
+                                    key={tag} 
+                                    variant="outline" 
+                                    className="text-xs"
+                                    onClick={() => handleTagSelect(tag)}
+                                  >
+                                    {tag}
+                                  </Badge>
+                                ))}
+                              </div>
                             </CardHeader>
                             <CardFooter className="flex justify-between">
-                              <div className="flex items-center">
-                                <Clock className="h-4 w-4 mr-1 text-muted-foreground" />
-                                <span className="text-sm text-muted-foreground">{post.readTime} read</span>
+                              <div className="flex items-center gap-4">
+                                <span className="flex items-center text-sm text-muted-foreground">
+                                  <Clock className="h-4 w-4 mr-1" />
+                                  {post.readTime} read
+                                </span>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  onClick={() => handleSavePost(post.id)}
+                                >
+                                  {savedPosts.includes(post.id) ? (
+                                    <BookmarkCheck className="h-4 w-4" />
+                                  ) : (
+                                    <Bookmark className="h-4 w-4" />
+                                  )}
+                                </Button>
                               </div>
                               <Button variant="ghost" size="sm" className="gap-1" asChild>
                                 <Link to={`/blog/${post.id}`}>
@@ -256,19 +579,27 @@ const Blog = () => {
                               </Button>
                             </CardFooter>
                           </Card>
+                        </motion.div>
                         ))}
                     </div>
-                  </TabsContent>
-                ))}
+                  </motion.div>
+                </AnimatePresence>
               </Tabs>
               
+              {recentPosts.length > 0 && (
               <div className="flex justify-center mt-8">
-                <Button variant="outline">View All Articles</Button>
+                  <Button variant="outline">Load More Articles</Button>
               </div>
+              )}
             </div>
             
             {/* Sidebar */}
-            <div className="col-span-1">
+            <motion.div 
+              className="col-span-1"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
               <Card>
                 <CardHeader>
                   <CardTitle>Categories</CardTitle>
@@ -278,18 +609,16 @@ const Blog = () => {
                     {categories.map((category) => (
                       <Button 
                         key={category} 
-                        variant="ghost" 
+                        variant={selectedCategory === category ? "default" : "ghost"}
                         className="justify-between w-full"
-                        asChild
+                        onClick={() => setSelectedCategory(category)}
                       >
-                        <Link to={`/blog/category/${category}`}>
                           {category}
                           <Badge variant="secondary" className="ml-2">
                             {blogPosts.filter(post => 
                               category === "All" ? true : post.category === category
                             ).length}
                           </Badge>
-                        </Link>
                       </Button>
                     ))}
                   </div>
@@ -303,7 +632,12 @@ const Blog = () => {
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
                     {popularTags.map((tag) => (
-                      <Badge key={tag} variant="outline" className="hover:bg-secondary cursor-pointer">
+                      <Badge 
+                        key={tag} 
+                        variant={selectedTags.includes(tag) ? "default" : "outline"}
+                        className="hover:bg-secondary cursor-pointer"
+                        onClick={() => handleTagSelect(tag)}
+                      >
                         <Tag className="h-3 w-3 mr-1" />
                         {tag}
                       </Badge>
@@ -320,13 +654,65 @@ const Blog = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    <Input placeholder="Your email address" />
+                  <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+                    <Input placeholder="Your email address" type="email" />
                     <Button className="w-full">Subscribe</Button>
+                  </form>
+                </CardContent>
+              </Card>
+
+              <Card className="mt-6">
+                <CardHeader>
+                  <CardTitle>Saved Articles</CardTitle>
+                  <CardDescription>
+                    Articles you've bookmarked for later
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {savedPosts.length === 0 ? (
+                      <p className="text-sm text-muted-foreground text-center py-4">
+                        No saved articles yet
+                      </p>
+                    ) : (
+                      blogPosts
+                        .filter(post => savedPosts.includes(post.id))
+                        .map(post => (
+                          <div 
+                            key={post.id} 
+                            className="flex items-start gap-3 group"
+                          >
+                            <div className="flex-1">
+                              <Link 
+                                to={`/blog/${post.id}`}
+                                className="text-sm font-medium hover:text-primary transition-colors"
+                              >
+                                {post.title}
+                              </Link>
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-xs text-muted-foreground">
+                                  {post.date}
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                  {post.readTime} read
+                                </span>
+                              </div>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={() => handleSavePost(post.id)}
+                            >
+                              <BookmarkCheck className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))
+                    )}
                   </div>
                 </CardContent>
               </Card>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import SignInForm from "@/components/SignInForm";
@@ -6,16 +6,18 @@ import RegisterForm from "@/components/RegisterForm";
 import { motion } from "framer-motion";
 import { useUser } from "@/contexts/UserContext";
 import Footer from "@/components/Footer";
+import AnimatedTitle from "@/components/ui/animated-title";
+import { Users, ShieldCheck, Globe2 } from "lucide-react";
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const type = searchParams.get("type") || "signin";
+  const [isRegister, setIsRegister] = useState(searchParams.get("type") === "register");
   const { isAuthenticated } = useUser();
 
   // Redirect to the proper URL if needed
   useEffect(() => {
-    if (type !== "signin" && type !== "register") {
+    if (searchParams.get("type") !== "signin" && searchParams.get("type") !== "register") {
       navigate("/auth?type=signin", { replace: true });
     }
     
@@ -23,82 +25,47 @@ const Auth = () => {
     if (isAuthenticated) {
       navigate("/dashboard");
     }
-  }, [type, navigate, isAuthenticated]);
+  }, [searchParams, navigate, isAuthenticated]);
 
   // Page title effect
   useEffect(() => {
-    document.title = type === "register" 
-      ? "Register - CPG Matchmaker" 
-      : "Sign In - CPG Matchmaker";
-  }, [type]);
+    document.title = isRegister ? "Register - CPG Matchmaker" : "Sign In - CPG Matchmaker";
+  }, [isRegister]);
+
+  useEffect(() => {
+    setIsRegister(searchParams.get("type") === "register");
+  }, [searchParams]);
 
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      <div className="flex-grow pt-24 pb-12 flex items-center justify-center relative">
+      <div className="flex-grow pt-16 pb-12 flex flex-col items-center justify-start relative">
         {/* Background blur circles */}
         <div className="absolute top-40 -left-40 w-80 h-80 bg-primary/30 rounded-full filter blur-3xl opacity-30 animate-pulse-slow" />
         <div className="absolute bottom-20 -right-40 w-80 h-80 bg-accent/30 rounded-full filter blur-3xl opacity-30 animate-pulse-slow" />
         
         <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
-            <div className="order-2 md:order-1">
-              {type === "signin" ? <SignInForm /> : <RegisterForm />}
+          {/* Main Title Section */}
+          <div className="mb-16">
+            <AnimatedTitle
+              title={isRegister ? "Join Our Platform" : "Welcome Back!"}
+              subtitle={
+                isRegister
+                  ? "Create your account and start connecting with CPG industry professionals"
+                  : "Sign in to your account and continue your journey"
+              }
+              size="xl"
+              className="relative z-10"
+            />
             </div>
             
-            <div className="order-1 md:order-2 text-center">
-              {/* Enhanced Title Animation */}
-              <div className="relative mb-8">
-                <motion.div
-                  className="absolute -inset-1 bg-gradient-to-r from-primary via-accent to-primary rounded-lg opacity-20 blur"
-                  animate={{
-                    backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-                  }}
-                  transition={{
-                    duration: 5,
-                    repeat: Infinity,
-                    ease: "linear"
-                  }}
-                  style={{
-                    backgroundSize: "200% 200%"
-                  }}
-                />
-                <motion.h1 
-                  className="relative text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  {type === "register" ? "Join Our Platform" : "Welcome Back"}
-                </motion.h1>
-                {/* Animated Underline */}
-                <motion.div
-                  className="absolute -bottom-2 left-1/2 -translate-x-1/2 h-[2px] bg-gradient-to-r from-primary via-accent to-primary rounded-full"
-                  initial={{ width: "0%" }}
-                  animate={{ width: "80%" }}
-                  transition={{
-                    duration: 0.8,
-                    delay: 0.3,
-                    ease: "easeOut"
-                  }}
-                />
-              </div>
-
-              <motion.p 
-                className="text-xl text-foreground/70 mb-12 relative max-w-2xl mx-auto"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-              >
-                {type === "register" 
-                  ? "Create an account to connect with the perfect partners in the CPG industry."
-                  : "Sign in to access your account and continue your journey in the CPG industry."
-                }
-              </motion.p>
-              
+          {/* Content Grid */}
+          <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-start">
+            {/* Illustration Section */}
+            <div className="order-1">
               <motion.div 
-                className="h-[300px] w-full relative rounded-2xl overflow-hidden shadow-xl"
+                className="h-[400px] w-full relative rounded-2xl overflow-hidden shadow-xl"
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
@@ -317,25 +284,130 @@ const Auth = () => {
                   }}
                 />
               </motion.div>
+
+              {/* Stats Section */}
+              <motion.div
+                className="mt-8 grid grid-cols-3 gap-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
+                {/* Active Users */}
+                <motion.div
+                  className="flex flex-col items-center p-4 rounded-xl bg-background/50 backdrop-blur-sm border border-primary/10"
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                >
+                  <motion.div
+                    className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-2"
+                    animate={{
+                      scale: [1, 1.1, 1],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  >
+                    <Users className="w-5 h-5 text-primary" />
+                  </motion.div>
+                  <motion.span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
+                    10K+
+                  </motion.span>
+                  <span className="text-sm text-muted-foreground mt-1">Active Users</span>
+                </motion.div>
+
+                {/* Secure Platform */}
+                <motion.div
+                  className="flex flex-col items-center p-4 rounded-xl bg-background/50 backdrop-blur-sm border border-primary/10"
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                >
+                  <motion.div
+                    className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-2"
+                    animate={{
+                      scale: [1, 1.1, 1],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                      delay: 0.3
+                    }}
+                  >
+                    <ShieldCheck className="w-5 h-5 text-primary" />
+                  </motion.div>
+                  <motion.span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
+                    100%
+                  </motion.span>
+                  <span className="text-sm text-muted-foreground mt-1">Secure Platform</span>
+                </motion.div>
+
+                {/* Global Reach */}
+                <motion.div
+                  className="flex flex-col items-center p-4 rounded-xl bg-background/50 backdrop-blur-sm border border-primary/10"
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                >
+                  <motion.div
+                    className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-2"
+                    animate={{
+                      scale: [1, 1.1, 1],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                      delay: 0.6
+                    }}
+                  >
+                    <Globe2 className="w-5 h-5 text-primary" />
+                  </motion.div>
+                  <motion.span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
+                    50+
+                  </motion.span>
+                  <span className="text-sm text-muted-foreground mt-1">Countries</span>
+                </motion.div>
+              </motion.div>
               
+              {/* Decorative Line */}
+              <motion.div
+                className="mt-6 h-[1px] w-full bg-gradient-to-r from-transparent via-primary/20 to-transparent"
+                initial={{ scaleX: 0, opacity: 0 }}
+                animate={{ scaleX: 1, opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.5 }}
+              />
+            </div>
+
+            {/* Form Section */}
+            <div className="order-2">
+              <motion.div
+                className="flex justify-center w-full"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
+                {isRegister ? <RegisterForm /> : <SignInForm />}
+              </motion.div>
+
+              {/* Switch Form Type */}
               <motion.div 
-                className="mt-6 text-center"
+                className="mt-8 text-center"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.6 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
               >
-                <p className="text-sm text-foreground/60">
-                  {type === "register" 
-                    ? "Already have an account?" 
-                    : "Don't have an account yet?"
-                  }
-                  {' '}
-                  <Link 
-                    to={type === "register" ? "/auth?type=signin" : "/auth?type=register"}
-                    className="text-primary hover:text-primary/80 transition-colors"
+                <p className="text-muted-foreground">
+                  {isRegister ? "Already have an account?" : "Don't have an account?"}
+                  {" "}
+                  <motion.button
+                    className="text-primary hover:text-accent transition-colors"
+                    onClick={() => setIsRegister(!isRegister)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                   >
-                    {type === "register" ? "Sign in" : "Create one"}
-                  </Link>
+                    {isRegister ? "Sign In" : "Register"}
+                  </motion.button>
                 </p>
               </motion.div>
             </div>

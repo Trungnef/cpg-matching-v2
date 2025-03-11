@@ -1,13 +1,47 @@
-
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clock, ArrowRight, Search, BarChart4, FileText } from "lucide-react";
+import { 
+  Clock, 
+  ArrowRight, 
+  Search, 
+  BarChart4, 
+  FileText,
+  Share2,
+  Bookmark,
+  BookmarkCheck,
+  ChevronRight,
+  Filter,
+  SlidersHorizontal,
+  Building2,
+  Trophy,
+  TrendingUp,
+  Target,
+  Users,
+  Calendar
+} from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetFooter,
+} from "@/components/ui/sheet";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // Mock case studies data
 const caseStudies = [
@@ -107,14 +141,86 @@ const categories = [
   "Retail"
 ];
 
+const fadeInUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: {
+      duration: 0.5
+    }
+  }
+};
+
+const staggerContainer = {
+  visible: {
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
 const CaseStudies = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [savedStudies, setSavedStudies] = useState<number[]>([]);
+  const [sortBy, setSortBy] = useState("latest");
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
   useEffect(() => {
     document.title = "Case Studies - CPG Matchmaker";
     window.scrollTo(0, 0);
+    
+    // Load saved case studies from localStorage
+    const saved = localStorage.getItem("savedCaseStudies");
+    if (saved) {
+      setSavedStudies(JSON.parse(saved));
+    }
   }, []);
   
-  const featuredCaseStudies = caseStudies.filter(study => study.featured);
-  const otherCaseStudies = caseStudies.filter(study => !study.featured);
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleSaveStudy = (studyId: number) => {
+    setSavedStudies(prev => {
+      const newSaved = prev.includes(studyId)
+        ? prev.filter(id => id !== studyId)
+        : [...prev, studyId];
+      
+      localStorage.setItem("savedCaseStudies", JSON.stringify(newSaved));
+      return newSaved;
+    });
+  };
+
+  const handleShare = (study: typeof caseStudies[0]) => {
+    if (navigator.share) {
+      navigator.share({
+        title: study.title,
+        text: study.excerpt,
+        url: window.location.href,
+      });
+    }
+  };
+
+  const filteredStudies = caseStudies
+    .filter(study => {
+      const matchesSearch = study.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          study.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          study.client.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = selectedCategory === "All" || study.category === selectedCategory;
+      
+      return matchesSearch && matchesCategory;
+    })
+    .sort((a, b) => {
+      if (sortBy === "latest") {
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      }
+      return 0;
+    });
+
+  const featuredCaseStudies = filteredStudies.filter(study => study.featured);
+  const otherCaseStudies = filteredStudies.filter(study => !study.featured);
 
   return (
     <div className="min-h-screen bg-background">
@@ -122,38 +228,175 @@ const CaseStudies = () => {
       
       <div className="pt-20">
         {/* Hero section */}
-        <div className="bg-primary/5">
-          <div className="container mx-auto px-4 py-16">
-            <div className="max-w-3xl mx-auto text-center">
-              <h1 className="text-4xl font-bold mb-4">Success Stories</h1>
-              <p className="text-xl text-muted-foreground mb-8">
+        <motion.div 
+          className="bg-primary/5 relative overflow-hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+        >
+          {/* Background Patterns */}
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/5 to-accent/5" />
+            <motion.div
+              className="absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full filter blur-3xl"
+              animate={{
+                scale: [1, 1.2, 1],
+                opacity: [0.3, 0.2, 0.3],
+              }}
+              transition={{
+                duration: 8,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
+            <motion.div
+              className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent/10 rounded-full filter blur-3xl"
+              animate={{
+                scale: [1, 1.1, 1],
+                opacity: [0.3, 0.1, 0.3],
+              }}
+              transition={{
+                duration: 6,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 1
+              }}
+            />
+          </div>
+
+          <div className="container mx-auto px-4 py-16 relative">
+            <motion.div 
+              className="max-w-3xl mx-auto text-center"
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
+            >
+              <motion.h1 
+                className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent"
+                variants={fadeInUp}
+              >
+                Success Stories
+              </motion.h1>
+              <motion.p 
+                className="text-xl text-muted-foreground mb-8"
+                variants={fadeInUp}
+              >
                 Real-world examples of how our platform has helped brands, manufacturers, and retailers achieve their goals
-              </p>
+              </motion.p>
               
-              <div className="relative max-w-md mx-auto">
+              <motion.div 
+                className="relative max-w-md mx-auto"
+                variants={fadeInUp}
+              >
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input 
                   placeholder="Search case studies..." 
-                  className="pl-10 pr-4 py-6" 
+                  className="pl-10 pr-4 py-6 rounded-full"
+                  value={searchQuery}
+                  onChange={handleSearch}
                 />
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="icon"
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full"
+                    >
+                      <SlidersHorizontal className="h-4 w-4" />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent>
+                    <SheetHeader>
+                      <SheetTitle>Filter Case Studies</SheetTitle>
+                      <SheetDescription>
+                        Refine your search with these filters
+                      </SheetDescription>
+                    </SheetHeader>
+                    <div className="py-4 space-y-4">
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-medium">Sort By</h4>
+                        <Select
+                          value={sortBy}
+                          onValueChange={setSortBy}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Sort by" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="latest">Latest First</SelectItem>
+                            <SelectItem value="impact">Highest Impact</SelectItem>
+                            <SelectItem value="popular">Most Popular</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-medium">Categories</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {categories.map((category) => (
+                            <Badge
+                              key={category}
+                              variant={selectedCategory === category ? "default" : "outline"}
+                              className="cursor-pointer"
+                              onClick={() => setSelectedCategory(category)}
+                            >
+                              {category}
+                            </Badge>
+                          ))}
               </div>
             </div>
           </div>
+                    <SheetFooter>
+                      <Button 
+                        variant="outline" 
+                        onClick={() => {
+                          setSelectedCategory("All");
+                          setSortBy("latest");
+                        }}
+                      >
+                        Reset Filters
+                      </Button>
+                      <Button onClick={() => setIsFiltersOpen(false)}>
+                        Apply Filters
+                      </Button>
+                    </SheetFooter>
+                  </SheetContent>
+                </Sheet>
+              </motion.div>
+            </motion.div>
         </div>
+        </motion.div>
         
         <div className="container mx-auto px-4 py-12">
           {/* Featured case studies */}
-          <div className="mb-16">
-            <h2 className="text-2xl font-bold mb-8">Featured Success Stories</h2>
+          <motion.div 
+            className="mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-2xl font-bold">Featured Success Stories</h2>
+              <Button variant="ghost" className="gap-2" asChild>
+                <Link to="/case-studies/featured">
+                  View All <ChevronRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {featuredCaseStudies.map((study) => (
-                <Card key={study.id} className="overflow-hidden border-none shadow-md">
-                  <div className="aspect-[16/9] bg-muted relative">
+                <motion.div
+                  key={study.id}
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Card className="overflow-hidden border-none shadow-md hover:shadow-xl transition-all duration-300">
+                    <div className="aspect-[16/9] bg-muted relative group">
                     <img 
                       src={study.image} 
                       alt={study.title} 
-                      className="w-full h-full object-cover" 
+                        className="w-full h-full object-cover transition-transform group-hover:scale-105" 
                     />
                     <div className="absolute top-4 left-4 bg-white h-12 w-12 rounded-full p-1 shadow-sm">
                       <img 
@@ -165,22 +408,70 @@ const CaseStudies = () => {
                     <Badge className="absolute top-4 right-4">
                       {study.category}
                     </Badge>
+                      <div className="absolute top-4 right-20 flex gap-2">
+                        <Button
+                          variant="secondary"
+                          size="icon"
+                          className="h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleSaveStudy(study.id);
+                          }}
+                        >
+                          {savedStudies.includes(study.id) ? (
+                            <BookmarkCheck className="h-4 w-4" />
+                          ) : (
+                            <Bookmark className="h-4 w-4" />
+                          )}
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          size="icon"
+                          className="h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleShare(study);
+                          }}
+                        >
+                          <Share2 className="h-4 w-4" />
+                        </Button>
                   </div>
-                  <CardHeader>
-                    <div className="text-sm text-muted-foreground mb-2">
-                      {study.client} • {study.date}
                     </div>
-                    <CardTitle className="text-xl">{study.title}</CardTitle>
+                    <CardHeader>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-sm text-muted-foreground flex items-center gap-1">
+                          <Building2 className="h-3 w-3" />
+                          {study.client}
+                        </span>
+                        <span className="text-sm text-muted-foreground flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          {study.date}
+                        </span>
+                      </div>
+                      <Link to={`/case-studies/${study.id}`}>
+                        <CardTitle className="text-xl hover:text-primary transition-colors">
+                          {study.title}
+                        </CardTitle>
+                      </Link>
                     <CardDescription>{study.excerpt}</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-1">
-                      <div className="text-sm font-medium">Key Results:</div>
-                      {study.results.map((result, index) => (
-                        <div key={index} className="flex items-center gap-2 text-sm">
-                          <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
-                          {result}
+                      <div className="space-y-3">
+                        <div className="text-sm font-medium flex items-center gap-2">
+                          <Trophy className="h-4 w-4 text-primary" />
+                          Key Results:
                         </div>
+                        {study.results.map((result, index) => (
+                          <motion.div 
+                            key={index} 
+                            className="flex items-center gap-2 text-sm"
+                            initial={{ opacity: 0, x: -20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                          >
+                            <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
+                            {result}
+                          </motion.div>
                       ))}
                     </div>
                   </CardContent>
@@ -189,22 +480,26 @@ const CaseStudies = () => {
                       <Clock className="h-4 w-4 mr-1 text-muted-foreground" />
                       <span className="text-sm text-muted-foreground">{study.readTime} read</span>
                     </div>
-                    <Button className="gap-1" asChild>
+                      <Button className="gap-1 group" asChild>
                       <Link to={`/case-studies/${study.id}`}>
-                        Read Case Study <ArrowRight className="h-4 w-4" />
+                          <span className="group-hover:translate-x-1 transition-transform">
+                            Read Case Study
+                          </span>
+                          <ArrowRight className="h-4 w-4" />
                       </Link>
                     </Button>
                   </CardFooter>
                 </Card>
+                </motion.div>
               ))}
             </div>
-          </div>
+          </motion.div>
           
           {/* All case studies */}
           <div className="mb-12">
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-2xl font-bold">All Case Studies</h2>
-              <Tabs defaultValue="All">
+              <Tabs defaultValue={selectedCategory} onValueChange={setSelectedCategory}>
                 <TabsList>
                   {categories.slice(0, 4).map((category) => (
                     <TabsTrigger key={category} value={category}>
@@ -215,92 +510,203 @@ const CaseStudies = () => {
               </Tabs>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={selectedCategory}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="grid grid-cols-1 md:grid-cols-3 gap-6"
+              >
               {otherCaseStudies.map((study) => (
-                <Card key={study.id} className="overflow-hidden hover:shadow-sm transition-all">
+                  <motion.div
+                    key={study.id}
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Card className="overflow-hidden hover:shadow-lg transition-all group">
                   <div className="p-4 border-b">
                     <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-3">
                       <div className="bg-muted h-10 w-10 rounded-full p-0.5">
                         <img 
                           src={study.logoImage} 
                           alt={study.client} 
                           className="w-full h-full object-contain" 
                         />
+                            </div>
+                            <div className="text-sm font-medium">{study.client}</div>
                       </div>
                       <Badge variant="outline">{study.category}</Badge>
                     </div>
-                    <h3 className="text-lg font-semibold line-clamp-2 mb-2">{study.title}</h3>
+                        <Link to={`/case-studies/${study.id}`}>
+                          <h3 className="text-lg font-semibold line-clamp-2 hover:text-primary transition-colors mb-2">
+                            {study.title}
+                          </h3>
+                        </Link>
                     <p className="text-sm text-muted-foreground line-clamp-3 mb-3">
                       {study.excerpt}
                     </p>
-                    <div className="text-sm font-medium mb-1">Highlights:</div>
-                    <div className="space-y-1 mb-4">
+                        <div className="space-y-2">
+                          <div className="text-sm font-medium flex items-center gap-2">
+                            <TrendingUp className="h-4 w-4 text-primary" />
+                            Key Achievements:
+                          </div>
                       {study.results.slice(0, 2).map((result, index) => (
-                        <div key={index} className="flex items-center gap-2 text-xs">
-                          <BarChart4 className="h-3 w-3 text-primary" />
+                            <motion.div 
+                              key={index} 
+                              className="flex items-center gap-2 text-xs"
+                              initial={{ opacity: 0, x: -20 }}
+                              whileInView={{ opacity: 1, x: 0 }}
+                              transition={{ delay: index * 0.1 }}
+                            >
+                              <Target className="h-3 w-3 text-primary" />
                           {result}
-                        </div>
-                      ))}
+                            </motion.div>
+                          ))}
                     </div>
                   </div>
                   <CardFooter className="flex justify-between py-3">
-                    <div className="flex items-center">
-                      <FileText className="h-3 w-3 mr-1 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">{study.readTime}</span>
+                        <div className="flex items-center gap-4">
+                          <span className="flex items-center text-xs text-muted-foreground">
+                            <FileText className="h-3 w-3 mr-1" />
+                            {study.readTime}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => handleSaveStudy(study.id)}
+                          >
+                            {savedStudies.includes(study.id) ? (
+                              <BookmarkCheck className="h-4 w-4" />
+                            ) : (
+                              <Bookmark className="h-4 w-4" />
+                            )}
+                          </Button>
                     </div>
-                    <Button variant="ghost" size="sm" className="gap-1 text-primary" asChild>
+                        <Button variant="ghost" size="sm" className="gap-1 group" asChild>
                       <Link to={`/case-studies/${study.id}`}>
-                        Read More <ArrowRight className="h-3 w-3" />
+                            <span className="group-hover:translate-x-1 transition-transform">
+                              Read More
+                            </span>
+                            <ArrowRight className="h-3 w-3" />
                       </Link>
                     </Button>
                   </CardFooter>
                 </Card>
+                  </motion.div>
               ))}
-            </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
           
           {/* Stats section */}
-          <div className="bg-secondary/30 rounded-lg p-8 mb-12">
+          <motion.div 
+            className="bg-secondary/30 rounded-lg p-8 mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold mb-2">Proven Results</h2>
+              <h2 className="text-2xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
+                Proven Results
+              </h2>
               <p className="text-muted-foreground">Success metrics from clients across our platform</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-1">35%</div>
-                <div className="text-sm text-muted-foreground">Average Cost Reduction</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-1">42%</div>
-                <div className="text-sm text-muted-foreground">Faster Time to Market</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-1">250+</div>
-                <div className="text-sm text-muted-foreground">Successful Partnerships</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-1">89%</div>
-                <div className="text-sm text-muted-foreground">Client Retention Rate</div>
-              </div>
+              {[
+                { value: "35%", label: "Average Cost Reduction", icon: TrendingUp },
+                { value: "42%", label: "Faster Time to Market", icon: Clock },
+                { value: "250+", label: "Successful Partnerships", icon: Users },
+                { value: "89%", label: "Client Retention Rate", icon: Target }
+              ].map((stat, index) => (
+                <motion.div 
+                  key={index}
+                  className="text-center p-4 rounded-lg bg-background/50 hover:bg-background/80 transition-colors"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <motion.div
+                    className="inline-block text-primary mb-2"
+                    animate={{
+                      rotate: [0, 10, -10, 0],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      repeatDelay: index
+                    }}
+                  >
+                    <stat.icon className="h-6 w-6" />
+                  </motion.div>
+                  <div className="text-3xl font-bold text-primary mb-1">{stat.value}</div>
+                  <div className="text-sm text-muted-foreground">{stat.label}</div>
+                </motion.div>
+              ))}
             </div>
-          </div>
+          </motion.div>
           
           {/* CTA section */}
-          <div className="bg-primary/10 rounded-lg p-8 text-center">
-            <h2 className="text-2xl font-bold mb-3">Ready to create your own success story?</h2>
-            <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
+          <motion.div 
+            className="bg-gradient-to-br from-primary/10 via-background to-accent/10 rounded-lg p-8 text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            whileHover={{ scale: 1.02 }}
+            transition={{ duration: 0.4 }}
+          >
+            <motion.h2 
+              className="text-2xl md:text-3xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent"
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+            >
+              Ready to create your own success story?
+            </motion.h2>
+            <motion.p 
+              className="text-muted-foreground mb-6 max-w-2xl mx-auto"
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+            >
               Join thousands of brands, manufacturers, and retailers who are already using our platform to grow their businesses
-            </p>
-            <div className="flex gap-4 justify-center">
-              <Button variant="outline" asChild>
-                <Link to="/manufacturers">Browse Manufacturers</Link>
+            </motion.p>
+            <motion.div 
+              className="flex gap-4 justify-center"
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+            >
+              <Button 
+                variant="outline" 
+                className="group"
+                asChild
+              >
+                <Link to="/manufacturers">
+                  <span className="group-hover:translate-x-1 transition-transform">
+                    Browse Manufacturers
+                  </span>
+                </Link>
               </Button>
-              <Button asChild>
-                <Link to="/auth?type=register">Get Started</Link>
+              <Button 
+                className="bg-gradient-to-r from-primary to-accent hover:shadow-lg transition-all duration-300 group"
+                asChild
+              >
+                <Link to="/auth?type=register">
+                  <span className="group-hover:translate-x-1 transition-transform">
+                    Get Started
+                  </span>
+                </Link>
               </Button>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </div>
     </div>
