@@ -24,7 +24,8 @@ import {
   TrendingUp,
   Target,
   Users,
-  Calendar
+  Calendar,
+  MoreVertical
 } from "lucide-react";
 import {
   Sheet,
@@ -42,6 +43,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 // Mock case studies data
 const caseStudies = [
@@ -166,6 +187,7 @@ const CaseStudies = () => {
   const [savedStudies, setSavedStudies] = useState<number[]>([]);
   const [sortBy, setSortBy] = useState("latest");
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [isBookmarkDialogOpen, setIsBookmarkDialogOpen] = useState(false);
 
   useEffect(() => {
     document.title = "Case Studies - CPG Matchmaker";
@@ -221,6 +243,7 @@ const CaseStudies = () => {
 
   const featuredCaseStudies = filteredStudies.filter(study => study.featured);
   const otherCaseStudies = filteredStudies.filter(study => !study.featured);
+  const bookmarkedCaseStudies = caseStudies.filter(study => savedStudies.includes(study.id));
 
   return (
     <div className="min-h-screen bg-background">
@@ -291,77 +314,200 @@ const CaseStudies = () => {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input 
                   placeholder="Search case studies..." 
-                  className="pl-10 pr-4 py-6 rounded-full"
+                  className="pl-10 pr-24 py-6 rounded-full"
                   value={searchQuery}
                   onChange={handleSearch}
                 />
-                <Sheet>
-                  <SheetTrigger asChild>
-                    <Button 
-                      variant="outline" 
-                      size="icon"
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full"
-                    >
-                      <SlidersHorizontal className="h-4 w-4" />
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent>
-                    <SheetHeader>
-                      <SheetTitle>Filter Case Studies</SheetTitle>
-                      <SheetDescription>
-                        Refine your search with these filters
-                      </SheetDescription>
-                    </SheetHeader>
-                    <div className="py-4 space-y-4">
-                      <div className="space-y-2">
-                        <h4 className="text-sm font-medium">Sort By</h4>
-                        <Select
-                          value={sortBy}
-                          onValueChange={setSortBy}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Sort by" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="latest">Latest First</SelectItem>
-                            <SelectItem value="impact">Highest Impact</SelectItem>
-                            <SelectItem value="popular">Most Popular</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <h4 className="text-sm font-medium">Categories</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {categories.map((category) => (
-                            <Badge
-                              key={category}
-                              variant={selectedCategory === category ? "default" : "outline"}
-                              className="cursor-pointer"
-                              onClick={() => setSelectedCategory(category)}
+                <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex gap-2">
+                  <Dialog open={isBookmarkDialogOpen} onOpenChange={setIsBookmarkDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        size="icon"
+                        className="rounded-full relative"
+                      >
+                        <Bookmark className="h-4 w-4" />
+                        {savedStudies.length > 0 && (
+                          <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground rounded-full w-4 h-4 text-xs flex items-center justify-center">
+                            {savedStudies.length}
+                          </span>
+                        )}
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                          <BookmarkCheck className="h-5 w-5 text-primary" />
+                          Saved Case Studies
+                          <Badge variant="outline" className="ml-2">
+                            {savedStudies.length} saved
+                          </Badge>
+                        </DialogTitle>
+                        <DialogDescription>
+                          Your bookmarked case studies for quick access
+                        </DialogDescription>
+                      </DialogHeader>
+
+                      {bookmarkedCaseStudies.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                          {bookmarkedCaseStudies.map((study) => (
+                            <motion.div
+                              key={study.id}
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.2 }}
                             >
-                              {category}
-                            </Badge>
+                              <Card className="overflow-hidden h-full group hover:shadow-md transition-all duration-300">
+                                <CardHeader className="pb-2">
+                                  <div className="flex items-center justify-between mb-1">
+                                    <Badge variant="outline" className="text-xs">
+                                      {study.category}
+                                    </Badge>
+                                    <span className="text-xs text-muted-foreground flex items-center">
+                                      <Clock className="h-3 w-3 mr-1" />
+                                      {study.readTime}
+                                    </span>
+                                  </div>
+                                  <CardTitle className="text-base hover:text-primary transition-colors line-clamp-2">
+                                    <Link to={`/case-studies/${study.id}`}>
+                                      {study.title}
+                                    </Link>
+                                  </CardTitle>
+                                </CardHeader>
+                                
+                                <CardContent className="pb-2">
+                                  <div className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                                    {study.excerpt}
+                                  </div>
+                                  <div className="flex items-center gap-2 text-sm">
+                                    <Building2 className="h-4 w-4 text-muted-foreground" />
+                                    <span className="font-medium">{study.client}</span>
+                                    <span className="text-muted-foreground">•</span>
+                                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                                    <span className="text-muted-foreground">{study.date}</span>
+                                  </div>
+                                </CardContent>
+                                
+                                <CardFooter className="pt-2 flex justify-between border-t">
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button variant="ghost" size="icon">
+                                        <MoreVertical className="h-4 w-4" />
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="start">
+                                      <DropdownMenuItem onClick={() => handleShare(study)}>
+                                        <Share2 className="h-4 w-4 mr-2" />
+                                        Share
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem onClick={() => handleSaveStudy(study.id)}>
+                                        <Bookmark className="h-4 w-4 mr-2" />
+                                        Remove from saved
+                                      </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                  <Button 
+                                    variant="default" 
+                                    size="sm" 
+                                    className="gap-1"
+                                    asChild
+                                  >
+                                    <Link to={`/case-studies/${study.id}`}>
+                                      Read Case Study
+                                      <ArrowRight className="h-3 w-3" />
+                                    </Link>
+                                  </Button>
+                                </CardFooter>
+                              </Card>
+                            </motion.div>
                           ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-8">
+                          <Bookmark className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                          <h3 className="text-lg font-medium mb-2">No saved case studies</h3>
+                          <p className="text-muted-foreground mb-4">
+                            Click the bookmark icon on any case study to save it for later
+                          </p>
+                          <Button 
+                            variant="outline" 
+                            onClick={() => setIsBookmarkDialogOpen(false)}
+                          >
+                            Browse Case Studies
+                          </Button>
+                        </div>
+                      )}
+                    </DialogContent>
+                  </Dialog>
+
+                  <Sheet>
+                    <SheetTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        size="icon"
+                        className="rounded-full"
+                      >
+                        <SlidersHorizontal className="h-4 w-4" />
+                      </Button>
+                    </SheetTrigger>
+                    <SheetContent>
+                      <SheetHeader>
+                        <SheetTitle>Filter Case Studies</SheetTitle>
+                        <SheetDescription>
+                          Refine your search with these filters
+                        </SheetDescription>
+                      </SheetHeader>
+                      <div className="py-4 space-y-4">
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-medium">Sort By</h4>
+                          <Select
+                            value={sortBy}
+                            onValueChange={setSortBy}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Sort by" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="latest">Latest First</SelectItem>
+                              <SelectItem value="impact">Highest Impact</SelectItem>
+                              <SelectItem value="popular">Most Popular</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <h4 className="text-sm font-medium">Categories</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {categories.map((category) => (
+                              <Badge
+                                key={category}
+                                variant={selectedCategory === category ? "default" : "outline"}
+                                className="cursor-pointer"
+                                onClick={() => setSelectedCategory(category)}
+                              >
+                                {category}
+                              </Badge>
+                            ))}
               </div>
             </div>
           </div>
-                    <SheetFooter>
-                      <Button 
-                        variant="outline" 
-                        onClick={() => {
-                          setSelectedCategory("All");
-                          setSortBy("latest");
-                        }}
-                      >
-                        Reset Filters
-                      </Button>
-                      <Button onClick={() => setIsFiltersOpen(false)}>
-                        Apply Filters
-                      </Button>
-                    </SheetFooter>
-                  </SheetContent>
-                </Sheet>
+                      <SheetFooter>
+                        <Button 
+                          variant="outline" 
+                          onClick={() => {
+                            setSelectedCategory("All");
+                            setSortBy("latest");
+                          }}
+                        >
+                          Reset Filters
+                        </Button>
+                        <Button onClick={() => setIsFiltersOpen(false)}>
+                          Apply Filters
+                        </Button>
+                      </SheetFooter>
+                    </SheetContent>
+                  </Sheet>
+                </div>
               </motion.div>
             </motion.div>
         </div>
@@ -564,7 +710,7 @@ const CaseStudies = () => {
                               <Target className="h-3 w-3 text-primary" />
                           {result}
                             </motion.div>
-                          ))}
+                      ))}
                     </div>
                   </div>
                   <CardFooter className="flex justify-between py-3">
