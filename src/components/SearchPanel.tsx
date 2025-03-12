@@ -30,7 +30,7 @@ import {
   History, 
   Star, 
   X, 
-  LoaderCircle, 
+  Loader, 
   SlidersHorizontal,
   CalendarIcon,
   Save,
@@ -275,7 +275,7 @@ const SearchPanel = ({ isOpen, onClose }: SearchPanelProps) => {
                     autoFocus
                   />
                   {isLoading ? (
-                    <LoaderCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground animate-spin" />
+                    <Loader className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground animate-spin" />
                   ) : (
                     <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   )}
@@ -315,7 +315,7 @@ const SearchPanel = ({ isOpen, onClose }: SearchPanelProps) => {
                 <div className="flex gap-2">
                   <Button type="submit" className="h-11" disabled={isLoading}>
                     {isLoading ? (
-                      <LoaderCircle className="h-4 w-4 mr-2 animate-spin" />
+                      <Loader className="h-4 w-4 mr-2 animate-spin" />
                     ) : (
                       <Search className="h-4 w-4 mr-2" />
                     )}
