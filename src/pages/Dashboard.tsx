@@ -94,6 +94,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+// Add CSS to prevent focus outline
+const noFocusOutlineStyle = {
+  WebkitTapHighlightColor: 'transparent',
+  '&:focus': {
+    outline: 'none'
+  },
+  '&:focus-visible': {
+    outline: 'none'
+  }
+};
+
 // Mock product data
 const products = [
   {
@@ -2411,6 +2422,7 @@ const Dashboard = () => {
               variant="ghost" 
               className={`w-full justify-start gap-2 ${activeView === "production" ? "bg-secondary" : ""}`} 
               onClick={() => setActiveView("production")}
+              style={noFocusOutlineStyle}
             >
               <Factory className="h-4 w-4" />
               Production
@@ -2419,6 +2431,7 @@ const Dashboard = () => {
               variant="ghost" 
               className={`w-full justify-start gap-2 ${activeView === "products" ? "bg-secondary" : ""}`} 
               onClick={() => setActiveView("products")}
+              style={noFocusOutlineStyle}
             >
               <Package className="h-4 w-4" />
               Products
@@ -2427,6 +2440,7 @@ const Dashboard = () => {
               variant="ghost" 
               className={`w-full justify-start gap-2 ${activeView === "inventory" ? "bg-secondary" : ""}`} 
               onClick={() => setActiveView("inventory")}
+              style={noFocusOutlineStyle}
             >
               <Warehouse className="h-4 w-4" />
               Inventory
@@ -2435,6 +2449,7 @@ const Dashboard = () => {
               variant="ghost" 
               className={`w-full justify-start gap-2 ${activeView === "suppliers" ? "bg-secondary" : ""}`} 
               onClick={() => setActiveView("suppliers")}
+              style={noFocusOutlineStyle}
             >
               <Truck className="h-4 w-4" />
               Suppliers
@@ -2443,6 +2458,7 @@ const Dashboard = () => {
               variant="ghost" 
               className={`w-full justify-start gap-2 ${activeView === "matches" ? "bg-secondary" : ""}`} 
               onClick={() => setActiveView("matches")}
+              style={noFocusOutlineStyle}
             >
               <Users className="h-4 w-4" />
               Matches
@@ -2451,6 +2467,7 @@ const Dashboard = () => {
               variant="ghost" 
               className={`w-full justify-start gap-2 ${activeView === "analytics" ? "bg-secondary" : ""}`} 
               onClick={() => setActiveView("analytics")}
+              style={noFocusOutlineStyle}
             >
               <BarChart4 className="h-4 w-4" />
               Analytics
@@ -2459,6 +2476,7 @@ const Dashboard = () => {
               variant="ghost" 
               className={`w-full justify-start gap-2 ${activeView === "manufacturers" ? "bg-secondary" : ""}`} 
               onClick={() => setActiveView("manufacturers")}
+              style={noFocusOutlineStyle}
             >
               <Factory className="h-4 w-4" />
               Manufacturers
@@ -2472,6 +2490,7 @@ const Dashboard = () => {
               variant="ghost" 
               className={`w-full justify-start gap-2 ${activeView === "products" ? "bg-secondary" : ""}`} 
               onClick={() => setActiveView("products")}
+              style={noFocusOutlineStyle}
             >
               <Package className="h-4 w-4" />
               Products
@@ -2480,6 +2499,7 @@ const Dashboard = () => {
               variant="ghost" 
               className={`w-full justify-start gap-2 ${activeView === "manufacturers" ? "bg-secondary" : ""}`} 
               onClick={() => setActiveView("manufacturers")}
+              style={noFocusOutlineStyle}
             >
               <Factory className="h-4 w-4" />
               Manufacturers
@@ -2488,6 +2508,7 @@ const Dashboard = () => {
               variant="ghost" 
               className={`w-full justify-start gap-2 ${activeView === "brands" ? "bg-secondary" : ""}`} 
               onClick={() => setActiveView("brands")}
+              style={noFocusOutlineStyle}
             >
               <Building2 className="h-4 w-4" />
               Brands
@@ -2496,6 +2517,7 @@ const Dashboard = () => {
               variant="ghost" 
               className={`w-full justify-start gap-2 ${activeView === "analytics" ? "bg-secondary" : ""}`} 
               onClick={() => setActiveView("analytics")}
+              style={noFocusOutlineStyle}
             >
               <BarChart4 className="h-4 w-4" />
               Analytics
@@ -2509,6 +2531,7 @@ const Dashboard = () => {
               variant="ghost" 
               className={`w-full justify-start gap-2 ${activeView === "inventory" ? "bg-secondary" : ""}`} 
               onClick={() => setActiveView("inventory")}
+              style={noFocusOutlineStyle}
             >
               <Warehouse className="h-4 w-4" />
               Inventory
@@ -2517,6 +2540,7 @@ const Dashboard = () => {
               variant="ghost" 
               className={`w-full justify-start gap-2 ${activeView === "brands" ? "bg-secondary" : ""}`} 
               onClick={() => setActiveView("brands")}
+              style={noFocusOutlineStyle}
             >
               <Store className="h-4 w-4" />
               Brands
@@ -2525,6 +2549,7 @@ const Dashboard = () => {
               variant="ghost" 
               className={`w-full justify-start gap-2 ${activeView === "matches" ? "bg-secondary" : ""}`} 
               onClick={() => setActiveView("matches")}
+              style={noFocusOutlineStyle}
             >
               <Handshake className="h-4 w-4" />
               Partnerships
@@ -2533,6 +2558,7 @@ const Dashboard = () => {
               variant="ghost" 
               className={`w-full justify-start gap-2 ${activeView === "analytics" ? "bg-secondary" : ""}`} 
               onClick={() => setActiveView("analytics")}
+              style={noFocusOutlineStyle}
             >
               <BarChart4 className="h-4 w-4" />
               Analytics
@@ -2607,6 +2633,7 @@ const Dashboard = () => {
                 size="sm" 
                 className="w-full justify-start"
                 onClick={handleLogout}
+                style={noFocusOutlineStyle}
               >
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
@@ -2618,6 +2645,7 @@ const Dashboard = () => {
                 variant="ghost" 
                 className={`w-full justify-start gap-2 ${activeView === "overview" ? "bg-secondary" : ""}`} 
                 onClick={() => setActiveView("overview")}
+                style={noFocusOutlineStyle}
               >
                 <Home className="h-4 w-4" />
                 Overview
@@ -2632,6 +2660,7 @@ const Dashboard = () => {
                 variant="ghost" 
                 className="w-full justify-start gap-2" 
                 onClick={() => navigate("/profile")}
+                style={noFocusOutlineStyle}
               >
                 <User className="h-4 w-4" />
                 Profile
@@ -2640,6 +2669,7 @@ const Dashboard = () => {
                 variant="ghost" 
                 className="w-full justify-start gap-2" 
                 onClick={() => navigate(`/${role}/settings`)}
+                style={noFocusOutlineStyle}
               >
                 <Settings className="h-4 w-4" />
                 Settings
