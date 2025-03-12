@@ -25,4 +25,3 @@ dist-ssr
 
 .venv/
 node_modules/
-package-lock.json

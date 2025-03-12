@@ -58,7 +58,7 @@ import RetailerSettings from "./pages/retailer/Settings";
 // TODO: Create ThemeContext and FavoriteContext files in src/contexts/
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { FavoriteProvider } from "@/contexts/FavoriteContext";
-import { CompareProvider } from "@/context/CompareContext";
+import { CompareProvider } from "@/contexts/CompareContext";
 import { ManufacturerFavoriteProvider } from "@/contexts/ManufacturerFavoriteContext";
 import { ManufacturerCompareProvider } from "@/contexts/ManufacturerCompareContext";
 
