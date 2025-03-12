@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -24,7 +23,10 @@ import {
   CreditCard, 
   AlertCircle, 
   Factory,
-  Building2
+  Building2,
+  LogOut,
+  Globe,
+  User
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
@@ -46,17 +48,43 @@ const Settings = () => {
   const [companyName, setCompanyName] = useState(user?.companyName || "");
   const [email, setEmail] = useState(user?.email || "");
   const [phone, setPhone] = useState("+1 (555) 123-4567");
+  const [website, setWebsite] = useState("https://example.com");
   const [address, setAddress] = useState("123 Manufacturing Way");
-  const [city, setCity] = useState("San Francisco");
+  const [city, setCity] = useState("Industrial City");
   const [state, setState] = useState("CA");
-  const [zipCode, setZipCode] = useState("94105");
-  const [description, setDescription] = useState("We are a leading organic food manufacturer specializing in cereal, energy bars, and healthy snacks. Our facility is certified organic, non-GMO, and follows sustainable manufacturing practices.");
+  const [zipCode, setZipCode] = useState("90210");
+  const [description, setDescription] = useState("Leading manufacturer of food processing equipment");
+  const [userName, setUserName] = useState(user?.name || "");
+  // Manufacturer specific fields
+  const [productionCapacity, setProductionCapacity] = useState("10000");
+  const [minimumOrderValue, setMinimumOrderValue] = useState("5000");
+  const [certifications, setCertifications] = useState("ISO 9001, HACCP, FDA Approved");
   
   // Notification settings
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [messageNotifications, setMessageNotifications] = useState(true);
   const [matchNotifications, setMatchNotifications] = useState(true);
   const [marketingNotifications, setMarketingNotifications] = useState(false);
+  
+  // Security settings
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [activeSessions, setActiveSessions] = useState([
+    {
+      device: "Current Browser",
+      platform: "Windows • Chrome",
+      time: "Today at 10:30 AM",
+      isActive: true
+    },
+    {
+      device: "Mobile Device",
+      platform: "iOS • Safari",
+      time: "Yesterday at 3:15 PM",
+      isActive: false
+    }
+  ]);
   
   useEffect(() => {
     document.title = "Account Settings - CPG Matchmaker";
@@ -84,9 +112,19 @@ const Settings = () => {
   };
 
   const handleSaveSecurity = () => {
+    // Validate password inputs
+    if (newPassword && newPassword !== confirmPassword) {
+      toast({
+        title: "Passwords don't match",
+        description: "Please ensure your passwords match and try again.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     toast({
-      title: "Security settings updated",
-      description: "Your security preferences have been saved.",
+      title: "Security settings saved",
+      description: "Your security preferences have been updated successfully."
     });
   };
 
@@ -94,6 +132,23 @@ const Settings = () => {
     toast({
       title: "Manufacturing settings updated",
       description: "Your manufacturing details have been saved.",
+    });
+  };
+
+  const handleLogoutAllDevices = () => {
+    // In a real app, this would call an API to invalidate all sessions
+    setActiveSessions([
+      {
+        device: "Current Browser",
+        platform: "Windows • Chrome",
+        time: "Just now",
+        isActive: true
+      }
+    ]);
+    
+    toast({
+      title: "Signed out from all devices",
+      description: "You have been signed out from all other devices."
     });
   };
 
@@ -149,39 +204,52 @@ const Settings = () => {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <div className="space-y-2">
-                      <label htmlFor="companyName" className="text-sm font-medium">
-                        Company Name
+                      <label htmlFor="userName" className="text-sm font-medium">
+                        Name
                       </label>
-                      <div className="flex">
-                        <div className="relative flex-1">
-                          <Building2 className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                          <Input 
-                            id="companyName" 
-                            value={companyName}
-                            onChange={e => setCompanyName(e.target.value)}
-                            className="pl-9"
-                          />
-                        </div>
+                      <div className="relative">
+                        <User className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                        <Input 
+                          id="userName" 
+                          value={userName}
+                          onChange={e => setUserName(e.target.value)}
+                          className="pl-9"
+                        />
                       </div>
                     </div>
-                    
+
                     <div className="space-y-2">
                       <label htmlFor="email" className="text-sm font-medium">
                         Email Address
                       </label>
-                      <div className="flex">
-                        <div className="relative flex-1">
-                          <Mail className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                          <Input 
-                            id="email" 
-                            type="email"
-                            value={email}
-                            onChange={e => setEmail(e.target.value)}
-                            className="pl-9"
-                          />
-                        </div>
+                      <div className="relative">
+                        <Mail className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                        <Input 
+                          id="email" 
+                          type="email"
+                          value={email}
+                          onChange={e => setEmail(e.target.value)}
+                          className="pl-9"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div className="space-y-2">
+                      <label htmlFor="companyName" className="text-sm font-medium">
+                        Company Name
+                      </label>
+                      <div className="relative">
+                        <Building2 className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                        <Input 
+                          id="companyName" 
+                          value={companyName}
+                          onChange={e => setCompanyName(e.target.value)}
+                          className="pl-9"
+                        />
                       </div>
                     </div>
                     
@@ -189,69 +257,48 @@ const Settings = () => {
                       <label htmlFor="phone" className="text-sm font-medium">
                         Phone Number
                       </label>
-                      <div className="flex">
-                        <div className="relative flex-1">
-                          <Phone className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                          <Input 
-                            id="phone" 
-                            value={phone}
-                            onChange={e => setPhone(e.target.value)}
-                            className="pl-9"
-                          />
-                        </div>
+                      <div className="relative">
+                        <Phone className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                        <Input 
+                          id="phone" 
+                          value={phone}
+                          onChange={e => setPhone(e.target.value)}
+                          className="pl-9"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div className="space-y-2">
+                      <label htmlFor="website" className="text-sm font-medium">
+                        Website
+                      </label>
+                      <div className="relative">
+                        <Globe className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                        <Input 
+                          id="website" 
+                          value={website}
+                          onChange={e => setWebsite(e.target.value)}
+                          className="pl-9"
+                          placeholder="https://example.com"
+                        />
                       </div>
                     </div>
                     
                     <div className="space-y-2">
                       <label htmlFor="address" className="text-sm font-medium">
-                        Street Address
+                        Address
                       </label>
-                      <div className="flex">
-                        <div className="relative flex-1">
-                          <MapPin className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                          <Input 
-                            id="address" 
-                            value={address}
-                            onChange={e => setAddress(e.target.value)}
-                            className="pl-9"
-                          />
-                        </div>
+                      <div className="relative">
+                        <MapPin className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                        <Input 
+                          id="address" 
+                          value={address}
+                          onChange={e => setAddress(e.target.value)}
+                          className="pl-9"
+                        />
                       </div>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <label htmlFor="city" className="text-sm font-medium">
-                        City
-                      </label>
-                      <Input 
-                        id="city" 
-                        value={city}
-                        onChange={e => setCity(e.target.value)}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <label htmlFor="state" className="text-sm font-medium">
-                        State
-                      </label>
-                      <Input 
-                        id="state" 
-                        value={state}
-                        onChange={e => setState(e.target.value)}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <label htmlFor="zipCode" className="text-sm font-medium">
-                        Zip Code
-                      </label>
-                      <Input 
-                        id="zipCode" 
-                        value={zipCode}
-                        onChange={e => setZipCode(e.target.value)}
-                      />
                     </div>
                   </div>
                   
@@ -263,11 +310,54 @@ const Settings = () => {
                       id="description" 
                       value={description}
                       onChange={e => setDescription(e.target.value)}
-                      rows={4}
+                      className="min-h-[120px]"
+                      placeholder="Tell us about your company..."
                     />
-                    <p className="text-xs text-muted-foreground">
-                      This description will be visible to potential brand partners.
-                    </p>
+                  </div>
+
+                  <Separator className="my-6" />
+                  
+                  <div>
+                    <h3 className="text-lg font-medium mb-4">Manufacturer Details</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div className="space-y-2">
+                        <label htmlFor="productionCapacity" className="text-sm font-medium">
+                          Production Capacity (units/month)
+                        </label>
+                        <Input 
+                          id="productionCapacity" 
+                          type="number"
+                          value={productionCapacity || ""}
+                          onChange={e => setProductionCapacity(e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label htmlFor="minimumOrderValue" className="text-sm font-medium">
+                          Minimum Order Value ($)
+                        </label>
+                        <Input 
+                          id="minimumOrderValue" 
+                          type="number"
+                          value={minimumOrderValue || ""}
+                          onChange={e => setMinimumOrderValue(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label htmlFor="certifications" className="text-sm font-medium">
+                        Certifications
+                      </label>
+                      <Textarea 
+                        id="certifications" 
+                        value={certifications || ""}
+                        onChange={e => setCertifications(e.target.value)}
+                        className="min-h-[100px]"
+                        placeholder="Enter certifications separated by commas (e.g. ISO 9001, Organic, HACCP)"
+                      />
+                      <p className="text-sm text-muted-foreground">
+                        Enter all your certifications, separated by commas
+                      </p>
+                    </div>
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-end">
@@ -538,149 +628,93 @@ const Settings = () => {
             </TabsContent>
             
             {/* Security Tab */}
-            <TabsContent value="security">
+            <TabsContent value="security" className="space-y-6">
               <Card>
                 <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle>Security & Privacy</CardTitle>
-                      <CardDescription>
-                        Manage your password and security settings
-                      </CardDescription>
-                    </div>
-                    <Shield className="h-5 w-5 text-muted-foreground" />
-                  </div>
+                  <CardTitle>Security Settings</CardTitle>
+                  <CardDescription>Manage your account security and password</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-4">
-                    <h3 className="text-sm font-medium">Change Password</h3>
-                    
-                    <div className="space-y-2">
-                      <label htmlFor="currentPassword" className="text-sm">
-                        Current Password
-                      </label>
-                      <div className="relative">
-                        <Lock className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                    <h3 className="text-lg font-medium">Change Password</h3>
+                    <div className="grid grid-cols-1 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium" htmlFor="current-password">Current Password</label>
                         <Input 
-                          id="currentPassword" 
+                          id="current-password" 
+                          type="password" 
+                          value={currentPassword}
+                          onChange={(e) => setCurrentPassword(e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium" htmlFor="new-password">New Password</label>
+                        <Input 
+                          id="new-password" 
                           type="password"
-                          className="pl-9"
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium" htmlFor="confirm-password">Confirm New Password</label>
+                        <Input 
+                          id="confirm-password" 
+                          type="password"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
                         />
                       </div>
                     </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label htmlFor="newPassword" className="text-sm">
-                          New Password
-                        </label>
-                        <div className="relative">
-                          <Lock className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                          <Input 
-                            id="newPassword" 
-                            type="password"
-                            className="pl-9"
-                          />
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <label htmlFor="confirmPassword" className="text-sm">
-                          Confirm New Password
-                        </label>
-                        <div className="relative">
-                          <Lock className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                          <Input 
-                            id="confirmPassword" 
-                            type="password"
-                            className="pl-9"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex justify-end">
-                      <Button size="sm" variant="outline">Update Password</Button>
-                    </div>
                   </div>
                   
                   <Separator />
                   
                   <div className="space-y-4">
-                    <h3 className="text-sm font-medium">Two-Factor Authentication</h3>
-                    
-                    <div className="flex items-center justify-between py-2">
-                      <div>
-                        <p className="font-medium">Enable 2FA</p>
-                        <p className="text-sm text-muted-foreground">
-                          Add an extra layer of security to your account
-                        </p>
+                    <h3 className="text-lg font-medium">Two-Factor Authentication</h3>
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <label className="text-sm font-medium">Enable Two-Factor Authentication</label>
+                        <p className="text-sm text-muted-foreground">Add an extra layer of security to your account</p>
                       </div>
-                      <Switch defaultChecked={false} />
+                      <Switch 
+                        checked={twoFactorEnabled}
+                        onCheckedChange={setTwoFactorEnabled}
+                      />
                     </div>
                   </div>
                   
                   <Separator />
                   
+                  {/* Active Sessions Section */}
                   <div className="space-y-4">
-                    <h3 className="text-sm font-medium">Account Privacy</h3>
-                    
-                    <div className="flex items-center justify-between py-2">
-                      <div>
-                        <p className="font-medium">Profile Visibility</p>
-                        <p className="text-sm text-muted-foreground">
-                          Control who can see your manufacturing profile
-                        </p>
-                      </div>
-                      <Select defaultValue="verified">
-                        <SelectTrigger className="w-40">
-                          <SelectValue placeholder="Select visibility" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="public">Public</SelectItem>
-                          <SelectItem value="verified">Verified Brands Only</SelectItem>
-                          <SelectItem value="private">Private (Invite Only)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="flex items-center justify-between py-2">
-                      <div>
-                        <p className="font-medium">Data Usage Consent</p>
-                        <p className="text-sm text-muted-foreground">
-                          Allow platform to use your data for match recommendations
-                        </p>
-                      </div>
-                      <Switch defaultChecked />
-                    </div>
-                  </div>
-                  
-                  <Separator />
-                  
-                  <div className="space-y-4">
-                    <h3 className="text-sm font-medium">Danger Zone</h3>
-                    
-                    <div className="p-4 border border-red-200 bg-red-50 dark:bg-red-950/10 dark:border-red-950/20 rounded-md">
-                      <div className="flex items-start">
-                        <AlertCircle className="h-5 w-5 text-red-500 mr-3 mt-0.5" />
-                        <div>
-                          <h4 className="font-medium text-red-500">Deactivate Account</h4>
-                          <p className="text-sm text-muted-foreground mb-4">
-                            Temporarily disable your account. You can reactivate it anytime.
-                          </p>
-                          <Button variant="outline" size="sm" className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white">
-                            Deactivate Account
-                          </Button>
+                    <h3 className="text-lg font-medium">Active Sessions</h3>
+                    <div className="space-y-3">
+                      {activeSessions.map((session, index) => (
+                        <div key={index} className="p-3 border rounded-md">
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <p className="font-medium">{session.device}</p>
+                              <p className="text-sm text-muted-foreground">{session.platform} • {session.time}</p>
+                            </div>
+                            {session.isActive && <Badge>Active Now</Badge>}
+                          </div>
                         </div>
-                      </div>
+                      ))}
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={handleLogoutAllDevices}
+                        className="flex items-center gap-2"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        Sign Out All Other Devices
+                      </Button>
                     </div>
                   </div>
                 </CardContent>
-                <CardFooter className="flex justify-end">
-                  <Button onClick={handleSaveSecurity}>
-                    <Save className="mr-2 h-4 w-4" />
-                    Save Security Settings
-                  </Button>
+                <CardFooter>
+                  <Button onClick={handleSaveSecurity}>Save Changes</Button>
                 </CardFooter>
               </Card>
             </TabsContent>

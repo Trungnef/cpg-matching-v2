@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, ChevronDown, User, Search } from "lucide-react";
+import { Menu, X, ChevronDown, User, Search, Check, CircleEllipsis, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -8,12 +8,19 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuPortal,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 import { useUser } from "@/contexts/UserContext";
 import SearchPanel from "./SearchPanel";
 import { motion, AnimatePresence } from "framer-motion";
 import ThemeToggle from "./ThemeToggle";
 import FavoritesMenu from "./FavoritesMenu";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,7 +28,7 @@ const Navbar = () => {
   const [searchPanelOpen, setSearchPanelOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated, user, logout } = useUser();
+  const { isAuthenticated, user, logout, updateUserStatus } = useUser();
 
   // Handle scroll effect with enhanced animation
   useEffect(() => {
@@ -133,13 +140,13 @@ const Navbar = () => {
       >
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex items-center justify-between h-16">
-            {/* Enhanced Logo with animation */}
+            {/* Logo */}
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="relative"
             >
-            <Link to="/" className="flex items-center space-x-2">
+              <Link to="/" className="flex items-center space-x-2">
                 <motion.span 
                   className="font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto]"
                   animate={{
@@ -165,10 +172,10 @@ const Navbar = () => {
                     ease: "easeInOut"
                   }}
                 />
-            </Link>
+              </Link>
             </motion.div>
 
-            {/* Desktop Navigation with enhanced styling */}
+            {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-2">
               {[
                 { to: "/", text: "Home" },
@@ -204,18 +211,18 @@ const Navbar = () => {
                         exit={{ scale: 0.9, opacity: 0 }}
                       />
                     </motion.div>
-              </Button>
+                  </Button>
                 </motion.div>
               ))}
 
-              {/* Enhanced Resources Dropdown */}
+              {/* Resources Dropdown */}
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.6 }}
               >
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
                     <motion.div
                       whileHover="hover"
                       whileTap="tap"
@@ -236,430 +243,259 @@ const Navbar = () => {
                         <motion.div
                           className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                         />
-                  </Button>
+                      </Button>
                     </motion.div>
-                </DropdownMenuTrigger>
-                  <DropdownMenuContent className="bg-background/80 backdrop-blur-xl border-white/10">
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="bg-background/80 backdrop-blur-xl border-white/10">
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.2 }}
                     >
-                      {[
-                        { to: "/blog", text: "Blog" },
-                        { to: "/case-studies", text: "Case Studies" },
-                        { to: "/webinars", text: "Webinars" }
-                      ].map((item, index) => (
-                        <DropdownMenuItem 
-                          key={item.to} 
-                          asChild
-                          className="hover:bg-gradient-to-r hover:from-primary/20 hover:to-accent/20 transition-all duration-300"
-                        >
-                          <Link to={item.to}>{item.text}</Link>
-                  </DropdownMenuItem>
-                      ))}
+                      <DropdownMenuItem asChild>
+                        <Link to="/blog">Blog</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/case-studies">Case Studies</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/webinars">Webinars</Link>
+                      </DropdownMenuItem>
                     </motion.div>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </motion.div>
-              
-              {/* Theme and Favorite Icons */}
-              <div className="flex items-center gap-1">
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.65 }}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
+
+              {/* Search Button */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.7 }}
+              >
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleSearchPanel}
+                  className="relative group"
                 >
-                  <ThemeToggle />
-                </motion.div>
-                
+                  <Search className="h-4 w-4 text-primary" />
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full"
+                  />
+                </Button>
+              </motion.div>
+
+              {/* Theme Toggle */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.8 }}
+              >
+                <ThemeToggle />
+              </motion.div>
+
+              {/* Favorites Menu */}
+              {isAuthenticated && (
                 <motion.div
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.7 }}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
+                  transition={{ delay: 0.9 }}
                 >
                   <FavoritesMenu />
                 </motion.div>
+              )}
 
-                {/* Enhanced Search Button */}
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.75 }}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    onClick={toggleSearchPanel}
-                    aria-label="Search"
-                    className="relative group hover:bg-transparent"
-                  >
-                    <motion.div
-                      animate={{
-                        rotate: searchPanelOpen ? 90 : 0,
-                      }}
-                      transition={{ duration: 0.2 }}
-                      className="relative z-10"
-                    >
-                      <motion.div
-                        className="relative"
-                        whileHover={{
-                          scale: 1.1,
-                        }}
-                      >
-                        <Search className="h-5 w-5 text-foreground group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-primary group-hover:to-accent transition-all duration-300" />
-                        <motion.div
-                          className="absolute inset-0 bg-gradient-to-r from-primary to-accent opacity-0 group-hover:opacity-100 blur-sm transition-all duration-300"
-                        />
-                      </motion.div>
-                    </motion.div>
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300"
-                    />
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-full blur-xl opacity-0 group-hover:opacity-70 transition-all duration-300"
-                    />
-                  </Button>
-                </motion.div>
-              </div>
-            </div>
-
-            {/* Enhanced Auth Buttons */}
-            <div className="hidden md:flex items-center gap-3">
+              {/* User Menu */}
               {isAuthenticated ? (
                 <motion.div
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.8 }}
+                  transition={{ delay: 1 }}
                 >
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                      <motion.div
-                        whileHover="hover"
-                        whileTap="tap"
-                        variants={buttonVariants}
-                      >
-                        <Button 
-                          variant="ghost" 
-                          className="gap-2 relative group overflow-hidden bg-gradient-to-r hover:from-primary/20 hover:to-accent/20"
-                        >
-                          <User className="h-4 w-4 text-primary" />
-                          <span className="bg-gradient-to-r from-primary to-accent bg-[length:0%_2px] group-hover:bg-[length:100%_2px] bg-no-repeat bg-left-bottom transition-all duration-500">
-                      {user?.name}
-                          </span>
-                    </Button>
-                      </motion.div>
-                  </DropdownMenuTrigger>
-                    <DropdownMenuContent 
-                      align="end"
-                      className="bg-background/80 backdrop-blur-xl border-white/10"
-                    >
-                      <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                    <DropdownMenuItem asChild>
-                      <Link to="/dashboard">Dashboard</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/profile">Profile</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout}>
-                      Logout
-                    </DropdownMenuItem>
-                      </motion.div>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="gap-2 relative p-0 h-9 w-9 rounded-full">
+                        <div className="relative flex items-center justify-center w-full h-full">
+                          <Avatar>
+                            <AvatarImage src={user?.avatar} />
+                            <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <div className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-background ${
+                            user?.status === "online" 
+                              ? "bg-green-500" 
+                              : user?.status === "away" 
+                              ? "bg-yellow-500" 
+                              : "bg-red-500"}`}
+                          />
+                        </div>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                      <div className="flex items-center p-2">
+                        <div className="flex items-center flex-1 space-x-2">
+                          <Avatar>
+                            <AvatarImage src={user?.avatar} />
+                            <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <div className="flex flex-col space-y-0.5">
+                            <p className="text-sm font-medium">{user?.name}</p>
+                            <p className="text-xs text-muted-foreground">{user?.email}</p>
+                          </div>
+                        </div>
+                      </div>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuSub>
+                        <DropdownMenuSubTrigger>
+                          <div className="flex items-center space-x-2">
+                            <CircleEllipsis className="w-4 h-4" />
+                            <span>Status</span>
+                          </div>
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuPortal>
+                          <DropdownMenuSubContent>
+                            <DropdownMenuRadioGroup value={user?.status} onValueChange={updateUserStatus}>
+                              <DropdownMenuRadioItem value="online">
+                                <div className="flex items-center space-x-2">
+                                  <Check className="w-4 h-4 text-green-500" />
+                                  <span>Online</span>
+                                </div>
+                              </DropdownMenuRadioItem>
+                              <DropdownMenuRadioItem value="away">
+                                <div className="flex items-center space-x-2">
+                                  <Clock className="w-4 h-4 text-yellow-500" />
+                                  <span>Away</span>
+                                </div>
+                              </DropdownMenuRadioItem>
+                              <DropdownMenuRadioItem value="offline">
+                                <div className="flex items-center space-x-2">
+                                  <CircleEllipsis className="w-4 h-4 text-red-500" />
+                                  <span>Offline</span>
+                                </div>
+                              </DropdownMenuRadioItem>
+                            </DropdownMenuRadioGroup>
+                          </DropdownMenuSubContent>
+                        </DropdownMenuPortal>
+                      </DropdownMenuSub>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/dashboard">Dashboard</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/profile">Profile</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleLogout}>
+                        Logout
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </motion.div>
               ) : (
-                <>
-                  <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.8 }}
-                    whileHover="hover"
-                    whileTap="tap"
-                    variants={buttonVariants}
-                  >
-                    <Button 
-                      variant="ghost" 
-                      asChild
-                      className="relative group overflow-hidden"
-                    >
-                      <Link to="/auth?type=signin">
-                        <span className="relative z-10 bg-gradient-to-r from-primary to-accent bg-[length:0%_2px] group-hover:bg-[length:100%_2px] bg-no-repeat bg-left-bottom transition-all duration-500">
-                          Sign In
-                        </span>
-                        <motion.div
-                          className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                        />
-                      </Link>
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 1 }}
+                >
+                  <Button asChild variant="default">
+                    <Link to="/auth">Sign In</Link>
                   </Button>
-                  </motion.div>
-                  <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.9 }}
-                    whileHover="hover"
-                    whileTap="tap"
-                    variants={buttonVariants}
-                  >
-                    <Button 
-                      asChild
-                      className="relative overflow-hidden bg-gradient-to-r from-primary to-accent hover:shadow-lg hover:shadow-primary/25 transition-all duration-300"
-                    >
-                      <Link to="/auth?type=register">
-                        <span className="relative z-10">Register</span>
-                        <motion.div
-                          className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"
-                        />
-                      </Link>
-                  </Button>
-                  </motion.div>
-                </>
+                </motion.div>
               )}
             </div>
 
-            {/* Mobile Menu Button with animation */}
-            <div className="md:hidden flex items-center gap-2">
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <ThemeToggle />
-              </motion.div>
-              
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <FavoritesMenu />
-              </motion.div>
-
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="focus:outline-none relative group hover:bg-transparent"
-                  onClick={toggleSearchPanel}
-                >
-                  <motion.div
-                    className="relative z-10"
-                  >
-                    <motion.div
-                      className="relative"
-                      whileHover={{
-                        scale: 1.1,
-                      }}
-                    >
-                      <Search className="h-5 w-5 text-foreground group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-primary group-hover:to-accent transition-all duration-300" />
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-primary to-accent opacity-0 group-hover:opacity-100 blur-sm transition-all duration-300"
-                      />
-                    </motion.div>
-                  </motion.div>
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300"
-                  />
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-full blur-xl opacity-0 group-hover:opacity-70 transition-all duration-300"
-                  />
-                </Button>
-              </motion.div>
-              
-              <motion.button
-                className="focus:outline-none"
+            {/* Mobile Menu Button */}
+            <div className="md:hidden">
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={() => setIsOpen(!isOpen)}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+                className="relative group"
               >
-                <AnimatePresence mode="wait">
                 {isOpen ? (
-                    <motion.div
-                      key="close"
-                      initial={{ rotate: -180, opacity: 0 }}
-                      animate={{ rotate: 0, opacity: 1 }}
-                      exit={{ rotate: 180, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                  <X className="h-6 w-6" />
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="menu"
-                      initial={{ rotate: 180, opacity: 0 }}
-                      animate={{ rotate: 0, opacity: 1 }}
-                      exit={{ rotate: -180, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                  <Menu className="h-6 w-6" />
-                    </motion.div>
+                  <X className="h-6 w-6 text-primary" />
+                ) : (
+                  <Menu className="h-6 w-6 text-primary" />
                 )}
-                </AnimatePresence>
-              </motion.button>
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full"
+                />
+              </Button>
             </div>
           </div>
         </div>
+      </motion.nav>
 
-        {/* Mobile Menu with animation */}
-        <AnimatePresence>
+      {/* Mobile Menu */}
+      <AnimatePresence>
         {isOpen && (
-            <motion.div 
-              className="md:hidden bg-background/95 backdrop-blur-sm"
-              initial="closed"
-              animate="open"
-              exit="closed"
-              variants={mobileMenuVariants}
-            >
-              <motion.div 
-                className="container mx-auto px-4 py-4 space-y-2"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-              >
+          <motion.div
+            initial="closed"
+            animate="open"
+            exit="closed"
+            variants={mobileMenuVariants}
+            className="md:hidden fixed inset-x-0 top-16 bg-background/80 backdrop-blur-xl border-b border-white/10 z-40"
+          >
+            <div className="container mx-auto px-4 py-4">
+              <div className="flex flex-col space-y-4">
                 {[
                   { to: "/", text: "Home" },
                   { to: "/products", text: "Products" },
                   { to: "/manufacturers", text: "Manufacturers" },
-                  { to: "/solutions", text: "Solutions" }
-                ].map((item, index) => (
-                  <motion.div
+                  { to: "/solutions", text: "Solutions" },
+                  { to: "/blog", text: "Blog" },
+                  { to: "/case-studies", text: "Case Studies" },
+                  { to: "/webinars", text: "Webinars" }
+                ].map((item) => (
+                  <Button
                     key={item.to}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    whileHover={{ x: 10 }}
+                    variant="ghost"
+                    asChild
+                    className="w-full justify-start"
                   >
-              <Button variant="ghost" className="w-full justify-start" asChild>
-                      <Link to={item.to}>{item.text}</Link>
-              </Button>
-                  </motion.div>
+                    <Link to={item.to}>{item.text}</Link>
+                  </Button>
                 ))}
-              
-                {/* Resources Section */}
-                <motion.div 
-                  className="border-t border-border pt-2 mt-2"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.4 }}
-                >
-                <p className="text-sm text-muted-foreground mb-2 px-3">Resources</p>
-                  {[
-                    { to: "/blog", text: "Blog" },
-                    { to: "/case-studies", text: "Case Studies" },
-                    { to: "/webinars", text: "Webinars" }
-                  ].map((item, index) => (
-                    <motion.div
-                      key={item.to}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.5 + index * 0.1 }}
-                      whileHover={{ x: 10 }}
-                    >
-                <Button variant="ghost" className="w-full justify-start" asChild>
-                        <Link to={item.to}>{item.text}</Link>
-                </Button>
-                    </motion.div>
-                  ))}
-                </motion.div>
-              
-                {/* Auth Buttons for Mobile */}
-                <motion.div 
-                  className="border-t border-border pt-2 mt-2"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.8 }}
-                >
                 {isAuthenticated ? (
                   <>
-                      <motion.p 
-                        className="text-sm px-3 mb-2"
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                      >
-                      Signed in as <span className="font-medium">{user?.name}</span>
-                      </motion.p>
-                      {[
-                        { to: "/dashboard", text: "Dashboard" },
-                        { to: "/profile", text: "Profile" }
-                      ].map((item, index) => (
-                        <motion.div
-                          key={item.to}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.9 + index * 0.1 }}
-                          whileHover={{ x: 10 }}
-                        >
-                    <Button variant="ghost" className="w-full justify-start" asChild>
-                            <Link to={item.to}>{item.text}</Link>
+                    <Button
+                      variant="ghost"
+                      asChild
+                      className="w-full justify-start"
+                    >
+                      <Link to="/dashboard">Dashboard</Link>
                     </Button>
-                        </motion.div>
-                      ))}
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 1.1 }}
-                        whileHover={{ scale: 1.02 }}
-                      >
-                    <Button 
-                      variant="destructive" 
-                      className="w-full justify-start mt-2"
+                    <Button
+                      variant="ghost"
+                      asChild
+                      className="w-full justify-start"
+                    >
+                      <Link to="/profile">Profile</Link>
+                    </Button>
+                    <Button
+                      variant="ghost"
                       onClick={handleLogout}
+                      className="w-full justify-start"
                     >
                       Logout
                     </Button>
-                      </motion.div>
                   </>
                 ) : (
-                  <>
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.9 }}
-                        whileHover={{ scale: 1.02 }}
-                      >
-                    <Button variant="outline" className="w-full mb-2" asChild>
-                      <Link to="/auth?type=signin">Sign In</Link>
-                    </Button>
-                      </motion.div>
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 1 }}
-                        whileHover={{ scale: 1.02 }}
-                      >
-                        <Button 
-                          className="w-full bg-gradient-to-r from-primary to-accent hover:shadow-lg transition-all duration-300" 
-                          asChild
-                        >
-                      <Link to="/auth?type=register">Register</Link>
-                    </Button>
-                      </motion.div>
-                  </>
+                  <Button asChild variant="default" className="w-full">
+                    <Link to="/auth">Sign In</Link>
+                  </Button>
                 )}
-                </motion.div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.nav>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Global Search Panel */}
-      <SearchPanel 
-        isOpen={searchPanelOpen} 
-        onClose={() => setSearchPanelOpen(false)} 
-      />
+      {/* Search Panel */}
+      <AnimatePresence>
+        {searchPanelOpen && (
+          <SearchPanel isOpen={searchPanelOpen} onClose={() => setSearchPanelOpen(false)} />
+        )}
+      </AnimatePresence>
     </>
   );
 };
