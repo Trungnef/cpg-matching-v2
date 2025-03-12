@@ -94,120 +94,182 @@ const RegisterForm = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <motion.h2 
-          className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary"
-          initial={{ scale: 0.95 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          Create Account
-        </motion.h2>
+        <motion.div className="relative inline-block">
+          <motion.h2 
+            className="text-3xl font-bold"
+            initial={{ scale: 0.95 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <motion.span
+              className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary bg-300% animate-gradient"
+            >
+              Create Account
+            </motion.span>
+          </motion.h2>
+          <motion.div
+            className="absolute -bottom-1 left-0 right-0 h-[2px] bg-gradient-to-r from-primary via-accent to-primary"
+            initial={{ scaleX: 0, opacity: 0 }}
+            animate={{ scaleX: 1, opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+          />
+        </motion.div>
+        
         <motion.div
-          className="relative h-1 w-32 mx-auto mt-3 overflow-hidden rounded-full bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20"
+          className="relative h-1 w-32 mx-auto mt-4 overflow-hidden rounded-full bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20"
         >
           <motion.div
             className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-primary"
             initial={{ x: "-100%" }}
-            animate={{ x: "100%" }}
-            transition={{ 
-              duration: 2,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-          />
-        </motion.div>
-
-        {/* Animated User Avatar */}
-        <motion.div
-          className="relative w-20 h-20 mx-auto mt-6 mb-4"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: "spring", duration: 0.8, delay: 0.3 }}
-        >
-          {/* Avatar Circle */}
-          <motion.div
-            className="absolute inset-0 rounded-full bg-gradient-to-r from-primary via-accent to-primary"
-            animate={{
-              scale: [1, 1.1, 1],
-              rotate: [0, 360],
-            }}
-            transition={{
-              scale: {
+            animate={{ 
+              x: "100%",
+              transition: {
+                repeat: Infinity,
                 duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut"
-              },
-              rotate: {
-                duration: 20,
-                repeat: Infinity,
                 ease: "linear"
               }
             }}
           />
-          
-          {/* Inner Circle */}
-          <motion.div
-            className="absolute inset-0.5 rounded-full bg-background flex items-center justify-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            {/* User Icon */}
-            <motion.svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-10 w-10 text-primary"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={1.5}
-              initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 }}
-            >
-              <motion.path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 1, delay: 0.8 }}
-              />
-            </motion.svg>
-          </motion.div>
+        </motion.div>
 
-          {/* Orbiting Dots */}
+        {/* Animated Welcome Text */}
+        <motion.p 
+          className="text-muted-foreground mt-4 text-base relative"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
+          <motion.span
+            className="inline-block"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+          >
+            Join our
+          </motion.span>
+          {" "}
+          <motion.span
+            className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent font-medium"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.8 }}
+          >
+            community
+          </motion.span>
+          {" "}
+          <motion.span
+            className="inline-block"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 1 }}
+          >
+            of CPG industry professionals
+          </motion.span>
+        </motion.p>
+
+        {/* Decorative Dots */}
+        <motion.div className="absolute top-0 right-0 -mr-6 -mt-6">
           {[...Array(3)].map((_, i) => (
-            <motion.div
+            <motion.span
               key={i}
-              className="absolute w-2 h-2 rounded-full bg-accent"
-              style={{
-                top: "50%",
-                left: "50%",
-              }}
-              animate={{
-                x: Math.cos((i * 2 * Math.PI) / 3) * 40,
-                y: Math.sin((i * 2 * Math.PI) / 3) * 40,
-                scale: [1, 1.2, 1],
-                opacity: [0.5, 1, 0.5],
-              }}
+              className="absolute w-1.5 h-1.5 rounded-full bg-primary/50"
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{
-                duration: 2,
-                delay: i * 0.2,
-                repeat: Infinity,
-                ease: "linear",
+                duration: 0.4,
+                delay: 1.2 + i * 0.1,
+                ease: "easeOut"
+              }}
+              style={{
+                top: i * 6,
+                right: i * 6,
               }}
             />
           ))}
         </motion.div>
+      </motion.div>
 
-        <motion.p 
-          className="text-muted-foreground mt-3 text-sm"
+      {/* Animated User Avatar */}
+      <motion.div
+        className="relative w-20 h-20 mx-auto mt-6 mb-4"
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ type: "spring", duration: 0.8, delay: 0.3 }}
+      >
+        {/* Avatar Circle */}
+        <motion.div
+          className="absolute inset-0 rounded-full bg-gradient-to-r from-primary via-accent to-primary"
+          animate={{
+            scale: [1, 1.1, 1],
+            rotate: [0, 360],
+          }}
+          transition={{
+            scale: {
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            },
+            rotate: {
+              duration: 20,
+              repeat: Infinity,
+              ease: "linear"
+            }
+          }}
+        />
+        
+        {/* Inner Circle */}
+        <motion.div
+          className="absolute inset-0.5 rounded-full bg-background flex items-center justify-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
+          transition={{ delay: 0.5 }}
         >
-          Join our community of CPG industry professionals
-        </motion.p>
+          {/* User Icon */}
+          <motion.svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-10 w-10 text-primary"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={1.5}
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+          >
+            <motion.path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 1, delay: 0.8 }}
+            />
+          </motion.svg>
+        </motion.div>
+
+        {/* Orbiting Dots */}
+        {[...Array(3)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-2 h-2 rounded-full bg-accent"
+            style={{
+              top: "50%",
+              left: "50%",
+            }}
+            animate={{
+              x: Math.cos((i * 2 * Math.PI) / 3) * 40,
+              y: Math.sin((i * 2 * Math.PI) / 3) * 40,
+              scale: [1, 1.2, 1],
+              opacity: [0.5, 1, 0.5],
+            }}
+            transition={{
+              duration: 2,
+              delay: i * 0.2,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+          />
+        ))}
       </motion.div>
 
       {/* Decorative Elements */}
