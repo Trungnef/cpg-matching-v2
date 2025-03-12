@@ -3,25 +3,25 @@ Follow these steps:
 
 
 # Step 1: Clone the repository using the project's Git URL.
-'''sh
+```sh
 git clone https://github.com/Trungnef/cpg-matchmaker.git
-'''
+```
 # Step 2: Navigate to the project directory.
-'''sh
+```sh
 cd cpg-matching-v2
-'''
+```
 # Step 3: Create .venv | Install the necessary dependencies.
-'''sh
+```sh
 python -m venv .venv
-'''
-'''sh
+```
+```sh
 .venv/Scripts/activate
-'''
-'''sh
+```
+```sh
 npm i
-'''
+```
 
 # Step 4: Start the development server with auto-reloading and an instant preview.
-'''sh
+```sh
 npm run dev
 ```
