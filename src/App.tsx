@@ -46,12 +46,14 @@ import BrandProducts from "./pages/brand/Products";
 import BrandManufacturers from "./pages/brand/Manufacturers";
 import BrandAnalytics from "./pages/brand/Analytics";
 import BrandBrands from "./pages/brand/Brands";
+import BrandSettings from "./pages/brand/Settings";
 
 // Retailer pages
 import RetailerInventory from "./pages/retailer/Inventory";
 import RetailerBrands from "./pages/retailer/Brands";
 import RetailerAnalytics from "./pages/retailer/Analytics";
 import RetailerPartnerships from "./pages/retailer/Partnerships";
+import RetailerSettings from "./pages/retailer/Settings";
 
 const queryClient = new QueryClient();
 
@@ -195,6 +197,15 @@ const App = () => (
                 />
               } 
             />
+            <Route 
+              path="/brand/settings" 
+              element={
+                <ProtectedRoute 
+                  element={<BrandSettings />} 
+                  allowedRoles={["brand"]} 
+                />
+              } 
+            />
             
             {/* Retailer specific routes */}
             <Route 
@@ -229,6 +240,15 @@ const App = () => (
               element={
                 <ProtectedRoute 
                   element={<RetailerPartnerships />} 
+                  allowedRoles={["retailer"]} 
+                />
+              } 
+            />
+            <Route 
+              path="/retailer/settings" 
+              element={
+                <ProtectedRoute 
+                  element={<RetailerSettings />} 
                   allowedRoles={["retailer"]} 
                 />
               } 

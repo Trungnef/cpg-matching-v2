@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { UserCircle, Building, Mail, Phone, MapPin, Edit, Settings, Heart, ClipboardList, LogOut, User, Globe, Save, X } from "lucide-react";
+import { UserCircle, Building, Mail, Phone, MapPin, Edit, Settings, Heart, ClipboardList, LogOut, User, Globe, Save, X, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
 import ManufacturerProfile from "@/components/profile/ManufacturerProfile";
@@ -26,6 +26,17 @@ import {
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger 
+} from "@/components/ui/dialog";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Label } from "@/components/ui/label";
 
 // Define form schemas for each role
 const baseProfileSchema = z.object({
@@ -64,7 +75,7 @@ type RetailerFormValues = z.infer<typeof retailerFormSchema>;
 type FormValues = ManufacturerFormValues | BrandFormValues | RetailerFormValues;
 
 const Profile = () => {
-  const { role, user, isAuthenticated, logout, updateUserProfile, updateRoleSettings } = useUser();
+  const { role, user, isAuthenticated, logout, updateUserProfile, updateRoleSettings, updateUserAvatar } = useUser();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
@@ -605,131 +616,178 @@ const Profile = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <div className="container mx-auto px-4 py-24">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Left sidebar - Profile summary */}
-            <div className="lg:col-span-1">
-              <Card className="sticky top-24">
-                <CardHeader className="text-center pb-2">
-                  <div className="w-24 h-24 bg-primary/10 text-primary rounded-full mx-auto flex items-center justify-center mb-4">
-                    <UserCircle className="w-16 h-16" />
+      <div className="container mx-auto pt-20 pb-6 px-4 md:px-6 lg:pt-24 lg:pb-10">
+        <div className="grid gap-6 lg:grid-cols-4">
+          {/* Sidebar */}
+          <div>
+            <Card>
+              <CardHeader className="pb-3">
+                <div className="flex flex-col items-center">
+                  <div className="relative mb-4 group cursor-pointer">
+                    <label htmlFor="avatar-upload" className="cursor-pointer block">
+                      <Avatar className="h-24 w-24 border-4 border-background">
+                        <AvatarImage 
+                          src={user?.avatar || ""} 
+                          alt={user?.name || "User"} 
+                        />
+                        <AvatarFallback className="text-2xl">{user?.name?.charAt(0) || "U"}</AvatarFallback>
+                      </Avatar>
+                      <div className="absolute inset-0 bg-black/30 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <Upload className="h-8 w-8 text-white" />
+                      </div>
+                    </label>
+                    <Input 
+                      id="avatar-upload" 
+                      type="file" 
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = (e) => {
+                            if (e.target?.result) {
+                              updateUserAvatar(e.target.result as string);
+                              toast({
+                                title: "Avatar Updated",
+                                description: "Your profile picture has been updated successfully.",
+                              });
+                            }
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
                   </div>
-                  <CardTitle>{user?.name || "User Name"}</CardTitle>
-                  <CardDescription>
-                    <Badge className="mt-1 capitalize">{role}</Badge>
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <Building className="w-4 h-4 mr-2" />
-                      {user?.companyName || "Company Name"}
-                    </div>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <Mail className="w-4 h-4 mr-2" />
-                      {user?.email || "user@example.com"}
-                    </div>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <Phone className="w-4 h-4 mr-2" />
-                      +1 (555) 123-4567
-                    </div>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <MapPin className="w-4 h-4 mr-2" />
-                      San Francisco, CA
-                    </div>
+                  <CardTitle>{user?.name || "Demo User"}</CardTitle>
+                  <Badge className="mt-2 capitalize font-medium px-3 py-1 text-sm" variant="secondary">
+                    {user?.role === "manufacturer" ? "Manufacturer" : 
+                     user?.role === "brand" ? "Brand" : 
+                     user?.role === "retailer" ? "Retailer" : "Role"}
+                  </Badge>
+                  <div className="flex items-center mt-3">
+                    <span className={`h-2.5 w-2.5 rounded-full mr-2 
+                      ${user?.status === "online" ? "bg-green-500" : 
+                        user?.status === "away" ? "bg-yellow-500" : 
+                        "bg-red-500"}`} 
+                    />
+                    <span className="text-sm text-muted-foreground">
+                      {user?.status === "online" ? "Online" : 
+                        user?.status === "away" ? "Away" : 
+                        "Busy"}
+                    </span>
                   </div>
-                  
-                  <div className="pt-4 flex flex-col space-y-2">
-                    <Button 
-                      variant="outline" 
-                      className="justify-start"
-                      onClick={() => setIsEditing(true)}
-                    >
-                      <Edit className="w-4 h-4 mr-2" />
-                      Edit Profile
-                    </Button>
-                    <Button 
-                      variant="destructive" 
-                      className="justify-start"
-                      onClick={handleLogout}
-                    >
-                      <LogOut className="w-4 h-4 mr-2" />
-                      Log Out
-                    </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <Building className="w-4 h-4 mr-2" />
+                    {user?.companyName || "Company Name"}
                   </div>
-                </CardContent>
-              </Card>
-            </div>
-            
-            {/* Main content */}
-            <div className="lg:col-span-3">
-              {isEditing ? (
-                // Show edit form when editing is true
-                renderEditProfileForm()
-              ) : (
-                // Otherwise show normal profile content
-                <Tabs defaultValue="overview" className="space-y-6">
-                  <TabsList className="grid grid-cols-3 w-full max-w-md">
-                    <TabsTrigger value="overview">Overview</TabsTrigger>
-                    <TabsTrigger value="favorites">Favorites</TabsTrigger>
-                    <TabsTrigger value="projects">Projects</TabsTrigger>
-                  </TabsList>
-                  
-                  {/* Overview Tab - Role-specific content */}
-                  <TabsContent value="overview" className="space-y-6">
-                    {renderRoleSpecificContent()}
-                  </TabsContent>
-                  
-                  {/* Favorites Tab */}
-                  <TabsContent value="favorites">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Your Favorites</CardTitle>
-                        <CardDescription>
-                          View and manage your saved products, manufacturers, and retailers.
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-center py-12">
-                          <Heart className="w-12 h-12 mx-auto text-muted-foreground opacity-20 mb-4" />
-                          <h3 className="text-lg font-medium mb-2">No favorites yet</h3>
-                          <p className="text-muted-foreground max-w-md mx-auto mb-6">
-                            When you find products or manufacturers you're interested in, save them here for quick access.
-                          </p>
-                          <div className="flex gap-4 justify-center">
-                            <Button variant="outline">Explore Products</Button>
-                            <Button>Find Manufacturers</Button>
-                          </div>
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <Mail className="w-4 h-4 mr-2" />
+                    {user?.email || "user@example.com"}
+                  </div>
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <Phone className="w-4 h-4 mr-2" />
+                    +1 (555) 123-4567
+                  </div>
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <MapPin className="w-4 h-4 mr-2" />
+                    San Francisco, CA
+                  </div>
+                </div>
+                
+                <div className="pt-4 flex flex-col space-y-2">
+                  <Button 
+                    variant="outline" 
+                    className="justify-start"
+                    onClick={() => setIsEditing(true)}
+                  >
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit Profile
+                  </Button>
+                  <Button 
+                    variant="destructive" 
+                    className="justify-start"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Log Out
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          
+          {/* Main content */}
+          <div className="lg:col-span-3">
+            {isEditing ? (
+              // Show edit form when editing is true
+              renderEditProfileForm()
+            ) : (
+              // Otherwise show normal profile content
+              <Tabs defaultValue="overview" className="space-y-6">
+                <TabsList className="grid grid-cols-3 w-full max-w-md">
+                  <TabsTrigger value="overview">Overview</TabsTrigger>
+                  <TabsTrigger value="favorites">Favorites</TabsTrigger>
+                  <TabsTrigger value="projects">Projects</TabsTrigger>
+                </TabsList>
+                
+                {/* Overview Tab - Role-specific content */}
+                <TabsContent value="overview" className="space-y-6">
+                  {renderRoleSpecificContent()}
+                </TabsContent>
+                
+                {/* Favorites Tab */}
+                <TabsContent value="favorites">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Your Favorites</CardTitle>
+                      <CardDescription>
+                        View and manage your saved products, manufacturers, and retailers.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-center py-12">
+                        <Heart className="w-12 h-12 mx-auto text-muted-foreground opacity-20 mb-4" />
+                        <h3 className="text-lg font-medium mb-2">No favorites yet</h3>
+                        <p className="text-muted-foreground max-w-md mx-auto mb-6">
+                          When you find products or manufacturers you're interested in, save them here for quick access.
+                        </p>
+                        <div className="flex gap-4 justify-center">
+                          <Button variant="outline">Explore Products</Button>
+                          <Button>Find Manufacturers</Button>
                         </div>
-                      </CardContent>
-                    </Card>
-                  </TabsContent>
-                  
-                  {/* Projects Tab */}
-                  <TabsContent value="projects">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Your Projects</CardTitle>
-                        <CardDescription>
-                          Track and manage your registered projects and product requests.
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-center py-12">
-                          <ClipboardList className="w-12 h-12 mx-auto text-muted-foreground opacity-20 mb-4" />
-                          <h3 className="text-lg font-medium mb-2">No projects yet</h3>
-                          <p className="text-muted-foreground max-w-md mx-auto mb-6">
-                            Start by creating a new project to find matching manufacturers or suppliers for your product needs.
-                          </p>
-                          <Button>Create New Project</Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </TabsContent>
-                </Tabs>
-              )}
-            </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                
+                {/* Projects Tab */}
+                <TabsContent value="projects">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Your Projects</CardTitle>
+                      <CardDescription>
+                        Track and manage your registered projects and product requests.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-center py-12">
+                        <ClipboardList className="w-12 h-12 mx-auto text-muted-foreground opacity-20 mb-4" />
+                        <h3 className="text-lg font-medium mb-2">No projects yet</h3>
+                        <p className="text-muted-foreground max-w-md mx-auto mb-6">
+                          Start by creating a new project to find matching manufacturers or suppliers for your product needs.
+                        </p>
+                        <Button>Create New Project</Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
+            )}
           </div>
         </div>
       </div>

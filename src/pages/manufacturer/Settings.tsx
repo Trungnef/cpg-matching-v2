@@ -48,13 +48,17 @@ const Settings = () => {
   const [companyName, setCompanyName] = useState(user?.companyName || "");
   const [email, setEmail] = useState(user?.email || "");
   const [phone, setPhone] = useState("+1 (555) 123-4567");
-  const [address, setAddress] = useState("123 Manufacturing Way");
-  const [city, setCity] = useState("San Francisco");
-  const [state, setState] = useState("CA");
-  const [zipCode, setZipCode] = useState("94105");
-  const [description, setDescription] = useState("We are a leading organic food manufacturer specializing in cereal, energy bars, and healthy snacks. Our facility is certified organic, non-GMO, and follows sustainable manufacturing practices.");
   const [website, setWebsite] = useState("https://example.com");
+  const [address, setAddress] = useState("123 Manufacturing Way");
+  const [city, setCity] = useState("Industrial City");
+  const [state, setState] = useState("CA");
+  const [zipCode, setZipCode] = useState("90210");
+  const [description, setDescription] = useState("Leading manufacturer of food processing equipment");
   const [userName, setUserName] = useState(user?.name || "");
+  // Manufacturer specific fields
+  const [productionCapacity, setProductionCapacity] = useState("10000");
+  const [minimumOrderValue, setMinimumOrderValue] = useState("5000");
+  const [certifications, setCertifications] = useState("ISO 9001, HACCP, FDA Approved");
   
   // Notification settings
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -217,23 +221,6 @@ const Settings = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <label htmlFor="companyName" className="text-sm font-medium">
-                        Company Name
-                      </label>
-                      <div className="relative">
-                        <Building2 className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                        <Input 
-                          id="companyName" 
-                          value={companyName}
-                          onChange={e => setCompanyName(e.target.value)}
-                          className="pl-9"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div className="space-y-2">
                       <label htmlFor="email" className="text-sm font-medium">
                         Email Address
                       </label>
@@ -244,6 +231,23 @@ const Settings = () => {
                           type="email"
                           value={email}
                           onChange={e => setEmail(e.target.value)}
+                          className="pl-9"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div className="space-y-2">
+                      <label htmlFor="companyName" className="text-sm font-medium">
+                        Company Name
+                      </label>
+                      <div className="relative">
+                        <Building2 className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                        <Input 
+                          id="companyName" 
+                          value={companyName}
+                          onChange={e => setCompanyName(e.target.value)}
                           className="pl-9"
                         />
                       </div>
@@ -284,7 +288,7 @@ const Settings = () => {
                     
                     <div className="space-y-2">
                       <label htmlFor="address" className="text-sm font-medium">
-                        Street Address
+                        Address
                       </label>
                       <div className="relative">
                         <MapPin className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -295,41 +299,6 @@ const Settings = () => {
                           className="pl-9"
                         />
                       </div>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <div className="space-y-2">
-                      <label htmlFor="city" className="text-sm font-medium">
-                        City
-                      </label>
-                      <Input 
-                        id="city" 
-                        value={city}
-                        onChange={e => setCity(e.target.value)}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <label htmlFor="state" className="text-sm font-medium">
-                        State
-                      </label>
-                      <Input 
-                        id="state" 
-                        value={state}
-                        onChange={e => setState(e.target.value)}
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <label htmlFor="zipCode" className="text-sm font-medium">
-                        Zip Code
-                      </label>
-                      <Input 
-                        id="zipCode" 
-                        value={zipCode}
-                        onChange={e => setZipCode(e.target.value)}
-                      />
                     </div>
                   </div>
                   
@@ -344,6 +313,51 @@ const Settings = () => {
                       className="min-h-[120px]"
                       placeholder="Tell us about your company..."
                     />
+                  </div>
+
+                  <Separator className="my-6" />
+                  
+                  <div>
+                    <h3 className="text-lg font-medium mb-4">Manufacturer Details</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div className="space-y-2">
+                        <label htmlFor="productionCapacity" className="text-sm font-medium">
+                          Production Capacity (units/month)
+                        </label>
+                        <Input 
+                          id="productionCapacity" 
+                          type="number"
+                          value={productionCapacity || ""}
+                          onChange={e => setProductionCapacity(e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label htmlFor="minimumOrderValue" className="text-sm font-medium">
+                          Minimum Order Value ($)
+                        </label>
+                        <Input 
+                          id="minimumOrderValue" 
+                          type="number"
+                          value={minimumOrderValue || ""}
+                          onChange={e => setMinimumOrderValue(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label htmlFor="certifications" className="text-sm font-medium">
+                        Certifications
+                      </label>
+                      <Textarea 
+                        id="certifications" 
+                        value={certifications || ""}
+                        onChange={e => setCertifications(e.target.value)}
+                        className="min-h-[100px]"
+                        placeholder="Enter certifications separated by commas (e.g. ISO 9001, Organic, HACCP)"
+                      />
+                      <p className="text-sm text-muted-foreground">
+                        Enter all your certifications, separated by commas
+                      </p>
+                    </div>
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-end">

@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 
 export type UserRole = "manufacturer" | "brand" | "retailer";
@@ -36,6 +35,8 @@ interface UserData {
   createdAt: string;
   lastLogin: string;
   notifications: number;
+  avatar?: string; // URL to avatar image
+  status: "online" | "away" | "busy"; // User's online status
   // Role-specific settings based on user role
   manufacturerSettings?: ManufacturerSettings;
   brandSettings?: BrandSettings;
@@ -52,6 +53,8 @@ interface UserContextType {
   switchRole: (newRole: UserRole) => void;
   updateUserProfile: (updatedData: Partial<UserData>) => void;
   updateRoleSettings: <T extends ManufacturerSettings | BrandSettings | RetailerSettings>(settings: Partial<T>) => void;
+  updateUserStatus: (status: "online" | "away" | "busy") => void;
+  updateUserAvatar: (avatarUrl: string) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -122,6 +125,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       createdAt: new Date().toISOString(),
       lastLogin: new Date().toISOString(),
       notifications: Math.floor(Math.random() * 10),
+      avatar: "", // In a real app, this would come from the API
+      status: "online", // In a real app, this would come from the API
       ...roleSpecificSettings
     };
     
@@ -181,6 +186,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       createdAt: new Date().toISOString(),
       lastLogin: new Date().toISOString(),
       notifications: 0,
+      avatar: "", // In a real app, this would come from the API
+      status: "online", // In a real app, this would come from the API
       ...roleSpecificSettings
     };
     
@@ -285,6 +292,38 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const updateUserStatus = (status: "online" | "away" | "busy"): void => {
+    if (user) {
+      // Update user status
+      const updatedUser = {
+        ...user,
+        status: status
+      };
+      
+      // Save to localStorage
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      
+      // Update state
+      setUser(updatedUser);
+    }
+  };
+
+  const updateUserAvatar = (avatarUrl: string): void => {
+    if (user) {
+      // Update user avatar
+      const updatedUser = {
+        ...user,
+        avatar: avatarUrl
+      };
+      
+      // Save to localStorage
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      
+      // Update state
+      setUser(updatedUser);
+    }
+  };
+
   return (
     <UserContext.Provider 
       value={{ 
@@ -296,7 +335,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         logout,
         switchRole,
         updateUserProfile,
-        updateRoleSettings
+        updateRoleSettings,
+        updateUserStatus,
+        updateUserAvatar
       }}
     >
       {children}
