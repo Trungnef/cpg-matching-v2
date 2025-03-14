@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { UserProvider } from "./contexts/UserContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Index from "./pages/Index";
@@ -62,6 +62,12 @@ import { CompareProvider } from "@/contexts/CompareContext";
 import { ManufacturerFavoriteProvider } from "@/contexts/ManufacturerFavoriteContext";
 import { ManufacturerCompareProvider } from "@/contexts/ManufacturerCompareContext";
 
+// Admin pages
+import AdminLogin from './pages/AdminLogin';
+import AdminLayout from './components/admin/AdminLayout';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import UserManagement from './pages/admin/UserManagement';
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -75,7 +81,7 @@ const App = () => (
                 <ManufacturerCompareProvider>
                   <Toaster />
                   <Sonner />
-                  <BrowserRouter>
+                  <Router>
                     <Routes>
                       <Route path="/" element={<Index />} />
                       <Route 
@@ -266,10 +272,24 @@ const App = () => (
                         } 
                       />
                       
+                      {/* Admin routes */}
+                      <Route path="/admin/login" element={<AdminLogin />} />
+                      <Route path="/admin" element={<AdminLayout />}>
+                        <Route index element={<Navigate to="/admin/dashboard" replace />} />
+                        <Route path="dashboard" element={<AdminDashboard />} />
+                        <Route path="users" element={<UserManagement />} />
+                        <Route path="announcements" element={<div>Announcements Management</div>} />
+                        <Route path="activity" element={<div>Activity Logs</div>} />
+                        <Route path="analytics" element={<div>Analytics Dashboard</div>} />
+                        <Route path="settings" element={<div>System Settings</div>} />
+                        <Route path="profile" element={<div>Admin Profile</div>} />
+                        <Route path="help" element={<div>Admin Help Center</div>} />
+                      </Route>
+                      
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>
-                  </BrowserRouter>
+                  </Router>
                 </ManufacturerCompareProvider>
               </ManufacturerFavoriteProvider>
             </CompareProvider>

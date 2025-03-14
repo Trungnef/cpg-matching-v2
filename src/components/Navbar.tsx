@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, ChevronDown, User, Search, Check, CircleEllipsis, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [searchPanelOpen, setSearchPanelOpen] = useState(false);
+  const searchPanelRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, user, logout, updateUserStatus } = useUser();
@@ -62,6 +63,25 @@ const Navbar = () => {
   const toggleSearchPanel = () => {
     setSearchPanelOpen(!searchPanelOpen);
   };
+
+  // Check if current page should show search
+  const shouldShowSearch = !['/', '/solutions'].includes(location.pathname);
+
+  // Handle click outside search panel
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchPanelOpen && 
+          searchPanelRef.current && 
+          !searchPanelRef.current.contains(event.target as Node)) {
+        setSearchPanelOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [searchPanelOpen]);
 
   // Enhanced nav variants with glass effect
   const navVariants = {
@@ -140,43 +160,45 @@ const Navbar = () => {
       >
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative"
-            >
-              <Link to="/" className="flex items-center space-x-2">
-                <motion.span 
-                  className="font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto]"
-                  animate={{
-                    backgroundPosition: ["0%", "100%", "0%"],
-                  }}
-                  transition={{
-                    duration: 10,
-                    repeat: Infinity,
-                    ease: "linear"
-                  }}
-                >
-                  CPG Matchmaker
-                </motion.span>
-                <motion.div
-                  className="absolute -inset-x-6 -inset-y-2 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 blur-xl opacity-50"
-                  animate={{
-                    opacity: [0.5, 0.3, 0.5],
-                    scale: [1, 1.1, 1],
-                  }}
-                  transition={{
-                    duration: 4,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                />
-              </Link>
-            </motion.div>
+            {/* Column 1: Logo */}
+            <div className="flex-1 flex justify-start">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="relative"
+              >
+                <Link to="/" className="flex items-center space-x-2">
+                  <motion.span 
+                    className="font-bold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto]"
+                    animate={{
+                      backgroundPosition: ["0%", "100%", "0%"],
+                    }}
+                    transition={{
+                      duration: 10,
+                      repeat: Infinity,
+                      ease: "linear"
+                    }}
+                  >
+                    CPG Matchmaker
+                  </motion.span>
+                  <motion.div
+                    className="absolute -inset-x-6 -inset-y-2 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 blur-xl opacity-50"
+                    animate={{
+                      opacity: [0.5, 0.3, 0.5],
+                      scale: [1, 1.1, 1],
+                    }}
+                    transition={{
+                      duration: 4,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  />
+                </Link>
+              </motion.div>
+            </div>
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-2">
+            {/* Column 2: Main Navigation */}
+            <div className="hidden md:flex items-center justify-end ml-auto mr-44 space-x-4">
               {[
                 { to: "/", text: "Home" },
                 { to: "/products", text: "Products" },
@@ -265,25 +287,30 @@ const Navbar = () => {
                   </DropdownMenuContent>
                 </DropdownMenu>
               </motion.div>
+            </div>
 
-              {/* Search Button */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.7 }}
-              >
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={toggleSearchPanel}
-                  className="relative group"
+            {/* Column 3: Tools */}
+            <div className="hidden md:flex items-center space-x-3 mr-5">
+              {/* Search Button - Hidden on Home and Solutions pages */}
+              {shouldShowSearch && (
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.7 }}
                 >
-                  <Search className="h-4 w-4 text-primary" />
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full"
-                  />
-                </Button>
-              </motion.div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={toggleSearchPanel}
+                    className="relative group"
+                  >
+                    <Search className="h-4 w-4 text-primary" />
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full"
+                    />
+                  </Button>
+                </motion.div>
+              )}
 
               {/* Theme Toggle */}
               <motion.div
@@ -296,15 +323,18 @@ const Navbar = () => {
 
               {/* Favorites Menu */}
               {isAuthenticated && (
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.9 }}
-                >
-                  <FavoritesMenu />
-                </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.9 }}
+              >
+                <FavoritesMenu />
+              </motion.div>
               )}
+            </div>
 
+            {/* Column 4: User Controls */}
+            <div className="flex items-center justify-end">
               {/* User Menu */}
               {isAuthenticated ? (
                 <motion.div
@@ -490,10 +520,12 @@ const Navbar = () => {
         )}
       </AnimatePresence>
 
-      {/* Search Panel */}
-      <AnimatePresence>
-        {searchPanelOpen && (
-          <SearchPanel isOpen={searchPanelOpen} onClose={() => setSearchPanelOpen(false)} />
+      {/* Search Panel - Hidden on Home and Solutions pages */}
+      <AnimatePresence mode="wait">
+        {searchPanelOpen && shouldShowSearch && (
+          <div ref={searchPanelRef}>
+            <SearchPanel isOpen={searchPanelOpen} onClose={() => setSearchPanelOpen(false)} />
+          </div>
         )}
       </AnimatePresence>
     </>

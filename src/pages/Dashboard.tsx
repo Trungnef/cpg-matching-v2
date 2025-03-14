@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import { motion } from "framer-motion";
 import {
   BarChart4,
   Building2,
@@ -42,7 +43,9 @@ import {
   MapPin,
   CheckCircle,
   Star,
-  Globe
+  Globe,
+  PanelLeft,
+  Menu
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -93,6 +96,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import DashboardAnnouncement from "@/components/dashboard/DashboardAnnouncement";
 
 // Add CSS to prevent focus outline
 const noFocusOutlineStyle = {
@@ -602,10 +606,17 @@ const retailerBrands = [
 ];
 
 const Dashboard = () => {
-  const { role, isAuthenticated, user, logout } = useUser();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, logout, isAuthenticated, role: userRole } = useUser();
   const [activeView, setActiveView] = useState("overview");
+  const [showMobileNav, setShowMobileNav] = useState(false);
+  // Thêm state để quản lý trạng thái của sidebar
+  const [collapsed, setCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+  
+  // Lấy role từ user
+  const role = userRole || "";
   
   useEffect(() => {
     document.title = `${role.charAt(0).toUpperCase() + role.slice(1)} Dashboard - CPG Matchmaker`;
@@ -2115,7 +2126,7 @@ const Dashboard = () => {
     
     // If Brands view is active, render Brands content
     if (activeView === "brands") {
-      if (role === "brand") {
+      if (user?.role === "brand") {
         // Brand-specific Brands view (partnership management)
         return (
           <div>
@@ -2247,7 +2258,7 @@ const Dashboard = () => {
             </div>
           </div>
         );
-      } else if (role === "retailer") {
+      } else if (user?.role === "retailer") {
         // Retailer-specific Brands view
         return (
           <div>
@@ -2596,6 +2607,166 @@ const Dashboard = () => {
     );
   };
 
+  // Theo dõi thay đổi kích thước màn hình
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      setIsMobile(width < 1024);
+      if (width >= 1024) {
+        setShowMobileNav(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  // Các hiệu ứng cho sidebar
+  const sidebarVariants = {
+    open: { width: 256, transition: { duration: 0.3 } },
+    closed: { width: 80, transition: { duration: 0.3 } }
+  };
+
+  const contentVariants = {
+    wide: { marginLeft: 80, transition: { duration: 0.3 } },
+    narrow: { marginLeft: 256, transition: { duration: 0.3 } }
+  };
+  
+  // Thêm hàm tạo menu khi sidebar đã thu gọn
+  const getCollapsedNavigationItems = () => {
+    switch(role) {
+      case "manufacturer":
+        return (
+          <>
+            <Button 
+              variant="ghost" 
+              className={`w-10 h-10 p-0 justify-center ${activeView === "production" ? "bg-secondary" : ""}`} 
+              onClick={() => setActiveView("production")}
+              style={noFocusOutlineStyle}
+            >
+              <Factory className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              className={`w-10 h-10 p-0 justify-center ${activeView === "products" ? "bg-secondary" : ""}`} 
+              onClick={() => setActiveView("products")}
+              style={noFocusOutlineStyle}
+            >
+              <Package className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              className={`w-10 h-10 p-0 justify-center ${activeView === "inventory" ? "bg-secondary" : ""}`} 
+              onClick={() => setActiveView("inventory")}
+              style={noFocusOutlineStyle}
+            >
+              <Warehouse className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              className={`w-10 h-10 p-0 justify-center ${activeView === "suppliers" ? "bg-secondary" : ""}`} 
+              onClick={() => setActiveView("suppliers")}
+              style={noFocusOutlineStyle}
+            >
+              <Truck className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              className={`w-10 h-10 p-0 justify-center ${activeView === "matches" ? "bg-secondary" : ""}`} 
+              onClick={() => setActiveView("matches")}
+              style={noFocusOutlineStyle}
+            >
+              <Users className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              className={`w-10 h-10 p-0 justify-center ${activeView === "analytics" ? "bg-secondary" : ""}`} 
+              onClick={() => setActiveView("analytics")}
+              style={noFocusOutlineStyle}
+            >
+              <BarChart4 className="h-4 w-4" />
+            </Button>
+          </>
+        );
+      case "brand":
+        return (
+          <>
+            <Button 
+              variant="ghost" 
+              className={`w-10 h-10 p-0 justify-center ${activeView === "products" ? "bg-secondary" : ""}`} 
+              onClick={() => setActiveView("products")}
+              style={noFocusOutlineStyle}
+            >
+              <Package className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              className={`w-10 h-10 p-0 justify-center ${activeView === "manufacturers" ? "bg-secondary" : ""}`} 
+              onClick={() => setActiveView("manufacturers")}
+              style={noFocusOutlineStyle}
+            >
+              <Factory className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              className={`w-10 h-10 p-0 justify-center ${activeView === "brands" ? "bg-secondary" : ""}`} 
+              onClick={() => setActiveView("brands")}
+              style={noFocusOutlineStyle}
+            >
+              <ShoppingCart className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              className={`w-10 h-10 p-0 justify-center ${activeView === "analytics" ? "bg-secondary" : ""}`} 
+              onClick={() => setActiveView("analytics")}
+              style={noFocusOutlineStyle}
+            >
+              <BarChart4 className="h-4 w-4" />
+            </Button>
+          </>
+        );
+      case "retailer":
+        return (
+          <>
+            <Button 
+              variant="ghost" 
+              className={`w-10 h-10 p-0 justify-center ${activeView === "inventory" ? "bg-secondary" : ""}`} 
+              onClick={() => setActiveView("inventory")}
+              style={noFocusOutlineStyle}
+            >
+              <Warehouse className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              className={`w-10 h-10 p-0 justify-center ${activeView === "brands" ? "bg-secondary" : ""}`} 
+              onClick={() => setActiveView("brands")}
+              style={noFocusOutlineStyle}
+            >
+              <ShoppingCart className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              className={`w-10 h-10 p-0 justify-center ${activeView === "partnerships" ? "bg-secondary" : ""}`} 
+              onClick={() => setActiveView("partnerships")}
+              style={noFocusOutlineStyle}
+            >
+              <Handshake className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              className={`w-10 h-10 p-0 justify-center ${activeView === "analytics" ? "bg-secondary" : ""}`} 
+              onClick={() => setActiveView("analytics")}
+              style={noFocusOutlineStyle}
+            >
+              <BarChart4 className="h-4 w-4" />
+            </Button>
+          </>
+        );
+      default:
+        return null;
+    }
+  };
+
   if (!isAuthenticated) {
     // Return empty div while redirecting
     return <div></div>;
@@ -2606,87 +2777,135 @@ const Dashboard = () => {
       <Navbar />
       
       <div className="flex min-h-screen pt-16">
+        {/* Sidebar - Mobile Toggle Button */}
+        {isMobile && (
+          <div className="fixed top-20 left-4 z-50">
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={() => setShowMobileNav(!showMobileNav)}
+              className="rounded-full bg-primary text-white border-0 shadow-lg lg:hidden"
+            >
+              {showMobileNav ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+          </div>
+        )}
+        
         {/* Sidebar */}
-        <aside className="w-64 border-r hidden lg:block p-6 fixed top-16 left-0 h-[calc(100vh-4rem)] overflow-y-auto">
-          <div className="space-y-4">
-            <div className="mb-8">
-              <h2 className="text-xl font-bold capitalize">{role} Dashboard</h2>
-              <p className="text-sm text-foreground/60">
-                {user?.companyName || "Company Name"}
-              </p>
-            </div>
-            
-            {/* User info */}
-            <div className="mb-6 pb-6 border-b">
-              <div className="flex items-center mb-4">
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mr-3">
-                  <Users className="h-5 w-5 text-primary" />
+        {((!isMobile) || (isMobile && showMobileNav)) && (
+          <motion.aside 
+            className={`border-r bg-background fixed top-16 left-0 h-[calc(100vh-4rem)] overflow-y-auto shadow-sm z-40 ${isMobile ? 'w-64' : ''}`}
+            variants={sidebarVariants}
+            animate={collapsed && !isMobile ? "closed" : "open"}
+            initial={collapsed && !isMobile ? "closed" : "open"}
+          >
+            <div className={`p-6 space-y-6 ${collapsed && !isMobile ? 'items-center' : ''}`}>
+              {/* Toggle Button (only on desktop) */}
+              {!isMobile && (
+                <div className={`flex ${collapsed ? 'justify-center' : 'justify-end'} mb-4`}>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => setCollapsed(!collapsed)}
+                    className={collapsed ? "rotate-180" : ""}
+                  >
+                    <PanelLeft className="h-5 w-5" />
+                  </Button>
                 </div>
-                <div>
-                  <p className="font-medium">{user?.name || "User Name"}</p>
-                  <p className="text-xs text-muted-foreground">{user?.email || "user@example.com"}</p>
+              )}
+              
+              {/* User info */}
+              <div className={`mb-6 pb-6 border-b ${collapsed && !isMobile ? 'flex flex-col items-center' : ''}`}>
+                <div className={`${collapsed && !isMobile ? 'flex flex-col items-center' : 'flex items-center'} mb-4`}>
+                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                    <Users className="h-5 w-5 text-primary" />
+                  </div>
+                  {(!collapsed || isMobile) && (
+                    <motion.div
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -10 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <p className="font-medium">{user?.name || "User Name"}</p>
+                      <p className="text-xs text-muted-foreground">{user?.email || "user@example.com"}</p>
+                    </motion.div>
+                  )}
                 </div>
+                
+                <Button 
+                  variant="destructive" 
+                  size="sm" 
+                  className={`${collapsed && !isMobile ? 'w-10 h-10 p-0' : 'w-full justify-start'}`}
+                  onClick={handleLogout}
+                  style={noFocusOutlineStyle}
+                >
+                  <LogOut className={`h-4 w-4 ${!collapsed || isMobile ? 'mr-2' : ''}`} />
+                  {(!collapsed || isMobile) && "Logout"}
+                </Button>
               </div>
               
-              <Button 
-                variant="destructive" 
-                size="sm" 
-                className="w-full justify-start"
-                onClick={handleLogout}
-                style={noFocusOutlineStyle}
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Logout
-              </Button>
-            </div>
-            
-            <nav className="space-y-1">
-              <Button 
-                variant="ghost" 
-                className={`w-full justify-start gap-2 ${activeView === "overview" ? "bg-secondary" : ""}`} 
-                onClick={() => setActiveView("overview")}
-                style={noFocusOutlineStyle}
-              >
-                <Home className="h-4 w-4" />
-                Overview
-              </Button>
+              <nav className="space-y-2">
+                <Button 
+                  variant="ghost" 
+                  className={`${collapsed && !isMobile ? 'w-10 h-10 p-0 justify-center' : 'w-full justify-start gap-2'} ${activeView === "overview" ? "bg-secondary" : ""}`} 
+                  onClick={() => setActiveView("overview")}
+                  style={noFocusOutlineStyle}
+                >
+                  <Home className="h-4 w-4" />
+                  {(!collapsed || isMobile) && "Overview"}
+                </Button>
+                
+                {/* Role-specific navigation */}
+                {(!collapsed || isMobile) ? (
+                  getNavigationItems()
+                ) : (
+                  getCollapsedNavigationItems()
+                )}
+              </nav>
               
-              {/* Role-specific navigation */}
-              {getNavigationItems()}
-            </nav>
-            
-            <div className="pt-4 mt-4 border-t space-y-1">
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start gap-2" 
-                onClick={() => navigate("/profile")}
-                style={noFocusOutlineStyle}
-              >
-                <User className="h-4 w-4" />
-                Profile
-              </Button>
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start gap-2" 
-                onClick={() => navigate(`/${role}/settings`)}
-                style={noFocusOutlineStyle}
-              >
-                <Settings className="h-4 w-4" />
-                Settings
-              </Button>
+              <div className={`pt-6 mt-6 border-t space-y-2 ${collapsed && !isMobile ? 'flex flex-col items-center' : ''}`}>
+                <Button 
+                  variant="ghost" 
+                  className={`${collapsed && !isMobile ? 'w-10 h-10 p-0 justify-center' : 'w-full justify-start gap-2'}`}
+                  onClick={() => navigate("/profile")}
+                  style={noFocusOutlineStyle}
+                >
+                  <User className="h-4 w-4" />
+                  {(!collapsed || isMobile) && "Profile"}
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className={`${collapsed && !isMobile ? 'w-10 h-10 p-0 justify-center' : 'w-full justify-start gap-2'}`}
+                  onClick={() => navigate(`/${role}/settings`)}
+                  style={noFocusOutlineStyle}
+                >
+                  <Settings className="h-4 w-4" />
+                  {(!collapsed || isMobile) && "Settings"}
+                </Button>
+              </div>
             </div>
-          </div>
-        </aside>
+          </motion.aside>
+        )}
         
         {/* Main content */}
-        <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-auto lg:ml-64">
-          <div className="max-w-7xl mx-auto">
+        <motion.main 
+          className={`flex-1 ${isMobile ? 'ml-0' : ''}`}
+          variants={contentVariants}
+          animate={isMobile ? "wide" : (collapsed ? "wide" : "narrow")}
+        >
+          <div className="flex-1 space-y-4 p-6 pt-14 md:pt-6 overflow-y-auto">         
+            {/* Tabs to switch between dashboard views */}
             {activeView === "overview" ? (
               <>
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-                  <div>
-                    <h1 className="text-3xl font-bold capitalize">{role} Dashboard</h1>
-                    <p className="text-muted-foreground">Welcome back, {user?.name || "User"}</p>
+                  <div className="w-full h-[180px]">
+                    {/* Dashboard Announcement */}
+                    <DashboardAnnouncement 
+                      role={role}
+                      userName={user?.name}
+                      companyName={user?.companyName}
+                    />
                   </div>
                   
                   {/* Dashboard tabs for mobile */}
@@ -2706,7 +2925,7 @@ const Dashboard = () => {
             {/* Role-specific dashboard content */}
             {renderRoleSpecificDashboard()}
           </div>
-        </main>
+        </motion.main>
       </div>
     </div>
   );
