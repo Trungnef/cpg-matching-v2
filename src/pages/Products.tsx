@@ -56,6 +56,37 @@ import { cn } from "@/lib/utils";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "react-i18next";
+
+// Define Product type to fix linter error
+type Product = {
+  id: number;
+  name: string;
+  category: string;
+  manufacturer: string;
+  image: string;
+  price: string;
+  certifications: string[];
+  rating: number;
+  packagingType: string;
+  description: string;
+  minOrderQuantity: number;
+  leadTime: string;
+  sustainable: boolean;
+};
+
+// Define Manufacturer type to match FavoriteContext
+interface Manufacturer {
+  id: number;
+  name: string;
+  location: string;
+  logo: string;
+  categories: string[];
+  certifications: string[];
+  minOrderSize: string;
+  establishedYear: number;
+  rating: number;
+}
 
 // Mock product data - in a real app, this would come from an API
 const mockProducts = [
@@ -151,50 +182,165 @@ const mockProducts = [
   }
 ];
 
-// Category options
-const categories = [
-  "All Categories",
-  "Breakfast Foods",
-  "Beverages",
-  "Snacks",
-  "Spreads",
-  "Condiments",
-  "Dairy & Alternatives",
-  "Baking"
+// Internationalized mock product data function
+const getLocalizedProducts = (t: any): Product[] => [
+  {
+    id: 1,
+    name: t('product-name-organic-granola', 'Organic Granola'),
+    category: t('category-breakfast-foods', 'Breakfast Foods'),
+    manufacturer: t('manufacturer-natures-best', 'Nature\'s Best'),
+    image: "/placeholder.svg",
+    price: "$4.99",
+    certifications: [
+      t('certification-organic', 'Organic'),
+      t('certification-non-gmo', 'Non-GMO')
+    ],
+    rating: 4.5,
+    packagingType: t('packaging-cardboard-box', 'Cardboard Box'),
+    description: t('product-desc-organic-granola', 'Delicious organic granola made with whole grain oats, honey, and mixed nuts. Perfect for breakfast or as a healthy snack.'),
+    minOrderQuantity: 100,
+    leadTime: t('lead-time-2-3-weeks', '2-3 weeks'),
+    sustainable: true
+  },
+  {
+    id: 2,
+    name: t('product-name-premium-coffee', 'Premium Coffee Beans'),
+    category: t('category-beverages', 'Beverages'),
+    manufacturer: t('manufacturer-mountain-roasters', 'Mountain Roasters'),
+    image: "/placeholder.svg",
+    price: "$12.99",
+    certifications: [
+      t('certification-fair-trade', 'Fair Trade'),
+      t('certification-organic', 'Organic')
+    ],
+    rating: 4.8,
+    packagingType: t('packaging-resealable-bag', 'Resealable Bag'),
+    description: t('product-desc-premium-coffee', 'Premium arabica coffee beans sourced from high-altitude farms. Medium roast with notes of chocolate and caramel.'),
+    minOrderQuantity: 50,
+    leadTime: t('lead-time-1-2-weeks', '1-2 weeks'),
+    sustainable: true
+  },
+  {
+    id: 3,
+    name: t('product-name-almond-butter', 'Almond Butter'),
+    category: t('category-spreads', 'Spreads'),
+    manufacturer: t('manufacturer-pure-foods', 'Pure Foods Co.'),
+    image: "/placeholder.svg",
+    price: "$7.99",
+    certifications: [
+      t('certification-non-gmo', 'Non-GMO'),
+      t('certification-gluten-free', 'Gluten-Free')
+    ],
+    rating: 4.2,
+    packagingType: t('packaging-glass-jar', 'Glass Jar'),
+    description: t('product-desc-almond-butter', 'Creamy almond butter made from dry roasted almonds. No added sugar or preservatives.'),
+    minOrderQuantity: 75,
+    leadTime: t('lead-time-2-weeks', '2 weeks'),
+    sustainable: false
+  },
+  {
+    id: 4,
+    name: t('product-name-protein-bars', 'Protein Bars'),
+    category: t('category-snacks', 'Snacks'),
+    manufacturer: t('manufacturer-fitness-nutrition', 'Fitness Nutrition'),
+    image: "/placeholder.svg",
+    price: "$2.49",
+    certifications: [
+      t('certification-high-protein', 'High-Protein'),
+      t('certification-low-sugar', 'Low-Sugar')
+    ],
+    rating: 4.0,
+    packagingType: t('packaging-wrapper', 'Wrapper'),
+    description: t('product-desc-protein-bars', 'High-protein bars with 20g of protein per serving. Great for post-workout recovery or a quick snack on the go.'),
+    minOrderQuantity: 200,
+    leadTime: t('lead-time-1-week', '1 week'),
+    sustainable: false
+  },
+  {
+    id: 5,
+    name: t('product-name-sparkling-water', 'Sparkling Water'),
+    category: t('category-beverages', 'Beverages'),
+    manufacturer: t('manufacturer-clear-springs', 'Clear Springs'),
+    image: "/placeholder.svg",
+    price: "$1.29",
+    certifications: [
+      t('certification-zero-calorie', 'Zero-Calorie')
+    ],
+    rating: 4.3,
+    packagingType: t('packaging-aluminum-can', 'Aluminum Can'),
+    description: t('product-desc-sparkling-water', 'Refreshing sparkling water with natural flavors. Zero calories, zero sweeteners, and zero sodium.'),
+    minOrderQuantity: 300,
+    leadTime: t('lead-time-1-2-weeks', '1-2 weeks'),
+    sustainable: true
+  },
+  {
+    id: 6,
+    name: t('product-name-dried-fruit-mix', 'Dried Fruit Mix'),
+    category: t('category-snacks', 'Snacks'),
+    manufacturer: t('manufacturer-harvest-farms', 'Harvest Farms'),
+    image: "/placeholder.svg",
+    price: "$5.49",
+    certifications: [
+      t('certification-no-added-sugar', 'No Added Sugar'),
+      t('certification-organic', 'Organic')
+    ],
+    rating: 4.6,
+    packagingType: t('packaging-resealable-pouch', 'Resealable Pouch'),
+    description: t('product-desc-dried-fruit-mix', 'A delicious mix of organic dried fruits, including apples, cranberries, and mangoes. Perfect for snacking or baking.'),
+    minOrderQuantity: 100,
+    leadTime: t('lead-time-1-3-weeks', '1-3 weeks'),
+    sustainable: true
+  }
 ];
+
+// Category options
+const categoryOptions = [
+  "all-categories",
+  "breakfast-foods",
+  "beverages",
+  "snacks",
+  "spreads",
+  "condiments",
+  "dairy-alternatives",
+  "baking"
+];
+
+const Products = () => {
+  const { t } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
 
 // Certification options
 const certifications = [
-  "Organic",
-  "Non-GMO",
-  "Gluten-Free",
-  "Fair Trade",
-  "No Added Sugar",
-  "High-Protein",
-  "Low-Sugar",
-  "Zero-Calorie"
+    t('certification-organic', 'Organic'),
+    t('certification-non-gmo', 'Non-GMO'),
+    t('certification-gluten-free', 'Gluten-Free'),
+    t('certification-fair-trade', 'Fair Trade'),
+    t('certification-no-added-sugar', 'No Added Sugar'),
+    t('certification-high-protein', 'High-Protein'),
+    t('certification-low-sugar', 'Low-Sugar'),
+    t('certification-zero-calorie', 'Zero-Calorie')
 ];
 
 // Packaging types
 const packagingTypes = [
-  "Cardboard Box",
-  "Glass Jar",
-  "Aluminum Can",
-  "Plastic Bottle",
-  "Resealable Bag",
-  "Resealable Pouch",
-  "Wrapper",
-  "Tetra Pak"
+    t('packaging-cardboard-box', 'Cardboard Box'),
+    t('packaging-glass-jar', 'Glass Jar'),
+    t('packaging-aluminum-can', 'Aluminum Can'),
+    t('packaging-plastic-bottle', 'Plastic Bottle'),
+    t('packaging-resealable-bag', 'Resealable Bag'),
+    t('packaging-resealable-pouch', 'Resealable Pouch'),
+    t('packaging-wrapper', 'Wrapper'),
+    t('packaging-tetra-pak', 'Tetra Pak')
 ];
 
 // Sort options
 const sortOptions = [
-  { label: "Relevance", value: "relevance" },
-  { label: "Price: Low to High", value: "price-asc" },
-  { label: "Price: High to Low", value: "price-desc" },
-  { label: "Rating: High to Low", value: "rating-desc" },
-  { label: "Name: A to Z", value: "name-asc" },
-  { label: "Name: Z to A", value: "name-desc" }
+    { label: t('sort-relevance', 'Relevance'), value: "relevance" },
+    { label: t('sort-price-low-high', 'Price: Low to High'), value: "price-asc" },
+    { label: t('sort-price-high-low', 'Price: High to Low'), value: "price-desc" },
+    { label: t('sort-rating', 'Rating: High to Low'), value: "rating-desc" },
+    { label: t('sort-name-asc', 'Name: A to Z'), value: "name-asc" },
+    { label: t('sort-name-desc', 'Name: Z to A'), value: "name-desc" }
 ];
 
 // Animation variants
@@ -218,12 +364,12 @@ const cardVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
 };
 
-const Products = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState(searchParams.get("q") || "");
-  const [products, setProducts] = useState(mockProducts);
+  // Use localized products
+  const [products, setProducts] = useState<Product[]>([]);
   const [showFilters, setShowFilters] = useState(false);
-  const [activeCategory, setActiveCategory] = useState("All Categories");
+  // Store category key instead of translated text
+  const [activeCategory, setActiveCategory] = useState("all-categories");
   const [selectedCertifications, setSelectedCertifications] = useState<string[]>([]);
   const [selectedPackaging, setSelectedPackaging] = useState<string[]>([]);
   const [activeView, setActiveView] = useState("grid");
@@ -250,10 +396,36 @@ const Products = () => {
     toggleFavorite
   } = useFavorites();
 
+  // Wrapper function to convert Product to Manufacturer for toggleFavorite
+  const handleToggleFavorite = (product: Product) => {
+    // Convert product to match Manufacturer interface
+    const manufacturer: Manufacturer = {
+      id: product.id,
+      name: product.name,
+      location: '',  // Default value
+      logo: product.image,
+      categories: [product.category],
+      certifications: product.certifications,
+      minOrderSize: product.minOrderQuantity.toString(),
+      establishedYear: new Date().getFullYear(), // Default value
+      rating: product.rating
+    };
+    
+    toggleFavorite(manufacturer);
+  };
+
+  // Initialize localized products on component mount
+  useEffect(() => {
+    const localizedProducts = getLocalizedProducts(t);
+    setProducts(localizedProducts);
+  }, [t]);
+
   // Page title effect
   useEffect(() => {
-    document.title = "Browse Products - CPG Matchmaker";
-  }, []);
+    document.title = searchParams.get("view") === "favorites" 
+      ? t('my-favorites-title', "My Favorites - CPG Matchmaker") 
+      : t('browse-products-title', "Browse Products - CPG Matchmaker");
+  }, [searchParams, t]);
 
   // Simulate loading state
   useEffect(() => {
@@ -278,7 +450,8 @@ const Products = () => {
   useEffect(() => {
     if (searchParams.get("productId") && !isLoading) {
       const productId = parseInt(searchParams.get("productId") || "0");
-      const product = mockProducts.find(p => p.id === productId);
+      const localizedProducts = getLocalizedProducts(t);
+      const product = localizedProducts.find(p => p.id === productId);
       if (product) {
         handleProductDetailsClick(product);
       }
@@ -287,13 +460,14 @@ const Products = () => {
     // View favorites if that view is requested  
     if (searchParams.get("view") === "favorites") {
       // Set page title for favorites view
-      document.title = "My Favorites - CPG Matchmaker";
+      document.title = t('my-favorites-title', "My Favorites - CPG Matchmaker");
     }
-  }, [searchParams, isLoading]);
+  }, [searchParams, isLoading, t]);
 
   // Filter and sort products
   useEffect(() => {
-    let filteredProducts = [...mockProducts];
+    let localizedProducts = getLocalizedProducts(t);
+    let filteredProducts = [...localizedProducts];
 
     if (searchParams.get("view") === "favorites") {
       filteredProducts = filteredProducts.filter(product => 
@@ -330,9 +504,9 @@ const Products = () => {
       }
 
     // Filter by category
-    if (activeCategory !== "All Categories") {
+      if (activeCategory !== "all-categories") {
       filteredProducts = filteredProducts.filter(
-        product => product.category === activeCategory
+          product => product.category === t(`category-${activeCategory}`, activeCategory)
       );
     }
 
@@ -340,7 +514,7 @@ const Products = () => {
     if (selectedCertifications.length > 0) {
       filteredProducts = filteredProducts.filter(product => 
         selectedCertifications.every(cert => 
-          product.certifications.includes(cert)
+            product.certifications.includes(t(`certification-${cert.toLowerCase().replace(/[\s-]+/g, '-')}`, cert))
         )
       );
     }
@@ -396,7 +570,7 @@ const Products = () => {
 
     setProducts(filteredProducts);
   }, [searchTerm, activeCategory, selectedCertifications, selectedPackaging, sortBy, sustainableOnly, 
-      searchParams, isFavorite, priceRange, minOrder, selectedLeadTime, inStockOnly, newArrivalsOnly, minRating]);
+      searchParams, isFavorite, priceRange, minOrder, selectedLeadTime, inStockOnly, newArrivalsOnly, minRating, t]);
 
   // Toggle certification selection
   const toggleCertification = (cert: string) => {
@@ -427,7 +601,7 @@ const Products = () => {
 
   // Clear all filters including advanced filters
   const clearFilters = () => {
-    setActiveCategory("All Categories");
+    setActiveCategory("all-categories");
     setSelectedCertifications([]);
     setSelectedPackaging([]);
     setSearchTerm("");
@@ -498,10 +672,10 @@ const Products = () => {
           transition={{ duration: 0.5 }}
         >
           <ShoppingBag className="w-12 h-12 text-muted-foreground/50 mx-auto mb-4" />
-          <p className="text-lg text-foreground/70 mb-2">No products found matching your criteria.</p>
-          <p className="text-sm text-muted-foreground mb-6">Try adjusting your filters or search terms.</p>
+          <p className="text-lg text-foreground/70 mb-2">{t('no-products-found', 'No products found matching your criteria.')}</p>
+          <p className="text-sm text-muted-foreground mb-6">{t('adjust-filters', 'Try adjusting your filters or search terms.')}</p>
           <Button variant="outline" onClick={clearFilters}>
-            Clear All Filters
+            {t('clear-all-filters', 'Clear All Filters')}
           </Button>
         </motion.div>
       );
@@ -520,7 +694,7 @@ const Products = () => {
               <ProductCard 
                 product={product} 
                 isFavorite={isFavorite(product.id)}
-                onFavoriteToggle={() => toggleFavorite(product)}
+                onFavoriteToggle={() => handleToggleFavorite(product)}
                 onDetailsClick={() => handleProductDetailsClick(product)}
                 className="h-full"
               />
@@ -557,7 +731,7 @@ const Products = () => {
                         </div>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Sustainable Product</p>
+                        <p>{t('sustainable-product', 'Sustainable Product')}</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
@@ -575,7 +749,7 @@ const Products = () => {
                       variant="ghost" 
                       size="icon" 
                       className={isFavorite(product.id) ? "text-red-500" : "text-muted-foreground"}
-                      onClick={() => toggleFavorite(product)}
+                      onClick={() => handleToggleFavorite(product)}
                     >
                       <Heart className="h-4 w-4" fill={isFavorite(product.id) ? "currentColor" : "none"} />
                     </Button>
@@ -606,10 +780,10 @@ const Products = () => {
                       size="sm"
                       onClick={() => handleProductDetailsClick(product)}
                     >
-                      Details
+                      {t('details', 'Details')}
                     </Button>
                     <Button size="sm">
-                      Match
+                      {t('match', 'Match')}
                     </Button>
                   </div>
                 </div>
@@ -640,10 +814,14 @@ const Products = () => {
           >
             <div>
               <h1 className="text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary animate-gradient bg-300%">
-                Browse Products
+                {searchParams.get("view") === "favorites" 
+                  ? t('my-favorites', "My Favorites") 
+                  : t('browse-products', "Browse Products")}
               </h1>
               <p className="text-foreground/70">
-                Discover the perfect products for your CPG business
+                {searchParams.get("view") === "favorites" 
+                  ? t('saved-products-description', "Products you've saved for later") 
+                  : t('discover-products-description', "Discover the perfect products for your CPG business")}
               </p>
             </div>
             
@@ -656,11 +834,11 @@ const Products = () => {
                     className="flex items-center gap-2"
                   >
                     <ArrowUpDown className="h-4 w-4" />
-                    Sort: {sortOptions.find(option => option.value === sortBy)?.label}
+                    {t('sort', 'Sort')}: {t(`sort-option-${sortOptions.find(option => option.value === sortBy)?.value}`, sortOptions.find(option => option.value === sortBy)?.label)}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>Sort by</DropdownMenuLabel>
+                  <DropdownMenuLabel>{t('sort-by', 'Sort by')}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   {sortOptions.map(option => (
                     <DropdownMenuItem 
@@ -668,7 +846,7 @@ const Products = () => {
                       onClick={() => setSortBy(option.value)}
                       className={sortBy === option.value ? "bg-muted" : ""}
                     >
-                      {option.label}
+                      {t(`sort-option-${option.value}`, option.label)}
                       {sortBy === option.value && (
                         <CheckCircle2 className="h-4 w-4 ml-2" />
                       )}
@@ -684,18 +862,18 @@ const Products = () => {
                 className="flex items-center gap-2"
               >
                 <Filter className="h-4 w-4" />
-                Filters
-                {(selectedCertifications.length > 0 || selectedPackaging.length > 0 || activeCategory !== "All Categories" || sustainableOnly) && (
+                {t('filters', 'Filters')}
+                {(selectedCertifications.length > 0 || selectedPackaging.length > 0 || activeCategory !== "all-categories" || sustainableOnly) && (
                   <Badge variant="secondary" className="ml-1">
-                    {selectedCertifications.length + selectedPackaging.length + (activeCategory !== "All Categories" ? 1 : 0) + (sustainableOnly ? 1 : 0)}
+                    {selectedCertifications.length + selectedPackaging.length + (activeCategory !== "all-categories" ? 1 : 0) + (sustainableOnly ? 1 : 0)}
                   </Badge>
                 )}
               </Button>
               
               <Tabs defaultValue={activeView} onValueChange={setActiveView} className="w-auto">
                 <TabsList className="grid w-[120px] grid-cols-2">
-                  <TabsTrigger value="grid">Grid</TabsTrigger>
-                  <TabsTrigger value="list">List</TabsTrigger>
+                  <TabsTrigger value="grid">{t('grid-view', 'Grid')}</TabsTrigger>
+                  <TabsTrigger value="list">{t('list-view', 'List')}</TabsTrigger>
                 </TabsList>
               </Tabs>
             </div>
@@ -711,7 +889,7 @@ const Products = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
                 type="search"
-                placeholder="Search products, manufacturers, or categories..."
+                placeholder={t('search-placeholder', 'Search products, manufacturers, or categories...')}
                 className="pl-10 pr-24 w-full"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -726,7 +904,7 @@ const Products = () => {
                 )}
               >
                 <SlidersHorizontal className="h-4 w-4 mr-1" />
-                Advanced
+                {t('advanced-search', 'Advanced')}
               </Button>
             </div>
 
@@ -743,7 +921,7 @@ const Products = () => {
                     <div className="space-y-3">
                       <Label className="text-sm font-medium flex items-center gap-2">
                         <Star className="h-4 w-4 text-yellow-500" />
-                        Product Rating
+                        {t('product-rating', 'Product Rating')}
                       </Label>
                       <div className="pt-2 px-2">
                         <Slider
@@ -771,7 +949,7 @@ const Products = () => {
                     <div className="space-y-3">
                       <Label className="text-sm font-medium flex items-center gap-2">
                         <Package className="h-4 w-4 text-emerald-500" />
-                        Price Range
+                        {t('price-range', 'Price Range')}
                       </Label>
                       <div className="pt-2 px-2">
                         <Slider
@@ -792,10 +970,15 @@ const Products = () => {
                     <div className="space-y-3">
                       <Label className="text-sm font-medium flex items-center gap-2">
                         <Clock className="h-4 w-4 text-blue-500" />
-                        Lead Time
+                        {t('lead-time', 'Lead Time')}
                       </Label>
                       <div className="flex flex-wrap gap-2">
-                        {["1 week", "2 weeks", "3 weeks", "4+ weeks"].map((time) => (
+                        {[
+                          t('lead-time-1-week', '1 week'),
+                          t('lead-time-2-weeks', '2 weeks'),
+                          t('lead-time-3-weeks', '3 weeks'),
+                          t('lead-time-4plus-weeks', '4+ weeks')
+                        ].map((time) => (
                           <Badge
                             key={time}
                             variant={selectedLeadTime.includes(time) ? "default" : "outline"}
@@ -807,7 +990,7 @@ const Products = () => {
                             )}
                             onClick={() => toggleLeadTime(time)}
                           >
-                            {time}
+                            {t(`lead-time-${time.replace(/\s+/g, '-').replace('+', 'plus')}`, time)}
                           </Badge>
                         ))}
                       </div>
@@ -817,7 +1000,7 @@ const Products = () => {
                     <div className="space-y-3">
                       <Label className="text-sm font-medium flex items-center gap-2">
                         <ShoppingBag className="h-4 w-4 text-purple-500" />
-                        Minimum Order
+                        {t('minimum-order', 'Minimum Order')}
                       </Label>
                       <div className="pt-2 px-2">
                         <Slider
@@ -829,8 +1012,8 @@ const Products = () => {
                           className="w-full"
                         />
                         <div className="flex justify-between mt-2">
-                          <span className="text-sm font-medium text-purple-600">{minOrder} units</span>
-                          <span className="text-sm font-medium text-purple-600">5K+ units</span>
+                          <span className="text-sm font-medium text-purple-600">{minOrder} {t('units', 'units')}</span>
+                          <span className="text-sm font-medium text-purple-600">5K+ {t('units', 'units')}</span>
                         </div>
                       </div>
                     </div>
@@ -839,7 +1022,7 @@ const Products = () => {
                     <div className="col-span-full space-y-3">
                       <Label className="text-sm font-medium flex items-center gap-2">
                         <Award className="h-4 w-4 text-amber-500" />
-                        Certifications
+                        {t('certifications', 'Certifications')}
                       </Label>
                       <div className="flex flex-wrap gap-2">
                         {certifications.map((cert) => (
@@ -854,7 +1037,7 @@ const Products = () => {
                             )}
                             onClick={() => toggleCertification(cert)}
                           >
-                            {cert}
+                            {t(`certification-${cert.toLowerCase().replace(/[\s-]+/g, '-')}`, cert)}
                           </Badge>
                         ))}
                       </div>
@@ -864,7 +1047,7 @@ const Products = () => {
                     <div className="col-span-full border-t pt-4 mt-2">
                       <Label className="text-sm font-medium flex items-center gap-2 mb-4">
                         <Filter className="h-4 w-4 text-gray-600" />
-                        Additional Filters
+                        {t('additional-filters', 'Additional Filters')}
                       </Label>
                       <div className="grid grid-cols-2 gap-6">
                         <div className="space-y-4">
@@ -872,21 +1055,21 @@ const Products = () => {
                             <Switch id="inStock" checked={inStockOnly} onCheckedChange={setInStockOnly} />
                             <Label htmlFor="inStock" className="text-sm flex items-center gap-2">
                               <Package className="h-4 w-4 text-green-500" />
-                              In Stock Only
+                              {t('in-stock-only', 'In Stock Only')}
                             </Label>
                           </div>
                           <div className="flex items-center space-x-3">
                             <Switch id="newArrivals" checked={newArrivalsOnly} onCheckedChange={setNewArrivalsOnly} />
                             <Label htmlFor="newArrivals" className="text-sm flex items-center gap-2">
                               <Star className="h-4 w-4 text-orange-500" />
-                              New Arrivals Only
+                              {t('new-arrivals-only', 'New Arrivals Only')}
                             </Label>
                           </div>
                           <div className="flex items-center space-x-3">
                             <Switch id="customization" checked={hasCustomization} onCheckedChange={setHasCustomization} />
                             <Label htmlFor="customization" className="text-sm flex items-center gap-2">
                               <Building2 className="h-4 w-4 text-indigo-500" />
-                              Customization Available
+                              {t('customization-available', 'Customization Available')}
                             </Label>
                           </div>
                         </div>
@@ -895,14 +1078,14 @@ const Products = () => {
                             <Switch id="sustainable" checked={sustainableOnly} onCheckedChange={setSustainableOnly} />
                             <Label htmlFor="sustainable" className="text-sm flex items-center gap-2">
                               <CheckCircle2 className="h-4 w-4 text-green-500" />
-                              Sustainable Only
+                              {t('sustainable-only', 'Sustainable Only')}
                             </Label>
                           </div>
                           <div className="flex items-center space-x-3">
                             <Switch id="samples" checked={hasSamples} onCheckedChange={setHasSamples} />
                             <Label htmlFor="samples" className="text-sm flex items-center gap-2">
                               <Package className="h-4 w-4 text-blue-500" />
-                              Sample Available
+                              {t('sample-available', 'Sample Available')}
                             </Label>
                           </div>
                         </div>
@@ -920,7 +1103,7 @@ const Products = () => {
                       className="flex items-center gap-2 text-red-500 hover:text-red-600 hover:bg-red-50"
                     >
                       <Trash2 className="h-4 w-4" />
-                      Reset All
+                      {t('reset-all', 'Reset All')}
                     </Button>
                     <div className="flex gap-2">
                       <Button
@@ -929,14 +1112,14 @@ const Products = () => {
                         className="flex items-center gap-2"
                       >
                         <X className="h-4 w-4" />
-                        Cancel
+                        {t('cancel', 'Cancel')}
                       </Button>
                       <Button
                         onClick={applyAdvancedFilters}
                         className="flex items-center gap-2 bg-primary hover:bg-primary/90"
                       >
                         <Filter className="h-4 w-4" />
-                        Apply Filters
+                        {t('apply-filters', 'Apply Filters')}
                       </Button>
                     </div>
                   </div>
@@ -947,21 +1130,21 @@ const Products = () => {
           
           {/* Active filters */}
           <AnimatePresence>
-            {(selectedCertifications.length > 0 || selectedPackaging.length > 0 || activeCategory !== "All Categories" || sustainableOnly) && (
+            {(selectedCertifications.length > 0 || selectedPackaging.length > 0 || activeCategory !== "all-categories" || sustainableOnly) && (
               <motion.div 
                 className="mb-6 flex flex-wrap items-center gap-2"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
               >
-              <span className="text-sm text-foreground/70">Active filters:</span>
-              
-              {activeCategory !== "All Categories" && (
+                <span className="text-sm text-foreground/70">{t('active-filters', 'Active filters:')}</span>
+                
+                {activeCategory !== "all-categories" && (
                   <Badge variant="secondary" className="flex items-center gap-1 animate-fadeIn">
-                  {activeCategory}
+                    {t(`category-${activeCategory}`, activeCategory)}
                     <motion.button 
-                      onClick={() => setActiveCategory("All Categories")}
+                      onClick={() => setActiveCategory("all-categories")}
                       whileTap={{ scale: 0.9 }}
                     >
                     <X className="h-3 w-3" />
@@ -995,7 +1178,7 @@ const Products = () => {
               
                 {sustainableOnly && (
                   <Badge variant="secondary" className="flex items-center gap-1 animate-fadeIn bg-green-100 text-green-800 hover:bg-green-200">
-                    Sustainable Only
+                    {t('sustainable-only', 'Sustainable Only')}
                     <motion.button 
                       onClick={() => setSustainableOnly(false)}
                       whileTap={{ scale: 0.9 }}
@@ -1006,132 +1189,45 @@ const Products = () => {
                 )}
                 
                 <motion.div whileTap={{ scale: 0.95 }}>
-              <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs">
-                Clear all
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={clearFilters}
+                    className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    {t('clear-all', 'Clear all')}
               </Button>
                 </motion.div>
               </motion.div>
           )}
           </AnimatePresence>
           
-          {/* Filter sidebar and product grid */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* Filter sidebar - always shown on desktop, conditionally on mobile */}
-            <AnimatePresence>
+          {/* Main content grid */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {/* Filter sidebar */}
             {showFilters && (
-                <motion.div
-                  className="md:col-span-1 space-y-6 bg-card p-4 rounded-lg shadow-sm border"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                >
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold flex items-center gap-2">
-                    <SlidersHorizontal className="h-4 w-4" />
-                    Filters
-                  </h3>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="md:hidden"
-                    onClick={() => setShowFilters(false)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-                
-                  <div className="space-y-1 border-t pt-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <CheckCircle2 className="h-4 w-4 text-green-600" />
-                      <h4 className="text-sm font-medium">Sustainability</h4>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        variant={sustainableOnly ? "default" : "outline"}
-                        size="sm"
-                        className={`py-1 px-3 h-auto text-xs ${sustainableOnly ? "bg-green-600 text-white hover:bg-green-700" : ""}`}
-                        onClick={() => setSustainableOnly(!sustainableOnly)}
-                      >
-                        Sustainable Only
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  <div className="border-t pt-4">
-                    <h4 className="text-sm font-medium mb-2 flex justify-between items-center">
-                      <span>Categories</span>
-                      <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                    </h4>
-                    <div className="space-y-1 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
-                      {categories.map(category => (
-                        <motion.div key={category} whileTap={{ scale: 0.98 }}>
-                          <Button
-                            variant={activeCategory === category ? "secondary" : "ghost"}
-                        size="sm"
-                        className="w-full justify-start text-sm h-8"
+              <div className="md:col-span-1">
+                <div className="bg-card rounded-lg border shadow-sm p-4">
+                  <h3 className="font-medium mb-3">{t('categories', 'Categories')}</h3>
+                  <div className="space-y-2">
+                    {categoryOptions.map((category) => (
+                      <div 
+                        key={category}
+                        className={`px-3 py-2 rounded-md cursor-pointer transition-colors ${
+                          activeCategory === category 
+                            ? 'bg-primary/10 text-primary font-medium' 
+                            : 'hover:bg-muted'
+                        }`}
                         onClick={() => setActiveCategory(category)}
                       >
-                        {category}
-                      </Button>
-                        </motion.div>
+                        {t(`category-${category}`, category)}
+                  </div>
                     ))}
                   </div>
                 </div>
-                
-                  <div className="border-t pt-4">
-                    <h4 className="text-sm font-medium mb-2 flex justify-between items-center">
-                      <span>Certifications</span>
-                      <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                    </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {certifications.map(cert => (
-                        <motion.div key={cert} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                      <Badge
-                        variant={selectedCertifications.includes(cert) ? "default" : "outline"}
-                        className="cursor-pointer"
-                        onClick={() => toggleCertification(cert)}
-                      >
-                        {cert}
-                      </Badge>
-                        </motion.div>
-                    ))}
                   </div>
-                </div>
-                
-                  <div className="border-t pt-4">
-                    <h4 className="text-sm font-medium mb-2 flex justify-between items-center">
-                      <span>Packaging Type</span>
-                      <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                    </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {packagingTypes.map(pkg => (
-                        <motion.div key={pkg} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                      <Badge
-                        variant={selectedPackaging.includes(pkg) ? "default" : "outline"}
-                        className="cursor-pointer"
-                        onClick={() => togglePackaging(pkg)}
-                      >
-                        {pkg}
-                      </Badge>
-                        </motion.div>
-                    ))}
-                  </div>
-                </div>
-                
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  variant="outline"
-                  size="sm"
-                      className="w-full mt-4"
-                  onClick={clearFilters}
-                >
-                  Clear All Filters
-                </Button>
-                  </motion.div>
-                </motion.div>
             )}
-            </AnimatePresence>
             
             {/* Products grid */}
             <div className={`${showFilters ? 'md:col-span-3' : 'md:col-span-4'}`}>
@@ -1157,7 +1253,7 @@ const Products = () => {
               <DialogHeader>
                 <DialogTitle className="text-xl">{selectedProduct.name}</DialogTitle>
                 <DialogDescription>
-                  By {selectedProduct.manufacturer}
+                  {t('by-manufacturer', 'By {{manufacturer}}', { manufacturer: selectedProduct.manufacturer })}
                 </DialogDescription>
               </DialogHeader>
               
@@ -1181,43 +1277,43 @@ const Products = () => {
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm text-foreground/70">Price</p>
+                      <p className="text-sm text-foreground/70">{t('price', 'Price')}</p>
                       <p className="font-semibold text-lg">{selectedProduct.price}</p>
                           </div>
                     <div>
-                      <p className="text-sm text-foreground/70">Category</p>
+                      <p className="text-sm text-foreground/70">{t('category', 'Category')}</p>
                       <p className="font-medium">{selectedProduct.category}</p>
                             </div>
                     <div>
-                      <p className="text-sm text-foreground/70">Minimum Order</p>
-                      <p className="font-medium">{selectedProduct.minOrderQuantity} units</p>
+                      <p className="text-sm text-foreground/70">{t('minimum-order', 'Minimum Order')}</p>
+                      <p className="font-medium">{selectedProduct.minOrderQuantity} {t('units', 'units')}</p>
                             </div>
                     <div>
-                      <p className="text-sm text-foreground/70">Lead Time</p>
+                      <p className="text-sm text-foreground/70">{t('lead-time', 'Lead Time')}</p>
                       <p className="font-medium">{selectedProduct.leadTime}</p>
                           </div>
                         </div>
                   
                   <div>
-                    <p className="text-sm text-foreground/70 mb-1">Certifications</p>
+                    <p className="text-sm text-foreground/70 mb-1">{t('certifications', 'Certifications')}</p>
                     <div className="flex flex-wrap gap-2">
                       {selectedProduct.certifications.map((cert: string) => (
                         <Badge key={cert} variant="secondary">
-                          {cert}
+                          {t(`certification-${cert.toLowerCase().replace(/[\s-]+/g, '-')}`, cert)}
                         </Badge>
                       ))}
                     </div>
                   </div>
                   
                   <div>
-                    <p className="text-sm text-foreground/70 mb-1">Packaging</p>
+                    <p className="text-sm text-foreground/70 mb-1">{t('packaging', 'Packaging')}</p>
                     <Badge>{selectedProduct.packagingType}</Badge>
                   </div>
                   
                   {selectedProduct.sustainable && (
                     <div className="flex items-center gap-2 text-green-600 font-medium">
                       <CheckCircle2 className="h-5 w-5" />
-                      <span>Sustainable Product</span>
+                      <span>{t('sustainable-product', 'Sustainable Product')}</span>
                     </div>
                   )}
             </div>
@@ -1226,18 +1322,18 @@ const Products = () => {
               <div className="flex justify-between items-center mt-4 pt-4 border-t">
                 <Button
                   variant="outline"
-                  onClick={() => toggleFavorite(selectedProduct)}
+                  onClick={() => handleToggleFavorite(selectedProduct)}
                 >
                   <Heart className="h-4 w-4 mr-2" fill={isFavorite(selectedProduct.id) ? "currentColor" : "none"} />
-                  {isFavorite(selectedProduct.id) ? "Saved" : "Save"}
+                  {isFavorite(selectedProduct.id) ? t('saved', 'Saved') : t('save', 'Save')}
                 </Button>
                 
                 <div className="flex gap-2">
                   <Button variant="outline" onClick={() => setShowProductDetails(false)}>
-                    Close
+                    {t('close', 'Close')}
                   </Button>
                   <Button className="gap-1">
-                    Find Match
+                    {t('find-match', 'Find Match')}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
         </div>

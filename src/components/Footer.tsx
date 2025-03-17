@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Github, Linkedin, Twitter, Mail, MapPin, Phone, ArrowUpCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const Footer = () => {
+  const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
   
   const containerVariants = {
@@ -76,7 +78,7 @@ const Footer = () => {
               </span>
             </div>
             <p className="text-base text-foreground/70 mb-6">
-              AI-powered matchmaking platform revolutionizing connections in the Consumer Packaged Goods industry.
+              {t('hero-subtitle')}
             </p>
             <div className="space-y-3 mb-6">
               <motion.a 
@@ -134,16 +136,22 @@ const Footer = () => {
 
           {/* Quick Links Sections */}
           <motion.div className="md:col-span-2" variants={itemVariants}>
-            <h4 className="font-semibold text-lg mb-6">Platform</h4>
+            <h4 className="font-semibold text-lg mb-6">{t('platform')}</h4>
             <ul className="space-y-3">
-              {['Solutions', 'Products', 'Manufacturers', 'Pricing', 'Integration'].map((item) => (
-                <li key={item}>
+              {[
+                { key: 'solutions', text: t('solutions') },
+                { key: 'products', text: t('products') },
+                { key: 'manufacturers', text: t('manufacturers') },
+                { key: 'pricing', text: t('pricing') },
+                { key: 'integration', text: t('integration', 'Integration') },
+              ].map(({ key, text }) => (
+                <li key={key}>
                   <Link 
-                    to={`/${item.toLowerCase()}`} 
+                    to={`/${key.toLowerCase()}`} 
                     className="text-sm text-foreground/70 hover:text-foreground transition-colors inline-flex items-center group"
                   >
                     <span className="relative after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:-bottom-1 after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 group-hover:after:scale-x-100 group-hover:after:origin-bottom-left">
-                      {item}
+                      {text}
                     </span>
                   </Link>
                 </li>
@@ -152,16 +160,22 @@ const Footer = () => {
           </motion.div>
 
           <motion.div className="md:col-span-2" variants={itemVariants}>
-            <h4 className="font-semibold text-lg mb-6">Company</h4>
+            <h4 className="font-semibold text-lg mb-6">{t('company-section')}</h4>
             <ul className="space-y-3">
-              {['About Us', 'Careers', 'Blog', 'Partners', 'Contact'].map((item) => (
-                <li key={item}>
+              {[
+                { key: 'about-us', text: t('about-us') },
+                { key: 'careers', text: t('careers', 'Careers') },
+                { key: 'blog', text: t('blog') },
+                { key: 'partners', text: t('partners', 'Partners') },
+                { key: 'contact-us', text: t('contact-us') },
+              ].map(({ key, text }) => (
+                <li key={key}>
                   <Link 
-                    to={`/${item.toLowerCase().replace(' ', '-')}`} 
+                    to={`/${key}`} 
                     className="text-sm text-foreground/70 hover:text-foreground transition-colors inline-flex items-center group"
                   >
                     <span className="relative after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:-bottom-1 after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 group-hover:after:scale-x-100 group-hover:after:origin-bottom-left">
-                      {item}
+                      {text}
                     </span>
                   </Link>
                 </li>
@@ -170,16 +184,22 @@ const Footer = () => {
           </motion.div>
 
           <motion.div className="md:col-span-2" variants={itemVariants}>
-            <h4 className="font-semibold text-lg mb-6">Legal</h4>
+            <h4 className="font-semibold text-lg mb-6">{t('legal', 'Legal')}</h4>
             <ul className="space-y-3">
-              {['Privacy Policy', 'Terms of Service', 'Cookie Policy', 'Security', 'Compliance'].map((item) => (
-                <li key={item}>
+              {[
+                { key: 'privacy-policy', text: t('privacy-policy') },
+                { key: 'terms-of-service', text: t('terms-of-service') },
+                { key: 'cookie-policy', text: t('cookie-policy', 'Cookie Policy') },
+                { key: 'security', text: t('security', 'Security') },
+                { key: 'compliance', text: t('compliance', 'Compliance') },
+              ].map(({ key, text }) => (
+                <li key={key}>
                   <Link 
-                    to={`/${item.toLowerCase().replace(' ', '-')}`} 
+                    to={`/${key}`} 
                     className="text-sm text-foreground/70 hover:text-foreground transition-colors inline-flex items-center group"
                   >
                     <span className="relative after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:-bottom-1 after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 group-hover:after:scale-x-100 group-hover:after:origin-bottom-left">
-                      {item}
+                      {text}
                     </span>
                   </Link>
                 </li>
@@ -189,15 +209,15 @@ const Footer = () => {
 
           {/* Newsletter Section */}
           <motion.div className="md:col-span-2" variants={itemVariants}>
-            <h4 className="font-semibold text-lg mb-6">Stay Updated</h4>
+            <h4 className="font-semibold text-lg mb-6">{t('stay-updated', 'Stay Updated')}</h4>
             <p className="text-sm text-foreground/70 mb-4">
-              Subscribe to our newsletter for the latest updates and insights.
+              {t('newsletter-description', 'Subscribe to our newsletter for the latest updates and insights.')}
             </p>
             <form className="space-y-3">
               <div className="relative">
                 <input
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder={t('enter-email', 'Enter your email')}
                   className="w-full px-4 py-2 rounded-xl bg-foreground/5 border border-border/50 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm"
                 />
               </div>
@@ -207,7 +227,7 @@ const Footer = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                Subscribe
+                {t('subscribe')}
               </motion.button>
             </form>
           </motion.div>
@@ -228,7 +248,7 @@ const Footer = () => {
           </motion.button>
           
           <p className="text-sm text-foreground/50 text-center">
-            © {currentYear} CPG Matchmaker. All rights reserved.
+            © {currentYear} CPG Matchmaker. {t('all-rights-reserved')}
           </p>
         </motion.div>
       </div>

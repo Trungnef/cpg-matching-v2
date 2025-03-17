@@ -24,24 +24,36 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 import { 
   Search, 
-  Filter, 
-  History, 
-  Star, 
-  X, 
+  Tag, 
+  Settings2, 
   Loader, 
-  SlidersHorizontal,
-  CalendarIcon,
-  Save,
-  Clock,
-  Tag,
-  Settings2,
-  Download,
+  Save, 
+  History, 
+  Clock, 
+  Star, 
+  Filter, 
+  XCircle, 
+  Download, 
+  ArrowRight, 
+  Trash2, 
+  SlidersHorizontal, 
+  Calendar as CalendarIcon,
+  Check,
+  X
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { useClickOutside } from "@/hooks/useClickOutside";
+import { useTranslation } from "react-i18next";
 
 interface SearchPanelProps {
   isOpen: boolean;
@@ -67,6 +79,7 @@ interface SavedSearch {
 }
 
 const SearchPanel = ({ isOpen, onClose }: SearchPanelProps) => {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -142,6 +155,15 @@ const SearchPanel = ({ isOpen, onClose }: SearchPanelProps) => {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [onClose]);
+
+  // Sử dụng hook useClickOutside để đóng panel khi click bên ngoài
+  useClickOutside(panelRef, (event) => {
+    // Kiểm tra xem click có trên overlay không
+    if (!overlayRef.current?.contains(event.target as Node)) {
+      return;
+    }
+    onClose();
+  });
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -290,11 +312,11 @@ const SearchPanel = ({ isOpen, onClose }: SearchPanelProps) => {
       >
         <div className="p-4 sm:p-6 space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Advanced Search</h2>
+            <h2 className="text-lg font-semibold">{t('advanced-search')}</h2>
             {resultsCount > 0 && (
               <div className="flex items-center gap-2">
                 <Badge variant="secondary">
-                  {resultsCount} results
+                  {resultsCount} {t('results')}
                 </Badge>
                 <TooltipProvider>
                   <Tooltip>
@@ -309,7 +331,7 @@ const SearchPanel = ({ isOpen, onClose }: SearchPanelProps) => {
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      Export results
+                      {t('export-results')}
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -321,7 +343,7 @@ const SearchPanel = ({ isOpen, onClose }: SearchPanelProps) => {
             <div className="flex flex-col sm:flex-row gap-2">
               <div className="flex-1 relative">
                 <Input 
-                  placeholder="Search by keyword, category, or company name" 
+                  placeholder={t('search-placeholder', "Search by keyword, category, or company name")} 
                   className="w-full pr-10 h-11"
                   value={searchQuery}
                   onChange={handleSearchChange}
@@ -372,7 +394,7 @@ const SearchPanel = ({ isOpen, onClose }: SearchPanelProps) => {
                   ) : (
                     <Search className="h-4 w-4 mr-2" />
                   )}
-                  Search
+                  {t('search')}
                 </Button>
                 <TooltipProvider>
                   <Tooltip>
@@ -387,7 +409,7 @@ const SearchPanel = ({ isOpen, onClose }: SearchPanelProps) => {
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      Save this search
+                      {t('save-this-search', "Save this search")}
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -401,7 +423,7 @@ const SearchPanel = ({ isOpen, onClose }: SearchPanelProps) => {
                 className="flex flex-wrap gap-2 items-center"
               >
                 <History className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">Recent:</span>
+                <span className="text-sm text-muted-foreground">{t('recent-searches')}:</span>
                 {recentSearches.map(({query, timestamp}) => (
                   <Badge
                     key={timestamp}
@@ -425,7 +447,7 @@ const SearchPanel = ({ isOpen, onClose }: SearchPanelProps) => {
                           />
                         </TooltipTrigger>
                         <TooltipContent>
-                          Save this search
+                          {t('save-this-search', "Save this search")}
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>

@@ -6,8 +6,10 @@ import Testimonials from "@/components/Testimonials";
 import Footer from "@/components/Footer";
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import { Building2, ShoppingBag, Factory, Store, Droplet, Coffee, Pizza, ShoppingCart, Sandwich, Cookie, Apple, Wine, Beef, Beer, Milk, IceCream, Candy, Fish, Soup, Carrot } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const Index = () => {
+  const { t } = useTranslation();
   const { scrollYProgress, scrollY } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -165,7 +167,7 @@ const Index = () => {
                   viewport={{ once: true }}
                   transition={{ duration: 0.6 }}
                 >
-                  Our Featured Partners
+                  {t('featured-partners', 'Our Featured Partners')}
                 </motion.h2>
                 <motion.p 
                   className="text-muted-foreground text-lg max-w-2xl mx-auto"
@@ -174,7 +176,7 @@ const Index = () => {
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: 0.2 }}
                 >
-                  Join our growing network of successful partnerships in the CPG industry
+                  {t('featured-partners-description', 'Join our growing network of successful partnerships in the CPG industry')}
                 </motion.p>
               </div>
 
@@ -182,27 +184,27 @@ const Index = () => {
                 {[
                   {
                     icon: Building2,
-                    title: "Manufacturers",
-                    count: "987+",
-                    description: "Leading CPG manufacturers"
+                    title: t('manufacturers-title', 'Manufacturers'),
+                    count: t('manufacturers-count', '987+'),
+                    description: t('manufacturers-description', 'Leading CPG manufacturers')
                   },
                   {
                     icon: ShoppingBag,
-                    title: "Brands",
-                    count: "1000+",
-                    description: "Innovative consumer brands"
+                    title: t('brands-title', 'Brands'),
+                    count: t('brands-count', '1000+'),
+                    description: t('brands-description', 'Innovative consumer brands')
                   },
                   {
                     icon: Factory,
-                    title: "Suppliers",
-                    count: "300+",
-                    description: "Quality material suppliers"
+                    title: t('suppliers-title', 'Suppliers'),
+                    count: t('suppliers-count', '300+'),
+                    description: t('suppliers-description', 'Quality material suppliers')
                   },
                   {
                     icon: Store,
-                    title: "Retailers",
-                    count: "200+",
-                    description: "Global retail partners"
+                    title: t('retailers-title', 'Retailers'),
+                    count: t('retailers-count', '200+'),
+                    description: t('retailers-description', 'Global retail partners')
                   }
                 ].map((partner, index) => (
                   <motion.div
@@ -265,8 +267,8 @@ const Index = () => {
                   viewport={{ once: true }}
                   transition={{ duration: 0.6 }}
                 >
-                  <h3 className="text-2xl font-semibold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">Our Global Partners</h3>
-                  <p>Trusted by leading companies worldwide</p>
+                  <h3 className="text-2xl font-semibold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">{t('global-partners', 'Our Global Partners')}</h3>
+                  <p>{t('trusted-companies', 'Trusted by leading companies worldwide')}</p>
                 </motion.div>
                 
                 <motion.div 
@@ -277,21 +279,21 @@ const Index = () => {
                   transition={{ duration: 0.8 }}
                 >
                   {[
-                    { icon: Droplet, name: "Coca-Cola", color: "text-[#FF0000]" },
-                    { icon: Coffee, name: "Nestlé", color: "text-[#009CA6]" },
-                    { icon: Pizza, name: "PepsiCo", color: "text-[#004B93]" },
-                    { icon: ShoppingCart, name: "Unilever", color: "text-[#1F36C7]" },
-                    { icon: Sandwich, name: "Kraft Heinz", color: "text-[#FF0000]" },
-                    { icon: Cookie, name: "Mondelez", color: "text-[#7B5AA6]" },
-                    { icon: Apple, name: "Danone", color: "text-[#0066B3]" },
-                    { icon: Wine, name: "P&G", color: "text-[#004B93]" },
-                    { icon: Beef, name: "Tyson Foods", color: "text-[#008542]" },
-                    { icon: Beer, name: "AB InBev", color: "text-[#FFC200]" },
-                    { icon: Milk, name: "General Mills", color: "text-[#301E46]" },
-                    { icon: IceCream, name: "Mars Inc", color: "text-[#FF0000]" },
-                    { icon: Candy, name: "Hershey's", color: "text-[#89443C]" },
-                    { icon: Fish, name: "Kellogg's", color: "text-[#FF0000]" },
-                    { icon: Soup, name: "Campbell's", color: "text-[#E31837]" }
+                    { icon: Droplet, name: t('company-cocacola', 'Coca-Cola'), color: "text-[#FF0000]" },
+                    { icon: Coffee, name: t('company-nestle', 'Nestlé'), color: "text-[#009CA6]" },
+                    { icon: Pizza, name: t('company-pepsico', 'PepsiCo'), color: "text-[#004B93]" },
+                    { icon: ShoppingCart, name: t('company-unilever', 'Unilever'), color: "text-[#1F36C7]" },
+                    { icon: Sandwich, name: t('company-kraftheinz', 'Kraft Heinz'), color: "text-[#FF0000]" },
+                    { icon: Cookie, name: t('company-mondelez', 'Mondelez'), color: "text-[#7B5AA6]" },
+                    { icon: Apple, name: t('company-danone', 'Danone'), color: "text-[#0066B3]" },
+                    { icon: Wine, name: t('company-pg', 'P&G'), color: "text-[#004B93]" },
+                    { icon: Beef, name: t('company-tyson', 'Tyson Foods'), color: "text-[#008542]" },
+                    { icon: Beer, name: t('company-abinbev', 'AB InBev'), color: "text-[#FFC200]" },
+                    { icon: Milk, name: t('company-generalmills', 'General Mills'), color: "text-[#301E46]" },
+                    { icon: IceCream, name: t('company-mars', 'Mars Inc'), color: "text-[#FF0000]" },
+                    { icon: Candy, name: t('company-hersheys', 'Hershey\'s'), color: "text-[#89443C]" },
+                    { icon: Fish, name: t('company-kelloggs', 'Kellogg\'s'), color: "text-[#FF0000]" },
+                    { icon: Soup, name: t('company-campbells', 'Campbell\'s'), color: "text-[#E31837]" }
                   ].map((company, i) => (
                     <motion.div
                       key={company.name}
@@ -356,12 +358,12 @@ const Index = () => {
                   transition={{ duration: 0.6, delay: 0.4 }}
                 >
                   {[
-                    "ISO Certified",
-                    "GDPR Compliant",
-                    "Enterprise Ready",
-                    "24/7 Support",
-                    "Global Network",
-                    "Secure Platform"
+                    t('badge-iso', 'ISO Certified'),
+                    t('badge-gdpr', 'GDPR Compliant'),
+                    t('badge-enterprise', 'Enterprise Ready'),
+                    t('badge-support', '24/7 Support'),
+                    t('badge-network', 'Global Network'),
+                    t('badge-secure', 'Secure Platform')
                   ].map((badge, i) => (
                     <motion.div
                       key={badge}

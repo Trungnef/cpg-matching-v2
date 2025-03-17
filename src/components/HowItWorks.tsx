@@ -1,7 +1,9 @@
 import { CheckCircle2, Cpu, Handshake, Search } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 const HowItWorks = () => {
+  const { t } = useTranslation();
   const { scrollYProgress } = useScroll();
   
   // Enhanced animation variants
@@ -70,68 +72,42 @@ const HowItWorks = () => {
   };
 
   return (
-    <section className="py-20 relative overflow-hidden">
-      {/* Enhanced background elements */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
+    <section id="how-it-works" className="py-20 bg-background">
+      <div className="container mx-auto px-4 md:px-6">
         <motion.div 
-          className="absolute top-20 left-[10%] w-96 h-96 bg-primary/5 rounded-full filter blur-[100px]"
-          style={{
-            scale: useTransform(scrollYProgress, [0, 1], [0.8, 1.2]),
-            opacity: useTransform(scrollYProgress, [0, 0.5, 1], [0.3, 0.6, 0.3])
-          }}
-        />
-        <motion.div 
-          className="absolute bottom-40 right-[5%] w-[500px] h-[500px] bg-accent/5 rounded-full filter blur-[120px]"
-          style={{
-            scale: useTransform(scrollYProgress, [0, 1], [1.2, 0.8]),
-            opacity: useTransform(scrollYProgress, [0, 0.5, 1], [0.4, 0.7, 0.4])
-          }}
-        />
-      </div>
-      
-      <div className="container mx-auto px-4 relative z-10">
-        <motion.div 
-          className="text-center max-w-2xl mx-auto mb-16"
-          initial={{ opacity: 1 }}
-          animate={{ opacity: 1 }}
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          viewport={{ once: true, amount: 0.3 }}
         >
-          <motion.div
-            className="inline-block"
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 1 }}
+          <motion.h2 
+            className="text-3xl md:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            viewport={{ once: true, amount: 0.3 }}
           >
-            <motion.h2 
-              className="text-4xl md:text-6xl font-bold mb-6 relative"
-              initial={{ opacity: 1, y: 0 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              <span className="relative inline-block bg-clip-text text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 animate-gradient bg-300%">
-                How It Works
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 blur-xl -z-10"
-                  animate={{
-                    opacity: [0.5, 0.8, 0.5]
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                />
-                <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full" />
-              </span>
-            </motion.h2>
-          </motion.div>
+            {t('how-it-works')}
+          </motion.h2>
+          <motion.div 
+            className="h-1 w-20 bg-gradient-to-r from-primary to-accent rounded-full mx-auto mb-6"
+            initial={{ opacity: 0, width: 0 }}
+            whileInView={{ opacity: 1, width: 80 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            viewport={{ once: true, amount: 0.3 }}
+          />
           <motion.p 
-            className="text-lg text-foreground/70"
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 1 }}
+            className="max-w-2xl mx-auto text-foreground/70"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            viewport={{ once: true, amount: 0.3 }}
           >
-            Our platform simplifies the connection process between manufacturers, brands, and retailers
-            through our advanced AI-driven matchmaking system.
+            {t('how-it-works-description', 'Our AI-powered platform simplifies the process of connecting manufacturers with retailers and brands in the CPG industry.')}
           </motion.p>
         </motion.div>
-        
+
         <motion.div 
           className="grid md:grid-cols-3 gap-8"
           initial="hidden"
@@ -171,16 +147,16 @@ const HowItWorks = () => {
               className="text-xl font-semibold mb-2"
               variants={itemVariants}
             >
-              1. Search & Discover
+              {t('step-1-title', '1. Search & Discover')}
             </motion.h3>
             <motion.p 
               className="text-foreground/70"
               variants={itemVariants}
             >
-              Browse our extensive database of products, manufacturers, and packaging solutions based on your specific needs.
+              {t('step-1-description', 'Browse our extensive database of products, manufacturers, and packaging solutions based on your specific needs.')}
             </motion.p>
           </motion.div>
-          
+
           {/* Step 2 */}
           <motion.div 
             className="relative bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-6 flex flex-col items-center text-center group"
@@ -205,8 +181,7 @@ const HowItWorks = () => {
                 transition={{
                   duration: 2,
                   repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: 0.3
+                  ease: "easeInOut"
                 }}
               />
             </motion.div>
@@ -214,16 +189,16 @@ const HowItWorks = () => {
               className="text-xl font-semibold mb-2"
               variants={itemVariants}
             >
-              2. AI Matching
+              {t('step-2-title', '2. AI Matchmaking')}
             </motion.h3>
             <motion.p 
               className="text-foreground/70"
               variants={itemVariants}
             >
-              Our advanced AI analyzes your requirements and preferences to suggest the most compatible business partners.
+              {t('step-2-description', 'Our AI algorithms analyze requirements, capabilities, and preferences to suggest the most compatible business partnerships.')}
             </motion.p>
           </motion.div>
-          
+
           {/* Step 3 */}
           <motion.div 
             className="relative bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-6 flex flex-col items-center text-center group"
@@ -248,8 +223,7 @@ const HowItWorks = () => {
                 transition={{
                   duration: 2,
                   repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: 0.6
+                  ease: "easeInOut"
                 }}
               />
             </motion.div>
@@ -257,17 +231,17 @@ const HowItWorks = () => {
               className="text-xl font-semibold mb-2"
               variants={itemVariants}
             >
-              3. Connect & Collaborate
+              {t('step-3-title', '3. Connect & Collaborate')}
             </motion.h3>
             <motion.p 
               className="text-foreground/70"
               variants={itemVariants}
             >
-              Establish direct communication with potential partners and start collaborating on your next successful product.
+              {t('step-3-description', 'Establish connections with your matches, communicate directly, and form productive business relationships.')}
             </motion.p>
           </motion.div>
         </motion.div>
-        
+
         <motion.div 
           className="mt-16 relative bg-card/50 backdrop-blur-sm border border-border/50 rounded-xl p-8 max-w-3xl mx-auto overflow-hidden"
           initial={{ opacity: 0, y: 30 }}
@@ -298,26 +272,26 @@ const HowItWorks = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            Why Choose Our Platform?
+            {t('why-choose-platform', 'Why Choose Our Platform?')}
           </motion.h3>
           
-          <div className="grid sm:grid-cols-2 gap-6">
+          <div className="space-y-4 relative z-10">
             {[
               {
-                title: "Time Efficiency",
-                description: "Reduce time spent finding compatible business partners"
+                title: t('benefit-time', 'Time Efficiency'),
+                description: t('benefit-time-description', 'Reduce time spent finding compatible business partners')
               },
               {
-                title: "Higher Match Quality",
-                description: "AI ensures more compatible and successful partnerships"
+                title: t('benefit-quality', 'Higher Match Quality'),
+                description: t('benefit-quality-description', 'AI ensures more compatible and successful partnerships')
               },
               {
-                title: "Data-Driven Decisions",
-                description: "Make informed choices based on comprehensive data"
+                title: t('benefit-data', 'Data-Driven Decisions'),
+                description: t('benefit-data-description', 'Make informed choices based on comprehensive data')
               },
               {
-                title: "Streamlined Communication",
-                description: "Built-in tools to facilitate smooth collaboration"
+                title: t('benefit-communication', 'Streamlined Communication'),
+                description: t('benefit-communication-description', 'Built-in tools to facilitate smooth collaboration')
               }
             ].map((item, index) => (
             <motion.div 
@@ -348,25 +322,11 @@ const HowItWorks = () => {
                     }}
                   />
                 </motion.div>
-              <div>
-                  <motion.h4 
-                    className="font-medium"
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    transition={{ delay: 0.2 + index * 0.1 }}
-                  >
-                    {item.title}
-                  </motion.h4>
-                  <motion.p 
-                    className="text-sm text-foreground/70"
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    transition={{ delay: 0.3 + index * 0.1 }}
-                  >
-                    {item.description}
-                  </motion.p>
-              </div>
-            </motion.div>
+                <div>
+                  <h4 className="font-medium text-foreground">{item.title}</h4>
+                  <p className="text-sm text-foreground/70">{item.description}</p>
+                </div>
+              </motion.div>
             ))}
           </div>
         </motion.div>

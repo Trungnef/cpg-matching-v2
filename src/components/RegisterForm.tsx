@@ -23,23 +23,25 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
 import { motion } from "framer-motion";
-
-// Form schema
-const formSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
-  email: z.string().email({ message: "Please enter a valid email address" }),
-  password: z.string().min(8, { message: "Password must be at least 8 characters" }),
-  companyName: z.string().min(2, { message: "Company name is required" }),
-  role: z.enum(["manufacturer", "brand", "retailer"]),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+import { useTranslation } from "react-i18next";
 
 const RegisterForm = () => {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const { register } = useUser();
   const navigate = useNavigate();
+
+  // Form schema
+  const formSchema = z.object({
+    name: z.string().min(2, { message: t('name-min-length', "Name must be at least 2 characters") }),
+    email: z.string().email({ message: t('invalid-email', "Please enter a valid email address") }),
+    password: z.string().min(8, { message: t('password-min-length', "Password must be at least 8 characters") }),
+    companyName: z.string().min(2, { message: t('company-name-required', "Company name is required") }),
+    role: z.enum(["manufacturer", "brand", "retailer"]),
+  });
+
+  type FormValues = z.infer<typeof formSchema>;
 
   // Define form
   const form = useForm<FormValues>({
@@ -64,11 +66,12 @@ const RegisterForm = () => {
         password: data.password,
         companyName: data.companyName,
         role: data.role,
+        status: 'online',
       });
       
       toast({
-        title: "Account created",
-        description: "Your account has been created successfully.",
+        title: t('account-created', 'Account created'),
+        description: t('account-created-success', 'Your account has been created successfully.'),
       });
       
       // Redirect to dashboard
@@ -76,8 +79,8 @@ const RegisterForm = () => {
     } catch (error) {
       console.error("Registration error:", error);
       toast({
-        title: "Registration failed",
-        description: "There was a problem with your registration.",
+        title: t('registration-failed', 'Registration failed'),
+        description: t('registration-problem', 'There was a problem with your registration.'),
         variant: "destructive",
       });
     } finally {
@@ -104,7 +107,7 @@ const RegisterForm = () => {
             <motion.span
               className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary bg-300% animate-gradient"
             >
-              Create Account
+              {t('create-account', 'Create Account')}
             </motion.span>
           </motion.h2>
           <motion.div
@@ -145,7 +148,7 @@ const RegisterForm = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
           >
-            Join our
+            {t('join-our', 'Join our')}
           </motion.span>
           {" "}
           <motion.span
@@ -154,7 +157,7 @@ const RegisterForm = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.8 }}
           >
-            community
+            {t('community', 'community')}
           </motion.span>
           {" "}
           <motion.span
@@ -163,7 +166,7 @@ const RegisterForm = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 1 }}
           >
-            of CPG industry professionals
+            {t('cpg-professionals', 'of CPG industry professionals')}
           </motion.span>
         </motion.p>
 
@@ -297,9 +300,9 @@ const RegisterForm = () => {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Full Name</FormLabel>
+                <FormLabel>{t('full-name', 'Full Name')}</FormLabel>
                 <FormControl>
-                  <Input placeholder="John Doe" {...field} />
+                  <Input placeholder={t('full-name-placeholder', 'John Doe')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -311,9 +314,9 @@ const RegisterForm = () => {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>{t('email', 'Email')}</FormLabel>
                 <FormControl>
-                  <Input placeholder="your@email.com" {...field} />
+                  <Input placeholder={t('email-placeholder', 'your@email.com')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -325,9 +328,9 @@ const RegisterForm = () => {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>{t('password', 'Password')}</FormLabel>
                 <FormControl>
-                  <Input type="password" placeholder="********" {...field} />
+                  <Input type="password" placeholder={t('password-placeholder', '********')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -339,9 +342,9 @@ const RegisterForm = () => {
             name="companyName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Company Name</FormLabel>
+                <FormLabel>{t('company-name', 'Company Name')}</FormLabel>
                 <FormControl>
-                  <Input placeholder="Acme Inc." {...field} />
+                  <Input placeholder={t('company-name-placeholder', 'Acme Inc.')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -353,17 +356,17 @@ const RegisterForm = () => {
             name="role"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Account Type</FormLabel>
+                <FormLabel>{t('account-type', 'Account Type')}</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select account type" />
+                      <SelectValue placeholder={t('select-account-type', 'Select account type')} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="manufacturer">Manufacturer</SelectItem>
-                    <SelectItem value="brand">Brand</SelectItem>
-                    <SelectItem value="retailer">Retailer</SelectItem>
+                    <SelectItem value="manufacturer">{t('manufacturer', 'Manufacturer')}</SelectItem>
+                    <SelectItem value="brand">{t('brand', 'Brand')}</SelectItem>
+                    <SelectItem value="retailer">{t('retailer', 'Retailer')}</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -372,7 +375,7 @@ const RegisterForm = () => {
           />
           
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Creating Account..." : "Create Account"}
+            {isLoading ? t('creating-account', 'Creating Account...') : t('create-account', 'Create Account')}
           </Button>
         </form>
       </Form>

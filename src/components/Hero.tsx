@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
 import { ArrowRight, CheckCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 // Enhanced CountUp component with more vibrant animations
 const CountUp = ({ end, title, duration = 2000 }) => {
@@ -77,6 +78,7 @@ const CountUp = ({ end, title, duration = 2000 }) => {
 };
 
 const Hero = () => {
+  const { t } = useTranslation();
   const sectionRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -200,7 +202,7 @@ const Hero = () => {
               }}
             />
             <p className="text-sm font-medium bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              AI-Powered Matchmaking
+              {t('ai-powered-matchmaking', 'AI-Powered Matchmaking')}
             </p>
           </motion.div>
           
@@ -208,7 +210,7 @@ const Hero = () => {
             className="text-6xl md:text-7xl font-bold leading-tight mb-8"
             variants={itemVariants}
           >
-            Connect With The{' '}
+            {t('connect-with-the', 'Connect With The')}{' '}
             <motion.span 
               className="relative inline-block"
               whileHover={{
@@ -217,7 +219,7 @@ const Hero = () => {
               }}
             >
               <span className="relative z-10 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                Perfect Partner
+                {t('perfect-partner', 'Perfect Partner')}
               </span>
               <motion.span
                 className="absolute inset-0 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 blur-lg -z-10"
@@ -231,14 +233,14 @@ const Hero = () => {
                 }}
               />
             </motion.span>{' '}
-            In The CPG Industry
+            {t('in-the-cpg-industry', 'In The CPG Industry')}
           </motion.h1>
           
           <motion.p 
             className="text-xl text-foreground/80 mb-10 leading-relaxed"
             variants={itemVariants}
           >
-            Our AI-driven platform connects manufacturers, brands, and retailers, enabling efficient product discovery and matchmaking through smart algorithms.
+            {t('hero-description', 'Our AI-driven platform connects manufacturers, brands, and retailers, enabling efficient product discovery and matchmaking through smart algorithms.')}
           </motion.p>
           
           {/* Enhanced buttons */}
@@ -252,7 +254,7 @@ const Hero = () => {
                 whileTap={{ scale: 0.95 }}
               >
                 <Button size="lg" className="rounded-full px-8 py-6 text-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg hover:shadow-primary/20 transition-all duration-300">
-                  Get Started <ArrowRight size={20} />
+                  {t('get-started')} <ArrowRight size={20} />
               </Button>
               </motion.div>
             </Link>
@@ -262,7 +264,7 @@ const Hero = () => {
                 whileTap={{ scale: 0.95 }}
               >
                 <Button variant="outline" size="lg" className="rounded-full px-8 py-6 text-lg border-2 hover:bg-primary/10 transition-all duration-300">
-                  Learn More
+                  {t('learn-more')}
                 </Button>
               </motion.div>
             </Link>
@@ -274,9 +276,9 @@ const Hero = () => {
             variants={itemVariants}
           >
             {[
-              "AI-powered matchmaking algorithms",
-              "Customized solutions for manufacturers, brands & retailers",
-              "Streamlined product discovery process"
+              t('feature-ai-matchmaking', 'AI-powered matchmaking algorithms'),
+              t('feature-customized', 'Customized solutions for manufacturers, brands & retailers'),
+              t('feature-streamlined', 'Streamlined product discovery process')
             ].map((feature, index) => (
             <motion.div 
                 key={index}
@@ -313,9 +315,9 @@ const Hero = () => {
             className="grid grid-cols-3 gap-4 mt-12"
             variants={itemVariants}
           >
-            <CountUp end={978} title="Manufacturers" />
-            <CountUp end={8500} title="Products" />
-            <CountUp end={98} title="Match Rate" />
+            <CountUp end={978} title={t('manufacturers')} />
+            <CountUp end={8500} title={t('products')} />
+            <CountUp end={98} title={t('match-rate', 'Match Rate')} />
           </motion.div>
         </div>
         
@@ -413,7 +415,7 @@ const Hero = () => {
             ease: "easeInOut"
           }}
         >
-          Scroll to explore
+          {t('scroll-to-explore', 'Scroll to explore')}
         </motion.p>
 
         <motion.div 

@@ -20,6 +20,8 @@ import SearchPanel from "./SearchPanel";
 import { motion, AnimatePresence } from "framer-motion";
 import ThemeToggle from "./ThemeToggle";
 import FavoritesMenu from "./FavoritesMenu";
+import LanguageSwitcher from "./LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const Navbar = () => {
@@ -30,6 +32,7 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, user, logout, updateUserStatus } = useUser();
+  const { t } = useTranslation();
 
   // Handle scroll effect with enhanced animation
   useEffect(() => {
@@ -200,10 +203,10 @@ const Navbar = () => {
             {/* Column 2: Main Navigation */}
             <div className="hidden md:flex items-center justify-end ml-auto mr-44 space-x-4">
               {[
-                { to: "/", text: "Home" },
-                { to: "/products", text: "Products" },
-                { to: "/manufacturers", text: "Manufacturers" },
-                { to: "/solutions", text: "Solutions" }
+                { to: "/", text: t('home') },
+                { to: "/products", text: t('products') },
+                { to: "/manufacturers", text: t('manufacturers') },
+                { to: "/solutions", text: t('solutions') }
               ].map((item, index) => (
                 <motion.div
                   key={item.to}
@@ -253,7 +256,7 @@ const Navbar = () => {
                     >
                       <Button variant="ghost" className="gap-1 relative overflow-hidden">
                         <span className="bg-gradient-to-r from-primary to-accent bg-[length:0%_2px] group-hover:bg-[length:100%_2px] bg-no-repeat bg-left-bottom transition-all duration-500">
-                          Resources
+                          {t('resources')}
                         </span>
                         <motion.div
                           animate={{ rotate: [0, 180, 360] }}
@@ -275,13 +278,13 @@ const Navbar = () => {
                       transition={{ duration: 0.2 }}
                     >
                       <DropdownMenuItem asChild>
-                        <Link to="/blog">Blog</Link>
+                        <Link to="/blog">{t('blog')}</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link to="/case-studies">Case Studies</Link>
+                        <Link to="/case-studies">{t('case-studies')}</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link to="/webinars">Webinars</Link>
+                        <Link to="/webinars">{t('webinars')}</Link>
                       </DropdownMenuItem>
                     </motion.div>
                   </DropdownMenuContent>
@@ -311,6 +314,15 @@ const Navbar = () => {
                   </Button>
                 </motion.div>
               )}
+
+              {/* Language Switcher */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.75 }}
+              >
+                <LanguageSwitcher />
+              </motion.div>
 
               {/* Theme Toggle */}
               <motion.div
@@ -387,19 +399,19 @@ const Navbar = () => {
                               <DropdownMenuRadioItem value="online">
                                 <div className="flex items-center space-x-2">
                                   <Check className="w-4 h-4 text-green-500" />
-                                  <span>Online</span>
+                                  <span>{t('online')}</span>
                                 </div>
                               </DropdownMenuRadioItem>
                               <DropdownMenuRadioItem value="away">
                                 <div className="flex items-center space-x-2">
                                   <Clock className="w-4 h-4 text-yellow-500" />
-                                  <span>Away</span>
+                                  <span>{t('away')}</span>
                                 </div>
                               </DropdownMenuRadioItem>
                               <DropdownMenuRadioItem value="offline">
                                 <div className="flex items-center space-x-2">
                                   <CircleEllipsis className="w-4 h-4 text-red-500" />
-                                  <span>Offline</span>
+                                  <span>{t('offline')}</span>
                                 </div>
                               </DropdownMenuRadioItem>
                             </DropdownMenuRadioGroup>
@@ -408,14 +420,14 @@ const Navbar = () => {
                       </DropdownMenuSub>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
-                        <Link to="/dashboard">Dashboard</Link>
+                        <Link to="/dashboard">{t('dashboard')}</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link to="/profile">Profile</Link>
+                        <Link to="/profile">{t('profile')}</Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={handleLogout}>
-                        Logout
+                        {t('logout')}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -427,7 +439,7 @@ const Navbar = () => {
                   transition={{ delay: 1 }}
                 >
                   <Button asChild variant="default">
-                    <Link to="/auth">Sign In</Link>
+                    <Link to="/auth">{t('sign-in')}</Link>
                   </Button>
                 </motion.div>
               )}
@@ -468,13 +480,13 @@ const Navbar = () => {
             <div className="container mx-auto px-4 py-4">
               <div className="flex flex-col space-y-4">
                 {[
-                  { to: "/", text: "Home" },
-                  { to: "/products", text: "Products" },
-                  { to: "/manufacturers", text: "Manufacturers" },
-                  { to: "/solutions", text: "Solutions" },
-                  { to: "/blog", text: "Blog" },
-                  { to: "/case-studies", text: "Case Studies" },
-                  { to: "/webinars", text: "Webinars" }
+                  { to: "/", text: t('home') },
+                  { to: "/products", text: t('products') },
+                  { to: "/manufacturers", text: t('manufacturers') },
+                  { to: "/solutions", text: t('solutions') },
+                  { to: "/blog", text: t('blog') },
+                  { to: "/case-studies", text: t('case-studies') },
+                  { to: "/webinars", text: t('webinars') }
                 ].map((item) => (
                   <Button
                     key={item.to}
@@ -485,6 +497,32 @@ const Navbar = () => {
                     <Link to={item.to}>{item.text}</Link>
                   </Button>
                 ))}
+                
+                {/* Language Switcher in Mobile Menu */}
+                <div className="py-2">
+                  <p className="text-sm text-muted-foreground mb-2">{t('language')}</p>
+                  <div className="flex space-x-2">
+                    <Button
+                      variant={useTranslation().i18n.language === 'en' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => useTranslation().i18n.changeLanguage('en')}
+                      className="flex items-center gap-2"
+                    >
+                      <span className="text-base">🇺🇸</span>
+                      <span className="text-xs">{t('english')}</span>
+                    </Button>
+                    <Button
+                      variant={useTranslation().i18n.language === 'ja' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => useTranslation().i18n.changeLanguage('ja')}
+                      className="flex items-center gap-2"
+                    >
+                      <span className="text-base">🇯🇵</span>
+                      <span className="text-xs">{t('japanese')}</span>
+                    </Button>
+                  </div>
+                </div>
+                
                 {isAuthenticated ? (
                   <>
                     <Button
@@ -492,26 +530,26 @@ const Navbar = () => {
                       asChild
                       className="w-full justify-start"
                     >
-                      <Link to="/dashboard">Dashboard</Link>
+                      <Link to="/dashboard">{t('dashboard')}</Link>
                     </Button>
                     <Button
                       variant="ghost"
                       asChild
                       className="w-full justify-start"
                     >
-                      <Link to="/profile">Profile</Link>
+                      <Link to="/profile">{t('profile')}</Link>
                     </Button>
                     <Button
                       variant="ghost"
                       onClick={handleLogout}
                       className="w-full justify-start"
                     >
-                      Logout
+                      {t('logout')}
                     </Button>
                   </>
                 ) : (
                   <Button asChild variant="default" className="w-full">
-                    <Link to="/auth">Sign In</Link>
+                    <Link to="/auth">{t('sign-in')}</Link>
                   </Button>
                 )}
               </div>

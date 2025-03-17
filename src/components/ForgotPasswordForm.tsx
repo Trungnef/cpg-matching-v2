@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -15,21 +14,23 @@ import {
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
-
-// Form schema
-const formSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address" }),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+import { useTranslation } from "react-i18next";
 
 interface ForgotPasswordFormProps {
   onBack: () => void;
 }
 
 const ForgotPasswordForm = ({ onBack }: ForgotPasswordFormProps) => {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+
+  // Form schema
+  const formSchema = z.object({
+    email: z.string().email({ message: t('invalid-email', "Please enter a valid email address") }),
+  });
+
+  type FormValues = z.infer<typeof formSchema>;
 
   // Define form
   const form = useForm<FormValues>({
@@ -51,16 +52,16 @@ const ForgotPasswordForm = ({ onBack }: ForgotPasswordFormProps) => {
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       toast({
-        title: "Reset link sent",
-        description: "If an account exists with that email, you'll receive password reset instructions.",
+        title: t('reset-link-sent', 'Reset link sent'),
+        description: t('reset-link-sent-desc', 'If an account exists with that email, you\'ll receive password reset instructions.'),
       });
       
       form.reset();
     } catch (error) {
       console.error("Password reset error:", error);
       toast({
-        title: "Request failed",
-        description: "There was a problem sending your reset link. Please try again.",
+        title: t('request-failed', 'Request failed'),
+        description: t('reset-link-error', 'There was a problem sending your reset link. Please try again.'),
         variant: "destructive",
       });
     } finally {
@@ -78,11 +79,11 @@ const ForgotPasswordForm = ({ onBack }: ForgotPasswordFormProps) => {
           className="mb-4 -ml-2 text-muted-foreground"
         >
           <ArrowLeft className="mr-1 h-4 w-4" />
-          Back to login
+          {t('back-to-login', 'Back to login')}
         </Button>
-        <h2 className="text-2xl font-bold">Reset your password</h2>
+        <h2 className="text-2xl font-bold">{t('reset-your-password', 'Reset your password')}</h2>
         <p className="text-muted-foreground mt-2">
-          Enter your email address and we'll send you instructions to reset your password.
+          {t('reset-password-instruction', 'Enter your email address and we\'ll send you instructions to reset your password.')}
         </p>
       </div>
 
@@ -93,9 +94,9 @@ const ForgotPasswordForm = ({ onBack }: ForgotPasswordFormProps) => {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>{t('email', 'Email')}</FormLabel>
                 <FormControl>
-                  <Input placeholder="your@email.com" {...field} />
+                  <Input placeholder={t('email-placeholder', 'your@email.com')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -103,7 +104,7 @@ const ForgotPasswordForm = ({ onBack }: ForgotPasswordFormProps) => {
           />
           
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Sending reset link..." : "Send reset link"}
+            {isLoading ? t('sending-reset-link', 'Sending reset link...') : t('send-reset-link', 'Send reset link')}
           </Button>
         </form>
       </Form>

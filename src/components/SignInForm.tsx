@@ -24,22 +24,24 @@ import { useToast } from "@/hooks/use-toast";
 import ForgotPasswordForm from "./ForgotPasswordForm";
 import { useUser } from "@/contexts/UserContext";
 import { motion } from "framer-motion";
-
-// Form schema
-const formSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address" }),
-  password: z.string().min(8, { message: "Password must be at least 8 characters" }),
-  role: z.enum(["manufacturer", "brand", "retailer"]),
-});
+import { useTranslation } from "react-i18next";
 
 type FormValues = z.infer<typeof formSchema>;
 
 const SignInForm = () => {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const { toast } = useToast();
   const { login } = useUser();
   const navigate = useNavigate();
+
+  // Form schema
+  const formSchema = z.object({
+    email: z.string().email({ message: t('invalid-email', "Please enter a valid email address") }),
+    password: z.string().min(8, { message: t('password-min-length', "Password must be at least 8 characters") }),
+    role: z.enum(["manufacturer", "brand", "retailer"]),
+  });
 
   // Define form
   const form = useForm<FormValues>({
@@ -60,8 +62,8 @@ const SignInForm = () => {
       await login(data.email, data.password, data.role);
       
       toast({
-        title: "Welcome back",
-        description: "You've successfully signed in.",
+        title: t('welcome-back', 'Welcome back'),
+        description: t('sign-in-success', 'You\'ve successfully signed in.'),
       });
       
       // Redirect to dashboard
@@ -69,8 +71,8 @@ const SignInForm = () => {
     } catch (error) {
       console.error("Sign in error:", error);
       toast({
-        title: "Authentication failed",
-        description: "Incorrect email or password.",
+        title: t('auth-failed', 'Authentication failed'),
+        description: t('incorrect-credentials', 'Incorrect email or password.'),
         variant: "destructive",
       });
     } finally {
@@ -101,7 +103,7 @@ const SignInForm = () => {
             <motion.span
               className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary bg-300% animate-gradient"
             >
-              Lovely Mate
+              {t('lovely-mate', 'Lovely Mate')}
             </motion.span>
           </motion.h2>
           <motion.div
@@ -142,7 +144,7 @@ const SignInForm = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
           >
-            Great to see you
+            {t('great-to-see-you', 'Great to see you')}
           </motion.span>
           {" "}
           <motion.span
@@ -151,7 +153,7 @@ const SignInForm = () => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.8 }}
           >
-            again
+            {t('again', 'again')}
           </motion.span>
           {" "}
           <motion.span
@@ -160,7 +162,7 @@ const SignInForm = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 1 }}
           >
-            in our platform
+            {t('in-our-platform', 'in our platform')}
           </motion.span>
         </motion.p>
 
@@ -222,9 +224,9 @@ const SignInForm = () => {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>{t('email', 'Email')}</FormLabel>
                 <FormControl>
-                  <Input placeholder="your@email.com" {...field} />
+                  <Input placeholder={t('email-placeholder', 'your@email.com')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -236,9 +238,9 @@ const SignInForm = () => {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>{t('password', 'Password')}</FormLabel>
                 <FormControl>
-                  <Input type="password" placeholder="********" {...field} />
+                  <Input type="password" placeholder={t('password-placeholder', '********')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -250,17 +252,17 @@ const SignInForm = () => {
             name="role"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Account Type</FormLabel>
+                <FormLabel>{t('account-type', 'Account Type')}</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select account type" />
+                      <SelectValue placeholder={t('select-account-type', 'Select account type')} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="manufacturer">Manufacturer</SelectItem>
-                    <SelectItem value="brand">Brand</SelectItem>
-                    <SelectItem value="retailer">Retailer</SelectItem>
+                    <SelectItem value="manufacturer">{t('manufacturer', 'Manufacturer')}</SelectItem>
+                    <SelectItem value="brand">{t('brand', 'Brand')}</SelectItem>
+                    <SelectItem value="retailer">{t('retailer', 'Retailer')}</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -275,12 +277,12 @@ const SignInForm = () => {
               className="p-0 h-auto text-xs"
               onClick={() => setShowForgotPassword(true)}
             >
-              Forgot password?
+              {t('forgot-password-question', 'Forgot password?')}
             </Button>
           </div>
           
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Signing in..." : "Sign In"}
+            {isLoading ? t('signing-in', 'Signing in...') : t('sign-in', 'Sign In')}
           </Button>
         </form>
       </Form>

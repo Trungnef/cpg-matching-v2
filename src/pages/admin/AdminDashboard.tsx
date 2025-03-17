@@ -267,7 +267,7 @@ const AdminDashboard = () => {
                         </div>
                         <span className="text-sm">{stats.roleDistribution.manufacturers}</span>
                       </div>
-                      <Progress value={(stats.roleDistribution.manufacturers / stats.totalUsers) * 100} className="h-2 bg-blue-100" indicatorClassName="bg-blue-500" />
+                      <Progress value={(stats.roleDistribution.manufacturers / stats.totalUsers) * 100} className="h-2 bg-blue-100 [&>div]:bg-blue-500" />
                     </div>
                     
                     <div className="space-y-2">
@@ -278,7 +278,7 @@ const AdminDashboard = () => {
                         </div>
                         <span className="text-sm">{stats.roleDistribution.brands}</span>
                       </div>
-                      <Progress value={(stats.roleDistribution.brands / stats.totalUsers) * 100} className="h-2 bg-purple-100" indicatorClassName="bg-purple-500" />
+                      <Progress value={(stats.roleDistribution.brands / stats.totalUsers) * 100} className="h-2 bg-purple-100 [&>div]:bg-purple-500" />
                     </div>
                     
                     <div className="space-y-2">
@@ -289,7 +289,7 @@ const AdminDashboard = () => {
                         </div>
                         <span className="text-sm">{stats.roleDistribution.retailers}</span>
                       </div>
-                      <Progress value={(stats.roleDistribution.retailers / stats.totalUsers) * 100} className="h-2 bg-emerald-100" indicatorClassName="bg-emerald-500" />
+                      <Progress value={(stats.roleDistribution.retailers / stats.totalUsers) * 100} className="h-2 bg-emerald-100 [&>div]:bg-emerald-500" />
                     </div>
                   </div>
                   

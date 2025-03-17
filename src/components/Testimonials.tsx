@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, Quote } from 'lucide-react';
 import { Button } from './ui/button';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 interface Testimonial {
   id: number;
@@ -41,6 +42,7 @@ const testimonials: Testimonial[] = [
 ];
 
 const Testimonials = () => {
+  const { t } = useTranslation();
   const [activeIndex, setActiveIndex] = useState(0);
 
   const nextTestimonial = () => {
@@ -149,7 +151,7 @@ const Testimonials = () => {
               visible: { opacity: 1, y: 0 }
             }}
           >
-            What Our Users Say
+            {t('testimonials-title', 'What Our Users Say')}
           </motion.h2>
           <motion.p 
             className="text-lg text-foreground/70"
@@ -158,7 +160,7 @@ const Testimonials = () => {
               visible: { opacity: 1, y: 0 }
             }}
           >
-            Discover how our platform has helped businesses across the CPG industry
+            {t('testimonials-subtitle', 'Discover how our platform has helped businesses across the CPG industry')}
           </motion.p>
         </motion.div>
         
@@ -211,7 +213,7 @@ const Testimonials = () => {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2 }}
                     >
-                      "{testimonials[activeIndex].content}"
+                      "{t(`testimonial-${activeIndex+1}-content`, testimonials[activeIndex].content)}"
                     </motion.blockquote>
                     
                     <motion.div 
@@ -237,7 +239,7 @@ const Testimonials = () => {
                           animate={{ opacity: 1 }}
                           transition={{ delay: 0.4 }}
                         >
-                          {testimonials[activeIndex].name}
+                          {t(`testimonial-${activeIndex+1}-name`, testimonials[activeIndex].name)}
                         </motion.h4>
                         <motion.p 
                           className="text-sm text-foreground/70"
@@ -245,7 +247,7 @@ const Testimonials = () => {
                           animate={{ opacity: 1 }}
                           transition={{ delay: 0.5 }}
                         >
-                          {testimonials[activeIndex].role}, {testimonials[activeIndex].company}
+                          {t(`testimonial-${activeIndex+1}-role`, testimonials[activeIndex].role)}, {t(`testimonial-${activeIndex+1}-company`, testimonials[activeIndex].company)}
                         </motion.p>
                       </div>
                     </motion.div>

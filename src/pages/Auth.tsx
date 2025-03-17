@@ -8,8 +8,10 @@ import { useUser } from "@/contexts/UserContext";
 import Footer from "@/components/Footer";
 import AnimatedTitle from "@/components/ui/animated-title";
 import { Users, ShieldCheck, Globe2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const Auth = () => {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [isRegister, setIsRegister] = useState(searchParams.get("type") === "register");
@@ -29,18 +31,18 @@ const Auth = () => {
 
   // Page title effect
   useEffect(() => {
-    document.title = isRegister ? "Register - CPG Matchmaker" : "Sign In - CPG Matchmaker";
-  }, [isRegister]);
+    document.title = isRegister ? t('register-title', "Register - CPG Matchmaker") : t('sign-in-title', "Sign In - CPG Matchmaker");
+  }, [isRegister, t]);
 
   useEffect(() => {
     setIsRegister(searchParams.get("type") === "register");
   }, [searchParams]);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col overflow-x-hidden">
       <Navbar />
       
-      <div className="flex-grow pt-16 pb-12 flex flex-col items-center justify-start relative">
+      <div className="flex-grow pt-16 pb-12 flex flex-col items-center justify-start relative overflow-x-hidden">
         {/* Background blur circles */}
         <div className="absolute top-40 -left-40 w-80 h-80 bg-primary/30 rounded-full filter blur-3xl opacity-30 animate-pulse-slow" />
         <div className="absolute bottom-20 -right-40 w-80 h-80 bg-accent/30 rounded-full filter blur-3xl opacity-30 animate-pulse-slow" />
@@ -49,11 +51,11 @@ const Auth = () => {
           {/* Main Title Section */}
           <div className="mb-16">
             <AnimatedTitle
-              title={isRegister ? "Join Our Platform" : "Welcome Back!"}
+              title={isRegister ? t('join-platform', "Join Our Platform") : t('welcome-back', "Welcome Back!")}
               subtitle={
                 isRegister
-                  ? "Create your account and start connecting with CPG industry professionals"
-                  : "Sign in to your account and continue your journey"
+                  ? t('create-account-description', "Create your account and start connecting with CPG industry professionals")
+                  : t('sign-in-description', "Sign in to your account and continue your journey")
               }
               size="xl"
               className="relative z-10"
@@ -314,7 +316,7 @@ const Auth = () => {
                   <motion.span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
                     10K+
                   </motion.span>
-                  <span className="text-sm text-muted-foreground mt-1">Active Users</span>
+                  <span className="text-sm text-muted-foreground mt-1">{t('active-users', "Active Users")}</span>
                 </motion.div>
 
                 {/* Secure Platform */}
@@ -340,7 +342,7 @@ const Auth = () => {
                   <motion.span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
                     100%
                   </motion.span>
-                  <span className="text-sm text-muted-foreground mt-1">Secure Platform</span>
+                  <span className="text-sm text-muted-foreground mt-1">{t('secure-platform', "Secure Platform")}</span>
                 </motion.div>
 
                 {/* Global Reach */}
@@ -366,7 +368,7 @@ const Auth = () => {
                   <motion.span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
                     50+
                   </motion.span>
-                  <span className="text-sm text-muted-foreground mt-1">Countries</span>
+                  <span className="text-sm text-muted-foreground mt-1">{t('countries', "Countries")}</span>
                 </motion.div>
               </motion.div>
               
@@ -398,7 +400,7 @@ const Auth = () => {
                 transition={{ duration: 0.5, delay: 0.4 }}
               >
                 <p className="text-muted-foreground">
-                  {isRegister ? "Already have an account?" : "Don't have an account?"}
+                  {isRegister ? t('already-have-account', "Already have an account?") : t('dont-have-account', "Don't have an account?")}
                   {" "}
                   <motion.button
                     className="text-primary hover:text-accent transition-colors"
@@ -406,7 +408,7 @@ const Auth = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    {isRegister ? "Sign In" : "Register"}
+                    {isRegister ? t('sign-in', "Sign In") : t('register', "Register")}
                   </motion.button>
                 </p>
               </motion.div>
