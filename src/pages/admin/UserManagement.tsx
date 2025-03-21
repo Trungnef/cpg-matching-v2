@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAdminUsers } from '@/hooks/useAdminUsers';
+import { useToast } from '@/components/ui/use-toast';
 import { 
   Search, 
   PlusCircle, 
@@ -66,90 +68,6 @@ import {
 } from "@/components/ui/table";
 import { Checkbox } from '@/components/ui/checkbox';
 
-// Mock user data
-const mockUsers = [
-  {
-    id: 1,
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    role: 'Manufacturer',
-    company: 'Green Foods Corp',
-    status: 'active',
-    lastActive: '2 hours ago',
-    verified: true
-  },
-  {
-    id: 2,
-    name: 'Alice Smith',
-    email: 'alice.smith@example.com',
-    role: 'Brand',
-    company: 'Healthy Harvest',
-    status: 'active',
-    lastActive: '1 day ago',
-    verified: true
-  },
-  {
-    id: 3,
-    name: 'Robert Wilson',
-    email: 'robert.wilson@example.com',
-    role: 'Retailer',
-    company: 'Fresh Choice Markets',
-    status: 'inactive',
-    lastActive: '1 week ago',
-    verified: true
-  },
-  {
-    id: 4,
-    name: 'Emily Jackson',
-    email: 'emily.jackson@example.com',
-    role: 'Brand',
-    company: 'Organic Essentials',
-    status: 'pending',
-    lastActive: 'Never',
-    verified: false
-  },
-  {
-    id: 5,
-    name: 'Michael Chen',
-    email: 'michael.chen@example.com',
-    role: 'Manufacturer',
-    company: 'Pure Foods Inc',
-    status: 'active',
-    lastActive: '3 hours ago',
-    verified: true
-  },
-  {
-    id: 6,
-    name: 'Sarah Lee',
-    email: 'sarah.lee@example.com',
-    role: 'Retailer',
-    company: 'Metro Grocers',
-    status: 'active',
-    lastActive: '12 hours ago',
-    verified: true
-  },
-  {
-    id: 7,
-    name: 'David Miller',
-    email: 'david.miller@example.com',
-    role: 'Brand',
-    company: 'Naturals Co.',
-    status: 'suspended',
-    lastActive: '1 month ago',
-    verified: true
-  },
-  {
-    id: 8,
-    name: 'Jennifer Kim',
-    email: 'jennifer.kim@example.com',
-    role: 'Manufacturer',
-    company: 'Eco Foods',
-    status: 'pending',
-    lastActive: 'Never',
-    verified: false
-  }
-];
-
 type User = typeof mockUsers[0];
 
 const roleIcons = {
@@ -167,35 +85,24 @@ const statusStyles = {
 };
 
 const UserManagement = () => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const { users, loading, error, deleteUser, updateUserRole, updateUserStatus } = useAdminUsers();
+  const { toast } = useToast();
+  const [filteredUsers, setFilteredUsers] = useState(users);
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 5;
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [newUser, setNewUser] = useState({
     name: '',
     email: '',
-    role: 'Brand',
+    role: '',
     company: ''
   });
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
-
-  // Simulate fetching users
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setUsers(mockUsers);
-      setFilteredUsers(mockUsers);
-      setIsLoading(false);
-    }, 1000);
-    
-    return () => clearTimeout(timer);
-  }, []);
 
   // Handle search and filtering
   useEffect(() => {
@@ -244,7 +151,7 @@ const UserManagement = () => {
   };
 
   // Toggle select a single user
-  const toggleSelectUser = (userId: number) => {
+  const toggleSelectUser = (userId: string) => {
     if (selectedUsers.includes(userId)) {
       setSelectedUsers(selectedUsers.filter(id => id !== userId));
     } else {
@@ -272,18 +179,73 @@ const UserManagement = () => {
     setNewUser({ name: '', email: '', role: 'Brand', company: '' });
   };
 
-  const handleDeleteUser = () => {
+  const handleDeleteUser = async () => {
     if (userToDelete) {
-      setUsers(users.filter(user => user.id !== userToDelete.id));
-      setSelectedUsers(selectedUsers.filter(id => id !== userToDelete.id));
-      setDeleteConfirmOpen(false);
-      setUserToDelete(null);
+      try {
+        await deleteUser(userToDelete.id);
+        toast({
+          title: "Success",
+          description: "User deleted successfully",
+        });
+        setDeleteConfirmOpen(false);
+        setUserToDelete(null);
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to delete user",
+          variant: "destructive",
+        });
+      }
     }
   };
 
-  const handleBulkDelete = () => {
-    setUsers(users.filter(user => !selectedUsers.includes(user.id)));
-    setSelectedUsers([]);
+  const handleBulkDelete = async () => {
+    try {
+      await Promise.all(selectedUsers.map(id => deleteUser(id)));
+      setSelectedUsers([]);
+      toast({
+        title: "Success",
+        description: "Selected users deleted successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete some users",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleRoleChange = async (userId: string, newRole: string) => {
+    try {
+      await updateUserRole(userId, newRole);
+      toast({
+        title: "Success",
+        description: "User role updated successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update user role",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleStatusChange = async (userId: string, newStatus: string) => {
+    try {
+      await updateUserStatus(userId, newStatus);
+      toast({
+        title: "Success",
+        description: "User status updated successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update user status",
+        variant: "destructive",
+      });
+    }
   };
 
   // Animation variants
@@ -302,7 +264,7 @@ const UserManagement = () => {
     visible: { opacity: 1, y: 0 }
   };
 
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[80vh]">
         <motion.div

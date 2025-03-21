@@ -68,11 +68,15 @@ const SignInForm = () => {
       
       // Redirect to dashboard
       navigate("/dashboard");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Sign in error:", error);
+      
+      // Hiển thị thông báo lỗi chi tiết từ API nếu có
+      const errorMessage = error.response?.data?.message || t('incorrect-credentials', 'Incorrect email or password.');
+      
       toast({
         title: t('auth-failed', 'Authentication failed'),
-        description: t('incorrect-credentials', 'Incorrect email or password.'),
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

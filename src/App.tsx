@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { UserProvider } from "./contexts/UserContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -36,6 +36,7 @@ const PageWithFooter = ({ Component }: { Component: React.ComponentType }) => {
 // Manufacturer pages
 import ManufacturerProduction from "./pages/manufacturer/Production";
 import ManufacturerProducts from "./pages/manufacturer/Products";
+import AddProduct from "./pages/manufacturer/AddProduct";
 import ManufacturerMatches from "./pages/manufacturer/Matches";
 import ManufacturerAnalytics from "./pages/manufacturer/Analytics";
 import ManufacturerSettings from "./pages/manufacturer/Settings";
@@ -68,6 +69,7 @@ import AdminLogin from './pages/AdminLogin';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import UserManagement from './pages/admin/UserManagement';
+
 
 const queryClient = new QueryClient();
 
@@ -117,68 +119,24 @@ const App = () => (
                         
                         {/* Manufacturer specific routes */}
                         <Route 
-                          path="/manufacturer/production" 
+                          path="/manufacturer" 
                           element={
                             <ProtectedRoute 
-                              element={<ManufacturerProduction />} 
                               allowedRoles={["manufacturer"]} 
-                            />
+                            >
+                              <Outlet />
+                            </ProtectedRoute>
                           } 
-                        />
-                        <Route 
-                          path="/manufacturer/products" 
-                          element={
-                            <ProtectedRoute 
-                              element={<ManufacturerProducts />} 
-                              allowedRoles={["manufacturer"]} 
-                            />
-                          } 
-                        />
-                        <Route 
-                          path="/manufacturer/matches" 
-                          element={
-                            <ProtectedRoute 
-                              element={<ManufacturerMatches />} 
-                              allowedRoles={["manufacturer"]} 
-                            />
-                          } 
-                        />
-                        <Route 
-                          path="/manufacturer/analytics" 
-                          element={
-                            <ProtectedRoute 
-                              element={<ManufacturerAnalytics />} 
-                              allowedRoles={["manufacturer"]} 
-                            />
-                          } 
-                        />
-                        <Route 
-                          path="/manufacturer/settings" 
-                          element={
-                            <ProtectedRoute 
-                              element={<ManufacturerSettings />} 
-                              allowedRoles={["manufacturer"]} 
-                            />
-                          } 
-                        />
-                        <Route 
-                          path="/manufacturer/inventory" 
-                          element={
-                            <ProtectedRoute 
-                              element={<ManufacturerInventory />} 
-                              allowedRoles={["manufacturer"]} 
-                            />
-                          } 
-                        />
-                        <Route 
-                          path="/manufacturer/suppliers" 
-                          element={
-                            <ProtectedRoute 
-                              element={<ManufacturerSuppliers />} 
-                              allowedRoles={["manufacturer"]} 
-                            />
-                          } 
-                        />
+                        >
+                          <Route path="products" element={<ManufacturerProducts />} />
+                          <Route path="add-product" element={<AddProduct />} />
+                          <Route path="settings" element={<ManufacturerSettings />} />
+                          <Route path="analytics" element={<ManufacturerAnalytics />} />
+                          <Route path="production" element={<ManufacturerProduction />} />
+                          <Route path="suppliers" element={<ManufacturerSuppliers />} />
+                          <Route path="matches" element={<ManufacturerMatches />} />
+                          <Route path="inventory" element={<ManufacturerInventory />} />
+                        </Route>
                         
                         {/* Brand specific routes */}
                         <Route 

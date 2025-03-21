@@ -119,7 +119,39 @@ const products = [
     moq: 1000,
     capacity: "15,000 units/day",
     clients: 3,
-    image: "/placeholder.svg"
+    image: "/placeholder.svg",
+    inventory: [
+      {
+        id: 101,
+        name: "Organic Oats",
+        category: "Raw Materials",
+        status: "In Stock",
+        quantity: 15000,
+        unit: "kg",
+        threshold: 5000,
+        location: "Warehouse A"
+      },
+      {
+        id: 102,
+        name: "Honey",
+        category: "Raw Materials",
+        status: "Low Stock",
+        quantity: 1200,
+        unit: "liters",
+        threshold: 1500,
+        location: "Warehouse B"
+      },
+      {
+        id: 103,
+        name: "Cardboard Boxes",
+        category: "Packaging",
+        status: "In Stock",
+        quantity: 12000,
+        unit: "units",
+        threshold: 5000,
+        location: "Warehouse C"
+      }
+    ]
   },
   {
     id: 2,
@@ -140,6 +172,36 @@ const products = [
     capacity: "8,000 units/day",
     clients: 0,
     image: "/placeholder.svg"
+  },
+  {
+    id: 4,
+    name: "Organic Juice",
+    category: "Beverage",
+    status: "Active",
+    moq: 3000,
+    capacity: "10,000 units/day",
+    clients: 4,
+    image: "/placeholder.svg"
+  },
+  {
+    id: 5,
+    name: "Trail Mix",
+    category: "Food",
+    status: "Active",
+    moq: 1500,
+    capacity: "8,000 units/day",
+    clients: 1,
+    image: "/placeholder.svg"
+  },
+  {
+    id: 6,
+    name: "Vegan Cookies",
+    category: "Food",
+    status: "Inactive",
+    moq: 2000,
+    capacity: "5,000 units/day",
+    clients: 0,
+    image: "/placeholder.svg"
   }
 ];
 
@@ -151,43 +213,34 @@ const productionLines = [
     status: "Active", 
     product: "Organic Cereal", 
     efficiency: 92,
-    daily_capacity: "10,000 units",
+    daily_capacity: "6,000 units",
     next_maintenance: "2023-10-15"
   },
   { 
     id: 2, 
     name: "Line B", 
-    status: "Maintenance", 
-    product: "N/A", 
-    efficiency: 0,
-    daily_capacity: "8,000 units",
-    next_maintenance: "2023-10-02"
+    status: "Active", 
+    product: "Energy Bars", 
+    efficiency: 88,
+    daily_capacity: "5,200 units",
+    next_maintenance: "2023-10-12"
   },
   { 
     id: 3, 
     name: "Line C", 
     status: "Active", 
-    product: "Protein Bars", 
-    efficiency: 87,
-    daily_capacity: "15,000 units",
-    next_maintenance: "2023-11-05"
+    product: "Organic Juice", 
+    efficiency: 95,
+    daily_capacity: "8,000 units",
+    next_maintenance: "2023-10-22"
   },
   { 
     id: 4, 
     name: "Line D", 
-    status: "Active", 
-    product: "Granola Packaging", 
-    efficiency: 95,
-    daily_capacity: "12,000 units",
-    next_maintenance: "2023-10-22"
-  },
-  { 
-    id: 5, 
-    name: "Line E", 
-    status: "Idle", 
-    product: "N/A", 
+    status: "Maintenance", 
+    product: "Trail Mix", 
     efficiency: 0,
-    daily_capacity: "9,000 units",
+    daily_capacity: "4,000 units",
     next_maintenance: "2023-10-18"
   }
 ];
@@ -208,30 +261,33 @@ const suppliers = [
     status: "Active",
     reliability: "98%",
     leadTime: "3-5 days",
-    materials: 5,
-    relationship: "4 years",
     image: "/placeholder.svg"
   },
   {
     id: 2,
-    name: "Premium Packaging Ltd.",
+    name: "Eco Packaging Ltd.",
     category: "Packaging",
     status: "Active",
     reliability: "95%",
-    leadTime: "7-10 days",
-    materials: 8,
-    relationship: "3 years",
+    leadTime: "4-6 days",
     image: "/placeholder.svg"
   },
   {
     id: 3,
-    name: "Global Ingredients Inc.",
+    name: "Pure Ingredients Inc.",
     category: "Raw Materials",
-    status: "Under Review",
-    reliability: "87%",
-    leadTime: "10-14 days",
-    materials: 3,
-    relationship: "1 year",
+    status: "Active",
+    reliability: "99%",
+    leadTime: "2-4 days",
+    image: "/placeholder.svg"
+  },
+  {
+    id: 4,
+    name: "Green Box Solutions",
+    category: "Packaging",
+    status: "Inactive",
+    reliability: "85%",
+    leadTime: "7-10 days",
     image: "/placeholder.svg"
   }
 ];
@@ -272,6 +328,42 @@ const inventory = [
     threshold: 3000,
     usedIn: 2,
     location: "Warehouse A",
+    image: "/placeholder.svg"
+  },
+  {
+    id: 4,
+    name: "Glass Bottles (500ml)",
+    category: "Packaging",
+    status: "Low Stock",
+    quantity: 5000,
+    unit: "units",
+    threshold: 8000,
+    usedIn: 1,
+    location: "Warehouse C",
+    image: "/placeholder.svg"
+  },
+  {
+    id: 5,
+    name: "Cardboard Boxes",
+    category: "Packaging",
+    status: "In Stock",
+    quantity: 12000,
+    unit: "units",
+    threshold: 5000,
+    usedIn: 5,
+    location: "Warehouse C",
+    image: "/placeholder.svg"
+  },
+  {
+    id: 6,
+    name: "Vitamin C",
+    category: "Additives",
+    status: "Out of Stock",
+    quantity: 0,
+    unit: "kg",
+    threshold: 200,
+    usedIn: 2,
+    location: "Warehouse B",
     image: "/placeholder.svg"
   }
 ];
@@ -1148,13 +1240,13 @@ const Dashboard = () => {
                   <div className="grid grid-cols-2 gap-2">
                     <div className="flex items-center text-sm">
                       <DollarSign className="h-4 w-4 mr-2 text-muted-foreground" />
-                      <span className="text-muted-foreground">Materials:</span>
-                      <span className="ml-1 font-medium">{supplier.materials}</span>
+                      <span className="text-muted-foreground">Quality:</span>
+                      <span className="ml-1 font-medium">{supplier.reliability}</span>
                     </div>
                     <div className="flex items-center text-sm">
                       <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
-                      <span className="text-muted-foreground">Relationship:</span>
-                      <span className="ml-1 font-medium">{supplier.relationship}</span>
+                      <span className="text-muted-foreground">Lead Time:</span>
+                      <span className="ml-1 font-medium">{supplier.leadTime}</span>
                     </div>
                   </div>
                 </CardContent>

@@ -60,27 +60,31 @@ const RegisterForm = () => {
     setIsLoading(true);
     
     try {
+      // Register user 
       await register({
         name: data.name,
         email: data.email,
         password: data.password,
         companyName: data.companyName,
         role: data.role,
-        status: 'online',
       });
       
       toast({
         title: t('account-created', 'Account created'),
-        description: t('account-created-success', 'Your account has been created successfully.'),
+        description: t('register-success', 'Your account has been created successfully.'),
       });
       
       // Redirect to dashboard
       navigate("/dashboard");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Registration error:", error);
+      
+      // Hiển thị thông báo lỗi chi tiết từ API nếu có
+      const errorMessage = error.response?.data?.message || t('register-failed', 'Registration failed. Please try again later.');
+      
       toast({
         title: t('registration-failed', 'Registration failed'),
-        description: t('registration-problem', 'There was a problem with your registration.'),
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

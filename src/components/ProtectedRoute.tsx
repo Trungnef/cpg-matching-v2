@@ -1,13 +1,13 @@
-
 import { Navigate, useLocation } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 
 interface ProtectedRouteProps {
-  element: React.ReactNode;
+  element?: React.ReactNode;
   allowedRoles: string[];
+  children?: React.ReactNode;
 }
 
-const ProtectedRoute = ({ element, allowedRoles }: ProtectedRouteProps) => {
+const ProtectedRoute = ({ element, allowedRoles, children }: ProtectedRouteProps) => {
   const { isAuthenticated, role } = useUser();
   const location = useLocation();
 
@@ -21,7 +21,11 @@ const ProtectedRoute = ({ element, allowedRoles }: ProtectedRouteProps) => {
     return <Navigate to="/dashboard" replace />;
   }
 
-  // If authenticated and authorized, render the component
+  // If authenticated and authorized, render the component or children
+  if (children) {
+    return <>{children}</>;
+  }
+  
   return <>{element}</>;
 };
 

@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import { userService } from "@/lib/api";
 
-export type UserRole = "manufacturer" | "brand" | "retailer";
+export type UserRole = "manufacturer" | "brand" | "retailer" | "admin";
 
 // Role-specific settings interfaces
 interface ManufacturerSettings {
@@ -41,6 +42,7 @@ interface UserData {
   manufacturerSettings?: ManufacturerSettings;
   brandSettings?: BrandSettings;
   retailerSettings?: RetailerSettings;
+  token?: string; // JWT token
 }
 
 interface UserContextType {
@@ -67,144 +69,92 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   // Check if user is already logged in from localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
-    if (storedUser) {
+    const token = localStorage.getItem("token");
+    
+    if (storedUser && token) {
       const userData = JSON.parse(storedUser);
-      setUser(userData);
+      setUser({...userData, token});
       setRole(userData.role);
       setIsAuthenticated(true);
     }
   }, []);
 
   const login = async (email: string, password: string, selectedRole: UserRole): Promise<void> => {
-    // In a real app, this would make an API call to authenticate
-    // For now, we'll simulate a successful login
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Create mock role-specific settings based on the role
-    let roleSpecificSettings = {};
-    
-    if (selectedRole === "manufacturer") {
-      roleSpecificSettings = {
-        manufacturerSettings: {
-          productionCapacity: 50000,
-          certifications: ["ISO 9001", "Organic", "Fair Trade"],
-          preferredCategories: ["Food", "Beverage", "Personal Care"],
-          minimumOrderValue: 10000
-        }
+    try {
+      // Kết nối API thực tế
+      const response = await userService.login(email, password);
+      
+      // Lấy thông tin user và token từ response
+      const { token, ...userData } = response;
+      
+      // Tạo đối tượng user với các thông tin cần thiết
+      const user: UserData = {
+        ...userData,
+        role: userData.role || selectedRole,
+        profileComplete: !!userData.companyName,
+        createdAt: userData.createdAt || new Date().toISOString(),
+        lastLogin: new Date().toISOString(),
+        notifications: Math.floor(Math.random() * 10),
+        avatar: userData.avatar || "",
+        status: "online",
+        token
       };
-    } else if (selectedRole === "brand") {
-      roleSpecificSettings = {
-        brandSettings: {
-          marketSegments: ["Health-conscious", "Eco-friendly", "Premium"],
-          brandValues: ["Sustainability", "Quality", "Innovation"],
-          targetDemographics: ["Millennials", "Gen Z", "Health enthusiasts"],
-          productCategories: ["Organic Foods", "Wellness", "Eco-friendly products"]
-        }
-      };
-    } else if (selectedRole === "retailer") {
-      roleSpecificSettings = {
-        retailerSettings: {
-          storeLocations: 12,
-          averageOrderValue: 75,
-          customerBase: ["Urban professionals", "Health-conscious families", "Millennials"],
-          preferredCategories: ["Organic", "Local", "Sustainable", "Health food"]
-        }
-      };
+      
+      // Lưu token vào localStorage
+      localStorage.setItem("token", token);
+      
+      // Lưu thông tin user vào localStorage
+      localStorage.setItem("user", JSON.stringify(user));
+      
+      // Cập nhật state
+      setUser(user);
+      setRole(user.role);
+      setIsAuthenticated(true);
+    } catch (error) {
+      console.error("Login error:", error);
+      throw error;
     }
-    
-    // Create mock user data
-    const userData: UserData = {
-      id: Math.random().toString(36).substr(2, 9),
-      name: "Demo User", // In a real app, this would come from the API
-      email,
-      companyName: "Demo Company", // In a real app, this would come from the API
-      role: selectedRole,
-      profileComplete: false,
-      createdAt: new Date().toISOString(),
-      lastLogin: new Date().toISOString(),
-      notifications: Math.floor(Math.random() * 10),
-      avatar: "", // In a real app, this would come from the API
-      status: "online", // In a real app, this would come from the API
-      ...roleSpecificSettings
-    };
-    
-    // Save to localStorage for persistence
-    localStorage.setItem("user", JSON.stringify(userData));
-    
-    // Update state
-    setUser(userData);
-    setRole(selectedRole);
-    setIsAuthenticated(true);
   };
 
   const register = async (userData: Omit<UserData, "id" | "profileComplete" | "createdAt" | "lastLogin" | "notifications"> & { password: string }): Promise<void> => {
-    // In a real app, this would make an API call to register the user
-    // For now, we'll simulate a successful registration
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Create role-specific settings based on the role
-    let roleSpecificSettings = {};
-    
-    if (userData.role === "manufacturer") {
-      roleSpecificSettings = {
-        manufacturerSettings: {
-          productionCapacity: 0,
-          certifications: [],
-          preferredCategories: [],
-          minimumOrderValue: 0
-        }
+    try {
+      // Kết nối API thực tế
+      const response = await userService.register(userData);
+      
+      // Lấy thông tin user và token từ response
+      const { token, ...registeredUserData } = response;
+      
+      // Tạo đối tượng user với các thông tin cần thiết
+      const user: UserData = {
+        ...registeredUserData,
+        profileComplete: false,
+        createdAt: registeredUserData.createdAt || new Date().toISOString(),
+        lastLogin: new Date().toISOString(),
+        notifications: 0,
+        avatar: registeredUserData.avatar || "",
+        status: "online",
+        token
       };
-    } else if (userData.role === "brand") {
-      roleSpecificSettings = {
-        brandSettings: {
-          marketSegments: [],
-          brandValues: [],
-          targetDemographics: [],
-          productCategories: []
-        }
-      };
-    } else if (userData.role === "retailer") {
-      roleSpecificSettings = {
-        retailerSettings: {
-          storeLocations: 0,
-          averageOrderValue: 0,
-          customerBase: [],
-          preferredCategories: []
-        }
-      };
+      
+      // Lưu token vào localStorage
+      localStorage.setItem("token", token);
+      
+      // Lưu thông tin user vào localStorage
+      localStorage.setItem("user", JSON.stringify(user));
+      
+      // Cập nhật state
+      setUser(user);
+      setRole(user.role);
+      setIsAuthenticated(true);
+    } catch (error) {
+      console.error("Register error:", error);
+      throw error;
     }
-    
-    // Create user with random ID and default values
-    const newUser: UserData = {
-      ...userData,
-      id: Math.random().toString(36).substr(2, 9),
-      profileComplete: false,
-      createdAt: new Date().toISOString(),
-      lastLogin: new Date().toISOString(),
-      notifications: 0,
-      avatar: "", // In a real app, this would come from the API
-      status: "online", // In a real app, this would come from the API
-      ...roleSpecificSettings
-    };
-    
-    // Omit password before storing in state
-    const { password, ...userWithoutPassword } = userData;
-    
-    // Save to localStorage for persistence
-    localStorage.setItem("user", JSON.stringify(newUser));
-    
-    // Update state
-    setUser(newUser);
-    setRole(newUser.role);
-    setIsAuthenticated(true);
   };
 
   const logout = (): void => {
-    // Clear local storage
+    // Xóa thông tin từ localStorage
+    localStorage.removeItem("token");
     localStorage.removeItem("user");
     
     // Reset state
@@ -214,75 +164,69 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const switchRole = (newRole: UserRole): void => {
     if (user) {
-      // Update user with new role
+      // Cập nhật user với role mới
       const updatedUser = {
         ...user,
         role: newRole
       };
       
-      // Save to localStorage
+      // Lưu vào localStorage
       localStorage.setItem("user", JSON.stringify(updatedUser));
       
-      // Update state
+      // Cập nhật state
       setUser(updatedUser);
       setRole(newRole);
     }
   };
 
-  const updateUserProfile = (updatedData: Partial<UserData>): void => {
+  const updateUserProfile = async (updatedData: Partial<UserData>): Promise<void> => {
     if (user) {
-      // Update user with new profile data
-      const updatedUser = {
-        ...user,
-        ...updatedData,
-        lastLogin: new Date().toISOString()
-      };
-      
-      // Save to localStorage
-      localStorage.setItem("user", JSON.stringify(updatedUser));
-      
-      // Update state
-      setUser(updatedUser);
+      try {
+        // Kết nối API thực tế
+        const response = await userService.updateUserProfile(updatedData);
+        
+        // Cập nhật user với dữ liệu mới
+        const updatedUser = {
+          ...user,
+          ...response,
+          lastLogin: new Date().toISOString()
+        };
+        
+        // Lưu vào localStorage
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        
+        // Cập nhật state
+        setUser(updatedUser);
+      } catch (error) {
+        console.error("Update profile error:", error);
+        throw error;
+      }
     }
   };
 
   const updateRoleSettings = <T extends ManufacturerSettings | BrandSettings | RetailerSettings>(settings: Partial<T>): void => {
     if (user) {
-      let updatedUser;
+      let settingsKey: string;
       
-      // Update appropriate settings based on role
-      if (role === "manufacturer" && user.manufacturerSettings) {
-        updatedUser = {
-          ...user,
-          manufacturerSettings: {
-            ...user.manufacturerSettings,
-            ...settings
-          }
-        };
-      } else if (role === "brand" && user.brandSettings) {
-        updatedUser = {
-          ...user,
-          brandSettings: {
-            ...user.brandSettings,
-            ...settings
-          }
-        };
-      } else if (role === "retailer" && user.retailerSettings) {
-        updatedUser = {
-          ...user,
-          retailerSettings: {
-            ...user.retailerSettings,
-            ...settings
-          }
-        };
+      // Determine which settings key to update based on user role
+      if (user.role === "manufacturer") {
+        settingsKey = "manufacturerSettings";
+      } else if (user.role === "brand") {
+        settingsKey = "brandSettings";
+      } else if (user.role === "retailer") {
+        settingsKey = "retailerSettings";
       } else {
-        // If settings don't exist yet, create them
-        const settingsKey = `${role}Settings` as keyof UserData;
-        updatedUser = {
-          ...user,
-          [settingsKey]: settings
-        };
+        return; // No valid role
       }
+      
+      // Update user with new settings
+      const updatedUser = {
+        ...user,
+        [settingsKey]: {
+          ...user[settingsKey as keyof UserData],
+          ...settings
+        }
+      };
       
       // Save to localStorage
       localStorage.setItem("user", JSON.stringify(updatedUser));
@@ -294,10 +238,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const updateUserStatus = (status: "online" | "away" | "busy"): void => {
     if (user) {
-      // Update user status
+      // Update user with new status
       const updatedUser = {
         ...user,
-        status: status
+        status
       };
       
       // Save to localStorage
@@ -310,7 +254,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const updateUserAvatar = (avatarUrl: string): void => {
     if (user) {
-      // Update user avatar
+      // Update user with new avatar
       const updatedUser = {
         ...user,
         avatar: avatarUrl
@@ -325,19 +269,19 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <UserContext.Provider 
-      value={{ 
+    <UserContext.Provider
+      value={{
         role,
-        isAuthenticated, 
-        user, 
-        login, 
-        register, 
+        isAuthenticated,
+        user,
+        login,
+        register,
         logout,
         switchRole,
         updateUserProfile,
         updateRoleSettings,
         updateUserStatus,
-        updateUserAvatar
+        updateUserAvatar,
       }}
     >
       {children}
