@@ -45,6 +45,64 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
   }
 };
 
+// Middleware xác thực admin từ custom headers
+export const protectAdmin = async (req: Request, res: Response, next: NextFunction) => {
+  let token;
+
+  console.log('Admin auth middleware - Headers received:', 
+    Object.keys(req.headers).map(h => `${h}: ${req.headers[h]}`));
+  
+  // Get admin authorization header - case insensitive
+  const adminAuthHeader = Object.keys(req.headers)
+    .find(h => h.toLowerCase() === 'adminauthorization');
+  
+  if (adminAuthHeader && req.headers[adminAuthHeader]?.toString().startsWith('Bearer')) {
+    try {
+      // Lấy token từ header
+      token = req.headers[adminAuthHeader].toString().split(' ')[1];
+      console.log('Admin token received:', token ? 'Valid token' : 'Invalid token');
+      
+      // Kiểm tra role từ header - case insensitive
+      const roleHeader = Object.keys(req.headers)
+        .find(h => h.toLowerCase() === 'x-admin-role');
+      const emailHeader = Object.keys(req.headers)
+        .find(h => h.toLowerCase() === 'x-admin-email');
+      
+      const adminRole = roleHeader ? req.headers[roleHeader]?.toString() : undefined;
+      const adminEmail = emailHeader ? req.headers[emailHeader]?.toString() : undefined;
+      
+      console.log('Admin authentication - Role:', adminRole, 'Email:', adminEmail);
+      
+      if (!adminRole || adminRole !== 'admin' || !adminEmail) {
+        console.log('Admin authentication failed - Invalid role or email');
+        return res.status(401).json({ 
+          message: 'Admin authentication failed, redirecting to login page' 
+        });
+      }
+      
+      // Set user object for admin role check middleware
+      (req as any).user = {
+        role: 'admin',
+        email: adminEmail
+      };
+      
+      console.log('Admin authentication successful');
+      next();
+    } catch (error) {
+      console.error('Admin auth error:', error);
+      return res.status(401).json({ 
+        message: 'Admin authentication failed, redirecting to login page' 
+      });
+    }
+  } else {
+    console.log('Admin authorization header missing or invalid');
+    console.log('Available headers:', Object.keys(req.headers).join(', '));
+    return res.status(401).json({ 
+      message: 'Admin authentication failed, redirecting to login page' 
+    });
+  }
+};
+
 // Middleware cho các role cụ thể
 export const authorize = (roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {

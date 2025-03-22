@@ -68,7 +68,16 @@ import {
 } from "@/components/ui/table";
 import { Checkbox } from '@/components/ui/checkbox';
 
-type User = typeof mockUsers[0];
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  company: string;
+  status: 'active' | 'inactive' | 'pending' | 'suspended';
+  lastActive: string;
+  verified: boolean;
+}
 
 const roleIcons = {
   Manufacturer: <Building2 className="h-4 w-4 text-blue-500" />,
@@ -85,7 +94,7 @@ const statusStyles = {
 };
 
 const UserManagement = () => {
-  const { users, loading, error, deleteUser, updateUserRole, updateUserStatus } = useAdminUsers();
+  const { users, loading, error, fetchUsers, deleteUser, updateUserRole, updateUserStatus } = useAdminUsers();
   const { toast } = useToast();
   const [filteredUsers, setFilteredUsers] = useState(users);
   const [searchQuery, setSearchQuery] = useState('');
@@ -162,8 +171,8 @@ const UserManagement = () => {
   // Handle user actions
   const handleAddUser = () => {
     // In a real app, this would send data to an API
-    const newUserId = Math.max(...users.map(user => user.id)) + 1;
-    const userToAdd = {
+    const newUserId = (Math.max(...users.map(user => parseInt(user.id, 10) || 0)) + 1).toString();
+    const userToAdd: User = {
       id: newUserId,
       name: newUser.name,
       email: newUser.email,
@@ -174,7 +183,9 @@ const UserManagement = () => {
       verified: false
     };
     
-    setUsers([...users, userToAdd]);
+    // In a real app we would call an API to create the user
+    // For now just fetch users again to refresh the list
+    fetchUsers();
     setIsAddUserOpen(false);
     setNewUser({ name: '', email: '', role: 'Brand', company: '' });
   };
@@ -232,7 +243,7 @@ const UserManagement = () => {
     }
   };
 
-  const handleStatusChange = async (userId: string, newStatus: string) => {
+  const handleStatusChange = async (userId: string, newStatus: 'active' | 'inactive' | 'pending' | 'suspended') => {
     try {
       await updateUserStatus(userId, newStatus);
       toast({

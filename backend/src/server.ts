@@ -16,9 +16,17 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(cors({
   origin: '*',
-  credentials: true
+  credentials: true,
+  exposedHeaders: ['Content-Length', 'Authorization', 'AdminAuthorization', 'X-Admin-Role', 'X-Admin-Email']
 }));
 app.use(express.json());
+
+// Log middleware - logs all incoming requests with their headers
+app.use((req: Request, res: Response, next: NextFunction) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.originalUrl}`);
+  console.log('Headers:', JSON.stringify(req.headers, null, 2));
+  next();
+});
 
 // Routes
 app.use('/api/admin', adminRoutes);
@@ -29,8 +37,15 @@ app.get('/health', (req: Request, res: Response) => {
   res.json({ status: 'ok' });
 });
 
+// Not found middleware
+app.use((req: Request, res: Response) => {
+  console.log(`404 Not Found: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({ message: 'Endpoint not found' });
+});
+
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error('Server error:', err);
   console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!' });
 });

@@ -22,6 +22,15 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
+// Define admin user interface
+interface AdminUser {
+  email: string;
+  role: string;
+  name?: string;
+  avatar?: string;
+  permissions?: string[];
+}
+
 const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -29,18 +38,31 @@ const AdminLayout = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [adminUser, setAdminUser] = useState<any>(null);
+  const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
 
   // Check authentication
   useEffect(() => {
+    // Clear any mock data flags to ensure real database is used
+    localStorage.removeItem('useMockData');
+    
     const adminAuth = localStorage.getItem('adminAuth');
     const adminUserData = localStorage.getItem('adminUser');
     
     if (adminAuth === 'true' && adminUserData) {
-      setIsAuthenticated(true);
-      setAdminUser(JSON.parse(adminUserData));
+      try {
+        const userData = JSON.parse(adminUserData);
+        setIsAuthenticated(true);
+        setAdminUser(userData);
+      } catch (e) {
+        // Invalid JSON in adminUserData
+        localStorage.removeItem('adminAuth');
+        localStorage.removeItem('adminUser');
+        navigate('/admin/login', { replace: true }); // Use replace to avoid history stack
+      }
     } else {
-      navigate('/admin/login');
+      // If not authenticated, redirect to admin login
+      setIsAuthenticated(false);
+      navigate('/admin/login', { replace: true }); // Use replace to avoid history stack
     }
   }, [navigate]);
 

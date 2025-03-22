@@ -43,10 +43,54 @@ const api = axios.create({
 // Interceptor để thêm token vào header
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    // Check if this is an admin request
+    const isAdminRequest = config.url?.includes('/admin/');
+    
+    if (isAdminRequest) {
+      // Use admin token for admin routes
+      const adminAuth = localStorage.getItem('adminAuth');
+      const adminUserData = localStorage.getItem('adminUser');
+      
+      if (adminAuth === 'true' && adminUserData) {
+        try {
+          const adminUser = JSON.parse(adminUserData);
+          
+          // Check if token is expired
+          const now = Date.now();
+          if (adminUser.expires && now > adminUser.expires) {
+            console.error('Admin token expired, clearing admin session');
+            localStorage.removeItem('adminAuth');
+            localStorage.removeItem('adminUser');
+            // Let the request go through to receive 401 from the server
+          } else {
+            // Nếu là request admin, thêm token admin vào header
+            // Use consistent capitalization for headers
+            config.headers['AdminAuthorization'] = `Bearer ${adminUser.token || 'admin-token'}`;
+            
+            // Thêm admin info vào header để backend có thể xác thực
+            config.headers['X-Admin-Role'] = adminUser.role || 'admin';
+            config.headers['X-Admin-Email'] = adminUser.email || '';
+            
+            console.log('Admin request headers set:', {
+              Authorization: config.headers['AdminAuthorization'],
+              Role: config.headers['X-Admin-Role'],
+              Email: config.headers['X-Admin-Email']
+            });
+          }
+        } catch (e) {
+          console.error('Error parsing admin user data:', e);
+        }
+      } else {
+        console.warn('Admin request without valid admin authentication');
+      }
+    } else {
+      // For regular user routes, use the normal token
+      const token = localStorage.getItem('token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
+    
     return config;
   },
   (error) => Promise.reject(error)
@@ -64,8 +108,21 @@ api.interceptors.response.use(
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       
-      // Chuyển hướng về trang đăng nhập
-      window.location.href = '/auth?type=signin';
+      // Check if the request is for an admin route
+      const requestUrl = error.config?.url || '';
+      if (requestUrl.includes('/admin/')) {
+        // For admin routes, just clear admin auth but don't redirect
+        // Let the components handle redirection
+        localStorage.removeItem('adminAuth');
+        localStorage.removeItem('adminUser');
+      }
+      
+      // Store auth failure info in a safer way
+      Object.defineProperty(error, 'authFailure', {
+        value: true,
+        writable: false,
+        configurable: true
+      });
     }
     
     return Promise.reject(error);
@@ -141,13 +198,108 @@ export const productService = {
 
 // Admin Services
 export const adminService = {
+  // Hàm trợ giúp tạo mock data
+  getMockUsers: () => {
+    return [
+      {
+        id: '1',
+        name: 'Admin User',
+        email: 'admin@example.com',
+        role: 'Admin',
+        company: 'Admin Company',
+        status: 'active',
+        lastActive: 'Now',
+        verified: true
+      },
+      {
+        id: '2',
+        name: 'John Smith',
+        email: 'john@example.com',
+        role: 'Manufacturer',
+        company: 'Manufacturing Inc.',
+        status: 'active',
+        lastActive: '2 hours ago',
+        verified: true
+      },
+      {
+        id: '3',
+        name: 'Sarah Johnson',
+        email: 'sarah@example.com',
+        role: 'Brand',
+        company: 'Brand Co.',
+        status: 'active',
+        lastActive: '1 day ago',
+        verified: true
+      },
+      {
+        id: '4',
+        name: 'Michael Wong',
+        email: 'michael@example.com',
+        role: 'Retailer',
+        company: 'Retail Solutions',
+        status: 'inactive',
+        lastActive: '5 days ago',
+        verified: false
+      },
+      {
+        id: '5',
+        name: 'Emily Davis',
+        email: 'emily@example.com',
+        role: 'Brand',
+        company: 'Fashion Brand',
+        status: 'pending',
+        lastActive: 'Never',
+        verified: false
+      }
+    ];
+  },
+  
   getAllUsers: async () => {
     try {
+      // Check for admin authentication first
+      const adminAuth = localStorage.getItem('adminAuth');
+      if (adminAuth !== 'true') {
+        throw new Error('Admin authentication required');
+      }
+      
+      console.log('Making API request to get all users from database...');
       const response = await api.get('/admin/users');
-      return response.data;
+      
+      // Define interface for MongoDB user data
+      interface MongoDBUser {
+        _id?: string;
+        id?: string;
+        name?: string;
+        email?: string;
+        role?: string;
+        companyName?: string;
+        status?: string;
+        updatedAt?: string;
+      }
+      
+      // Map MongoDB data to frontend format
+      const users = response.data.map((user: MongoDBUser) => ({
+        id: user._id || user.id,
+        name: user.name || 'Unknown',
+        email: user.email || '',
+        role: user.role || 'unknown',
+        company: user.companyName || '',
+        status: user.status || 'inactive',
+        lastActive: user.updatedAt ? new Date(user.updatedAt).toLocaleString() : 'Never',
+        verified: user.status === 'active'
+      }));
+      
+      console.log('Database users retrieved:', users.length);
+      return users;
     } catch (error) {
+      console.error('Error fetching users from database:', error);
+      
+      // Remove mock data fallback - always use real database
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 401) {
+          // Clear admin auth but don't redirect directly
+          localStorage.removeItem('adminAuth');
+          localStorage.removeItem('adminUser');
           throw new Error('Unauthorized: Please log in as admin.');
         } else if (error.response?.status === 403) {
           throw new Error('Forbidden: Admin access required.');
@@ -155,7 +307,9 @@ export const adminService = {
           throw new Error('Users API endpoint not found.');
         }
       }
-      throw new Error('Failed to fetch users.');
+      
+      // Propagate the error without falling back to mock data
+      throw error;
     }
   },
 

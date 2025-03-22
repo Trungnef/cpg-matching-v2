@@ -4,12 +4,25 @@ import User from '../models/User';
 // Get all users
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
+    console.log('Database query: Fetching all users');
     const users = await User.find({}, '-password');
-    console.log('Fetched users:', users);
+    console.log(`Successfully fetched ${users.length} users from database`);
+    
+    // Return data in a consistent format
     res.json(users);
   } catch (error) {
-    console.error('Error fetching users:', error);
-    res.status(500).json({ message: 'Error fetching users' });
+    console.error('Database error when fetching users:', error);
+    
+    // Send more detailed error for debugging
+    if (error instanceof Error) {
+      res.status(500).json({ 
+        message: 'Error fetching users from database', 
+        error: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      });
+    } else {
+      res.status(500).json({ message: 'Unknown error fetching users' });
+    }
   }
 };
 

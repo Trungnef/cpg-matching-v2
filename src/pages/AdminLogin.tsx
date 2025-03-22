@@ -22,9 +22,27 @@ const AdminLogin = () => {
     // Simple admin authentication
     setTimeout(() => {
       if (email === 'admin@admin.com' && password === 'admin') {
-        // Set admin session
+        // Tạo admin token để API có thể xác thực
+        // Use a more comprehensive token format with timestamp
+        const timestamp = Date.now();
+        const adminToken = btoa(`ADMIN:${email}:${timestamp}`);
+        
+        // Set admin session with more details
         localStorage.setItem('adminAuth', 'true');
-        localStorage.setItem('adminUser', JSON.stringify({ email, role: 'admin' }));
+        localStorage.setItem('adminUser', JSON.stringify({ 
+          email, 
+          role: 'admin',
+          token: adminToken,
+          name: 'Admin User',
+          timestamp,
+          expires: timestamp + (24 * 60 * 60 * 1000) // 24 hour expiry
+        }));
+        
+        // Clear any existing tokens to avoid confusion
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        
+        console.log('Admin login successful, redirecting to dashboard');
         navigate('/admin/dashboard');
       } else {
         setError('Invalid email or password');
