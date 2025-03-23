@@ -72,7 +72,13 @@ type BaseProfileValues = z.infer<typeof baseProfileSchema>;
 type ManufacturerFormValues = z.infer<typeof manufacturerFormSchema>;
 type BrandFormValues = z.infer<typeof brandFormSchema>;
 type RetailerFormValues = z.infer<typeof retailerFormSchema>;
-type FormValues = ManufacturerFormValues | BrandFormValues | RetailerFormValues;
+
+// Create a union type for all possible form values
+type FormValues = BaseProfileValues & Partial<
+  | { productionCapacity: number; certifications: string; minimumOrderValue: number }
+  | { marketSegments: string; brandValues: string; targetDemographics: string }
+  | { storeLocations: number; averageOrderValue: number; customerBase: string }
+>;
 
 const Profile = () => {
   const { role, user, isAuthenticated, logout, updateUserProfile, updateRoleSettings, updateUserAvatar } = useUser();
@@ -109,10 +115,10 @@ const Profile = () => {
       name: user.name || "",
       email: user.email || "",
       companyName: user.companyName || "",
-      phone: "",
-      website: "",
-      address: "",
-      description: "",
+      phone: user.phone || "",
+      website: user.website || "",
+      address: user.address || "",
+      description: user.companyDescription || "",
     };
 
     if (role === "manufacturer" && user.manufacturerSettings) {
@@ -171,6 +177,10 @@ const Profile = () => {
         name: data.name,
         email: data.email,
         companyName: data.companyName,
+        phone: data.phone,
+        website: data.website,
+        address: data.address,
+        companyDescription: data.description,
         profileComplete: true,
       };
       
@@ -691,11 +701,15 @@ const Profile = () => {
                   </div>
                   <div className="flex items-center text-sm text-muted-foreground">
                     <Phone className="w-4 h-4 mr-2" />
-                    +1 (555) 123-4567
+                    {user?.phone || "No phone number"}
                   </div>
                   <div className="flex items-center text-sm text-muted-foreground">
                     <MapPin className="w-4 h-4 mr-2" />
-                    San Francisco, CA
+                    {user?.address || "No address"}
+                  </div>
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <Globe className="w-4 h-4 mr-2" />
+                    {user?.website || "No website"}
                   </div>
                 </div>
                 

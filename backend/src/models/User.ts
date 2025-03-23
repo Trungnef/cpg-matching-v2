@@ -10,6 +10,10 @@ export interface IUser extends Document {
   password: string;
   role: string;
   companyName: string;
+  phone: string;
+  website: string;
+  address: string;
+  companyDescription: string;
   status: 'active' | 'inactive' | 'pending' | 'suspended';
   createdAt: Date;
   updatedAt: Date;
@@ -40,6 +44,22 @@ const userSchema = new Schema<IUser>(
     companyName: {
       type: String,
       required: true
+    },
+    phone: {
+      type: String,
+      default: ''
+    },
+    website: {
+      type: String,
+      default: ''
+    },
+    address: {
+      type: String,
+      default: ''
+    },
+    companyDescription: {
+      type: String,
+      default: ''
     },
     status: {
       type: String,

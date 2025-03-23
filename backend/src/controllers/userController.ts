@@ -3,6 +3,13 @@ import mongoose from 'mongoose';
 import User, { IUser } from '../models/User';
 import jwt from 'jsonwebtoken';
 
+// Define a custom Request type that includes the user property
+interface RequestWithUser extends Request {
+  user: {
+    _id: mongoose.Types.ObjectId | string;
+  };
+}
+
 // Helper function để tạo JWT
 const generateToken = (id: string) => {
   return jwt.sign({ id }, process.env.JWT_SECRET || 'fallbacksecret', {
@@ -41,6 +48,11 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
       email: user.email,
       role: user.role,
       companyName: user.companyName,
+      phone: user.phone,
+      website: user.website,
+      address: user.address,
+      companyDescription: user.companyDescription,
+      status: user.status,
       token: generateToken(userId)
     });
   } catch (error) {
@@ -57,7 +69,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 // @access  Public
 export const registerUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, email, password, role, companyName } = req.body;
+    const { name, email, password, role, companyName, phone, website, address, companyDescription } = req.body;
 
     // Kiểm tra xem người dùng đã tồn tại chưa
     const userExists = await User.findOne({ email });
@@ -73,7 +85,11 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
       email,
       password,
       role,
-      companyName
+      companyName,
+      phone,
+      website,
+      address,
+      companyDescription
     });
 
     if (user) {
@@ -85,6 +101,11 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
         email: user.email,
         role: user.role,
         companyName: user.companyName,
+        phone: user.phone,
+        website: user.website,
+        address: user.address,
+        companyDescription: user.companyDescription,
+        status: user.status,
         token: generateToken(userId)
       });
     } else {
@@ -104,8 +125,7 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
 // @access  Private
 export const getUserProfile = async (req: Request, res: Response): Promise<void> => {
   try {
-    // Lưu ý: định nghĩa req.user cần được thêm vào Express request
-    const user = await User.findById((req as any).user._id);
+    const user = await User.findById((req as RequestWithUser).user._id);
 
     if (user) {
       res.json({
@@ -113,7 +133,12 @@ export const getUserProfile = async (req: Request, res: Response): Promise<void>
         name: user.name,
         email: user.email,
         role: user.role,
-        companyName: user.companyName
+        companyName: user.companyName,
+        phone: user.phone,
+        website: user.website,
+        address: user.address,
+        companyDescription: user.companyDescription,
+        status: user.status
       });
     } else {
       res.status(404).json({ message: 'User not found' });
@@ -132,12 +157,16 @@ export const getUserProfile = async (req: Request, res: Response): Promise<void>
 // @access  Private
 export const updateUserProfile = async (req: Request, res: Response): Promise<void> => {
   try {
-    const user = await User.findById((req as any).user._id);
+    const user = await User.findById((req as RequestWithUser).user._id);
 
     if (user) {
       user.name = req.body.name || user.name;
       user.email = req.body.email || user.email;
       user.companyName = req.body.companyName || user.companyName;
+      user.phone = req.body.phone || user.phone;
+      user.website = req.body.website || user.website;
+      user.address = req.body.address || user.address;
+      user.companyDescription = req.body.companyDescription || user.companyDescription;
 
       if (req.body.password) {
         user.password = req.body.password;
@@ -152,6 +181,10 @@ export const updateUserProfile = async (req: Request, res: Response): Promise<vo
         email: updatedUser.email,
         role: updatedUser.role,
         companyName: updatedUser.companyName,
+        phone: updatedUser.phone,
+        website: updatedUser.website,
+        address: updatedUser.address,
+        companyDescription: updatedUser.companyDescription,
         token: generateToken(userId)
       });
     } else {

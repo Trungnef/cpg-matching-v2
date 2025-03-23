@@ -7,6 +7,10 @@ interface UserData {
   password?: string;
   role: string;
   companyName: string;
+  phone?: string;
+  website?: string;
+  address?: string;
+  companyDescription?: string;
   token?: string;
   avatar?: string;
   createdAt?: string;

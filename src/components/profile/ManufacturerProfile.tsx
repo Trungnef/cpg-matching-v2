@@ -1,12 +1,41 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Factory, Package, Truck, Users, FileText, Settings } from "lucide-react";
+import { Factory, Package, Truck, Users, FileText, Settings, Building } from "lucide-react";
+import { useUser } from "@/contexts/UserContext";
 
 const ManufacturerProfile = () => {
+  const { user } = useUser();
+  
   return (
     <div className="space-y-6">
+      {/* Company Description Card */}
+      {user?.companyDescription && (
+        <Card>
+          <CardHeader>
+            <CardTitle>About Company</CardTitle>
+            <CardDescription>
+              Information about your manufacturing business
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-start space-x-4">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Building className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-medium">{user.companyName}</h3>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    {user.companyDescription}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle>Manufacturer Overview</CardTitle>

@@ -31,6 +31,10 @@ interface UserData {
   name: string;
   email: string;
   companyName: string;
+  phone?: string;
+  website?: string;
+  address?: string;
+  companyDescription?: string;
   role: UserRole;
   profileComplete: boolean;
   createdAt: string;
