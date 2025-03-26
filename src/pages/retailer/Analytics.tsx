@@ -1,10 +1,9 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "@/components/Navbar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Download, Calendar, TrendingUp, DollarSign, Users, ShoppingBag, ShoppingCart } from "lucide-react";
+import { Download, Calendar, TrendingUp, DollarSign, Users, ShoppingBag, ShoppingCart } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import {
   AreaChart,
@@ -22,6 +21,8 @@ import {
   Legend,
 } from "recharts";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import RetailerLayout from "@/components/layouts/RetailerLayout";
+import { motion } from "framer-motion";
 
 // Mock data for charts
 const salesData = [
@@ -72,22 +73,16 @@ const Analytics = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-
-      <div className="container mx-auto px-4 py-24">
-        <div className="max-w-7xl mx-auto">
-          {/* Breadcrumb and header */}
+    <RetailerLayout>
+      <div className="max-w-none px-4 sm:px-6 lg:px-8 pb-8">
+        <motion.div 
+          className="w-full"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          {/* Header */}
           <div className="mb-8">
-            <Button
-              variant="ghost"
-              className="mb-4 pl-0 text-muted-foreground"
-              onClick={() => navigate("/dashboard")}
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Dashboard
-            </Button>
-
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
                 <h1 className="text-3xl font-bold">Retail Analytics</h1>
@@ -153,7 +148,7 @@ const Analytics = () => {
                 <div className="text-2xl font-bold">$27.14</div>
                 <div className="flex items-center text-xs text-muted-foreground mt-1">
                   <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
-                  <span className="text-green-500">+1.2%</span>
+                  <span className="text-green-500">+0.8%</span>
                   <span className="ml-1">from last month</span>
                 </div>
               </CardContent>
@@ -166,302 +161,146 @@ const Analytics = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">3,642</div>
+                <div className="text-2xl font-bold">2,580</div>
                 <div className="flex items-center text-xs text-muted-foreground mt-1">
                   <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
-                  <span className="text-green-500">+5.8%</span>
+                  <span className="text-green-500">+5.3%</span>
                   <span className="ml-1">from last month</span>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Main content */}
-          <Tabs defaultValue="overview" className="mb-8">
-            <TabsList className="grid w-full md:w-auto grid-cols-3">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="products">Product Analysis</TabsTrigger>
-              <TabsTrigger value="categories">Category Performance</TabsTrigger>
+          {/* Content Tabs */}
+          <Tabs defaultValue="sales" className="space-y-8">
+            <TabsList className="grid grid-cols-3 w-full max-w-[400px]">
+              <TabsTrigger value="sales">Sales</TabsTrigger>
+              <TabsTrigger value="products">Products</TabsTrigger>
+              <TabsTrigger value="categories">Categories</TabsTrigger>
             </TabsList>
-            
-            <TabsContent value="overview" className="mt-6">
-              <div className="grid gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Sales Performance</CardTitle>
-                    <CardDescription>
-                      Monthly revenue and transaction trends
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-[400px]">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart
-                          data={salesData}
-                          margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-                        >
-                          <defs>
-                            <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
-                              <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
-                            </linearGradient>
-                          </defs>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="month" />
-                          <YAxis yAxisId="left" orientation="left" stroke="#8884d8" />
-                          <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
-                          <Tooltip 
-                            formatter={(value, name) => {
-                              if (name === "revenue") return [`$${value}`, "Revenue"];
-                              return [value, "Transactions"];
-                            }}
-                          />
-                          <Legend />
-                          <Area
-                            yAxisId="left"
-                            type="monotone"
-                            dataKey="revenue"
-                            name="Revenue"
-                            stroke="#8884d8"
-                            fillOpacity={1}
-                            fill="url(#colorRevenue)"
-                          />
-                          <Area
-                            yAxisId="right"
-                            type="monotone"
-                            dataKey="transactions"
-                            name="Transactions"
-                            stroke="#82ca9d"
-                            fill="#82ca9d"
-                            fillOpacity={0.3}
-                          />
-                        </AreaChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Top Selling Products</CardTitle>
-                      <CardDescription>
-                        Best performers by units sold this month
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {topSellingProducts.map((product, index) => (
-                          <div key={index} className="flex items-center justify-between">
-                            <div className="flex items-center">
-                              <div className={`h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center mr-3`}>
-                                <ShoppingBag className="h-4 w-4 text-primary" />
-                              </div>
-                              <div>
-                                <p className="font-medium">{product.name}</p>
-                                <p className="text-xs text-muted-foreground">{product.brand}</p>
-                              </div>
-                            </div>
-                            <div className="flex flex-col items-end">
-                              <span className="font-medium">{product.sales} units</span>
-                              <Badge className="bg-green-500 mt-1">+{product.growth}%</Badge>
-                            </div>
+
+            <TabsContent value="sales" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Sales Performance</CardTitle>
+                  <CardDescription>Monthly revenue and transaction trends</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[350px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart
+                        data={salesData}
+                        margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                      >
+                        <defs>
+                          <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#0088FE" stopOpacity={0.8} />
+                            <stop offset="95%" stopColor="#0088FE" stopOpacity={0.1} />
+                          </linearGradient>
+                          <linearGradient id="colorTransactions" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#00C49F" stopOpacity={0.8} />
+                            <stop offset="95%" stopColor="#00C49F" stopOpacity={0.1} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="month" />
+                        <YAxis yAxisId="left" orientation="left" stroke="#0088FE" />
+                        <YAxis yAxisId="right" orientation="right" stroke="#00C49F" />
+                        <Tooltip />
+                        <Legend />
+                        <Area
+                          yAxisId="left"
+                          type="monotone"
+                          dataKey="revenue"
+                          name="Revenue ($)"
+                          stroke="#0088FE"
+                          fillOpacity={1}
+                          fill="url(#colorRevenue)"
+                        />
+                        <Area
+                          yAxisId="right"
+                          type="monotone"
+                          dataKey="transactions"
+                          name="Transactions"
+                          stroke="#00C49F"
+                          fillOpacity={1}
+                          fill="url(#colorTransactions)"
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="products" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Top Selling Products</CardTitle>
+                  <CardDescription>Best performing products by sales volume</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    {topSellingProducts.map((product, index) => (
+                      <div key={index} className="flex items-start justify-between">
+                        <div className="flex items-start">
+                          <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 mr-4">
+                            <ShoppingBag className="h-5 w-5 text-primary" />
                           </div>
-                        ))}
+                          <div>
+                            <h4 className="font-medium">{product.name}</h4>
+                            <p className="text-sm text-muted-foreground">{product.brand}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-medium">{product.sales} units</p>
+                          <div className="flex items-center justify-end">
+                            <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
+                            <span className="text-xs text-green-500">+{product.growth}%</span>
+                          </div>
+                        </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Revenue by Category</CardTitle>
-                      <CardDescription>
-                        Sales distribution across product categories
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="h-[300px]">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <PieChart>
-                            <Pie
-                              data={categoryData}
-                              cx="50%"
-                              cy="50%"
-                              labelLine={false}
-                              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                              outerRadius={100}
-                              fill="#8884d8"
-                              dataKey="value"
-                            >
-                              {categoryData.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                              ))}
-                            </Pie>
-                            <Tooltip formatter={(value) => [`${value}%`, 'Sales Percentage']} />
-                            <Legend />
-                          </PieChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
-            
-            <TabsContent value="products" className="mt-6">
-              <div className="grid gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Product Sales Performance</CardTitle>
-                    <CardDescription>
-                      Top 5 selling products by units sold
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-[400px]">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart
-                          data={topSellingProducts}
-                          layout="vertical"
-                          margin={{ top: 20, right: 30, left: 100, bottom: 5 }}
+
+            <TabsContent value="categories" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Sales by Category</CardTitle>
+                  <CardDescription>Distribution of sales across product categories</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[350px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={categoryData}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={true}
+                          outerRadius={130}
+                          fill="#8884d8"
+                          dataKey="value"
+                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                         >
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis type="number" />
-                          <YAxis dataKey="name" type="category" scale="band" />
-                          <Tooltip />
-                          <Legend />
-                          <Bar dataKey="sales" name="Units Sold" fill="#8884d8" />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="categories" className="mt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Category Distribution</CardTitle>
-                    <CardDescription>
-                      Product categories by percentage of total sales
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-[400px] flex items-center justify-center">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie
-                            data={categoryData}
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={60}
-                            outerRadius={120}
-                            fill="#8884d8"
-                            paddingAngle={5}
-                            dataKey="value"
-                            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                            labelLine={true}
-                          >
-                            {categoryData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                            ))}
-                          </Pie>
-                          <Tooltip formatter={(value) => [`${value}%`, 'Sales Percentage']} />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Category Performance Metrics</CardTitle>
-                    <CardDescription>
-                      Key metrics by product category
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-5">
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <div className="text-sm font-medium">Food & Beverage</div>
-                          <div className="text-sm font-medium">45%</div>
-                        </div>
-                        <div className="w-full bg-secondary h-2 rounded-full">
-                          <div className="bg-blue-500 h-2 rounded-full" style={{ width: '45%' }}></div>
-                        </div>
-                        <div className="flex justify-between mt-1 text-xs text-muted-foreground">
-                          <span>$51,300 revenue</span>
-                          <span>1,890 units</span>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <div className="text-sm font-medium">Health & Wellness</div>
-                          <div className="text-sm font-medium">25%</div>
-                        </div>
-                        <div className="w-full bg-secondary h-2 rounded-full">
-                          <div className="bg-green-500 h-2 rounded-full" style={{ width: '25%' }}></div>
-                        </div>
-                        <div className="flex justify-between mt-1 text-xs text-muted-foreground">
-                          <span>$28,500 revenue</span>
-                          <span>1,050 units</span>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <div className="text-sm font-medium">Household</div>
-                          <div className="text-sm font-medium">15%</div>
-                        </div>
-                        <div className="w-full bg-secondary h-2 rounded-full">
-                          <div className="bg-yellow-500 h-2 rounded-full" style={{ width: '15%' }}></div>
-                        </div>
-                        <div className="flex justify-between mt-1 text-xs text-muted-foreground">
-                          <span>$17,100 revenue</span>
-                          <span>630 units</span>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <div className="text-sm font-medium">Personal Care</div>
-                          <div className="text-sm font-medium">10%</div>
-                        </div>
-                        <div className="w-full bg-secondary h-2 rounded-full">
-                          <div className="bg-orange-500 h-2 rounded-full" style={{ width: '10%' }}></div>
-                        </div>
-                        <div className="flex justify-between mt-1 text-xs text-muted-foreground">
-                          <span>$11,400 revenue</span>
-                          <span>420 units</span>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <div className="text-sm font-medium">Other</div>
-                          <div className="text-sm font-medium">5%</div>
-                        </div>
-                        <div className="w-full bg-secondary h-2 rounded-full">
-                          <div className="bg-purple-500 h-2 rounded-full" style={{ width: '5%' }}></div>
-                        </div>
-                        <div className="flex justify-between mt-1 text-xs text-muted-foreground">
-                          <span>$5,700 revenue</span>
-                          <span>210 units</span>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+                          {categoryData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip formatter={(value) => `${value}%`} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </RetailerLayout>
   );
 };
 

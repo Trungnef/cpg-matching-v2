@@ -1,13 +1,26 @@
-
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "@/components/Navbar";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Filter, Search, MoreVertical, Handshake, Clock, Building, ShoppingBag } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
+import RetailerLayout from "@/components/layouts/RetailerLayout";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { 
+  Search, 
+  Filter, 
+  PlusCircle, 
+  Handshake, 
+  Building, 
+  Factory, 
+  AlertCircle, 
+  CheckCircle, 
+  Clock, 
+  MoreHorizontal 
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,79 +29,107 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-// Mock partnerships data
-const partnerships = [
+// Mock partnerships data - brands
+const brandPartnerships = [
   {
     id: 1,
-    name: "Health & Wellness Co-op",
-    type: "Buying Group",
+    name: "Green Earth Foods",
     status: "Active",
-    members: 15,
-    duration: "3 years",
-    productsAccess: 120,
-    discount: "12%",
-    image: "/placeholder.svg"
+    products: 12,
+    dateEstablished: "May 10, 2022",
+    logoUrl: "/placeholder.svg",
+    location: "Portland, OR",
+    contactPerson: "Sarah Johnson",
+    email: "sarah@greenearthfoods.com"
   },
   {
     id: 2,
-    name: "Local Producers Alliance",
-    type: "Supply Chain",
+    name: "Fresh Press",
     status: "Active",
-    members: 24,
-    duration: "2 years",
-    productsAccess: 85,
-    discount: "8%",
-    image: "/placeholder.svg"
+    products: 8,
+    dateEstablished: "July 22, 2022",
+    logoUrl: "/placeholder.svg",
+    location: "San Francisco, CA",
+    contactPerson: "Alex Chen",
+    email: "alex@freshpress.com"
   },
   {
     id: 3,
-    name: "Eco-Friendly Retailers Network",
-    type: "Industry Group",
-    status: "Active",
-    members: 32,
-    duration: "18 months",
-    productsAccess: 65,
-    discount: "5%",
-    image: "/placeholder.svg"
+    name: "Pure Wellness",
+    status: "Pending",
+    products: 0,
+    dateEstablished: "Pending Approval",
+    logoUrl: "/placeholder.svg",
+    location: "Boulder, CO",
+    contactPerson: "Michael Rivera",
+    email: "michael@purewellness.com"
   },
   {
     id: 4,
-    name: "Downtown Business Association",
-    type: "Local Network",
-    status: "Pending",
-    members: 45,
-    duration: "Negotiating",
-    productsAccess: 0,
-    discount: "TBD",
-    image: "/placeholder.svg"
+    name: "Clean Living",
+    status: "Active",
+    products: 5,
+    dateEstablished: "February 5, 2023",
+    logoUrl: "/placeholder.svg",
+    location: "Austin, TX",
+    contactPerson: "Emma Wilson",
+    email: "emma@cleanliving.com"
   },
   {
     id: 5,
-    name: "Organic Suppliers Collective",
-    type: "Supply Chain",
-    status: "Active",
-    members: 18,
-    duration: "1 year",
-    productsAccess: 52,
-    discount: "7%",
-    image: "/placeholder.svg"
-  },
-  {
-    id: 6,
-    name: "Regional Distribution Network",
-    type: "Logistics",
+    name: "Nature's Harvest",
     status: "Inactive",
-    members: 0,
-    duration: "Past Partner",
-    productsAccess: 0,
-    discount: "0%",
-    image: "/placeholder.svg"
+    products: 3,
+    dateEstablished: "November 18, 2021",
+    logoUrl: "/placeholder.svg",
+    location: "Seattle, WA",
+    contactPerson: "David Kim",
+    email: "david@naturesharvest.com"
   }
 ];
 
-const Partnerships = () => {
+// Mock partnerships data - manufacturers
+const manufacturerPartnerships = [
+  {
+    id: 101,
+    name: "EcoPackaging Solutions",
+    status: "Active",
+    products: 7,
+    dateEstablished: "March 15, 2022",
+    logoUrl: "/placeholder.svg",
+    location: "Chicago, IL",
+    contactPerson: "Robert Chen",
+    email: "robert@ecopackaging.com"
+  },
+  {
+    id: 102,
+    name: "Organic Food Processing",
+    status: "Active",
+    products: 14,
+    dateEstablished: "January 8, 2022",
+    logoUrl: "/placeholder.svg",
+    location: "Minneapolis, MN",
+    contactPerson: "Lisa Garcia",
+    email: "lisa@organicprocessing.com"
+  },
+  {
+    id: 103,
+    name: "Sustainable Packaging Inc",
+    status: "Pending",
+    products: 0,
+    dateEstablished: "Pending Approval",
+    logoUrl: "/placeholder.svg",
+    location: "Denver, CO",
+    contactPerson: "James Wilson",
+    email: "james@sustainablepackaging.com"
+  }
+];
+
+const RetailerPartnerships = () => {
   const { isAuthenticated, user, role } = useUser();
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("brands");
   
   useEffect(() => {
     document.title = "Partnerships - CPG Matchmaker";
@@ -105,173 +146,456 @@ const Partnerships = () => {
     return null;
   }
 
+  // Filter partnerships based on search query and active tab
+  const filteredPartnerships = activeTab === "brands" 
+    ? brandPartnerships.filter(partner => 
+        partner.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        partner.location.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : manufacturerPartnerships.filter(partner => 
+        partner.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        partner.location.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+  // Get status badge
   const getStatusBadge = (status: string) => {
-    switch(status) {
+    switch (status) {
       case "Active":
         return <Badge className="bg-green-500">Active</Badge>;
       case "Pending":
-        return <Badge variant="outline" className="text-yellow-500 border-yellow-500">Pending</Badge>;
+        return <Badge className="bg-yellow-500">Pending</Badge>;
       case "Inactive":
-        return <Badge variant="secondary">Inactive</Badge>;
+        return <Badge variant="outline" className="text-gray-500 border-gray-500">Inactive</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      
-      <div className="container mx-auto px-4 py-24">
-        <div className="max-w-7xl mx-auto">
-          {/* Breadcrumb and header */}
+    <RetailerLayout>
+      <motion.div 
+        className="max-w-none px-4 sm:px-6 lg:px-8 pb-8"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="space-y-6">
+          {/* Header */}
           <div className="mb-8">
-            <Button 
-              variant="ghost" 
-              className="mb-4 pl-0 text-muted-foreground" 
-              onClick={() => navigate("/dashboard")}
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Dashboard
-            </Button>
-            
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
-                <h1 className="text-3xl font-bold">Strategic Partnerships</h1>
-                <p className="text-muted-foreground">{user?.companyName} - Partnership Management</p>
+                <h1 className="text-3xl font-bold">Partnerships</h1>
+                <p className="text-muted-foreground">{user?.companyName} - Manage Your Brand & Manufacturer Relationships</p>
               </div>
               
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="group">
+                    <PlusCircle className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
+                    New Partnership
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Create New Partnership</DialogTitle>
+                    <DialogDescription>
+                      Send a partnership request to a brand or manufacturer to establish a business relationship.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <label htmlFor="partnerType" className="text-right text-sm font-medium col-span-1">
+                        Type
+                      </label>
+                      <select 
+                        id="partnerType" 
+                        className="col-span-3 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      >
+                        <option value="brand">Brand</option>
+                        <option value="manufacturer">Manufacturer</option>
+                      </select>
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <label htmlFor="partnerName" className="text-right text-sm font-medium col-span-1">
+                        Name
+                      </label>
+                      <Input
+                        id="partnerName"
+                        placeholder="Partner company name"
+                        className="col-span-3"
+                      />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <label htmlFor="contactEmail" className="text-right text-sm font-medium col-span-1">
+                        Email
+                      </label>
+                      <Input
+                        id="contactEmail"
+                        placeholder="Contact email address"
+                        className="col-span-3"
+                      />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <label htmlFor="message" className="text-right text-sm font-medium col-span-1">
+                        Message
+                      </label>
+                      <textarea
+                        id="message"
+                        placeholder="Introduce yourself and explain why you'd like to partner"
+                        className="col-span-3 flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button type="submit">Send Request</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
+          
+          {/* Tabs for Brand/Manufacturer */}
+          <Tabs 
+            defaultValue="brands" 
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="mb-8"
+          >
+            <div className="flex justify-between items-center mb-4">
+              <TabsList className="grid w-[400px] grid-cols-2">
+                <TabsTrigger value="brands" className="flex items-center gap-2">
+                  <Building className="h-4 w-4" />
+                  Brand Partners
+                </TabsTrigger>
+                <TabsTrigger value="manufacturers" className="flex items-center gap-2">
+                  <Factory className="h-4 w-4" />
+                  Manufacturer Partners
+                </TabsTrigger>
+              </TabsList>
+              
               <div className="flex gap-2">
-                <Button variant="outline">
-                  <Filter className="mr-2 h-4 w-4" />
-                  Filter
-                </Button>
-                <Button>
-                  <Handshake className="mr-2 h-4 w-4" />
-                  New Partnership
-                </Button>
-              </div>
-            </div>
-          </div>
-          
-          {/* Search and stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <div className="md:col-span-2">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input placeholder="Search partnerships..." className="pl-10" />
-              </div>
-            </div>
-            
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Active Partnerships</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">4</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  <span className="text-yellow-500">1 pending</span> partnership
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Product Access</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">322</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  <span className="text-green-500">Avg. 8% discount</span> on wholesale
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-          
-          {/* Partnerships grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {partnerships.map((partnership) => (
-              <Card key={partnership.id} className="overflow-hidden">
-                <div className="aspect-video bg-muted flex items-center justify-center">
-                  <img 
-                    src={partnership.image}
-                    alt={partnership.name}
-                    className="h-full w-full object-cover"
+                <div className="relative w-64">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                  <Input 
+                    placeholder="Search partnerships..." 
+                    className="pl-10" 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-lg">{partnership.name}</CardTitle>
-                      <CardDescription>{partnership.type}</CardDescription>
-                    </div>
-                    {getStatusBadge(partnership.status)}
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2 pb-2">
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="flex items-center text-sm">
-                      <Building className="h-4 w-4 mr-2 text-muted-foreground" />
-                      <span className="text-muted-foreground">Members:</span>
-                      <span className="ml-1 font-medium">{partnership.members}</span>
-                    </div>
-                    <div className="flex items-center text-sm">
-                      <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
-                      <span className="text-muted-foreground">Duration:</span>
-                      <span className="ml-1 font-medium">{partnership.duration}</span>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="flex items-center text-sm">
-                      <ShoppingBag className="h-4 w-4 mr-2 text-muted-foreground" />
-                      <span className="text-muted-foreground">Products:</span>
-                      <span className="ml-1 font-medium">{partnership.productsAccess}</span>
-                    </div>
-                    <div className="flex items-center text-sm">
-                      <span className="text-muted-foreground">Discount:</span>
-                      <span className="ml-1 font-medium">{partnership.discount}</span>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter className="flex justify-between pt-0">
-                  <Button size="sm" variant="outline">View Details</Button>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button size="icon" variant="ghost">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Edit Partnership</DropdownMenuItem>
-                      <DropdownMenuItem>View Members</DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem className={partnership.status === "Active" ? "text-red-500" : "text-green-500"}>
-                        {partnership.status === "Active" ? "Deactivate" : "Activate"}
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </CardFooter>
-              </Card>
-            ))}
+                <Button variant="outline" className="group">
+                  <Filter className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
+                  Filter
+                </Button>
+              </div>
+            </div>
             
-            {/* Add new partnership card */}
-            <Card className="flex flex-col items-center justify-center h-full border-dashed">
-              <CardContent className="pt-6 flex flex-col items-center">
-                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <Handshake className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="font-medium mb-2">New Partnership</h3>
-                <p className="text-sm text-muted-foreground text-center mb-4">
-                  Create a new strategic alliance
-                </p>
-                <Button>Add Partnership</Button>
-              </CardContent>
-            </Card>
-          </div>
+            <TabsContent value="brands" className="m-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredPartnerships.map((partner) => (
+                  <Card key={partner.id} className="overflow-hidden hover:shadow-md transition-shadow duration-300">
+                    <div className="h-24 bg-muted flex items-center justify-center p-4">
+                      <img 
+                        src={partner.logoUrl} 
+                        alt={partner.name} 
+                        className="h-16 w-auto object-contain"
+                      />
+                    </div>
+                    <CardHeader className="pb-2">
+                      <div className="flex justify-between items-start">
+                        <CardTitle className="text-lg">{partner.name}</CardTitle>
+                        {getStatusBadge(partner.status)}
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-3 pb-2">
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div>
+                          <span className="text-muted-foreground">Location:</span>
+                          <span className="ml-1 font-medium">{partner.location}</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Products:</span>
+                          <span className="ml-1 font-medium">{partner.products}</span>
+                        </div>
+                        <div className="col-span-2">
+                          <span className="text-muted-foreground">Since:</span>
+                          <span className="ml-1 font-medium">{partner.dateEstablished}</span>
+                        </div>
+                        <div className="col-span-2">
+                          <span className="text-muted-foreground">Contact:</span>
+                          <span className="ml-1 font-medium">{partner.contactPerson}</span>
+                        </div>
+                      </div>
+                      
+                      {partner.status === "Active" && (
+                        <div className="flex items-center text-xs text-green-500 font-medium">
+                          <CheckCircle className="h-3 w-3 mr-1" />
+                          Active Partnership
+                        </div>
+                      )}
+                      {partner.status === "Pending" && (
+                        <div className="flex items-center text-xs text-yellow-500 font-medium">
+                          <Clock className="h-3 w-3 mr-1" />
+                          Awaiting Approval
+                        </div>
+                      )}
+                      {partner.status === "Inactive" && (
+                        <div className="flex items-center text-xs text-gray-500 font-medium">
+                          <AlertCircle className="h-3 w-3 mr-1" />
+                          Partnership Inactive
+                        </div>
+                      )}
+                    </CardContent>
+                    <CardFooter className="flex justify-between pt-0">
+                      <Button 
+                        size="sm" 
+                        variant={partner.status === "Active" ? "outline" : "default"}
+                        className="group"
+                      >
+                        {partner.status === "Active" ? (
+                          <>View Products</>
+                        ) : partner.status === "Pending" ? (
+                          <>Review Request</>
+                        ) : (
+                          <>Reactivate</>
+                        )}
+                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button size="icon" variant="ghost">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>View Details</DropdownMenuItem>
+                          <DropdownMenuItem>Contact Partner</DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          {partner.status === "Active" ? (
+                            <DropdownMenuItem className="text-red-500">Deactivate</DropdownMenuItem>
+                          ) : partner.status === "Inactive" ? (
+                            <DropdownMenuItem>Reactivate</DropdownMenuItem>
+                          ) : (
+                            <DropdownMenuItem className="text-red-500">Cancel Request</DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </CardFooter>
+                  </Card>
+                ))}
+                
+                {/* Add New Partnership Card */}
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Card className="flex flex-col items-center justify-center h-full border-dashed cursor-pointer hover:border-primary hover:bg-muted/50 transition-colors duration-300">
+                      <CardContent className="pt-6 flex flex-col items-center">
+                        <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                          <Handshake className="h-6 w-6 text-primary" />
+                        </div>
+                        <h3 className="font-medium mb-2">New Brand Partnership</h3>
+                        <p className="text-sm text-muted-foreground text-center mb-4">
+                          Connect with a brand to offer their products
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Request Brand Partnership</DialogTitle>
+                      <DialogDescription>
+                        Send a partnership request to establish a business relationship with a brand.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <label htmlFor="brandName" className="text-right text-sm font-medium col-span-1">
+                          Brand Name
+                        </label>
+                        <Input
+                          id="brandName"
+                          placeholder="Brand company name"
+                          className="col-span-3"
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <label htmlFor="contactEmail" className="text-right text-sm font-medium col-span-1">
+                          Email
+                        </label>
+                        <Input
+                          id="contactEmail"
+                          placeholder="Contact email address"
+                          className="col-span-3"
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <label htmlFor="message" className="text-right text-sm font-medium col-span-1">
+                          Message
+                        </label>
+                        <textarea
+                          id="message"
+                          placeholder="Introduce yourself and explain why you'd like to partner"
+                          className="col-span-3 flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button type="submit">Send Request</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="manufacturers" className="m-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredPartnerships.map((partner) => (
+                  <Card key={partner.id} className="overflow-hidden hover:shadow-md transition-shadow duration-300">
+                    <div className="h-24 bg-muted flex items-center justify-center p-4">
+                      <img 
+                        src={partner.logoUrl} 
+                        alt={partner.name} 
+                        className="h-16 w-auto object-contain"
+                      />
+                    </div>
+                    <CardHeader className="pb-2">
+                      <div className="flex justify-between items-start">
+                        <CardTitle className="text-lg">{partner.name}</CardTitle>
+                        {getStatusBadge(partner.status)}
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-3 pb-2">
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div>
+                          <span className="text-muted-foreground">Location:</span>
+                          <span className="ml-1 font-medium">{partner.location}</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Products:</span>
+                          <span className="ml-1 font-medium">{partner.products}</span>
+                        </div>
+                        <div className="col-span-2">
+                          <span className="text-muted-foreground">Since:</span>
+                          <span className="ml-1 font-medium">{partner.dateEstablished}</span>
+                        </div>
+                        <div className="col-span-2">
+                          <span className="text-muted-foreground">Contact:</span>
+                          <span className="ml-1 font-medium">{partner.contactPerson}</span>
+                        </div>
+                      </div>
+                      
+                      {partner.status === "Active" && (
+                        <div className="flex items-center text-xs text-green-500 font-medium">
+                          <CheckCircle className="h-3 w-3 mr-1" />
+                          Active Partnership
+                        </div>
+                      )}
+                      {partner.status === "Pending" && (
+                        <div className="flex items-center text-xs text-yellow-500 font-medium">
+                          <Clock className="h-3 w-3 mr-1" />
+                          Awaiting Approval
+                        </div>
+                      )}
+                    </CardContent>
+                    <CardFooter className="flex justify-between pt-0">
+                      <Button 
+                        size="sm" 
+                        variant={partner.status === "Active" ? "outline" : "default"}
+                        className="group"
+                      >
+                        {partner.status === "Active" ? (
+                          <>View Production</>
+                        ) : partner.status === "Pending" ? (
+                          <>Review Request</>
+                        ) : (
+                          <>Reactivate</>
+                        )}
+                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button size="icon" variant="ghost">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>View Details</DropdownMenuItem>
+                          <DropdownMenuItem>Contact Partner</DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          {partner.status === "Active" ? (
+                            <DropdownMenuItem className="text-red-500">Deactivate</DropdownMenuItem>
+                          ) : (
+                            <DropdownMenuItem className="text-red-500">Cancel Request</DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </CardFooter>
+                  </Card>
+                ))}
+                
+                {/* Add New Partnership Card */}
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Card className="flex flex-col items-center justify-center h-full border-dashed cursor-pointer hover:border-primary hover:bg-muted/50 transition-colors duration-300">
+                      <CardContent className="pt-6 flex flex-col items-center">
+                        <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                          <Factory className="h-6 w-6 text-primary" />
+                        </div>
+                        <h3 className="font-medium mb-2">New Manufacturer Partnership</h3>
+                        <p className="text-sm text-muted-foreground text-center mb-4">
+                          Connect with a manufacturer for production
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Request Manufacturer Partnership</DialogTitle>
+                      <DialogDescription>
+                        Send a partnership request to establish a business relationship with a manufacturer.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <label htmlFor="manufacturerName" className="text-right text-sm font-medium col-span-1">
+                          Name
+                        </label>
+                        <Input
+                          id="manufacturerName"
+                          placeholder="Manufacturer company name"
+                          className="col-span-3"
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <label htmlFor="contactEmail" className="text-right text-sm font-medium col-span-1">
+                          Email
+                        </label>
+                        <Input
+                          id="contactEmail"
+                          placeholder="Contact email address"
+                          className="col-span-3"
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <label htmlFor="message" className="text-right text-sm font-medium col-span-1">
+                          Message
+                        </label>
+                        <textarea
+                          id="message"
+                          placeholder="Introduce yourself and explain your production needs"
+                          className="col-span-3 flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button type="submit">Send Request</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </RetailerLayout>
   );
 };
 
-export default Partnerships;
+export default RetailerPartnerships;

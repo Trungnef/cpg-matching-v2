@@ -680,7 +680,7 @@ const Manufacturers = () => {
                 </SheetTrigger>
                 <SheetContent side="right" className="w-full h-full p-0 border-none bg-transparent">
                   <motion.div 
-                    className="fixed inset-0 bg-background/95 backdrop-blur-sm z-50 overflow-y-auto"
+                    className="fixed inset-0 bg-background/95 backdrop-blur-sm z-50 overflow-y-auto no-scrollbar"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}

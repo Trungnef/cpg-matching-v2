@@ -294,7 +294,7 @@ const SearchSection = () => {
                 )}
               </Button>
             </SheetTrigger>
-            <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
+            <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto no-scrollbar">
               <SheetHeader>
                 <SheetTitle>Advanced Filters</SheetTitle>
                 <SheetDescription>

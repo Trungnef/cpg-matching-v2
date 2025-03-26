@@ -1,13 +1,11 @@
-
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "@/components/Navbar";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Package, PlusCircle, Filter, ArrowLeft, Search, MoreVertical, Tag, Calendar, Clock, Truck } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Package, PlusCircle, Filter, Search, Pencil, MoreHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,77 +13,74 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import BrandLayout from "@/components/layouts/BrandLayout";
+import { motion } from "framer-motion";
 
-// Mock product data
+// Mock products data
 const products = [
   {
     id: 1,
-    name: "Organic Breakfast Cereal",
-    category: "Food",
+    name: "Organic Cereal",
+    category: "Breakfast",
     status: "Active",
-    launched: "Jan 2023",
-    manufacturer: "Premium Foods Co.",
-    retailers: 4,
+    retailPartners: 12,
+    salesLastMonth: "$45,000",
     image: "/placeholder.svg"
   },
   {
     id: 2,
-    name: "Natural Energy Bars",
-    category: "Food",
+    name: "Protein Bar",
+    category: "Snacks",
     status: "Active",
-    launched: "Mar 2023",
-    manufacturer: "Sustainable Nutrition Inc.",
-    retailers: 3,
+    retailPartners: 8,
+    salesLastMonth: "$32,500",
     image: "/placeholder.svg"
   },
   {
     id: 3,
-    name: "Plant Protein Powder",
-    category: "Supplement",
+    name: "Kombucha",
+    category: "Beverages",
     status: "Development",
-    launched: "Coming Soon",
-    manufacturer: "Pending Selection",
-    retailers: 0,
+    retailPartners: 0,
+    salesLastMonth: "$0",
     image: "/placeholder.svg"
   },
   {
     id: 4,
-    name: "Fresh Fruit Smoothies",
-    category: "Beverage",
+    name: "Gluten-Free Crackers",
+    category: "Snacks",
     status: "Active",
-    launched: "Feb 2023",
-    manufacturer: "Nature's Best Beverages",
-    retailers: 6,
+    retailPartners: 5,
+    salesLastMonth: "$18,750",
     image: "/placeholder.svg"
   },
   {
     id: 5,
-    name: "Gourmet Trail Mix",
-    category: "Snack",
+    name: "Plant-Based Milk",
+    category: "Beverages",
     status: "Active",
-    launched: "Apr 2023",
-    manufacturer: "Premium Foods Co.",
-    retailers: 5,
+    retailPartners: 10,
+    salesLastMonth: "$28,000",
     image: "/placeholder.svg"
   },
   {
     id: 6,
-    name: "Gluten-Free Cookies",
-    category: "Food",
+    name: "Vitamin Supplement",
+    category: "Health",
     status: "Inactive",
-    launched: "Dec 2022",
-    manufacturer: "Sustainable Nutrition Inc.",
-    retailers: 2,
+    retailPartners: 0,
+    salesLastMonth: "$0",
     image: "/placeholder.svg"
   }
 ];
 
-const Products = () => {
+const BrandProducts = () => {
   const { isAuthenticated, user, role } = useUser();
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
   
   useEffect(() => {
-    document.title = "Brand Products - CPG Matchmaker";
+    document.title = "Products Management - CPG Matchmaker";
     
     // If not authenticated or not a brand, redirect
     if (!isAuthenticated) {
@@ -99,93 +94,74 @@ const Products = () => {
     return null;
   }
 
+  // Filter products based on search query
+  const filteredProducts = products.filter(product => 
+    product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    product.category.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Helper function for status badges
   const getStatusBadge = (status: string) => {
     switch(status) {
       case "Active":
         return <Badge className="bg-green-500">Active</Badge>;
       case "Development":
-        return <Badge variant="outline" className="text-blue-500 border-blue-500">Development</Badge>;
+        return <Badge className="bg-blue-500">Development</Badge>;
       case "Inactive":
-        return <Badge variant="secondary">Inactive</Badge>;
+        return <Badge variant="outline" className="text-gray-500 border-gray-500">Inactive</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      
-      <div className="container mx-auto px-4 py-24">
-        <div className="max-w-7xl mx-auto">
-          {/* Breadcrumb and header */}
+    <BrandLayout>
+      <motion.div 
+        className="max-w-none px-4 sm:px-6 lg:px-8 pb-8"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="space-y-6">
+          {/* Header */}
           <div className="mb-8">
-            <Button 
-              variant="ghost" 
-              className="mb-4 pl-0 text-muted-foreground" 
-              onClick={() => navigate("/dashboard")}
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Dashboard
-            </Button>
-            
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
-                <h1 className="text-3xl font-bold">Brand Products</h1>
-                <p className="text-muted-foreground">{user?.companyName} - Your Product Portfolio</p>
+                <h1 className="text-3xl font-bold">Product Management</h1>
+                <p className="text-muted-foreground">{user?.companyName} - Manage Your Product Catalog</p>
               </div>
               
-              <div className="flex gap-2">
-                <Button variant="outline">
-                  <Filter className="mr-2 h-4 w-4" />
-                  Filter
-                </Button>
-                <Button>
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Add Product
-                </Button>
-              </div>
+              <Button className="group">
+                <PlusCircle className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
+                Add New Product
+              </Button>
             </div>
           </div>
           
-          {/* Search and stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <div className="md:col-span-2">
+          {/* Search and Filter */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+            <div className="sm:col-span-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input placeholder="Search products..." className="pl-10" />
+                <Input 
+                  placeholder="Search products..." 
+                  className="pl-10" 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
               </div>
             </div>
             
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Products</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">6</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  <span className="text-green-500">5 Active</span>, 1 In Development
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Retail Partners</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">8</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  <span className="text-blue-500">2 Potential</span> new partners in pipeline
-                </p>
-              </CardContent>
-            </Card>
+            <Button variant="outline" className="group">
+              <Filter className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
+              Filter Products
+            </Button>
           </div>
           
-          {/* Product grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {products.map((product) => (
-              <Card key={product.id} className="overflow-hidden">
+          {/* Products Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredProducts.map((product) => (
+              <Card key={product.id} className="overflow-hidden hover:shadow-md transition-shadow duration-300">
                 <div className="aspect-video bg-muted flex items-center justify-center">
                   <img 
                     src={product.image}
@@ -205,32 +181,29 @@ const Products = () => {
                 <CardContent className="space-y-2 pb-2">
                   <div className="grid grid-cols-2 gap-2">
                     <div className="flex items-center text-sm">
-                      <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
-                      <span className="text-muted-foreground">Launched:</span>
-                      <span className="ml-1 font-medium">{product.launched}</span>
+                      <span className="text-muted-foreground">Retail Partners:</span>
+                      <span className="ml-1 font-medium">{product.retailPartners}</span>
                     </div>
                     <div className="flex items-center text-sm">
-                      <Truck className="h-4 w-4 mr-2 text-muted-foreground" />
-                      <span className="text-muted-foreground">Retailers:</span>
-                      <span className="ml-1 font-medium">{product.retailers}</span>
+                      <span className="text-muted-foreground">Sales:</span>
+                      <span className="ml-1 font-medium">{product.salesLastMonth}</span>
                     </div>
-                  </div>
-                  <div className="text-sm">
-                    <span className="text-muted-foreground">Manufacturer:</span>
-                    <span className="ml-1 font-medium">{product.manufacturer}</span>
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-between pt-0">
-                  <Button size="sm" variant="outline">View Details</Button>
+                  <Button size="sm" variant="outline" className="group">
+                    <Pencil className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
+                    Edit
+                  </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button size="icon" variant="ghost">
-                        <MoreVertical className="h-4 w-4" />
+                        <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
+                      <DropdownMenuItem>View Details</DropdownMenuItem>
                       <DropdownMenuItem>Edit Product</DropdownMenuItem>
-                      <DropdownMenuItem>View Analytics</DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem className={product.status === "Active" ? "text-red-500" : "text-green-500"}>
                         {product.status === "Active" ? "Deactivate" : "Activate"}
@@ -242,23 +215,24 @@ const Products = () => {
             ))}
             
             {/* Add new product card */}
-            <Card className="flex flex-col items-center justify-center h-full border-dashed">
+            <Card 
+              className="flex flex-col items-center justify-center h-full border-dashed cursor-pointer hover:border-primary hover:bg-muted/50 transition-colors duration-300"
+            >
               <CardContent className="pt-6 flex flex-col items-center">
                 <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   <PlusCircle className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="font-medium mb-2">Add New Product</h3>
                 <p className="text-sm text-muted-foreground text-center mb-4">
-                  Create a new brand product
+                  Create a new product in your catalog
                 </p>
-                <Button>Create Product</Button>
               </CardContent>
             </Card>
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </BrandLayout>
   );
 };
 
-export default Products;
+export default BrandProducts;

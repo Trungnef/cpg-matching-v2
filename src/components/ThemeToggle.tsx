@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { SunMoon, Sun, Moon, Star } from "lucide-react";
+import { Sun, Moon } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { 
@@ -8,168 +8,206 @@ import {
   TooltipProvider, 
   TooltipTrigger 
 } from "@/components/ui/tooltip";
+import { useEffect, useState } from "react";
+
+// Animation variants
+const toggleVariants = {
+  light: {
+    rotate: [0, 15, -15, 0],
+    scale: [1, 1.1, 1],
+    transition: { 
+      duration: 0.6,
+      ease: "easeInOut"
+    }
+  },
+  dark: {
+    rotate: [0, -15, 15, 0],
+    scale: [1, 1.1, 1],
+    transition: { 
+      duration: 0.6,
+      ease: "easeInOut"
+    }
+  }
+};
 
 const ThemeToggle = () => {
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === 'dark';
+  const [hasClicked, setHasClicked] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
-  // Animated stars for dark mode
-  const renderStars = () => {
-    return Array(4).fill(0).map((_, i) => (
-      <motion.div
-        key={i}
-        className="absolute"
-        initial={false}
-        animate={{
-          scale: [0.5, 1, 0.5],
-          opacity: [0.3, 0.8, 0.3],
-        }}
-        transition={{
-          duration: 2 + i * 0.5,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: i * 0.5
-        }}
-        style={{
-          top: `${10 + (i * 15)}%`,
-          left: `${(i * 20) % 80}%`,
-          width: `${4 + (i % 2)}px`,
-          height: `${4 + (i % 2)}px`,
-          borderRadius: '50%',
-          background: 'white'
-        }}
-      />
-    ));
+  // Check for reduced motion preference
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+    
+    const handleChange = () => setPrefersReducedMotion(mediaQuery.matches);
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  // Function to handle theme toggle with animation
+  const handleToggle = () => {
+    setHasClicked(true);
+    toggleTheme();
   };
 
-  // Cloud particles for light mode
-  const renderClouds = () => {
-    return Array(3).fill(0).map((_, i) => (
-      <motion.div
-        key={i}
-        className="absolute bg-white/80 rounded-full blur-[2px]"
-        initial={false}
-        animate={{
-          x: [-(i*5), (i*5), -(i*5)],
-          opacity: [0.7, 0.9, 0.7],
-        }}
-        transition={{
-          duration: 3,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: i * 0.3
-        }}
-        style={{
-          top: `${35 + (i * 10)}%`,
-          left: `${30 + (i * 10)}%`,
-          width: `${8 + (i * 2)}px`,
-          height: `${8 + (i * 2)}px`,
-        }}
-      />
-    ));
+  // Render particles based on theme
+  const renderParticles = () => {
+    if (prefersReducedMotion) return null;
+    
+    return (
+      <div className="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
+        {isDark ? (
+          // Stars for dark mode
+          Array(6).fill(0).map((_, i) => (
+            <motion.div
+              key={`star-${i}`}
+              className="absolute bg-yellow-100 rounded-full"
+              initial={false}
+              animate={{
+                opacity: [0, 0.8, 0],
+                scale: [0, 1, 0],
+                x: [0, (i % 2 === 0 ? 15 : -15) * (i + 1) / 3],
+                y: [0, ((i % 3) - 1) * 15],
+              }}
+              transition={{
+                duration: 1.5,
+                ease: "easeOut",
+                delay: hasClicked ? 0 : 0.5 + i * 0.1,
+                repeat: hasClicked ? 0 : Infinity,
+                repeatDelay: 3,
+              }}
+              style={{
+                top: `${50 + ((i % 3) - 1) * 10}%`,
+                left: `${50 + ((i % 2) * 10) - 5}%`,
+                width: `${2 + (i % 3)}px`,
+                height: `${2 + (i % 3)}px`,
+              }}
+            />
+          ))
+        ) : (
+          // Rays for light mode
+          Array(8).fill(0).map((_, i) => {
+            const angle = (i / 8) * Math.PI * 2;
+            return (
+              <motion.div
+                key={`ray-${i}`}
+                className="absolute bg-yellow-400"
+                initial={false}
+                animate={{
+                  opacity: [0.5, 1, 0.5],
+                  scale: [0.6, 1, 0.6],
+                }}
+                transition={{
+                  duration: 2,
+                  ease: "easeInOut",
+                  delay: hasClicked ? 0 : i * 0.1,
+                  repeat: hasClicked ? 0 : Infinity,
+                }}
+                style={{
+                  height: '2px',
+                  width: '10px',
+                  borderRadius: '2px',
+                  transformOrigin: 'left center',
+                  left: '50%',
+                  top: '50%',
+                  transform: `rotate(${angle}rad) translateX(14px)`,
+                }}
+              />
+            );
+          })
+        )}
+      </div>
+    );
   };
 
   return (
     <TooltipProvider>
-      <Tooltip>
+      <Tooltip delayDuration={300}>
         <TooltipTrigger asChild>
-          <div className="relative w-10 h-10 flex items-center justify-center">
+          <div className="relative">
             <motion.div
-              className="absolute inset-0 rounded-full"
-              animate={{
-                background: isDark 
-                  ? "radial-gradient(circle, rgba(30,41,59,1) 0%, rgba(17,24,39,1) 100%)" 
-                  : "radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(226,232,240,1) 100%)"
-              }}
-              initial={false}
-              transition={{ duration: 0.6 }}
-            />
-            
-            {/* Outer glowing ring */}
-            <motion.div
-              className="absolute inset-0 rounded-full blur-md"
-              animate={{
+              className={`flex items-center justify-center w-9 h-9 rounded-full ${
+                isDark 
+                  ? 'bg-gradient-to-b from-slate-700 to-slate-900 shadow-inner shadow-slate-950/50' 
+                  : 'bg-gradient-to-b from-blue-50 to-sky-100 shadow-inner shadow-sky-200/50'
+              } transition-colors duration-300 ease-in-out relative overflow-hidden`}
+              whileHover={{ 
+                scale: 1.05,
                 boxShadow: isDark 
-                  ? "0 0 10px 2px rgba(147, 197, 253, 0.3), inset 0 0 4px rgba(147, 197, 253, 0.3)" 
-                  : "0 0 15px 2px rgba(226, 232, 240, 0.5), inset 0 0 4px rgba(226, 232, 240, 0.5)"
+                  ? '0 0 8px 2px rgba(148, 163, 184, 0.3)' 
+                  : '0 0 8px 2px rgba(14, 165, 233, 0.2)' 
               }}
-              initial={false}
-              transition={{ duration: 0.6 }}
-            />
-            
-            {/* Star particles in dark mode */}
-            {isDark && renderStars()}
-            
-            {/* Cloud particles in light mode */}
-            {!isDark && renderClouds()}
-            
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={toggleTheme}
-              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-              className="relative z-10 bg-transparent hover:bg-transparent"
+              whileTap={{ scale: 0.95 }}
             >
-              <motion.div
-                className="relative"
-                initial={false}
-                animate={{ rotate: isDark ? 0 : 180 }}
-                transition={{ 
-                  type: "spring",
-                  stiffness: 200,
-                  damping: 10
+              {/* Glow effect */}
+              <motion.div 
+                className="absolute inset-0 rounded-full blur-md"
+                animate={{
+                  background: isDark 
+                    ? 'radial-gradient(circle at center, rgba(30, 58, 138, 0.15) 0%, rgba(15, 23, 42, 0) 70%)' 
+                    : 'radial-gradient(circle at center, rgba(251, 191, 36, 0.2) 0%, rgba(251, 191, 36, 0) 70%)'
                 }}
+                initial={false}
+                transition={{ duration: 0.6 }}
+              />
+
+              {renderParticles()}
+
+              {/* Toggle button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleToggle}
+                className="relative z-10 rounded-full p-0 h-full w-full bg-transparent hover:bg-transparent focus-visible:ring-1 focus-visible:ring-offset-1"
+                aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
               >
-                {/* Sun or Moon Icon */}
                 <motion.div
+                  animate={hasClicked ? (isDark ? "dark" : "light") : ""}
+                  variants={toggleVariants}
                   initial={false}
-                  animate={{ 
-                    scale: isDark ? 1 : 0,
-                    opacity: isDark ? 1 : 0,
-                  }}
-                  transition={{ duration: 0.3 }}
-                  className="absolute inset-0 flex items-center justify-center"
                 >
-                  <Moon className="h-[18px] w-[18px] text-blue-300" strokeWidth={1.5} />
+                  <motion.div
+                    initial={false}
+                    animate={{ 
+                      opacity: isDark ? 1 : 0,
+                      scale: isDark ? 1 : 0.5,
+                      rotateZ: isDark ? 0 : -90
+                    }}
+                    transition={{ 
+                      duration: 0.3,
+                      ease: "easeInOut"
+                    }}
+                    className="absolute inset-0 flex items-center justify-center"
+                  >
+                    <Moon className="h-[18px] w-[18px] text-blue-200" strokeWidth={1.75} />
+                  </motion.div>
+                  
+                  <motion.div
+                    initial={false}
+                    animate={{ 
+                      opacity: !isDark ? 1 : 0,
+                      scale: !isDark ? 1 : 0.5,
+                      rotateZ: !isDark ? 0 : 90
+                    }}
+                    transition={{ 
+                      duration: 0.3,
+                      ease: "easeInOut"
+                    }}
+                    className="absolute inset-0 flex items-center justify-center"
+                  >
+                    <Sun className="h-[18px] w-[18px] text-amber-500" strokeWidth={1.75} />
+                  </motion.div>
                 </motion.div>
-                
-                <motion.div
-                  initial={false}
-                  animate={{ 
-                    scale: !isDark ? 1 : 0,
-                    opacity: !isDark ? 1 : 0,
-                  }}
-                  transition={{ duration: 0.3 }}
-                  className="absolute inset-0 flex items-center justify-center"
-                >
-                  <Sun className="h-[18px] w-[18px] text-sky-500" strokeWidth={1.5} />
-                </motion.div>
-                
-                {/* The combined icon that morphs */}
-                <motion.div
-                  initial={false}
-                  animate={{ 
-                    opacity: 0.2,
-                    rotate: isDark ? 0 : 180,
-                  }}
-                  transition={{ duration: 0.5 }}
-                  className="opacity-0"
-                >
-                  <SunMoon className="h-[22px] w-[22px]" />
-                </motion.div>
-              </motion.div>
-            </Button>
-            
-            {/* Move effect on hover */}
-            <motion.div
-              className="absolute inset-0 rounded-full"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              transition={{ type: "spring", stiffness: 400, damping: 17 }}
-            />
+              </Button>
+            </motion.div>
           </div>
         </TooltipTrigger>
-        <TooltipContent side="bottom">
+        <TooltipContent 
+          side="bottom"
+          className={`${isDark ? 'bg-slate-800 text-slate-200' : 'bg-white text-slate-900'} px-3 py-1.5 text-xs font-medium border ${isDark ? 'border-slate-700' : 'border-slate-200'}`}
+        >
           <p>{isDark ? 'Switch to light mode' : 'Switch to dark mode'}</p>
         </TooltipContent>
       </Tooltip>

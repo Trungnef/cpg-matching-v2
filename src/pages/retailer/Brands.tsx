@@ -1,94 +1,94 @@
-
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "@/components/Navbar";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingBag, Filter, ArrowLeft, Search, MoreVertical, Store, Package, CheckCircle } from "lucide-react";
-import { useUser } from "@/contexts/UserContext";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Filter, Plus, Search, Building, ArrowRight } from "lucide-react";
+import { useUser } from "@/contexts/UserContext";
+import RetailerLayout from "@/components/layouts/RetailerLayout";
+import { motion } from "framer-motion";
 
-// Mock brands data
-const brands = [
+// Mock data for brand partners
+const brandPartners = [
   {
     id: 1,
     name: "Green Earth Organics",
-    category: "Food & Beverage",
+    logo: "/placeholder.svg",
+    products: ["Organic Cereals", "Energy Bars", "Granola"],
     status: "Active",
-    products: 8,
-    topSeller: "Organic Breakfast Cereal",
-    customerRating: 4.8,
-    image: "/placeholder.svg",
-    certifications: ["Organic", "Non-GMO", "Sustainable"]
+    relationship: 4.5,
+    categoryFit: 4.8,
+    revenueImpact: 4.2,
+    categories: ["Breakfast", "Snacks"],
+    description: "Green Earth Organics specializes in organic breakfast options and healthy snacks, using sustainable ingredients and eco-friendly packaging."
   },
   {
     id: 2,
-    name: "Pure Nutrition",
-    category: "Health & Wellness",
-    status: "Active",
-    products: 5,
-    topSeller: "Plant Protein Powder",
-    customerRating: 4.6,
-    image: "/placeholder.svg",
-    certifications: ["Vegan", "Gluten-Free"]
+    name: "Pure Wellness",
+    logo: "/placeholder.svg",
+    products: ["Protein Powder", "Vitamin Supplements", "Superfood Blends"],
+    status: "Pending",
+    relationship: 0,
+    categoryFit: 4.5,
+    revenueImpact: 4.0,
+    categories: ["Health", "Wellness"],
+    description: "Pure Wellness offers premium health supplements and nutrition products focused on natural ingredients and scientifically-backed formulations."
   },
   {
     id: 3,
-    name: "Clean Living",
-    category: "Household",
+    name: "Fresh Press",
+    logo: "/placeholder.svg",
+    products: ["Cold-Pressed Juices", "Juice Cleanses", "Fruit Smoothies"],
     status: "Active",
-    products: 6,
-    topSeller: "Eco-Friendly Dish Soap",
-    customerRating: 4.7,
-    image: "/placeholder.svg",
-    certifications: ["Eco-Friendly", "Biodegradable"]
+    relationship: 3.9,
+    categoryFit: 4.1,
+    revenueImpact: 3.7,
+    categories: ["Beverages"],
+    description: "Fresh Press creates delicious, nutritious cold-pressed juices and smoothies using locally-sourced produce and innovative flavor combinations."
   },
   {
     id: 4,
-    name: "Fresh Press",
-    category: "Beverages",
+    name: "Clean Living",
+    logo: "/placeholder.svg",
+    products: ["Eco Dish Soap", "Natural Surface Cleaner", "Sustainable Laundry Detergent"],
     status: "Active",
-    products: 4,
-    topSeller: "Cold Pressed Orange Juice",
-    customerRating: 4.5,
-    image: "/placeholder.svg",
-    certifications: ["Organic", "No Added Sugar"]
+    relationship: 4.2,
+    categoryFit: 3.9,
+    revenueImpact: 3.5,
+    categories: ["Household"],
+    description: "Clean Living develops household cleaning products that are effective, environmentally friendly, and safe for families and pets."
   },
   {
     id: 5,
     name: "Nature's Harvest",
-    category: "Snacks",
+    logo: "/placeholder.svg",
+    products: ["Organic Trail Mix", "Dried Fruits", "Nut Butters"],
     status: "Inactive",
-    products: 3,
-    topSeller: "Organic Trail Mix",
-    customerRating: 4.3,
-    image: "/placeholder.svg",
-    certifications: ["Organic", "Non-GMO"]
+    relationship: 3.0,
+    categoryFit: 4.2,
+    revenueImpact: 2.8,
+    categories: ["Snacks"],
+    description: "Nature's Harvest specializes in nutrient-dense snacks made from organically grown nuts, seeds, and fruits with minimal processing."
   },
   {
     id: 6,
     name: "Wellness Essentials",
-    category: "Personal Care",
-    status: "Pending",
-    products: 0,
-    topSeller: "N/A",
-    customerRating: 0,
-    image: "/placeholder.svg",
-    certifications: ["Cruelty-Free", "Natural Ingredients"]
+    logo: "/placeholder.svg",
+    products: ["Essential Oils", "Aromatherapy Diffusers", "Natural Candles"],
+    status: "Active",
+    relationship: 4.0,
+    categoryFit: 3.5,
+    revenueImpact: 3.2,
+    categories: ["Health", "Household"],
+    description: "Wellness Essentials creates aromatherapy and self-care products designed to enhance wellbeing through natural scents and therapeutic benefits."
   }
 ];
 
 const Brands = () => {
   const { isAuthenticated, user, role } = useUser();
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
   
   useEffect(() => {
     document.title = "Brand Partners - CPG Matchmaker";
@@ -105,14 +105,22 @@ const Brands = () => {
     return null;
   }
 
+  // Filter brands based on search query
+  const filteredBrands = brandPartners.filter(brand => 
+    brand.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    brand.categories.some(category => category.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    brand.products.some(product => product.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
+  // Helper function for status badges
   const getStatusBadge = (status: string) => {
     switch(status) {
       case "Active":
         return <Badge className="bg-green-500">Active</Badge>;
-      case "Inactive":
-        return <Badge variant="secondary">Inactive</Badge>;
       case "Pending":
-        return <Badge variant="outline" className="text-blue-500 border-blue-500">Pending</Badge>;
+        return <Badge className="bg-yellow-500">Pending</Badge>;
+      case "Inactive":
+        return <Badge variant="outline" className="text-gray-500 border-gray-500">Inactive</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -142,154 +150,118 @@ const Brands = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      
-      <div className="container mx-auto px-4 py-24">
-        <div className="max-w-7xl mx-auto">
-          {/* Breadcrumb and header */}
-          <div className="mb-8">
-            <Button 
-              variant="ghost" 
-              className="mb-4 pl-0 text-muted-foreground" 
-              onClick={() => navigate("/dashboard")}
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Dashboard
-            </Button>
-            
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div>
-                <h1 className="text-3xl font-bold">Brand Partners</h1>
-                <p className="text-muted-foreground">{user?.companyName} - Brand relationships management</p>
-              </div>
-              
-              <div className="flex gap-2">
-                <Button variant="outline">
-                  <Filter className="mr-2 h-4 w-4" />
-                  Filter
-                </Button>
-                <Button>
-                  <Search className="mr-2 h-4 w-4" />
-                  Discover Brands
-                </Button>
-              </div>
-            </div>
-          </div>
-          
-          {/* Search and stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <div className="md:col-span-2">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input placeholder="Search brands..." className="pl-10" />
-              </div>
+    <RetailerLayout>
+      <motion.div 
+        className="max-w-7xl mx-auto"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold">Brand Partners</h1>
+              <p className="text-muted-foreground">{user?.companyName} - Brand relationships management</p>
             </div>
             
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Active Brands</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">26</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  <span className="text-green-500">+3</span> new this quarter
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Products Carried</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">154</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  <span className="text-blue-500">12</span> new this month
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-          
-          {/* Brands grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {brands.map((brand) => (
-              <Card key={brand.id} className="overflow-hidden">
-                <div className="aspect-video bg-muted flex items-center justify-center">
-                  <img 
-                    src={brand.image}
-                    alt={brand.name}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-lg">{brand.name}</CardTitle>
-                      <CardDescription>{brand.category}</CardDescription>
-                    </div>
-                    {getStatusBadge(brand.status)}
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-3 pb-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center text-sm">
-                      <Package className="h-4 w-4 mr-2 text-muted-foreground" />
-                      <span className="text-muted-foreground">Products:</span>
-                      <span className="ml-1 font-medium">{brand.products}</span>
-                    </div>
-                    <div className="text-sm">
-                      {getRatingStars(brand.customerRating)}
-                    </div>
-                  </div>
-                  
-                  {brand.products > 0 && (
-                    <div className="text-sm">
-                      <span className="text-muted-foreground">Top Seller:</span>
-                      <span className="ml-1 font-medium">{brand.topSeller}</span>
-                    </div>
-                  )}
-                  
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {brand.certifications.map((cert, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs">
-                        <CheckCircle className="h-3 w-3 mr-1" />
-                        {cert}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-                <CardFooter className="flex justify-between pt-0">
-                  <Button size="sm" variant="outline">View Profile</Button>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button size="icon" variant="ghost">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>View Products</DropdownMenuItem>
-                      <DropdownMenuItem>View Analytics</DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      {brand.status === "Active" ? (
-                        <>
-                          <DropdownMenuItem>Contact Rep</DropdownMenuItem>
-                          <DropdownMenuItem className="text-red-500">Mark as Inactive</DropdownMenuItem>
-                        </>
-                      ) : brand.status === "Pending" ? (
-                        <DropdownMenuItem className="text-green-500">Approve Partnership</DropdownMenuItem>
-                      ) : (
-                        <DropdownMenuItem className="text-green-500">Reactivate</DropdownMenuItem>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </CardFooter>
-              </Card>
-            ))}
+            <div className="flex gap-2">
+              <Button variant="outline">
+                <Filter className="mr-2 h-4 w-4" />
+                Filter
+              </Button>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Add Brand
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+        
+        {/* Search */}
+        <div className="mb-8">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input 
+              placeholder="Search brands, categories, or products..." 
+              className="pl-10" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
+        
+        {/* Brand partners grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {filteredBrands.map(brand => (
+            <Card key={brand.id} className="overflow-hidden transition-all duration-300 hover:shadow-md">
+              <CardHeader className="pb-2">
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center space-x-3">
+                    <div className="h-10 w-10 bg-muted rounded-full flex items-center justify-center overflow-hidden">
+                      <Building className="h-6 w-6 text-muted-foreground" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">{brand.name}</CardTitle>
+                      <CardDescription>{brand.categories.join(", ")}</CardDescription>
+                    </div>
+                  </div>
+                  {getStatusBadge(brand.status)}
+                </div>
+              </CardHeader>
+              <CardContent className="pb-3">
+                <div className="space-y-3">
+                  <div className="text-sm line-clamp-2 text-muted-foreground">
+                    {brand.description}
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    {brand.products.map((product, idx) => (
+                      <Badge variant="secondary" key={idx}>{product}</Badge>
+                    ))}
+                  </div>
+                  
+                  {brand.status !== "Pending" && (
+                    <div className="grid grid-cols-3 gap-2 text-center text-sm">
+                      <div>
+                        <p className="text-muted-foreground text-xs">Relationship</p>
+                        {getRatingStars(brand.relationship)}
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground text-xs">Category Fit</p>
+                        {getRatingStars(brand.categoryFit)}
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground text-xs">Revenue</p>
+                        {getRatingStars(brand.revenueImpact)}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+              <div className="px-6 py-4 bg-muted/30 flex justify-end">
+                <Button variant="ghost" size="sm" className="gap-1">
+                  View Details <ArrowRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </Card>
+          ))}
+          
+          {/* Add new brand card */}
+          <Card className="flex flex-col items-center justify-center h-full border-dashed cursor-pointer hover:border-primary hover:bg-muted/50 transition-colors duration-300">
+            <CardContent className="pt-6 flex flex-col items-center">
+              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <Plus className="h-6 w-6 text-primary" />
+              </div>
+              <h3 className="font-medium mb-2">Add New Brand Partner</h3>
+              <p className="text-sm text-muted-foreground text-center mb-4">
+                Connect with new brands to expand your product offerings
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </motion.div>
+    </RetailerLayout>
   );
 };
 

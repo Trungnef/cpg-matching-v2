@@ -1,55 +1,129 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "@/components/Navbar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/hooks/use-toast";
+import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Building, Lock, User, Bell, Tag, PlusCircle, X, Settings as SettingsIcon, ArrowLeft, Save, UserCircle, Mail, Phone, MapPin, Shield, CreditCard, AlertCircle, LogOut, Globe } from "lucide-react";
-import Footer from "@/components/Footer";
+import { 
+  Settings as SettingsIcon, 
+  Bell, 
+  Lock, 
+  Shield,
+  Building,
+  Globe,
+  ShieldAlert,
+  Loader2,
+  LifeBuoy,
+  AtSign,
+  Phone,
+  Tag,
+  PlusCircle,
+  X,
+  ShoppingBag,
+  Target,
+  Heart,
+  Languages,
+  Users,
+  Save,
+  UserCog,
+  BookOpen,
+  Megaphone,
+  Handshake
+} from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { motion, AnimatePresence } from "framer-motion";
+import BrandLayout from "@/components/layouts/BrandLayout";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 
-const BrandSettings = () => {
+// Enhanced animation variants
+const fadeIn = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { 
+      duration: 0.5,
+      ease: "easeOut"
+    }
+  },
+  exit: { 
+    opacity: 0,
+    y: -20,
+    transition: { 
+      duration: 0.3,
+      ease: "easeIn" 
+    }
+  }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2
+    }
+  }
+};
+
+const itemAnimation = {
+  hidden: { opacity: 0, y: 15 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: "easeOut" }
+  }
+};
+
+const Settings = () => {
   const { isAuthenticated, user, role } = useUser();
   const navigate = useNavigate();
   const { toast } = useToast();
   
   // Form states
-  const [companyName, setCompanyName] = useState(user?.companyName || "");
-  const [email, setEmail] = useState(user?.email || "");
-  const [userName, setUserName] = useState(user?.name || "");
-  const [phone, setPhone] = useState("+1 (555) 123-4567");
-  const [address, setAddress] = useState("123 Brand Ave");
-  const [city, setCity] = useState("San Francisco");
-  const [state, setState] = useState("CA");
-  const [zipCode, setZipCode] = useState("94103");
-  const [website, setWebsite] = useState("https://example.com");
-  const [description, setDescription] = useState("We are an innovative brand focused on creating sustainable products that meet the needs of eco-conscious consumers.");
+  const [companyName, setCompanyName] = useState(user?.companyName || "Eco Foods");
+  const [email, setEmail] = useState(user?.email || "contact@ecofoods.com");
+  const [phone, setPhone] = useState("+1 (555) 987-6543");
+  const [website, setWebsite] = useState("https://www.ecofoods.com");
+  const [address, setAddress] = useState("456 Brand Avenue");
+  const [city, setCity] = useState("Marketing City");
+  const [state, setState] = useState("NY");
+  const [zipCode, setZipCode] = useState("10001");
+  const [description, setDescription] = useState("Eco Foods is a leading brand of sustainable and healthy food products, committed to quality and environmental responsibility.");
+  
+  // Tags functionality
+  const [tags, setTags] = useState(["Organic", "Eco-friendly", "Health", "Sustainable"]);
+  const [newTag, setNewTag] = useState("");
+  
+  // Activity log
+  const [activityLog, setActivityLog] = useState([
+    { action: "Profile updated", timestamp: "2023-10-15 09:15 AM" },
+    { action: "New product added", timestamp: "2023-09-22 02:30 PM" },
+    { action: "Brand guidelines updated", timestamp: "2023-09-05 11:25 AM" },
+  ]);
   
   // Brand specific fields
-  const [tags, setTags] = useState(["Organic", "Vegan", "Non-GMO", "Sustainable"]);
-  const [newTag, setNewTag] = useState("");
-  const [marketSegments, setMarketSegments] = useState("Health-conscious, Eco-friendly, Premium");
-  const [brandValues, setBrandValues] = useState("Sustainability, Quality, Transparency");
-  const [targetDemographics, setTargetDemographics] = useState("25-45 years, Urban professionals, Health enthusiasts");
+  const [targetMarket, setTargetMarket] = useState("Health-conscious consumers, 25-45 years");
+  const [brandValues, setBrandValues] = useState("Sustainability, Health, Quality, Transparency");
+  const [usp, setUSP] = useState("Sustainable packaging with organic ingredients");
+  
+  // Product categories
+  const [productCategories, setProductCategories] = useState([
+    "Breakfast Foods", "Snacks", "Beverages", "Condiments"
+  ]);
+  const [newCategory, setNewCategory] = useState("");
   
   // Notification settings
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [messageNotifications, setMessageNotifications] = useState(true);
-  const [matchNotifications, setMatchNotifications] = useState(true);
+  const [partnershipNotifications, setPartnershipNotifications] = useState(true);
   const [marketingNotifications, setMarketingNotifications] = useState(false);
   
   // Security settings
@@ -57,20 +131,16 @@ const BrandSettings = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
-  const [activeSessions, setActiveSessions] = useState([
-    {
-      device: "Current Browser",
-      platform: "Windows • Chrome",
-      time: "Today at 10:30 AM",
-      isActive: true
-    },
-    {
-      device: "Mobile Device",
-      platform: "iOS • Safari",
-      time: "Yesterday at 3:15 PM",
-      isActive: false
-    }
-  ]);
+  
+  const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("general");
+  
+  // Language settings
+  const [language, setLanguage] = useState("en");
+  const [theme, setTheme] = useState("light");
+  
+  // Auto-save functionality
+  const [autoSave, setAutoSave] = useState(true);
   
   useEffect(() => {
     document.title = "Settings - CPG Matchmaker";
@@ -82,51 +152,97 @@ const BrandSettings = () => {
       navigate("/dashboard");
     }
   }, [isAuthenticated, navigate, role]);
-  
-  // Mock form submission
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    // Simulate API call
-    setTimeout(() => {
-      toast({
-        title: "Settings updated",
-        description: "Your settings have been successfully updated.",
-      });
-    }, 1000);
-  };
-  
-  // Handle adding a new tag
+
   const handleAddTag = (e) => {
     e.preventDefault();
     if (newTag.trim() && !tags.includes(newTag.trim())) {
       setTags([...tags, newTag.trim()]);
       setNewTag("");
+      
+      // Log activity
+      addToActivityLog("Added new tag: " + newTag.trim());
     }
   };
   
-  // Handle removing a tag
   const handleRemoveTag = (tagToRemove) => {
     setTags(tags.filter(tag => tag !== tagToRemove));
+    
+    // Log activity
+    addToActivityLog("Removed tag: " + tagToRemove);
   };
   
-  const handleSaveProfile = () => {
-    toast({
-      title: "Profile updated",
-      description: "Your profile information has been saved successfully.",
-    });
+  const handleAddCategory = (e) => {
+    e.preventDefault();
+    if (newCategory.trim() && !productCategories.includes(newCategory.trim())) {
+      setProductCategories([...productCategories, newCategory.trim()]);
+      setNewCategory("");
+      
+      // Log activity
+      addToActivityLog("Added new product category: " + newCategory.trim());
+    }
   };
   
+  const handleRemoveCategory = (categoryToRemove) => {
+    setProductCategories(productCategories.filter(category => category !== categoryToRemove));
+    
+    // Log activity
+    addToActivityLog("Removed product category: " + categoryToRemove);
+  };
+  
+  const addToActivityLog = (action) => {
+    const now = new Date();
+    const timestamp = now.toLocaleDateString() + " " + now.toLocaleTimeString();
+    const newActivity = { action, timestamp };
+    setActivityLog([newActivity, ...activityLog]);
+  };
+
+  const handleSaveGeneral = () => {
+    setIsLoading(true);
+    // Simulate API call
+    setTimeout(() => {
+      setIsLoading(false);
+      toast({
+        title: "Settings updated",
+        description: "Your company settings have been saved successfully.",
+      });
+      
+      // Log activity
+      addToActivityLog("Updated general settings");
+    }, 1000);
+  };
+
+  const handleSaveBrand = () => {
+    setIsLoading(true);
+    // Simulate API call
+    setTimeout(() => {
+      setIsLoading(false);
+      toast({
+        title: "Brand details updated",
+        description: "Your brand information has been saved successfully.",
+      });
+      
+      // Log activity
+      addToActivityLog("Updated brand details");
+    }, 1000);
+  };
+
   const handleSaveNotifications = () => {
-    toast({
-      title: "Notification preferences updated",
-      description: "Your notification settings have been saved.",
-    });
+    setIsLoading(true);
+    // Simulate API call
+    setTimeout(() => {
+      setIsLoading(false);
+      toast({
+        title: "Notification preferences updated",
+        description: "Your notification settings have been saved.",
+      });
+    }, 1000);
   };
-  
+
   const handleSaveSecurity = () => {
+    setIsLoading(true);
     // Validate password inputs
     if (newPassword && newPassword !== confirmPassword) {
+      setIsLoading(false);
       toast({
         title: "Passwords don't match",
         description: "Please ensure your passwords match and try again.",
@@ -135,544 +251,850 @@ const BrandSettings = () => {
       return;
     }
     
-    toast({
-      title: "Security settings saved",
-      description: "Your security preferences have been updated successfully."
-    });
+    // Simulate API call
+    setTimeout(() => {
+      setIsLoading(false);
+      toast({
+        title: "Security settings saved",
+        description: "Your security preferences have been updated successfully."
+      });
+    }, 1000);
   };
-  
-  const handleSaveBrand = () => {
-    toast({
-      title: "Brand settings updated",
-      description: "Your brand details have been saved.",
-    });
+
+  const handleSaveBranding = () => {
+    setIsLoading(true);
+    // Simulate API call
+    setTimeout(() => {
+      setIsLoading(false);
+      toast({
+        title: "Brand settings updated",
+        description: "Your brand details have been saved.",
+      });
+    }, 1000);
   };
-  
-  const handleLogoutAllDevices = () => {
-    // In a real app, this would call an API to invalidate all sessions
-    setActiveSessions([
-      {
-        device: "Current Browser",
-        platform: "Windows • Chrome",
-        time: "Just now",
-        isActive: true
-      }
-    ]);
-    
-    toast({
-      title: "Signed out from all devices",
-      description: "You have been signed out from all other devices."
-    });
-  };
-  
+
   if (!isAuthenticated || role !== "brand") {
     return null;
   }
   
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      
-      <div className="container mx-auto px-4 py-24">
-        <div className="max-w-5xl mx-auto">
-          {/* Breadcrumb and header */}
-          <div className="mb-8">
-            <Button 
-              variant="ghost" 
-              className="mb-4 pl-0 text-muted-foreground" 
-              onClick={() => navigate("/dashboard")}
+    <BrandLayout>
+      <div className="max-w-none px-4 sm:px-6 lg:px-8 pb-6">
+        <motion.div 
+          className="space-y-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
             >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Dashboard
-            </Button>
-            
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div>
-                <h1 className="text-3xl font-bold">Settings</h1>
-                <p className="text-muted-foreground">Manage your account and brand preferences</p>
-              </div>
-            </div>
+              <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+              <p className="text-muted-foreground">
+                Manage your account preferences and brand information
+              </p>
+            </motion.div>
+            <motion.div 
+              className="flex items-center gap-2"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <Badge variant="outline" className="text-xs px-2 py-1">
+                <span className="text-primary font-medium">Brand</span>
+              </Badge>
+              {autoSave && (
+                <Badge variant="secondary" className="text-xs px-2 py-1 flex items-center gap-1">
+                  <Save className="h-3 w-3" />
+                  <span>Auto-save on</span>
+                </Badge>
+              )}
+            </motion.div>
           </div>
-          
-          <Tabs defaultValue="profile" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4 mb-6">
-              <TabsTrigger value="profile">Profile</TabsTrigger>
-              <TabsTrigger value="brand">Brand</TabsTrigger>
-              <TabsTrigger value="notifications">Notifications</TabsTrigger>
-              <TabsTrigger value="security">Security</TabsTrigger>
-            </TabsList>
-            
-            {/* Profile Tab */}
-            <TabsContent value="profile">
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle>Profile Information</CardTitle>
-                      <CardDescription>
-                        Update your company profile and contact information
-                      </CardDescription>
-                    </div>
-                    <UserCircle className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div className="space-y-2">
-                      <label htmlFor="userName" className="text-sm font-medium">
-                        Name
-                      </label>
-                      <div className="relative">
-                        <User className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                        <Input 
-                          id="userName" 
-                          value={userName}
-                          onChange={e => setUserName(e.target.value)}
-                          className="pl-9"
-                        />
-                      </div>
-                    </div>
 
-                    <div className="space-y-2">
-                      <label htmlFor="email" className="text-sm font-medium">
-                        Email Address
-                      </label>
-                      <div className="relative">
-                        <Mail className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                        <Input 
-                          id="email" 
-                          type="email"
-                          value={email}
-                          onChange={e => setEmail(e.target.value)}
-                          className="pl-9"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div className="space-y-2">
-                      <label htmlFor="companyName" className="text-sm font-medium">
-                        Company Name
-                      </label>
-                      <div className="relative">
-                        <Building className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                        <Input 
-                          id="companyName" 
-                          value={companyName}
-                          onChange={e => setCompanyName(e.target.value)}
-                          className="pl-9"
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <label htmlFor="phone" className="text-sm font-medium">
-                        Phone Number
-                      </label>
-                      <div className="relative">
-                        <Phone className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                        <Input 
-                          id="phone" 
-                          value={phone}
-                          onChange={e => setPhone(e.target.value)}
-                          className="pl-9"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div className="space-y-2">
-                      <label htmlFor="website" className="text-sm font-medium">
-                        Website
-                      </label>
-                      <div className="relative">
-                        <Globe className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                        <Input 
-                          id="website" 
-                          value={website}
-                          onChange={e => setWebsite(e.target.value)}
-                          className="pl-9"
-                          placeholder="https://example.com"
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <label htmlFor="address" className="text-sm font-medium">
-                        Address
-                      </label>
-                      <div className="relative">
-                        <MapPin className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                        <Input 
-                          id="address" 
-                          value={address}
-                          onChange={e => setAddress(e.target.value)}
-                          className="pl-9"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label htmlFor="description" className="text-sm font-medium">
-                      Company Description
-                    </label>
-                    <Textarea 
-                      id="description" 
-                      value={description}
-                      onChange={e => setDescription(e.target.value)}
-                      className="min-h-[120px]"
-                      placeholder="Tell us about your company..."
-                    />
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button onClick={handleSaveProfile}>
-                    <Save className="mr-2 h-4 w-4" />
-                    Save Changes
-                  </Button>
-                </CardFooter>
-              </Card>
-            </TabsContent>
-            
-            {/* Brand Tab */}
-            <TabsContent value="brand">
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle>Brand Information</CardTitle>
-                      <CardDescription>
-                        Configure your brand identity and product preferences
-                      </CardDescription>
-                    </div>
-                    <Building className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium mb-2">Brand Identity</h3>
-                    
-                    <div className="space-y-2">
-                      <label htmlFor="marketSegments" className="text-sm font-medium">
-                        Market Segments
-                      </label>
-                      <Textarea 
-                        id="marketSegments" 
-                        value={marketSegments}
-                        onChange={e => setMarketSegments(e.target.value)}
-                        className="min-h-[100px]"
-                        placeholder="Enter market segments separated by commas (e.g. Health-conscious, Eco-friendly, Premium)"
-                      />
-                      <p className="text-sm text-muted-foreground">
-                        Enter your target market segments, separated by commas
-                      </p>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <label htmlFor="brandValues" className="text-sm font-medium">
-                        Brand Values
-                      </label>
-                      <Textarea 
-                        id="brandValues" 
-                        value={brandValues}
-                        onChange={e => setBrandValues(e.target.value)}
-                        className="min-h-[100px]"
-                        placeholder="Enter your brand values separated by commas (e.g. Sustainability, Innovation, Quality)"
-                      />
-                      <p className="text-sm text-muted-foreground">
-                        Enter your core brand values, separated by commas
-                      </p>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <label htmlFor="targetDemographics" className="text-sm font-medium">
-                        Target Demographics
-                      </label>
-                      <Textarea 
-                        id="targetDemographics" 
-                        value={targetDemographics}
-                        onChange={e => setTargetDemographics(e.target.value)}
-                        className="min-h-[100px]"
-                        placeholder="Enter your target demographics (e.g. 25-45 years, Urban professionals, Health enthusiasts)"
-                      />
-                      <p className="text-sm text-muted-foreground">
-                        Describe your target audience demographics
-                      </p>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Product Categories</label>
-                      <div className="flex flex-wrap gap-2 mb-2">
-                        {tags.map(tag => (
-                          <Badge key={tag} variant="secondary" className="px-3 py-1">
-                            {tag}
-                            <button 
-                              onClick={() => handleRemoveTag(tag)}
-                              className="ml-2 text-muted-foreground hover:text-foreground"
-                            >
-                              <X className="h-3 w-3" />
-                            </button>
-                          </Badge>
-                        ))}
-                      </div>
-                      <div className="flex gap-2">
-                        <Input 
-                          value={newTag}
-                          onChange={(e) => setNewTag(e.target.value)}
-                          placeholder="Add a product category"
-                        />
-                        <Button 
-                          type="button" 
-                          size="icon" 
-                          onClick={handleAddTag}
-                          variant="outline"
-                        >
-                          <PlusCircle className="h-4 w-4" />
-                        </Button>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Add categories that best describe your products
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button onClick={handleSaveBrand}>
-                    <Save className="mr-2 h-4 w-4" />
-                    Save Brand Details
-                  </Button>
-                </CardFooter>
-              </Card>
-            </TabsContent>
-            
-            {/* Notifications Tab */}
-            <TabsContent value="notifications">
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle>Notification Preferences</CardTitle>
-                      <CardDescription>
-                        Manage how and when you receive notifications
-                      </CardDescription>
-                    </div>
-                    <Bell className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-0.5">
-                          <label htmlFor="email-notifications" className="text-sm font-medium">
-                            Email Notifications
-                          </label>
-                          <p className="text-sm text-muted-foreground">
-                            Receive general email notifications about your account
-                          </p>
-                        </div>
-                        <Switch 
-                          id="email-notifications" 
-                          checked={emailNotifications}
-                          onCheckedChange={setEmailNotifications}
-                        />
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-0.5">
-                          <label htmlFor="message-notifications" className="text-sm font-medium">
-                            Message Notifications
-                          </label>
-                          <p className="text-sm text-muted-foreground">
-                            Get notified when you receive new messages
-                          </p>
-                        </div>
-                        <Switch 
-                          id="message-notifications" 
-                          checked={messageNotifications}
-                          onCheckedChange={setMessageNotifications}
-                        />
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-0.5">
-                          <label htmlFor="match-notifications" className="text-sm font-medium">
-                            Match Notifications
-                          </label>
-                          <p className="text-sm text-muted-foreground">
-                            Get notified when you match with a manufacturer
-                          </p>
-                        </div>
-                        <Switch 
-                          id="match-notifications" 
-                          checked={matchNotifications}
-                          onCheckedChange={setMatchNotifications}
-                        />
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-0.5">
-                          <label htmlFor="marketing-notifications" className="text-sm font-medium">
-                            Marketing & Newsletters
-                          </label>
-                          <p className="text-sm text-muted-foreground">
-                            Receive updates about new features and promotions
-                          </p>
-                        </div>
-                        <Switch 
-                          id="marketing-notifications" 
-                          checked={marketingNotifications}
-                          onCheckedChange={setMarketingNotifications}
-                        />
-                      </div>
-                    </div>
-                    
-                    <Separator />
-                    
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-medium">Notification Schedule</h3>
-                      <div className="space-y-2">
-                        <label htmlFor="digest-frequency" className="text-sm font-medium">
-                          Email Digest Frequency
-                        </label>
-                        <Select defaultValue="daily">
-                          <SelectTrigger id="digest-frequency">
-                            <SelectValue placeholder="Select frequency" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="realtime">Real-time</SelectItem>
-                            <SelectItem value="daily">Daily</SelectItem>
-                            <SelectItem value="weekly">Weekly</SelectItem>
-                            <SelectItem value="never">Never</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <p className="text-sm text-muted-foreground">
-                          How often you want to receive email digests
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button onClick={handleSaveNotifications}>
-                    <Save className="mr-2 h-4 w-4" />
-                    Save Notification Preferences
-                  </Button>
-                </CardFooter>
-              </Card>
-            </TabsContent>
-            
-            {/* Security Tab */}
-            <TabsContent value="security" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle>Security Settings</CardTitle>
-                      <CardDescription>
-                        Manage your account security and password
-                      </CardDescription>
-                    </div>
-                    <Lock className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium">Change Password</h3>
-                    <div className="grid grid-cols-1 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium" htmlFor="current-password">Current Password</label>
-                        <Input 
-                          id="current-password" 
-                          type="password" 
-                          value={currentPassword}
-                          onChange={(e) => setCurrentPassword(e.target.value)}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium" htmlFor="new-password">New Password</label>
-                        <Input 
-                          id="new-password" 
-                          type="password"
-                          value={newPassword}
-                          onChange={(e) => setNewPassword(e.target.value)}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium" htmlFor="confirm-password">Confirm New Password</label>
-                        <Input 
-                          id="confirm-password" 
-                          type="password"
-                          value={confirmPassword}
-                          onChange={(e) => setConfirmPassword(e.target.value)}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <Separator />
-                  
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium">Two-Factor Authentication</h3>
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <label className="text-sm font-medium">Enable Two-Factor Authentication</label>
-                        <p className="text-sm text-muted-foreground">Add an extra layer of security to your account</p>
-                      </div>
-                      <Switch 
-                        checked={twoFactorEnabled}
-                        onCheckedChange={setTwoFactorEnabled}
-                      />
-                    </div>
-                  </div>
-                  
-                  <Separator />
-                  
-                  {/* Active Sessions Section */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium">Active Sessions</h3>
-                    <div className="space-y-3">
-                      {activeSessions.map((session, index) => (
-                        <div key={index} className="p-3 border rounded-md">
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <p className="font-medium">{session.device}</p>
-                              <p className="text-sm text-muted-foreground">{session.platform} • {session.time}</p>
+          <Tabs
+            defaultValue="general"
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="space-y-4"
+          >
+            <motion.div 
+              className="bg-background sticky top-0 z-10 pb-4 pt-1"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-1">
+                <TabsTrigger value="general" className="flex items-center gap-1.5">
+                  <Building className="h-4 w-4" />
+                  <span>General</span>
+                </TabsTrigger>
+                <TabsTrigger value="brand" className="flex items-center gap-1.5">
+                  <ShoppingBag className="h-4 w-4" />
+                  <span>Brand</span>
+                </TabsTrigger>
+                <TabsTrigger value="notification" className="flex items-center gap-1.5">
+                  <Bell className="h-4 w-4" />
+                  <span>Notifications</span>
+                </TabsTrigger>
+                <TabsTrigger value="security" className="flex items-center gap-1.5">
+                  <Shield className="h-4 w-4" />
+                  <span>Security</span>
+                </TabsTrigger>
+                <TabsTrigger value="preferences" className="flex items-center gap-1.5">
+                  <SettingsIcon className="h-4 w-4" />
+                  <span>Preferences</span>
+                </TabsTrigger>
+                <TabsTrigger value="activity" className="flex items-center gap-1.5">
+                  <UserCog className="h-4 w-4" />
+                  <span>Activity</span>
+                </TabsTrigger>
+              </TabsList>
+            </motion.div>
+
+            <AnimatePresence mode="wait">
+              {/* General Settings Tab */}
+              {activeTab === "general" && (
+                <motion.div
+                  key="general"
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  variants={fadeIn}
+                >
+                  <TabsContent value="general" className="space-y-6">
+                    <motion.div variants={staggerContainer} initial="hidden" animate="visible">
+                      <Card>
+                        <CardHeader>
+                          <motion.div variants={itemAnimation}>
+                            <CardTitle>Company Information</CardTitle>
+                            <CardDescription>
+                              Update your company details and contact information
+                            </CardDescription>
+                          </motion.div>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                          <motion.div variants={itemAnimation} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                              <Label htmlFor="companyName">Company Name</Label>
+                              <div className="relative">
+                                <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                                <Input
+                                  id="companyName"
+                                  value={companyName}
+                                  onChange={(e) => setCompanyName(e.target.value)}
+                                  className="pl-10"
+                                />
+                              </div>
                             </div>
-                            {session.isActive && <Badge>Active Now</Badge>}
+                            
+                            <div className="space-y-2">
+                              <Label htmlFor="email">Email Address</Label>
+                              <div className="relative">
+                                <AtSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                                <Input
+                                  id="email"
+                                  type="email"
+                                  value={email}
+                                  onChange={(e) => setEmail(e.target.value)}
+                                  className="pl-10"
+                                />
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-2">
+                              <Label htmlFor="phone">Phone Number</Label>
+                              <div className="relative">
+                                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                                <Input
+                                  id="phone"
+                                  value={phone}
+                                  onChange={(e) => setPhone(e.target.value)}
+                                  className="pl-10"
+                                />
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-2">
+                              <Label htmlFor="website">Website</Label>
+                              <div className="relative">
+                                <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                                <Input
+                                  id="website"
+                                  value={website}
+                                  onChange={(e) => setWebsite(e.target.value)}
+                                  className="pl-10"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="space-y-2 md:col-span-2">
+                              <Label htmlFor="address">Address</Label>
+                              <Input
+                                id="address"
+                                value={address}
+                                onChange={(e) => setAddress(e.target.value)}
+                              />
+                            </div>
+                            
+                            <div className="space-y-2">
+                              <Label htmlFor="city">City</Label>
+                              <Input
+                                id="city"
+                                value={city}
+                                onChange={(e) => setCity(e.target.value)}
+                              />
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-2">
+                                <Label htmlFor="state">State</Label>
+                                <Input
+                                  id="state"
+                                  value={state}
+                                  onChange={(e) => setState(e.target.value)}
+                                />
+                              </div>
+                              
+                              <div className="space-y-2">
+                                <Label htmlFor="zipCode">Zip Code</Label>
+                                <Input
+                                  id="zipCode"
+                                  value={zipCode}
+                                  onChange={(e) => setZipCode(e.target.value)}
+                                />
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-2 md:col-span-2">
+                              <Label htmlFor="description">Company Description</Label>
+                              <Textarea
+                                id="description"
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                rows={4}
+                              />
+                            </div>
+                          </motion.div>
+                          
+                          <motion.div variants={itemAnimation} className="space-y-4">
+                            <Label>Company Tags</Label>
+                            <div className="flex flex-wrap gap-2 mb-4">
+                              {tags.map((tag, index) => (
+                                <motion.div
+                                  key={index}
+                                  initial={{ opacity: 0, scale: 0.8 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  transition={{ duration: 0.3 }}
+                                >
+                                  <Badge 
+                                    variant="secondary" 
+                                    className="px-3 py-1 gap-1 cursor-pointer hover:bg-secondary/80 transition-colors"
+                                    onClick={() => handleRemoveTag(tag)}
+                                  >
+                                    {tag}
+                                    <span className="ml-1 text-xs">×</span>
+                                  </Badge>
+                                </motion.div>
+                              ))}
+                            </div>
+                            
+                            <form onSubmit={handleAddTag} className="flex gap-2">
+                              <Input 
+                                placeholder="Add a tag..." 
+                                value={newTag}
+                                onChange={(e) => setNewTag(e.target.value)}
+                                className="max-w-xs"
+                              />
+                              <Button type="submit" size="sm">Add</Button>
+                            </form>
+                          </motion.div>
+                          
+                          <motion.div variants={itemAnimation} className="flex justify-end">
+                            <Button 
+                              onClick={handleSaveGeneral} 
+                              disabled={isLoading}
+                              className="group"
+                            >
+                              {isLoading ? (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              ) : (
+                                <Save className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
+                              )}
+                              Save Changes
+                            </Button>
+                          </motion.div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  </TabsContent>
+                </motion.div>
+              )}
+
+              {/* Brand Tab */}
+              {activeTab === "brand" && (
+                <motion.div
+                  key="brand"
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  variants={fadeIn}
+                >
+                  <TabsContent value="brand" className="space-y-6">
+                    <motion.div variants={staggerContainer} initial="hidden" animate="visible">
+                      <Card>
+                        <CardHeader>
+                          <motion.div variants={itemAnimation}>
+                            <CardTitle>Brand Information</CardTitle>
+                            <CardDescription>
+                              Manage your brand details and product categories
+                            </CardDescription>
+                          </motion.div>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                          <motion.div variants={itemAnimation} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                              <Label htmlFor="targetMarket">Target Market</Label>
+                              <div className="relative">
+                                <Target className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                                <Textarea
+                                  id="targetMarket"
+                                  value={targetMarket}
+                                  onChange={(e) => setTargetMarket(e.target.value)}
+                                  className="pl-10 min-h-[80px]"
+                                />
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-2">
+                              <Label htmlFor="brandValues">Brand Values</Label>
+                              <div className="relative">
+                                <Heart className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                                <Textarea
+                                  id="brandValues"
+                                  value={brandValues}
+                                  onChange={(e) => setBrandValues(e.target.value)}
+                                  className="pl-10 min-h-[80px]"
+                                />
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-2 md:col-span-2">
+                              <Label htmlFor="usp">Unique Selling Proposition</Label>
+                              <div className="relative">
+                                <Tag className="absolute left-3 top-3 text-muted-foreground h-4 w-4" />
+                                <Textarea
+                                  id="usp"
+                                  value={usp}
+                                  onChange={(e) => setUSP(e.target.value)}
+                                  className="pl-10"
+                                  placeholder="What makes your brand unique?"
+                                  rows={3}
+                                />
+                              </div>
+                            </div>
+                          </motion.div>
+                          
+                          <motion.div variants={itemAnimation} className="space-y-4">
+                            <Label>Product Categories</Label>
+                            <div className="flex flex-wrap gap-2 mb-4">
+                              {productCategories.map((category, index) => (
+                                <motion.div
+                                  key={index}
+                                  initial={{ opacity: 0, scale: 0.8 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  transition={{ duration: 0.3 }}
+                                >
+                                  <Badge 
+                                    variant="secondary" 
+                                    className="px-3 py-1 gap-1 cursor-pointer hover:bg-secondary/80 transition-colors"
+                                    onClick={() => handleRemoveCategory(category)}
+                                  >
+                                    {category}
+                                    <span className="ml-1 text-xs">×</span>
+                                  </Badge>
+                                </motion.div>
+                              ))}
+                            </div>
+                            
+                            <form onSubmit={handleAddCategory} className="flex gap-2">
+                              <Input 
+                                placeholder="Add a product category..." 
+                                value={newCategory}
+                                onChange={(e) => setNewCategory(e.target.value)}
+                                className="max-w-xs"
+                              />
+                              <Button type="submit" size="sm">Add</Button>
+                            </form>
+                          </motion.div>
+                          
+                          <motion.div variants={itemAnimation} className="border rounded-md p-4 bg-muted/30">
+                            <h3 className="font-medium mb-2 flex items-center gap-2">
+                              <ShoppingBag className="h-4 w-4" />
+                              Brand Highlights
+                            </h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                              <div className="flex items-center space-x-2">
+                                <Switch id="highlight-sustainable" defaultChecked />
+                                <Label htmlFor="highlight-sustainable">Sustainable</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Switch id="highlight-organic" defaultChecked />
+                                <Label htmlFor="highlight-organic">Organic</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Switch id="highlight-vegan" />
+                                <Label htmlFor="highlight-vegan">Vegan</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Switch id="highlight-glutenfree" />
+                                <Label htmlFor="highlight-glutenfree">Gluten-Free</Label>
+                              </div>
+                            </div>
+                          </motion.div>
+                          
+                          <motion.div variants={itemAnimation} className="flex justify-end">
+                            <Button 
+                              onClick={handleSaveBranding} 
+                              disabled={isLoading}
+                              className="group"
+                            >
+                              {isLoading ? (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              ) : (
+                                <Save className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
+                              )}
+                              Save Brand Details
+                            </Button>
+                          </motion.div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  </TabsContent>
+                </motion.div>
+              )}
+
+              {/* Notification Tab */}
+              {activeTab === "notification" && (
+                <motion.div
+                  key="notification"
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  variants={fadeIn}
+                >
+                  <TabsContent value="notification" className="space-y-6">
+                    <motion.div variants={staggerContainer} initial="hidden" animate="visible">
+                      <Card>
+                        <CardHeader>
+                          <motion.div variants={itemAnimation}>
+                            <CardTitle>Notification Preferences</CardTitle>
+                            <CardDescription>
+                              Choose how you want to receive notifications and updates
+                            </CardDescription>
+                          </motion.div>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                          <motion.div variants={itemAnimation} className="space-y-4">
+                            <div className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50 transition-colors">
+                              <div className="space-y-0.5">
+                                <Label htmlFor="emailNotifications" className="flex items-center gap-2">
+                                  <AtSign className="h-4 w-4 text-primary" />
+                                  Email Notifications
+                                </Label>
+                                <p className="text-sm text-muted-foreground">
+                                  Receive important updates via email
+                                </p>
+                              </div>
+                              <Switch
+                                id="emailNotifications"
+                                checked={emailNotifications}
+                                onCheckedChange={setEmailNotifications}
+                              />
+                            </div>
+                            
+                            <Separator />
+                            
+                            <div className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50 transition-colors">
+                              <div className="space-y-0.5">
+                                <Label htmlFor="messageNotifications" className="flex items-center gap-2">
+                                  <Bell className="h-4 w-4 text-primary" />
+                                  Message Notifications
+                                </Label>
+                                <p className="text-sm text-muted-foreground">
+                                  Get notified when you receive new messages
+                                </p>
+                              </div>
+                              <Switch
+                                id="messageNotifications"
+                                checked={messageNotifications}
+                                onCheckedChange={setMessageNotifications}
+                              />
+                            </div>
+                            
+                            <Separator />
+                            
+                            <div className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50 transition-colors">
+                              <div className="space-y-0.5">
+                                <Label htmlFor="partnershipNotifications" className="flex items-center gap-2">
+                                  <Handshake className="h-4 w-4 text-primary" />
+                                  Partnership Notifications
+                                </Label>
+                                <p className="text-sm text-muted-foreground">
+                                  Get notified about new partnership opportunities
+                                </p>
+                              </div>
+                              <Switch
+                                id="partnershipNotifications"
+                                checked={partnershipNotifications}
+                                onCheckedChange={setPartnershipNotifications}
+                              />
+                            </div>
+                            
+                            <Separator />
+                            
+                            <div className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50 transition-colors">
+                              <div className="space-y-0.5">
+                                <Label htmlFor="marketingNotifications" className="flex items-center gap-2">
+                                  <Megaphone className="h-4 w-4 text-primary" />
+                                  Marketing Emails
+                                </Label>
+                                <p className="text-sm text-muted-foreground">
+                                  Receive tips, product updates and offers
+                                </p>
+                              </div>
+                              <Switch
+                                id="marketingNotifications"
+                                checked={marketingNotifications}
+                                onCheckedChange={setMarketingNotifications}
+                              />
+                            </div>
+                          </motion.div>
+                          
+                          <motion.div variants={itemAnimation} className="flex justify-end">
+                            <Button 
+                              onClick={handleSaveNotifications} 
+                              disabled={isLoading}
+                              className="group"
+                            >
+                              {isLoading ? (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              ) : (
+                                <Save className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
+                              )}
+                              Save Notification Settings
+                            </Button>
+                          </motion.div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  </TabsContent>
+                </motion.div>
+              )}
+
+              {/* Security Tab */}
+              {activeTab === "security" && (
+                <motion.div
+                  key="security"
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  variants={fadeIn}
+                >
+                  <TabsContent value="security" className="space-y-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Password & Security</CardTitle>
+                        <CardDescription>
+                          Manage your password and security preferences
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                            <Label htmlFor="currentPassword">Current Password</Label>
+                            <div className="relative">
+                              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                              <Input
+                                id="currentPassword"
+                                type="password"
+                                value={currentPassword}
+                                onChange={(e) => setCurrentPassword(e.target.value)}
+                                className="pl-10"
+                              />
+                            </div>
+                          </div>
+                          
+                          <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                              <Label htmlFor="newPassword">New Password</Label>
+                              <div className="relative">
+                                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                                <Input
+                                  id="newPassword"
+                                  type="password"
+                                  value={newPassword}
+                                  onChange={(e) => setNewPassword(e.target.value)}
+                                  className="pl-10"
+                                />
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-2">
+                              <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                              <div className="relative">
+                                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                                <Input
+                                  id="confirmPassword"
+                                  type="password"
+                                  value={confirmPassword}
+                                  onChange={(e) => setConfirmPassword(e.target.value)}
+                                  className="pl-10"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="md:col-span-2">
+                            <Separator className="my-6" />
+                          </div>
+                          
+                          <div className="md:col-span-2">
+                            <div className="flex items-center justify-between">
+                              <div className="space-y-0.5">
+                                <Label htmlFor="twoFactorEnabled">Two-Factor Authentication</Label>
+                                <p className="text-sm text-muted-foreground">
+                                  Add an extra layer of security to your account
+                                </p>
+                              </div>
+                              <Switch
+                                id="twoFactorEnabled"
+                                checked={twoFactorEnabled}
+                                onCheckedChange={setTwoFactorEnabled}
+                              />
+                            </div>
                           </div>
                         </div>
-                      ))}
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={handleLogoutAllDevices}
-                        className="flex items-center gap-2"
-                      >
-                        <LogOut className="h-4 w-4" />
-                        Sign Out All Other Devices
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button onClick={handleSaveSecurity}>
-                    <Save className="mr-2 h-4 w-4" />
-                    Save Security Settings
-                  </Button>
-                </CardFooter>
-              </Card>
-            </TabsContent>
+                        
+                        <div className="flex justify-end">
+                          <Button onClick={handleSaveSecurity} disabled={isLoading}>
+                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Update Security Settings
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                </motion.div>
+              )}
+
+              {/* Preferences Tab */}
+              {activeTab === "preferences" && (
+                <motion.div
+                  key="preferences"
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  variants={fadeIn}
+                >
+                  <TabsContent value="preferences" className="space-y-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Application Preferences</CardTitle>
+                        <CardDescription>
+                          Customize your application experience
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-6">
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                              <Label htmlFor="language">Language</Label>
+                              <Select value={language} onValueChange={setLanguage}>
+                                <SelectTrigger id="language" className="w-full">
+                                  <div className="flex items-center gap-2">
+                                    <Languages className="h-4 w-4 text-muted-foreground" />
+                                    <SelectValue placeholder="Select language" />
+                                  </div>
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="en">English</SelectItem>
+                                  <SelectItem value="vi">Tiếng Việt</SelectItem>
+                                  <SelectItem value="fr">Français</SelectItem>
+                                  <SelectItem value="es">Español</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            
+                            <div className="space-y-2">
+                              <Label htmlFor="theme">Theme</Label>
+                              <Select value={theme} onValueChange={setTheme}>
+                                <SelectTrigger id="theme" className="w-full">
+                                  <SelectValue placeholder="Select theme" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="light">Light</SelectItem>
+                                  <SelectItem value="dark">Dark</SelectItem>
+                                  <SelectItem value="system">System</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                          
+                          <Separator />
+                          
+                          <div className="flex items-center justify-between">
+                            <div className="space-y-0.5">
+                              <Label htmlFor="compact-sidebar">Compact Sidebar</Label>
+                              <p className="text-sm text-muted-foreground">
+                                Use a more compact sidebar layout
+                              </p>
+                            </div>
+                            <Switch
+                              id="compact-sidebar"
+                              defaultChecked={true}
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="flex justify-end">
+                          <Button disabled={isLoading}>
+                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Save Preferences
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Help & Support</CardTitle>
+                        <CardDescription>
+                          Get help with using the platform
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="flex items-center gap-4">
+                          <LifeBuoy className="h-8 w-8 text-primary" />
+                          <div>
+                            <h3 className="text-lg font-medium">Need assistance?</h3>
+                            <p className="text-sm text-muted-foreground">
+                              Our support team is here to help you with any questions you may have.
+                            </p>
+                            <Button variant="outline" className="mt-2">
+                              Contact Support
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                </motion.div>
+              )}
+
+              {/* Add Activity Tab Content */}
+              {activeTab === "activity" && (
+                <motion.div
+                  key="activity"
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  variants={fadeIn}
+                >
+                  <TabsContent value="activity" className="space-y-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Account Activity</CardTitle>
+                        <CardDescription>
+                          Recent changes and activity on your account
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          {activityLog.map((activity, index) => (
+                            <motion.div 
+                              key={index}
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.3, delay: index * 0.1 }}
+                              className="flex justify-between items-center border-b pb-2 last:border-0"
+                            >
+                              <div className="flex items-center gap-3">
+                                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                                  <UserCog className="h-4 w-4 text-primary" />
+                                </div>
+                                <div>
+                                  <p className="font-medium">{activity.action}</p>
+                                  <p className="text-sm text-muted-foreground">
+                                    {activity.timestamp}
+                                  </p>
+                                </div>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Documentation & Guides</CardTitle>
+                        <CardDescription>
+                          Resources to help you use the platform effectively
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <motion.div 
+                            className="border rounded-lg p-4 hover:bg-muted/50 transition-colors cursor-pointer"
+                            whileHover={{ scale: 1.02 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                <BookOpen className="h-5 w-5 text-primary" />
+                              </div>
+                              <div>
+                                <h3 className="font-medium">Brand Settings Guide</h3>
+                                <p className="text-sm text-muted-foreground">
+                                  Learn how to configure your brand settings effectively
+                                </p>
+                              </div>
+                            </div>
+                          </motion.div>
+                          
+                          <motion.div 
+                            className="border rounded-lg p-4 hover:bg-muted/50 transition-colors cursor-pointer"
+                            whileHover={{ scale: 1.02 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                <ShieldAlert className="h-5 w-5 text-primary" />
+                              </div>
+                              <div>
+                                <h3 className="font-medium">Security Best Practices</h3>
+                                <p className="text-sm text-muted-foreground">
+                                  Tips to keep your account secure
+                                </p>
+                              </div>
+                            </div>
+                          </motion.div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </Tabs>
-        </div>
+        </motion.div>
       </div>
-      
-      <Footer />
-    </div>
+    </BrandLayout>
   );
 };
 
-export default BrandSettings;
+export default Settings;
