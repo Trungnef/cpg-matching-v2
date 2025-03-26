@@ -1290,6 +1290,328 @@ export const Production = () => {
           </div>
         </motion.div>
       </MotionConfig>
+
+      {/* Product Edit Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[850px] p-0 max-h-[90vh] overflow-hidden">
+          <DialogHeader className="px-6 pt-6 pb-2">
+            <DialogTitle className="text-xl flex items-center gap-2">
+              {selectedProduct ? <Pencil className="h-5 w-5 text-primary" /> : <PlusCircle className="h-5 w-5 text-primary" />}
+              <span>{selectedProduct ? "Edit Product" : "Create New Product"}</span>
+            </DialogTitle>
+            <DialogDescription className="text-base">
+              {selectedProduct 
+                ? "Edit the details of your existing product." 
+                : "Add a new product to your catalog."}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="px-6 pb-6 overflow-y-auto max-h-[calc(90vh-130px)]">
+            <ProductForm 
+              product={selectedProduct} 
+              onSubmit={selectedProduct ? handleUpdateProduct : handleCreateProduct} 
+              isLoading={isLoading} 
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Product Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="text-xl flex items-center gap-2 text-destructive">
+              <AlertTriangle className="h-5 w-5" />
+              <span>Delete Product</span>
+            </DialogTitle>
+            <DialogDescription className="text-base">
+              Are you sure you want to delete this product? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedProduct && (
+            <>
+              <div className="flex items-center gap-4 py-6 bg-destructive/5 px-4 rounded-lg border border-destructive/20">
+                <div className="h-16 w-16 rounded-md bg-destructive/10 flex items-center justify-center flex-shrink-0">
+                  <Package className="h-8 w-8 text-destructive" />
+                </div>
+                <div>
+                  <h4 className="font-medium text-lg">{selectedProduct.name}</h4>
+                  <p className="text-sm text-muted-foreground">
+                    SKU: {selectedProduct.sku} | Category: {selectedProduct.category}
+                  </p>
+                </div>
+              </div>
+              
+              <DialogFooter className="gap-2 mt-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setIsDeleteDialogOpen(false)}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  variant="destructive" 
+                  onClick={() => handleDeleteProduct(selectedProduct.id)}
+                  disabled={isLoading}
+                  className="flex-1"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Deleting...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete Product
+                    </>
+                  )}
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* View Product Details Dialog */}
+      <Dialog open={isViewDetailsOpen} onOpenChange={setIsViewDetailsOpen}>
+        <DialogContent className="sm:max-w-[900px] p-0 max-h-[90vh] overflow-hidden">
+          <DialogHeader className="sticky top-0 z-10 bg-background px-6 pt-6 pb-2 border-b">
+            <DialogTitle className="text-xl flex items-center gap-2">
+              <Package className="h-5 w-5 text-primary" />
+              <span>Product Details</span>
+            </DialogTitle>
+            <DialogDescription className="text-base">
+              Detailed information about this product.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="p-6 overflow-y-auto max-h-[calc(90vh-130px)]">
+            {selectedProductDetails && (
+              <ProductDetailsContent 
+                product={selectedProductDetails} 
+                getStatusBadge={getStatusBadge}
+                onEdit={() => {
+                  setIsViewDetailsOpen(false);
+                  setTimeout(() => openEditDialog(selectedProductDetails), 100);
+                }}
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Production Line Details Dialog */}
+      <Dialog open={isLineDetailsOpen} onOpenChange={setIsLineDetailsOpen}>
+        <DialogContent className="sm:max-w-[900px] p-0 max-h-[90vh] overflow-hidden">
+          <DialogHeader className="sticky top-0 z-10 bg-background px-6 pt-6 pb-2 border-b">
+            <DialogTitle className="text-xl flex items-center gap-2">
+              <Factory className="h-5 w-5 text-primary" />
+              <span>Production Line Details</span>
+            </DialogTitle>
+            <DialogDescription className="text-base">
+              View and manage details for this production line.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="p-6 overflow-y-auto max-h-[calc(90vh-130px)]">
+            {selectedProductionLine && (
+              <LineDetailsContent 
+                line={selectedProductionLine}
+                products={products}
+                handleToggleLineStatus={handleToggleLineStatus}
+                handleScheduleMaintenance={() => {
+                  setIsLineDetailsOpen(false);
+                  setTimeout(() => handleScheduleMaintenance(selectedProductionLine), 100);
+                }}
+                handleAssignProduct={() => {
+                  setIsLineDetailsOpen(false);
+                  setTimeout(() => handleAssignProduct(selectedProductionLine), 100);
+                }}
+                activeBatches={activeBatches}
+                efficiencyHistory={efficiencyHistory}
+                lineUtilization={lineUtilization}
+                isRealTimeMonitoring={isRealTimeMonitoring}
+                handleStartNewBatch={handleStartNewBatch}
+                handleCompleteBatch={handleCompleteBatch}
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Production Line Dialog */}
+      <Dialog open={isAddLineOpen} onOpenChange={setIsAddLineOpen}>
+        <DialogContent className="sm:max-w-[800px] p-0 max-h-[90vh] overflow-hidden">
+          <DialogHeader className="px-6 pt-6 pb-2">
+            <DialogTitle className="text-xl flex items-center gap-2">
+              <PlusCircle className="h-5 w-5 text-primary" />
+              <span>Add Production Line</span>
+            </DialogTitle>
+            <DialogDescription className="text-base">
+              Create a new production line in your facility.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="px-6 pb-6 overflow-y-auto max-h-[calc(90vh-130px)]">
+            <AddProductionLineForm
+              onSubmit={(newLine) => {
+                setIsLoading(true);
+                
+                // Simulate API call
+                setTimeout(() => {
+                  const line: ProductionLine = {
+                    ...newLine,
+                    id: Math.max(...productionLines.map(l => l.id), 0) + 1,
+                    maintenance_history: [],
+                    downtime_incidents: [],
+                    quality_metrics: {
+                      defect_rate: 0.5,
+                      quality_score: 95,
+                      last_inspection: new Date().toISOString().split('T')[0]
+                    },
+                    alerts: []
+                  };
+                  
+                  setProductionLines([...productionLines, line]);
+                  setIsLoading(false);
+                  setIsAddLineOpen(false);
+                  
+                  toast({
+                    title: "Production line added",
+                    description: `${line.name} has been added successfully.`,
+                    variant: "default",
+                  });
+                }, 600);
+              }}
+              isLoading={isLoading}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Schedule Maintenance Dialog */}
+      <Dialog open={isScheduleMaintenanceOpen} onOpenChange={setIsScheduleMaintenanceOpen}>
+        <DialogContent className="sm:max-w-[650px] p-0">
+          <DialogHeader className="px-6 pt-6 pb-2">
+            <DialogTitle className="text-xl flex items-center gap-2">
+              <Wrench className="h-5 w-5 text-primary" />
+              <span>Schedule Maintenance</span>
+            </DialogTitle>
+            <DialogDescription className="text-base">
+              {selectedProductionLine ? `Schedule maintenance for ${selectedProductionLine.name}` : "Schedule maintenance for production line"}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="px-6 pb-6">
+            {selectedProductionLine && (
+              <ScheduleMaintenanceForm
+                productionLine={selectedProductionLine}
+                onSubmit={(maintenanceData) => {
+                  setIsLoading(true);
+                  
+                  // Simulate API call
+                  setTimeout(() => {
+                    const updatedLines = productionLines.map(line => {
+                      if (line.id === selectedProductionLine.id) {
+                        // Create new maintenance record
+                        const newRecord: MaintenanceRecord = {
+                          id: Math.max(...(line.maintenance_history.map(m => m.id) || [0]), 0) + 1,
+                          date: maintenanceData.date,
+                          type: maintenanceData.type,
+                          technician: maintenanceData.technician,
+                          duration: maintenanceData.duration,
+                          notes: maintenanceData.notes
+                        };
+                        
+                        // Update line status if maintenance starts now
+                        const status = maintenanceData.startNow ? "Maintenance" : line.status;
+                        
+                        return {
+                          ...line,
+                          status: status as "Active" | "Maintenance" | "Idle" | "Setup" | "Offline",
+                          maintenance_history: [newRecord, ...line.maintenance_history],
+                          next_maintenance: maintenanceData.date,
+                          // If maintenance starts now, set efficiency to 0
+                          efficiency: status === "Maintenance" ? 0 : line.efficiency
+                        };
+                      }
+                      return line;
+                    });
+                    
+                    setProductionLines(updatedLines);
+                    setIsLoading(false);
+                    setIsScheduleMaintenanceOpen(false);
+                    
+                    toast({
+                      title: "Maintenance scheduled",
+                      description: `Maintenance for ${selectedProductionLine.name} has been scheduled for ${maintenanceData.date}.`,
+                      variant: "default",
+                    });
+                  }, 600);
+                }}
+                isLoading={isLoading}
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Assign Product Dialog */}
+      <Dialog open={isAssignProductOpen} onOpenChange={setIsAssignProductOpen}>
+        <DialogContent className="sm:max-w-[650px] p-0">
+          <DialogHeader className="px-6 pt-6 pb-2">
+            <DialogTitle className="text-xl flex items-center gap-2">
+              <Package className="h-5 w-5 text-primary" />
+              <span>Assign Product</span>
+            </DialogTitle>
+            <DialogDescription className="text-base">
+              {selectedProductionLine ? `Assign a product to ${selectedProductionLine.name}` : "Assign a product to production line"}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="px-6 pb-6">
+            {selectedProductionLine && (
+              <AssignProductForm
+                productionLine={selectedProductionLine}
+                products={products}
+                onSubmit={(productId) => {
+                  setIsLoading(true);
+                  
+                  // Find the selected product
+                  const selectedProduct = products.find(p => p.id === productId);
+                  
+                  // Simulate API call
+                  setTimeout(() => {
+                    const updatedLines = productionLines.map(line => {
+                      if (line.id === selectedProductionLine.id) {
+                        return {
+                          ...line,
+                          product: selectedProduct ? selectedProduct.name : "N/A"
+                        };
+                      }
+                      return line;
+                    });
+                    
+                    setProductionLines(updatedLines);
+                    setIsLoading(false);
+                    setIsAssignProductOpen(false);
+                    
+                    toast({
+                      title: "Product assigned",
+                      description: `${selectedProduct?.name || "Product"} has been assigned to ${selectedProductionLine.name}.`,
+                      variant: "default",
+                    });
+                  }, 600);
+                }}
+                isLoading={isLoading}
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </ManufacturerLayout>
   );
 };
@@ -2893,28 +3215,35 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, isLoading 
               </motion.div>
             )}
             
-            {/* Submit Button for Edit Mode */}
-            {product && (
-              <div className="pt-4">
-                <Button 
-                  type="submit" 
-                  className="w-full submit-button-hover"
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Saving Changes...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="h-4 w-4 mr-2" />
-                      Save Changes
-                    </>
-                  )}
-                </Button>
-              </div>
-            )}
+            {/* Submit Button */}
+            <div className="pt-4">
+              <Button 
+                type="submit" 
+                className="w-full submit-button-hover"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    {product ? "Saving Changes..." : "Creating Product..."}
+                  </>
+                ) : (
+                  <>
+                    {product ? (
+                      <>
+                        <Save className="h-4 w-4 mr-2" />
+                        Save Changes
+                      </>
+                    ) : (
+                      <>
+                        <PlusCircle className="h-4 w-4 mr-2" />
+                        Create Product
+                      </>
+                    )}
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         </div>
       </form>
