@@ -51,7 +51,7 @@ import {
 } from "@/components/ui/tooltip";
 import { toast } from "@/components/ui/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useFavorites } from "@/contexts/FavoriteContext";
+import { useProductFavorites } from "@/contexts/ProductFavoriteContext";
 import { cn } from "@/lib/utils";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
@@ -248,7 +248,7 @@ const Products = () => {
     favorites: favoritedProducts,
     isFavorite,
     toggleFavorite
-  } = useFavorites();
+  } = useProductFavorites();
 
   // Page title effect
   useEffect(() => {
@@ -1063,7 +1063,7 @@ const Products = () => {
                       <span>Categories</span>
                       <ChevronUp className="h-4 w-4 text-muted-foreground" />
                     </h4>
-                    <div className="space-y-1 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
+                    <div className="space-y-1 max-h-48 overflow-y-auto pr-1 custom-scrollbar no-scrollbar">
                       {categories.map(category => (
                         <motion.div key={category} whileTap={{ scale: 0.98 }}>
                           <Button

@@ -41,7 +41,14 @@ interface UserData {
   lastLogin: string;
   notifications: number;
   avatar?: string; // URL to avatar image
+  image?: string; // Alternative URL to user image
+  profilePic?: string; // URL to profile picture
   status: "online" | "away" | "busy"; // User's online status
+  // Additional profile information
+  phone?: string;
+  website?: string;
+  address?: string;
+  description?: string;
   // Role-specific settings based on user role
   manufacturerSettings?: ManufacturerSettings;
   brandSettings?: BrandSettings;
@@ -53,7 +60,7 @@ interface UserContextType {
   role: UserRole;
   isAuthenticated: boolean;
   user: UserData | null;
-  login: (email: string, password: string, role: UserRole) => Promise<void>;
+  login: (email: string, password: string, role?: UserRole) => Promise<void>;
   register: (userData: Omit<UserData, "id" | "profileComplete" | "createdAt" | "lastLogin" | "notifications"> & { password: string }) => Promise<void>;
   logout: () => void;
   switchRole: (newRole: UserRole) => void;
@@ -61,6 +68,9 @@ interface UserContextType {
   updateRoleSettings: <T extends ManufacturerSettings | BrandSettings | RetailerSettings>(settings: Partial<T>) => void;
   updateUserStatus: (status: "online" | "away" | "busy") => void;
   updateUserAvatar: (avatarUrl: string) => void;
+  verifyEmail: (email: string, verificationCode: string) => Promise<void>;
+  resendVerificationEmail: (email: string) => Promise<void>;
+  updateProfile: (profileData: any) => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -83,18 +93,18 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const login = async (email: string, password: string, selectedRole: UserRole): Promise<void> => {
+  const login = async (email: string, password: string, selectedRole?: UserRole): Promise<void> => {
     try {
-      // Kết nối API thực tế
+      // Use the real API connection
       const response = await userService.login(email, password);
       
-      // Lấy thông tin user và token từ response
+      // Get user info and token from response
       const { token, ...userData } = response;
       
-      // Tạo đối tượng user với các thông tin cần thiết
+      // Create user object with necessary information
       const user: UserData = {
         ...userData,
-        role: userData.role || selectedRole,
+        role: userData.role || selectedRole || "manufacturer",
         profileComplete: !!userData.companyName,
         createdAt: userData.createdAt || new Date().toISOString(),
         lastLogin: new Date().toISOString(),
@@ -104,13 +114,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         token
       };
       
-      // Lưu token vào localStorage
+      // Save token to localStorage
       localStorage.setItem("token", token);
       
-      // Lưu thông tin user vào localStorage
+      // Save user info to localStorage
       localStorage.setItem("user", JSON.stringify(user));
       
-      // Cập nhật state
+      // Update state
       setUser(user);
       setRole(user.role);
       setIsAuthenticated(true);
@@ -122,13 +132,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
   const register = async (userData: Omit<UserData, "id" | "profileComplete" | "createdAt" | "lastLogin" | "notifications"> & { password: string }): Promise<void> => {
     try {
-      // Kết nối API thực tế
+      // Connect to real API
       const response = await userService.register(userData);
       
-      // Lấy thông tin user và token từ response
+      // Get user info and token from response
       const { token, ...registeredUserData } = response;
       
-      // Tạo đối tượng user với các thông tin cần thiết
+      // Create user object with necessary information
       const user: UserData = {
         ...registeredUserData,
         profileComplete: false,
@@ -140,13 +150,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         token
       };
       
-      // Lưu token vào localStorage
+      // Save token to localStorage
       localStorage.setItem("token", token);
       
-      // Lưu thông tin user vào localStorage
+      // Save user info to localStorage
       localStorage.setItem("user", JSON.stringify(user));
       
-      // Cập nhật state
+      // Update state
       setUser(user);
       setRole(user.role);
       setIsAuthenticated(true);
@@ -157,7 +167,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = (): void => {
-    // Xóa thông tin từ localStorage
+    // Remove info from localStorage
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     
@@ -272,6 +282,78 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const verifyEmail = async (email: string, verificationCode: string): Promise<void> => {
+    // In a real app, this would make an API call to verify the email
+    // For now, we'll simulate successful verification
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Verify hard-coded verification code for demo purposes
+    if (verificationCode !== "123456") {
+      throw new Error("Invalid verification code");
+    }
+    
+    // If we got here, verification was successful
+    // In a real app, we would update the user's email verification status in the backend
+    
+    if (user) {
+      // Update user to mark email as verified
+      const updatedUser = {
+        ...user,
+        emailVerified: true,
+      };
+      
+      // Save to localStorage
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      
+      // Update state
+      setUser(updatedUser);
+    }
+  };
+
+  const resendVerificationEmail = async (email: string): Promise<void> => {
+    // In a real app, this would make an API call to resend the verification email
+    // For now, we'll simulate a successful resend
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // In a real app, we would trigger an email sending from the backend
+    console.log(`Verification email resent to ${email}`);
+    
+    // Nothing to update in the state for this operation
+  };
+
+  const updateProfile = async (profileData: any): Promise<void> => {
+    // In a real app, this would make an API call to update the user's profile
+    // For now, we'll simulate a successful profile update
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    if (user) {
+      // Update user with the new profile data
+      const updatedUser = {
+        ...user,
+        ...profileData,
+        profileComplete: true,
+        lastUpdated: new Date().toISOString(),
+      };
+      
+      // Save to localStorage
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      
+      // Update state
+      setUser(updatedUser);
+      
+      // If role was updated, update the role state as well
+      if (profileData.role && profileData.role !== user.role) {
+        setRole(profileData.role);
+      }
+    }
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -286,6 +368,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         updateRoleSettings,
         updateUserStatus,
         updateUserAvatar,
+        verifyEmail,
+        resendVerificationEmail,
+        updateProfile
       }}
     >
       {children}

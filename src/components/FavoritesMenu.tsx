@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Heart, X, ShoppingBag, Trash2, Eye, Building2, MapPin, Star, Factory, Globe, Mail, Phone } from "lucide-react";
 import { useFavorites } from "@/contexts/FavoriteContext";
 import { useManufacturerFavorites } from "@/contexts/ManufacturerFavoriteContext";
+import { useProductFavorites } from "@/contexts/ProductFavoriteContext";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -44,8 +45,24 @@ interface Manufacturer {
   establishedYear: number;
 }
 
+interface Product {
+  id: number;
+  name: string;
+  category: string;
+  manufacturer: string;
+  image: string;
+  price: string;
+  certifications: string[];
+  rating: number;
+  packagingType: string;
+  description?: string;
+  minOrderQuantity?: number;
+  leadTime?: string;
+  sustainable?: boolean;
+}
+
 const FavoritesMenu = () => {
-  const { favorites: productFavorites, favoriteIds: productFavoriteIds, removeFromFavorites: removeProduct, clearFavorites: clearProducts } = useFavorites();
+  const { favorites: productFavorites, toggleFavorite: toggleProduct, clearFavorites: clearProducts } = useProductFavorites();
   const { favorites: manufacturerFavorites, toggleFavorite: toggleManufacturer } = useManufacturerFavorites();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
@@ -85,7 +102,7 @@ const FavoritesMenu = () => {
       <Dialog open={showManufacturerDetails} onOpenChange={setShowManufacturerDetails}>
         <DialogContent className="max-w-[800px] p-0">
           {selectedManufacturer && (
-            <div className="overflow-y-auto">
+            <div className="overflow-y-auto no-scrollbar">
               <div className="relative h-56 bg-gradient-to-b from-primary/20 to-muted">
                 <Button
                   variant="ghost"
@@ -443,7 +460,7 @@ const FavoritesMenu = () => {
 
             <TabsContent value="products" className="mt-1 relative">
               {productFavorites.length > 0 ? (
-                <DropdownMenuGroup className="max-h-[320px] overflow-y-auto custom-scrollbar pr-1">
+                <DropdownMenuGroup className="max-h-[320px] overflow-y-auto custom-scrollbar pr-1 no-scrollbar">
                   {productFavorites.map((product) => (
                     <DropdownMenuItem key={product.id} className="p-0 focus:bg-transparent">
                       <div className="w-full p-2 hover:bg-muted/50 rounded-lg flex items-center gap-3 group">
@@ -491,7 +508,7 @@ const FavoritesMenu = () => {
                                   onClick={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
-                                    removeProduct(product.id);
+                                    toggleProduct(product);
                                   }}
                                 >
                                   <X className="h-3.5 w-3.5 text-muted-foreground" />
@@ -529,7 +546,7 @@ const FavoritesMenu = () => {
 
             <TabsContent value="manufacturers" className="mt-1 relative">
               {manufacturerFavorites.length > 0 ? (
-                <DropdownMenuGroup className="max-h-[320px] overflow-y-auto custom-scrollbar pr-1">
+                <DropdownMenuGroup className="max-h-[320px] overflow-y-auto custom-scrollbar pr-1 no-scrollbar">
                   {manufacturerFavorites.map((manufacturer) => (
                     <DropdownMenuItem key={manufacturer.id} className="p-0 focus:bg-transparent">
                       <div className="w-full p-2 hover:bg-muted/50 rounded-lg flex items-center gap-3 group">

@@ -142,7 +142,7 @@ const AdminLayout = () => {
             onClick={() => setMobileMenuOpen(false)}
           >
             <motion.div
-              className="fixed left-0 top-0 bottom-0 w-64 bg-white dark:bg-gray-900 shadow-2xl overflow-y-auto"
+              className="fixed left-0 top-0 bottom-0 w-64 bg-white dark:bg-gray-900 shadow-2xl overflow-y-auto no-scrollbar"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="p-4 flex items-center justify-between border-b dark:border-gray-800">
@@ -372,7 +372,7 @@ const AdminLayout = () => {
         variants={contentVariants}
         animate={isMobile ? "wide" : (collapsed ? "wide" : "narrow")}
       >
-        <div className="min-h-screen bg-gray-100 dark:bg-gray-950 p-4 md:p-6 lg:p-8">
+        <div className="min-h-screen bg-gray-100 dark:bg-gray-950 p-4 md:p-6 lg:p-8 w-full">
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}
@@ -380,7 +380,7 @@ const AdminLayout = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="container mx-auto"
+              className="w-full"
             >
               <Outlet />
             </motion.div>

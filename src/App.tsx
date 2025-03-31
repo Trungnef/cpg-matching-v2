@@ -14,6 +14,8 @@ import Manufacturers from "./pages/Manufacturers";
 import Profile from "./pages/Profile";
 import Solutions from "./pages/Solutions";
 import NotFound from "./pages/NotFound";
+import VerifyEmail from "./pages/VerifyEmail";
+import ProfileSetupPage from "./pages/ProfileSetupPage";
 
 // Resource pages
 import Blog from "./pages/Blog";
@@ -63,6 +65,8 @@ import { FavoriteProvider } from "@/contexts/FavoriteContext";
 import { CompareProvider } from "@/contexts/CompareContext";
 import { ManufacturerFavoriteProvider } from "@/contexts/ManufacturerFavoriteContext";
 import { ManufacturerCompareProvider } from "@/contexts/ManufacturerCompareContext";
+import { ScrollProvider } from "@/contexts/ScrollContext";
+import { ProductFavoriteProvider } from "@/contexts/ProductFavoriteContext";
 
 // Admin pages
 import AdminLogin from './pages/AdminLogin';
@@ -79,181 +83,195 @@ const App = () => (
       <UserProvider>
         <LanguageProvider>
           <ThemeProvider>
-            <FavoriteProvider>
-              <CompareProvider>
-                <ManufacturerFavoriteProvider>
-                  <ManufacturerCompareProvider>
-                    <Toaster />
-                    <Sonner />
-                    <Router>
-                      <Routes>
-                        <Route path="/" element={<Index />} />
-                        <Route 
-                          path="/dashboard" 
-                          element={
-                            <ProtectedRoute 
-                              element={<Dashboard />} 
-                              allowedRoles={["manufacturer", "brand", "retailer"]} 
+            <ScrollProvider>
+              <FavoriteProvider>
+                <ProductFavoriteProvider>
+                  <CompareProvider>
+                    <ManufacturerFavoriteProvider>
+                      <ManufacturerCompareProvider>
+                        <Toaster />
+                        <Sonner />
+                        <Router>
+                          <Routes>
+                            <Route path="/" element={<Index />} />
+                            <Route 
+                              path="/dashboard" 
+                              element={
+                                <ProtectedRoute 
+                                  element={<Dashboard />} 
+                                  allowedRoles={["manufacturer", "brand", "retailer"]} 
+                                />
+                              } 
                             />
-                          } 
-                        />
-                        <Route path="/auth" element={<Auth />} />
-                        
-                        {/* Updated routes with Footer for all pages as requested */}
-                        <Route path="/products" element={<PageWithFooter Component={Products} />} />
-                        <Route path="/manufacturers" element={<PageWithFooter Component={Manufacturers} />} />
-                        <Route path="/solutions" element={<PageWithFooter Component={Solutions} />} />
-                        <Route path="/blog" element={<PageWithFooter Component={Blog} />} />
-                        <Route path="/case-studies" element={<PageWithFooter Component={CaseStudies} />} />
-                        <Route path="/webinars" element={<PageWithFooter Component={Webinars} />} />
-                        
-                        <Route 
-                          path="/profile" 
-                          element={
-                            <ProtectedRoute 
-                              element={<Profile />} 
-                              allowedRoles={["manufacturer", "brand", "retailer"]} 
+                            <Route path="/auth" element={<Auth />} />
+                            <Route path="/verify-email" element={<VerifyEmail />} />
+                            <Route 
+                              path="/profile-setup" 
+                              element={
+                                <ProtectedRoute 
+                                  element={<ProfileSetupPage />} 
+                                  allowedRoles={["manufacturer", "brand", "retailer"]} 
+                                />
+                              } 
                             />
-                          } 
-                        />
-                        
-                        {/* Manufacturer specific routes */}
-                        <Route 
-                          path="/manufacturer" 
-                          element={
-                            <ProtectedRoute 
-                              allowedRoles={["manufacturer"]} 
+                            
+                            {/* Updated routes with Footer for all pages as requested */}
+                            <Route path="/products" element={<PageWithFooter Component={Products} />} />
+                            <Route path="/manufacturers" element={<PageWithFooter Component={Manufacturers} />} />
+                            <Route path="/solutions" element={<PageWithFooter Component={Solutions} />} />
+                            <Route path="/blog" element={<PageWithFooter Component={Blog} />} />
+                            <Route path="/case-studies" element={<PageWithFooter Component={CaseStudies} />} />
+                            <Route path="/webinars" element={<PageWithFooter Component={Webinars} />} />
+                            
+                            <Route 
+                              path="/profile" 
+                              element={
+                                <ProtectedRoute 
+                                  element={<Profile />} 
+                                  allowedRoles={["manufacturer", "brand", "retailer"]} 
+                                />
+                              } 
+                            />
+                            
+                            {/* Manufacturer specific routes */}
+                            <Route 
+                              path="/manufacturer" 
+                              element={
+                                <ProtectedRoute 
+                                  allowedRoles={["manufacturer"]} 
+                                >
+                                  <Outlet />
+                                </ProtectedRoute>
+                              } 
                             >
-                              <Outlet />
-                            </ProtectedRoute>
-                          } 
-                        >
-                          <Route path="products" element={<ManufacturerProducts />} />
-                          <Route path="add-product" element={<AddProduct />} />
-                          <Route path="settings" element={<ManufacturerSettings />} />
-                          <Route path="analytics" element={<ManufacturerAnalytics />} />
-                          <Route path="production" element={<ManufacturerProduction />} />
-                          <Route path="suppliers" element={<ManufacturerSuppliers />} />
-                          <Route path="matches" element={<ManufacturerMatches />} />
-                          <Route path="inventory" element={<ManufacturerInventory />} />
-                        </Route>
-                        
-                        {/* Brand specific routes */}
-                        <Route 
-                          path="/brand/products" 
-                          element={
-                            <ProtectedRoute 
-                              element={<BrandProducts />} 
-                              allowedRoles={["brand"]} 
+                              <Route path="products" element={<ManufacturerProducts />} />
+                              <Route path="add-product" element={<AddProduct />} />
+                              <Route path="settings" element={<ManufacturerSettings />} />
+                              <Route path="analytics" element={<ManufacturerAnalytics />} />
+                              <Route path="production" element={<ManufacturerProduction />} />
+                              <Route path="suppliers" element={<ManufacturerSuppliers />} />
+                              <Route path="matches" element={<ManufacturerMatches />} />
+                              <Route path="inventory" element={<ManufacturerInventory />} />
+                            </Route>
+                            
+                            {/* Brand specific routes */}
+                            <Route 
+                              path="/brand/products" 
+                              element={
+                                <ProtectedRoute 
+                                  element={<BrandProducts />} 
+                                  allowedRoles={["brand"]} 
+                                />
+                              } 
                             />
-                          } 
-                        />
-                        <Route 
-                          path="/brand/manufacturers" 
-                          element={
-                            <ProtectedRoute 
-                              element={<BrandManufacturers />} 
-                              allowedRoles={["brand"]} 
+                            <Route 
+                              path="/brand/manufacturers" 
+                              element={
+                                <ProtectedRoute 
+                                  element={<BrandManufacturers />} 
+                                  allowedRoles={["brand"]} 
+                                />
+                              } 
                             />
-                          } 
-                        />
-                        <Route 
-                          path="/brand/analytics" 
-                          element={
-                            <ProtectedRoute 
-                              element={<BrandAnalytics />} 
-                              allowedRoles={["brand"]} 
+                            <Route 
+                              path="/brand/analytics" 
+                              element={
+                                <ProtectedRoute 
+                                  element={<BrandAnalytics />} 
+                                  allowedRoles={["brand"]} 
+                                />
+                              } 
                             />
-                          } 
-                        />
-                        <Route 
-                          path="/brand/brands" 
-                          element={
-                            <ProtectedRoute 
-                              element={<BrandBrands />} 
-                              allowedRoles={["brand"]} 
+                            <Route 
+                              path="/brand/brands" 
+                              element={
+                                <ProtectedRoute 
+                                  element={<BrandBrands />} 
+                                  allowedRoles={["brand"]} 
+                                />
+                              } 
                             />
-                          } 
-                        />
-                        <Route 
-                          path="/brand/settings" 
-                          element={
-                            <ProtectedRoute 
-                              element={<BrandSettings />} 
-                              allowedRoles={["brand"]} 
+                            <Route 
+                              path="/brand/settings" 
+                              element={
+                                <ProtectedRoute 
+                                  element={<BrandSettings />} 
+                                  allowedRoles={["brand"]} 
+                                />
+                              } 
                             />
-                          } 
-                        />
-                        
-                        {/* Retailer specific routes */}
-                        <Route 
-                          path="/retailer/inventory" 
-                          element={
-                            <ProtectedRoute 
-                              element={<RetailerInventory />} 
-                              allowedRoles={["retailer"]} 
+                            
+                            {/* Retailer specific routes */}
+                            <Route 
+                              path="/retailer/inventory" 
+                              element={
+                                <ProtectedRoute 
+                                  element={<RetailerInventory />} 
+                                  allowedRoles={["retailer"]} 
+                                />
+                              } 
                             />
-                          } 
-                        />
-                        <Route 
-                          path="/retailer/brands" 
-                          element={
-                            <ProtectedRoute 
-                              element={<RetailerBrands />} 
-                              allowedRoles={["retailer"]} 
+                            <Route 
+                              path="/retailer/brands" 
+                              element={
+                                <ProtectedRoute 
+                                  element={<RetailerBrands />} 
+                                  allowedRoles={["retailer"]} 
+                                />
+                              } 
                             />
-                          } 
-                        />
-                        <Route 
-                          path="/retailer/analytics" 
-                          element={
-                            <ProtectedRoute 
-                              element={<RetailerAnalytics />} 
-                              allowedRoles={["retailer"]} 
+                            <Route 
+                              path="/retailer/analytics" 
+                              element={
+                                <ProtectedRoute 
+                                  element={<RetailerAnalytics />} 
+                                  allowedRoles={["retailer"]} 
+                                />
+                              } 
                             />
-                          } 
-                        />
-                        <Route 
-                          path="/retailer/partnerships" 
-                          element={
-                            <ProtectedRoute 
-                              element={<RetailerPartnerships />} 
-                              allowedRoles={["retailer"]} 
+                            <Route 
+                              path="/retailer/partnerships" 
+                              element={
+                                <ProtectedRoute 
+                                  element={<RetailerPartnerships />} 
+                                  allowedRoles={["retailer"]} 
+                                />
+                              } 
                             />
-                          } 
-                        />
-                        <Route 
-                          path="/retailer/settings" 
-                          element={
-                            <ProtectedRoute 
-                              element={<RetailerSettings />} 
-                              allowedRoles={["retailer"]} 
+                            <Route 
+                              path="/retailer/settings" 
+                              element={
+                                <ProtectedRoute 
+                                  element={<RetailerSettings />} 
+                                  allowedRoles={["retailer"]} 
+                                />
+                              } 
                             />
-                          } 
-                        />
-                        
-                        {/* Admin routes */}
-                        <Route path="/admin/login" element={<AdminLogin />} />
-                        <Route path="/admin" element={<AdminLayout />}>
-                          <Route index element={<Navigate to="/admin/dashboard" replace />} />
-                          <Route path="dashboard" element={<AdminDashboard />} />
-                          <Route path="users" element={<UserManagement />} />
-                          <Route path="announcements" element={<div>Announcements Management</div>} />
-                          <Route path="activity" element={<div>Activity Logs</div>} />
-                          <Route path="analytics" element={<div>Analytics Dashboard</div>} />
-                          <Route path="settings" element={<div>System Settings</div>} />
-                          <Route path="profile" element={<div>Admin Profile</div>} />
-                          <Route path="help" element={<div>Admin Help Center</div>} />
-                        </Route>
-                        
-                        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                        <Route path="*" element={<NotFound />} />
-                      </Routes>
-                    </Router>
-                  </ManufacturerCompareProvider>
-                </ManufacturerFavoriteProvider>
-              </CompareProvider>
-            </FavoriteProvider>
+                            
+                            {/* Admin routes */}
+                            <Route path="/admin/login" element={<AdminLogin />} />
+                            <Route path="/admin" element={<AdminLayout />}>
+                              <Route index element={<Navigate to="/admin/dashboard" replace />} />
+                              <Route path="dashboard" element={<AdminDashboard />} />
+                              <Route path="users" element={<UserManagement />} />
+                              <Route path="announcements" element={<div>Announcements Management</div>} />
+                              <Route path="activity" element={<div>Activity Logs</div>} />
+                              <Route path="analytics" element={<div>Analytics Dashboard</div>} />
+                              <Route path="settings" element={<div>System Settings</div>} />
+                              <Route path="profile" element={<div>Admin Profile</div>} />
+                              <Route path="help" element={<div>Admin Help Center</div>} />
+                            </Route>
+                            
+                            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                            <Route path="*" element={<NotFound />} />
+                          </Routes>
+                        </Router>
+                      </ManufacturerCompareProvider>
+                    </ManufacturerFavoriteProvider>
+                  </CompareProvider>
+                </ProductFavoriteProvider>
+              </FavoriteProvider>
+            </ScrollProvider>
           </ThemeProvider>
         </LanguageProvider>
       </UserProvider>

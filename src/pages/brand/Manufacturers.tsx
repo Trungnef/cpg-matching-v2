@@ -1,20 +1,13 @@
-
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "@/components/Navbar";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Factory, Filter, ArrowLeft, Search, MoreVertical, Tag, MapPin, CheckCircle } from "lucide-react";
+import { Factory, Filter, Search, Building, ArrowRight, Plus, MapPin, CheckCircle } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import BrandLayout from "@/components/layouts/BrandLayout";
+import { motion } from "framer-motion";
 
 // Mock manufacturer data
 const manufacturers = [
@@ -26,8 +19,8 @@ const manufacturers = [
     location: "Portland, OR",
     certifications: ["Organic", "Kosher", "Non-GMO"],
     products: 3,
-    image: "/placeholder.svg",
-    matchScore: 98
+    matchScore: 98,
+    description: "Premium Foods specializes in organic food production with state-of-the-art facilities that meet the highest quality standards."
   },
   {
     id: 2,
@@ -37,8 +30,8 @@ const manufacturers = [
     location: "Boulder, CO",
     certifications: ["Organic", "Vegan", "B Corp"],
     products: 2,
-    image: "/placeholder.svg",
-    matchScore: 95
+    matchScore: 95,
+    description: "Leaders in sustainable supplement manufacturing with a focus on plant-based ingredients and environmentally-friendly processes."
   },
   {
     id: 3,
@@ -48,8 +41,8 @@ const manufacturers = [
     location: "San Diego, CA",
     certifications: ["Fair Trade", "Non-GMO"],
     products: 1,
-    image: "/placeholder.svg",
-    matchScore: 92
+    matchScore: 92,
+    description: "Specialized in crafting premium natural beverages using innovative brewing and bottling technologies."
   },
   {
     id: 4,
@@ -59,8 +52,8 @@ const manufacturers = [
     location: "Seattle, WA",
     certifications: ["Sustainable", "Recyclable"],
     products: 0,
-    image: "/placeholder.svg",
-    matchScore: 94
+    matchScore: 94,
+    description: "Pioneers in eco-friendly packaging solutions using biodegradable materials and minimal waste production methods."
   },
   {
     id: 5,
@@ -70,8 +63,8 @@ const manufacturers = [
     location: "Minneapolis, MN",
     certifications: ["Organic", "B Corp"],
     products: 0,
-    image: "/placeholder.svg",
-    matchScore: 90
+    matchScore: 90,
+    description: "Full-service co-packer with expertise in organic food production, offering flexible manufacturing solutions for growing brands."
   },
   {
     id: 6,
@@ -81,14 +74,15 @@ const manufacturers = [
     location: "Austin, TX",
     certifications: ["Organic", "Kosher"],
     products: 0,
-    image: "/placeholder.svg",
-    matchScore: 87
+    matchScore: 87,
+    description: "Family-owned manufacturing facility specializing in small to medium batch production with a focus on quality and tradition."
   }
 ];
 
 const Manufacturers = () => {
   const { isAuthenticated, user, role } = useUser();
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
   
   useEffect(() => {
     document.title = "Manufacturer Partners - CPG Matchmaker";
@@ -104,6 +98,13 @@ const Manufacturers = () => {
   if (!isAuthenticated || role !== "brand") {
     return null;
   }
+
+  // Filter manufacturers based on search query
+  const filteredManufacturers = manufacturers.filter(manufacturer => 
+    manufacturer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    manufacturer.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    manufacturer.location.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const getStatusBadge = (status: string) => {
     switch(status) {
@@ -130,26 +131,20 @@ const Manufacturers = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      
-      <div className="container mx-auto px-4 py-24">
-        <div className="max-w-7xl mx-auto">
-          {/* Breadcrumb and header */}
+    <BrandLayout>
+      <motion.div 
+        className="max-w-none px-4 sm:px-6 lg:px-8 pb-8"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="space-y-6">
+          {/* Header */}
           <div className="mb-8">
-            <Button 
-              variant="ghost" 
-              className="mb-4 pl-0 text-muted-foreground" 
-              onClick={() => navigate("/dashboard")}
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Dashboard
-            </Button>
-            
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
                 <h1 className="text-3xl font-bold">Manufacturing Partners</h1>
-                <p className="text-muted-foreground">{user?.companyName} - Find & Manage Manufacturers</p>
+                <p className="text-muted-foreground">{user?.companyName} - Find and manage manufacturing partnerships</p>
               </div>
               
               <div className="flex gap-2">
@@ -158,113 +153,93 @@ const Manufacturers = () => {
                   Filter
                 </Button>
                 <Button>
-                  <Search className="mr-2 h-4 w-4" />
-                  Find New Partners
+                  <Plus className="mr-2 h-4 w-4" />
+                  Find Manufacturers
                 </Button>
               </div>
             </div>
           </div>
           
-          {/* Search and stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <div className="md:col-span-2">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input placeholder="Search manufacturers..." className="pl-10" />
-              </div>
+          {/* Search */}
+          <div className="mb-8">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input 
+                placeholder="Search manufacturers, categories, or locations..." 
+                className="pl-10" 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
-            
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Active Partners</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">3</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  <span className="text-green-500">6 Products</span> in production
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Potential Matches</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">8</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  <span className="text-blue-500">3</span> new this month
-                </p>
-              </CardContent>
-            </Card>
           </div>
           
           {/* Manufacturers grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {manufacturers.map((manufacturer) => (
-              <Card key={manufacturer.id} className="overflow-hidden">
-                <div className="aspect-video bg-muted flex items-center justify-center">
-                  <img 
-                    src={manufacturer.image}
-                    alt={manufacturer.name}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {filteredManufacturers.map(manufacturer => (
+              <Card key={manufacturer.id} className="overflow-hidden transition-all duration-300 hover:shadow-md">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-lg">{manufacturer.name}</CardTitle>
-                      <CardDescription>{manufacturer.category}</CardDescription>
+                    <div className="flex items-center space-x-3">
+                      <div className="h-10 w-10 bg-muted rounded-full flex items-center justify-center overflow-hidden">
+                        <Factory className="h-6 w-6 text-muted-foreground" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-lg">{manufacturer.name}</CardTitle>
+                        <CardDescription>{manufacturer.category}</CardDescription>
+                      </div>
                     </div>
                     {getStatusBadge(manufacturer.status)}
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-2 pb-2">
-                  <div className="flex items-center text-sm">
-                    <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
-                    <span className="font-medium">{manufacturer.location}</span>
-                  </div>
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {manufacturer.certifications.map((cert, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs">
-                        <CheckCircle className="h-3 w-3 mr-1" />
-                        {cert}
-                      </Badge>
-                    ))}
-                  </div>
-                  <div className="flex justify-between items-center mt-2">
-                    {getMatchScoreBadge(manufacturer.matchScore)}
-                    <span className="text-sm text-muted-foreground">
-                      {manufacturer.products} {manufacturer.products === 1 ? 'product' : 'products'}
-                    </span>
+                <CardContent className="pb-3">
+                  <div className="space-y-3">
+                    <div className="text-sm line-clamp-2 text-muted-foreground">
+                      {manufacturer.description}
+                    </div>
+                    
+                    <div className="flex items-center text-sm space-x-1">
+                      <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span>{manufacturer.location}</span>
+                    </div>
+                    
+                    <div className="flex flex-wrap gap-1 mb-2">
+                      {manufacturer.certifications.map((cert, idx) => (
+                        <Badge variant="secondary" key={idx} className="flex items-center gap-1">
+                          <CheckCircle className="h-3 w-3" />
+                          {cert}
+                        </Badge>
+                      ))}
+                    </div>
+                    
+                    <div className="pt-2">
+                      {getMatchScoreBadge(manufacturer.matchScore)}
+                    </div>
                   </div>
                 </CardContent>
-                <CardFooter className="flex justify-between pt-0">
-                  <Button size="sm" variant="outline">View Profile</Button>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button size="icon" variant="ghost">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Contact</DropdownMenuItem>
-                      <DropdownMenuItem>Schedule Meeting</DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      {manufacturer.status === "Potential Match" ? (
-                        <DropdownMenuItem className="text-green-500">Add as Partner</DropdownMenuItem>
-                      ) : (
-                        <DropdownMenuItem className="text-amber-500">Manage Relationship</DropdownMenuItem>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </CardFooter>
+                <div className="px-6 py-4 bg-muted/30 flex justify-end">
+                  <Button variant="ghost" size="sm" className="gap-1">
+                    View Details <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </div>
               </Card>
             ))}
+            
+            {/* Add new manufacturer card */}
+            <Card className="flex flex-col items-center justify-center h-full border-dashed cursor-pointer hover:border-primary hover:bg-muted/50 transition-colors duration-300">
+              <CardContent className="pt-6 flex flex-col items-center">
+                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                  <Plus className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="font-medium mb-2">Find New Manufacturers</h3>
+                <p className="text-sm text-muted-foreground text-center mb-4">
+                  Discover production partners that match your brand's needs
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </BrandLayout>
   );
 };
 

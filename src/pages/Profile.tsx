@@ -8,35 +8,14 @@ import { Badge } from "@/components/ui/badge";
 import { UserCircle, Building, Mail, Phone, MapPin, Edit, Settings, Heart, ClipboardList, LogOut, User, Globe, Save, X, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
-import ManufacturerProfile from "@/components/profile/ManufacturerProfile";
-import BrandProfile from "@/components/profile/BrandProfile";
-import RetailerProfile from "@/components/profile/RetailerProfile";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Separator } from "@/components/ui/separator";
-import { 
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Label } from "@/components/ui/label";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { 
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger 
-} from "@/components/ui/dialog";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Label } from "@/components/ui/label";
+import RoleProfileHandler from "@/components/profile/RoleProfileHandler";
+import ProfileForm from "@/components/profile/ProfileForm";
 
 // Define form schemas for each role
 const baseProfileSchema = z.object({
@@ -81,11 +60,10 @@ type FormValues = BaseProfileValues & Partial<
 >;
 
 const Profile = () => {
-  const { role, user, isAuthenticated, logout, updateUserProfile, updateRoleSettings, updateUserAvatar } = useUser();
+  const { user, isAuthenticated, logout, updateUserAvatar } = useUser();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Set page title and check authentication
   useEffect(() => {
@@ -734,11 +712,11 @@ const Profile = () => {
                   </div>
                   <div className="flex items-center text-sm text-muted-foreground">
                     <Phone className="w-4 h-4 mr-2" />
-                    {user?.phone || "No phone number"}
+                    {user?.phone || "+1 (555) 123-4567"}
                   </div>
                   <div className="flex items-center text-sm text-muted-foreground">
                     <MapPin className="w-4 h-4 mr-2" />
-                    {user?.address || "No address"}
+                    {user?.address || "San Francisco, CA"}
                   </div>
                   <div className="flex items-center text-sm text-muted-foreground">
                     <Globe className="w-4 h-4 mr-2" />
@@ -772,7 +750,7 @@ const Profile = () => {
           <div className="lg:col-span-3">
             {isEditing ? (
               // Show edit form when editing is true
-              renderEditProfileForm()
+              <ProfileForm onCancel={() => setIsEditing(false)} />
             ) : (
               // Otherwise show normal profile content
               <Tabs defaultValue="overview" className="space-y-6">
@@ -784,7 +762,7 @@ const Profile = () => {
                 
                 {/* Overview Tab - Role-specific content */}
                 <TabsContent value="overview" className="space-y-6">
-                  {renderRoleSpecificContent()}
+                  <RoleProfileHandler />
                 </TabsContent>
                 
                 {/* Favorites Tab */}
