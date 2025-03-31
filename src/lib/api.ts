@@ -375,6 +375,23 @@ export const adminService = {
       }
       throw error;
     }
+  },
+
+  updateUserProfile: async (userId: string, profileData: any) => {
+    try {
+      const response = await fetchWithAuth(`${API_BASE_URL}/admin/users/${userId}/profile`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(profileData),
+      });
+      
+      return handleResponse(response);
+    } catch (error) {
+      console.error('API error in updateUserProfile:', error);
+      throw error;
+    }
   }
 };
 

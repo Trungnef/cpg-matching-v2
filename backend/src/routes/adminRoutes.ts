@@ -5,7 +5,8 @@ import {
   updateUser, 
   deleteUser, 
   updateUserRole, 
-  updateUserStatus 
+  updateUserStatus, 
+  updateUserProfile 
 } from '../controllers/adminController';
 import { admin, protectAdmin } from '../middleware/authMiddleware';
 
@@ -33,5 +34,6 @@ router.put('/users/:id', updateUser);
 router.delete('/users/:id', deleteUser);
 router.patch('/users/:id/role', updateUserRole);
 router.patch('/users/:id/status', updateUserStatus);
+router.patch('/users/:id/profile', updateUserProfile);
 
 export default router; 

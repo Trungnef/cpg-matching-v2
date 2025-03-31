@@ -15,7 +15,9 @@ import {
   BadgeCheck,
   ShieldCheck,
   Check,
-  X
+  X,
+  Eye,
+  Save
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -67,6 +69,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import {
+  Switch
+} from "@/components/ui/switch";
 
 interface User {
   id: string;
@@ -94,7 +105,7 @@ const statusStyles = {
 };
 
 const UserManagement = () => {
-  const { users, loading, error, fetchUsers, deleteUser, updateUserRole, updateUserStatus } = useAdminUsers();
+  const { users, loading, error, fetchUsers, deleteUser, updateUserRole, updateUserStatus, updateUserProfile } = useAdminUsers();
   const { toast } = useToast();
   const [filteredUsers, setFilteredUsers] = useState(users);
   const [searchQuery, setSearchQuery] = useState('');
@@ -112,6 +123,12 @@ const UserManagement = () => {
   });
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  
+  // New states for user profile view/edit
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedUser, setEditedUser] = useState<Partial<User>>({});
 
   // Handle search and filtering
   useEffect(() => {
@@ -165,6 +182,48 @@ const UserManagement = () => {
       setSelectedUsers(selectedUsers.filter(id => id !== userId));
     } else {
       setSelectedUsers([...selectedUsers, userId]);
+    }
+  };
+
+  // Handle user profile view
+  const handleViewProfile = (user: User) => {
+    setSelectedUser(user);
+    setEditedUser({...user});
+    setIsEditing(false);
+    setIsProfileOpen(true);
+  };
+
+  // Handle edit mode toggle
+  const handleToggleEdit = () => {
+    setIsEditing(!isEditing);
+    if (!isEditing && selectedUser) {
+      setEditedUser({...selectedUser});
+    }
+  };
+
+  // Handle edited user field changes
+  const handleEditChange = (field: keyof User, value: any) => {
+    setEditedUser({...editedUser, [field]: value});
+  };
+
+  // Handle save profile changes
+  const handleSaveProfile = async () => {
+    if (!selectedUser || !editedUser) return;
+    
+    try {
+      await updateUserProfile(selectedUser.id, editedUser);
+      setIsEditing(false);
+      setSelectedUser({...selectedUser, ...editedUser});
+      toast({
+        title: "Success",
+        description: "User profile updated successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update user profile",
+        variant: "destructive",
+      });
     }
   };
 
@@ -528,9 +587,22 @@ const UserManagement = () => {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <DropdownMenuItem className="cursor-pointer">
+                              <DropdownMenuItem 
+                                className="cursor-pointer"
+                                onClick={() => handleViewProfile(user)}
+                              >
+                                <Eye className="h-4 w-4 mr-2" />
+                                View Profile
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                className="cursor-pointer"
+                                onClick={() => {
+                                  handleViewProfile(user);
+                                  setIsEditing(true);
+                                }}
+                              >
                                 <Edit className="h-4 w-4 mr-2" />
-                                Edit
+                                Edit Profile
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem 
@@ -638,6 +710,240 @@ const UserManagement = () => {
               <Trash2 className="h-4 w-4 mr-2" />
               Delete User
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* User Profile View/Edit Dialog */}
+      <Dialog open={isProfileOpen} onOpenChange={setIsProfileOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span>{isEditing ? 'Edit User Profile' : 'User Profile'}</span>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleToggleEdit}
+                className="flex items-center gap-1 text-xs"
+              >
+                {isEditing ? (
+                  <>
+                    <Eye className="h-4 w-4" />
+                    <span>View Mode</span>
+                  </>
+                ) : (
+                  <>
+                    <Edit className="h-4 w-4" />
+                    <span>Edit Mode</span>
+                  </>
+                )}
+              </Button>
+            </DialogTitle>
+            <DialogDescription>
+              {isEditing 
+                ? 'Edit the user information below and save when done.' 
+                : `Viewing user profile for ${selectedUser?.name}.`}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedUser && (
+            <div className="py-4">
+              <Tabs defaultValue="basic" className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="basic">Basic Info</TabsTrigger>
+                  <TabsTrigger value="account">Account</TabsTrigger>
+                  <TabsTrigger value="permissions">Permissions</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="basic" className="space-y-4 pt-4">
+                  <div className="flex items-start gap-4">
+                    <Avatar className="h-16 w-16">
+                      <AvatarImage src={`https://avatars.dicebear.com/api/initials/${selectedUser.name.replace(/\s+/g, '')}.svg`} />
+                      <AvatarFallback>{selectedUser.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div className="space-y-1">
+                      <h3 className="text-lg font-medium">{selectedUser.name}</h3>
+                      <p className="text-sm text-muted-foreground">{selectedUser.email}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-name">Full Name</Label>
+                      {isEditing ? (
+                        <Input 
+                          id="edit-name"
+                          value={editedUser.name || ''}
+                          onChange={(e) => handleEditChange('name', e.target.value)}
+                        />
+                      ) : (
+                        <div className="p-2 rounded-md border">{selectedUser.name}</div>
+                      )}
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-email">Email</Label>
+                      {isEditing ? (
+                        <Input 
+                          id="edit-email"
+                          value={editedUser.email || ''}
+                          onChange={(e) => handleEditChange('email', e.target.value)}
+                        />
+                      ) : (
+                        <div className="p-2 rounded-md border">{selectedUser.email}</div>
+                      )}
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-company">Company</Label>
+                      {isEditing ? (
+                        <Input 
+                          id="edit-company"
+                          value={editedUser.company || ''}
+                          onChange={(e) => handleEditChange('company', e.target.value)}
+                        />
+                      ) : (
+                        <div className="p-2 rounded-md border">{selectedUser.company}</div>
+                      )}
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-last-active">Last Active</Label>
+                      <div className="p-2 rounded-md border bg-muted">{selectedUser.lastActive}</div>
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="account" className="space-y-4 pt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-role">Role</Label>
+                      {isEditing ? (
+                        <Select 
+                          value={editedUser.role}
+                          onValueChange={(value) => handleEditChange('role', value)}
+                        >
+                          <SelectTrigger id="edit-role">
+                            <SelectValue placeholder="Select a role" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Manufacturer">Manufacturer</SelectItem>
+                            <SelectItem value="Brand">Brand</SelectItem>
+                            <SelectItem value="Retailer">Retailer</SelectItem>
+                            <SelectItem value="Admin">Admin</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <div className="p-2 rounded-md border flex items-center gap-2">
+                          {roleIcons[selectedUser.role as keyof typeof roleIcons]}
+                          {selectedUser.role}
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-status">Status</Label>
+                      {isEditing ? (
+                        <Select 
+                          value={editedUser.status}
+                          onValueChange={(value: any) => handleEditChange('status', value)}
+                        >
+                          <SelectTrigger id="edit-status">
+                            <SelectValue placeholder="Select a status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="active">Active</SelectItem>
+                            <SelectItem value="inactive">Inactive</SelectItem>
+                            <SelectItem value="pending">Pending</SelectItem>
+                            <SelectItem value="suspended">Suspended</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <Badge className={statusStyles[selectedUser.status as keyof typeof statusStyles]}>
+                          {selectedUser.status.charAt(0).toUpperCase() + selectedUser.status.slice(1)}
+                        </Badge>
+                      )}
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-verified">Email Verified</Label>
+                      <div className="flex items-center gap-2">
+                        {isEditing ? (
+                          <Switch 
+                            checked={editedUser.verified}
+                            onCheckedChange={(checked) => handleEditChange('verified', checked)}
+                          />
+                        ) : (
+                          selectedUser.verified ? (
+                            <Badge variant="outline" className="flex bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800">
+                              <Check className="h-3 w-3 mr-1" />
+                              Verified
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="flex bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800">
+                              <X className="h-3 w-3 mr-1" />
+                              Not Verified
+                            </Badge>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="permissions" className="space-y-4 pt-4">
+                  <p className="text-sm text-muted-foreground">
+                    Permission settings for this user based on their role.
+                  </p>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label className="text-base">Access Dashboard</Label>
+                        <p className="text-sm text-muted-foreground">User can access the main dashboard</p>
+                      </div>
+                      <Switch checked disabled={!isEditing} />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label className="text-base">Manage Products</Label>
+                        <p className="text-sm text-muted-foreground">User can create and manage products</p>
+                      </div>
+                      <Switch checked={selectedUser.role === 'Manufacturer' || selectedUser.role === 'Brand'} disabled={!isEditing} />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label className="text-base">View Analytics</Label>
+                        <p className="text-sm text-muted-foreground">User can view analytics data</p>
+                      </div>
+                      <Switch checked disabled={!isEditing} />
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </div>
+          )}
+          
+          <DialogFooter>
+            {isEditing ? (
+              <>
+                <Button variant="outline" onClick={() => {
+                  setIsEditing(false);
+                  setEditedUser(selectedUser || {});
+                }}>
+                  Cancel
+                </Button>
+                <Button onClick={handleSaveProfile}>
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Changes
+                </Button>
+              </>
+            ) : (
+              <Button onClick={() => setIsProfileOpen(false)}>
+                Close
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>

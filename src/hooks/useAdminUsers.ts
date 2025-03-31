@@ -13,6 +13,15 @@ interface User {
   verified: boolean;
 }
 
+interface UserProfileUpdate {
+  name?: string;
+  email?: string;
+  role?: string;
+  company?: string;
+  status?: 'active' | 'inactive' | 'pending' | 'suspended';
+  verified?: boolean;
+}
+
 interface UseAdminUsersReturn {
   users: User[];
   loading: boolean;
@@ -21,6 +30,7 @@ interface UseAdminUsersReturn {
   deleteUser: (userId: string) => Promise<void>;
   updateUserRole: (userId: string, role: string) => Promise<void>;
   updateUserStatus: (userId: string, status: User['status']) => Promise<void>;
+  updateUserProfile: (userId: string, profileData: UserProfileUpdate) => Promise<void>;
 }
 
 export const useAdminUsers = (): UseAdminUsersReturn => {
@@ -30,79 +40,65 @@ export const useAdminUsers = (): UseAdminUsersReturn => {
   const [error, setError] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   
-  // Sử dụng useRef để theo dõi trạng thái đã chuyển hướng
+  // Refs for tracking state
   const hasRedirected = useRef(false);
-  // State để theo dõi số lần thử xác thực
   const authAttempts = useRef(0);
 
-  // Kiểm tra xác thực khi mount component
+  // Cleanup on unmount
   useEffect(() => {
     checkAdminAuthentication();
   }, []);
 
-  // Hàm kiểm tra xác thực admin
   const checkAdminAuthentication = () => {
     const adminAuth = localStorage.getItem('adminAuth');
     const adminUserData = localStorage.getItem('adminUser');
     
-    // Nếu đã chuyển hướng hoặc đã thử quá 3 lần, không làm gì thêm
     if (hasRedirected.current || authAttempts.current > 3) {
       return;
     }
     
-    // Tăng số lần thử
     authAttempts.current += 1;
     
     if (adminAuth === 'true' && adminUserData) {
       try {
-        // Kiểm tra xem dữ liệu JSON có hợp lệ không
         JSON.parse(adminUserData);
         setIsAuthenticated(true);
       } catch (e) {
         console.error('Invalid admin user data in localStorage:', e);
-        // Dữ liệu không hợp lệ, xóa và chuyển về login
         handleAuthFailure();
       }
     } else {
-      // Không có dữ liệu xác thực, chuyển về login
       handleAuthFailure();
     }
   };
   
-  // Hàm xử lý khi xác thực thất bại
   const handleAuthFailure = () => {
     if (hasRedirected.current) return;
     
     console.log('Admin authentication failed, redirecting to login page');
     hasRedirected.current = true;
     
-    // Xóa dữ liệu xác thực nếu có
     localStorage.removeItem('adminAuth');
     localStorage.removeItem('adminUser');
     
-    // Đặt một timeout ngắn để tránh vòng lặp chuyển hướng
     setTimeout(() => {
       navigate('/admin/login', { replace: true });
     }, 100);
   };
 
-  // Cập nhật fetchUsers để xử lý lỗi 401 tốt hơn
   const fetchUsers = async () => {
-    // Không thực hiện nếu đã chuyển hướng
     if (hasRedirected.current) return;
     
     try {
       setLoading(true);
       setError(null);
       
-      // Use database directly without mock data fallback
       try {
         const data = await adminService.getAllUsers();
         setUsers(data);
       } catch (apiError) {
         console.error('Error calling database API:', apiError);
         
-        // If unauthorized, check authentication and redirect to login
         if (apiError instanceof Error && apiError.message.includes('Unauthorized')) {
           handleAuthFailure();
           throw apiError;
@@ -114,7 +110,6 @@ export const useAdminUsers = (): UseAdminUsersReturn => {
       console.error('Error fetching users from database:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch users from database');
       
-      // If authentication error, handle logout
       if (err instanceof Error && 
         (err.message.includes('authentication required') || 
         err.message.includes('Unauthorized'))) {
@@ -124,6 +119,26 @@ export const useAdminUsers = (): UseAdminUsersReturn => {
       setLoading(false);
     }
   };
+
+  // Fetch users when authenticated and when page is focused
+  useEffect(() => {
+    if (isAuthenticated && !hasRedirected.current) {
+      // Initial fetch
+      fetchUsers();
+
+      // Add focus event listener to refresh data when tab is focused
+      const handleFocus = () => {
+        fetchUsers();
+      };
+
+      window.addEventListener('focus', handleFocus);
+
+      // Cleanup
+      return () => {
+        window.removeEventListener('focus', handleFocus);
+      };
+    }
+  }, [isAuthenticated]);
 
   const deleteUser = async (userId: string) => {
     if (!isAuthenticated || hasRedirected.current) {
@@ -189,12 +204,27 @@ export const useAdminUsers = (): UseAdminUsersReturn => {
     }
   };
 
-  // Chỉ gọi fetchUsers khi isAuthenticated thay đổi thành true
-  useEffect(() => {
-    if (isAuthenticated && !hasRedirected.current) {
-      fetchUsers();
+  const updateUserProfile = async (userId: string, profileData: UserProfileUpdate) => {
+    if (!isAuthenticated || hasRedirected.current) {
+      return Promise.reject(new Error('Admin authentication required'));
     }
-  }, [isAuthenticated]);
+    
+    try {
+      await adminService.updateUserProfile(userId, profileData);
+      setUsers(users.map(user => 
+        user.id === userId ? { ...user, ...profileData } : user
+      ));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update user profile');
+      
+      if (err instanceof Error && 
+         (err.message.includes('authentication required') || 
+          err.message.includes('Unauthorized'))) {
+        handleAuthFailure();
+      }
+      throw err;
+    }
+  };
 
   return {
     users,
@@ -203,6 +233,7 @@ export const useAdminUsers = (): UseAdminUsersReturn => {
     fetchUsers,
     deleteUser,
     updateUserRole,
-    updateUserStatus
+    updateUserStatus,
+    updateUserProfile
   };
 }; 

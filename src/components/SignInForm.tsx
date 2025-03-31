@@ -251,7 +251,7 @@ const SignInForm = () => {
             )}
           />
           
-          <FormField
+          {/* <FormField
             control={form.control}
             name="role"
             render={({ field }) => (
@@ -272,7 +272,7 @@ const SignInForm = () => {
                 <FormMessage />
               </FormItem>
             )}
-          />
+          /> */}
           
           <div className="text-right">
             <Button 

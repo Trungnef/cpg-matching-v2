@@ -115,4 +115,50 @@ export const updateUserStatus = async (req: Request, res: Response) => {
     console.error('Error updating user status:', error);
     res.status(500).json({ message: 'Error updating user status' });
   }
+};
+
+// Update user profile
+export const updateUserProfile = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const profileData = req.body;
+    
+    // Validate the user ID
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required' });
+    }
+    
+    // Validate the profile data
+    if (Object.keys(profileData).length === 0) {
+      return res.status(400).json({ message: 'No profile data provided' });
+    }
+    
+    console.log(`Updating profile for user ${userId}:`, profileData);
+    
+    // Find and update the user
+    const updatedUser = await User.findByIdAndUpdate(
+      userId, 
+      { $set: profileData }, 
+      { new: true, runValidators: true }
+    ).select('-password');
+    
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    console.log('User profile updated successfully');
+    res.json(updatedUser);
+  } catch (error) {
+    console.error('Error updating user profile:', error);
+    
+    if (error instanceof Error) {
+      res.status(500).json({ 
+        message: 'Error updating user profile', 
+        error: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      });
+    } else {
+      res.status(500).json({ message: 'Unknown error updating user profile' });
+    }
+  }
 }; 

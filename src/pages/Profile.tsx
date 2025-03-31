@@ -43,28 +43,28 @@ const baseProfileSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Please enter a valid email"),
   companyName: z.string().min(2, "Company name must be at least 2 characters"),
-  phone: z.string().optional(),
-  website: z.string().optional(),
-  address: z.string().optional(),
-  description: z.string().optional(),
+  phone: z.string().optional().default(""),
+  website: z.string().optional().default(""),
+  address: z.string().optional().default(""),
+  description: z.string().optional().default(""),
 });
 
 const manufacturerFormSchema = baseProfileSchema.extend({
-  productionCapacity: z.coerce.number().min(0, "Capacity must be a positive number"),
-  certifications: z.string().optional(),
-  minimumOrderValue: z.coerce.number().min(0, "Order value must be a positive number"),
+  productionCapacity: z.coerce.number().min(0, "Capacity must be a positive number").default(0),
+  certifications: z.string().optional().default(""),
+  minimumOrderValue: z.coerce.number().min(0, "Order value must be a positive number").default(0),
 });
 
 const brandFormSchema = baseProfileSchema.extend({
-  marketSegments: z.string().optional(),
-  brandValues: z.string().optional(),
-  targetDemographics: z.string().optional(),
+  marketSegments: z.string().optional().default(""),
+  brandValues: z.string().optional().default(""),
+  targetDemographics: z.string().optional().default(""),
 });
 
 const retailerFormSchema = baseProfileSchema.extend({
-  storeLocations: z.coerce.number().min(0, "Store locations must be a positive number"),
-  averageOrderValue: z.coerce.number().min(0, "Average order value must be a positive number"),
-  customerBase: z.string().optional(),
+  storeLocations: z.coerce.number().min(0, "Store locations must be a positive number").default(0),
+  averageOrderValue: z.coerce.number().min(0, "Average order value must be a positive number").default(0),
+  customerBase: z.string().optional().default(""),
 });
 
 // Define form types
@@ -109,7 +109,33 @@ const Profile = () => {
 
   // Create initial values based on role
   const getInitialValues = () => {
-    if (!user) return {};
+    if (!user) {
+      // Return default values when user is not available
+      return {
+        name: "",
+        email: "",
+        companyName: "",
+        phone: "",
+        website: "",
+        address: "",
+        description: "",
+        ...(role === "manufacturer" && {
+          productionCapacity: 0,
+          certifications: "",
+          minimumOrderValue: 0,
+        }),
+        ...(role === "brand" && {
+          marketSegments: "",
+          brandValues: "",
+          targetDemographics: "",
+        }),
+        ...(role === "retailer" && {
+          storeLocations: 0,
+          averageOrderValue: 0,
+          customerBase: "",
+        }),
+      };
+    }
 
     const baseValues = {
       name: user.name || "",
@@ -161,11 +187,18 @@ const Profile = () => {
     }
   };
 
-  // Initialize form
-  const form = useForm({
+  // Initialize form with default values
+  const form = useForm<FormValues>({
     resolver: zodResolver(getFormSchema()),
     defaultValues: getInitialValues(),
   });
+
+  // Update form values when user data changes
+  useEffect(() => {
+    if (user) {
+      form.reset(getInitialValues());
+    }
+  }, [user, role]);
 
   // Handle form submission
   const onSubmit = async (data: FormValues) => {
