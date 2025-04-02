@@ -9,9 +9,8 @@ interface Product {
   manufacturer: string;
   image: string;
   price: string;
-  certifications: string[];
   rating: number;
-  packagingType: string;
+  productType: string;
   description: string;
   minOrderQuantity: number;
   leadTime: string;

@@ -13,9 +13,8 @@ interface Product {
   manufacturer: string;
   image: string;
   price: string;
-  certifications: string[];
   rating: number;
-  packagingType: string;
+  productType: string;
   description?: string;
   minOrderQuantity?: number;
   leadTime?: string;
@@ -124,18 +123,6 @@ const ProductCard = ({
         
         <p className="text-sm text-foreground/70 mb-2">{product.manufacturer}</p>
         
-        <div className="flex flex-wrap gap-1 mb-3">
-          {product.certifications.map((cert, index) => (
-            <Badge 
-              key={index} 
-              variant="outline" 
-              className="text-xs py-0 h-5"
-            >
-              {cert}
-            </Badge>
-          ))}
-        </div>
-        
         <div className="flex items-center gap-1 mb-1">
           {renderRating(product.rating)}
           <span className="text-xs text-foreground/70 ml-1">{product.rating.toFixed(1)}</span>
@@ -152,7 +139,7 @@ const ProductCard = ({
             {product.price}
           </p>
           <Badge variant="secondary" className="text-xs">
-            {product.packagingType}
+            {product.productType}
           </Badge>
         </div>
       </CardContent>

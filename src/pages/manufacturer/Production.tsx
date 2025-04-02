@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { 
   Factory, Settings, ArrowLeft, Calendar, BarChart, Clock, AlertCircle, 
   Package, PlusCircle, Pencil, Trash2, Search, Filter, ChevronDown, Save,
@@ -11,7 +12,8 @@ import {
   Bell, BellRing, Wrench, Activity, LineChart, Layers, Zap, AlertTriangle,
   Upload, Link as LinkIcon, Image, ImageIcon,
   MoreVertical, Plus, CircleDashed, Edit, Eye, Copy, Ban, InfoIcon,
-  PackageCheck, Tag, User, FileText, CalendarCheck, LineChartIcon
+  PackageCheck, Tag, User, FileText, CalendarCheck, LineChartIcon,
+  DollarSign, Box, Info, Star
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import {
@@ -56,6 +58,8 @@ import ManufacturerLayout from "@/components/layouts/ManufacturerLayout";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { cn } from "@/lib/utils";
+import { UploadCloud } from "lucide-react";
 
 // Global style to hide scrollbars
 const styles = `
@@ -314,18 +318,23 @@ interface Product {
   id: number;
   name: string;
   category: string;
-  sku: string;
-  status: string;
-  moq: number;
+  sku: string; // Generated automatically, not required for input
+  minOrderQuantity: number; // Changed from moq to match Products.tsx
   dailyCapacity: number;
   unitType: string;
-  inventoryLevel: number;
+  currentAvailable: number;
+  pricePerUnit: number;
+  productType: string;
   image: string;
   createdAt: string;
-  description: string; // Added field
-  updatedAt: string; // Added field
-  lastProduced: string; // Added field
-  reorderPoint: number; // Added field
+  description: string;
+  updatedAt: string;
+  lastProduced: string;
+  leadTime: string;
+  leadTimeUnit: string;
+  reorderPoint: number;
+  rating?: number; // Optional field, filled by matching users, not by manufacturers
+  sustainable: boolean; // This is a product characteristic determined by the manufacturer
 }
 
 // Mock products data
@@ -335,85 +344,106 @@ const initialProducts: Product[] = [
     name: "Organic Cereal",
     category: "Food",
     sku: "ORG-CER-001",
-    status: "Active",
-    moq: 1000,
+    minOrderQuantity: 1000,
     dailyCapacity: 10000,
     unitType: "boxes",
-    inventoryLevel: 5200,
+    currentAvailable: 5200,
+    pricePerUnit: 4.99,
+    productType: "Finished Good",
     image: "/placeholder.svg",
     createdAt: "2023-05-15",
     description: "Organic breakfast cereal made with whole grains and natural sweeteners",
     updatedAt: "2023-08-10",
     lastProduced: "2023-08-10",
-    reorderPoint: 0
+    leadTime: "1-2",
+    leadTimeUnit: "weeks",
+    reorderPoint: 0,
+    sustainable: true
+    // rating será preenchido pelos usuários que procuram matching
   },
   {
     id: 2,
     name: "Protein Bars",
     category: "Food",
     sku: "PRO-BAR-002",
-    status: "Active",
-    moq: 2000,
+    minOrderQuantity: 2000,
     dailyCapacity: 8000,
     unitType: "units",
-    inventoryLevel: 3600,
+    currentAvailable: 3600,
+    pricePerUnit: 2.49,
+    productType: "Finished Good",
     image: "/placeholder.svg",
     createdAt: "2023-06-22",
     description: "High-protein snack bars for active lifestyles",
     updatedAt: "2023-07-30",
     lastProduced: "2023-07-30",
-    reorderPoint: 0
+    leadTime: "1-2",
+    leadTimeUnit: "weeks",
+    reorderPoint: 0,
+    sustainable: false
   },
   {
     id: 3,
     name: "Granola Packaging",
     category: "Packaging",
     sku: "GRA-PKG-003",
-    status: "Active",
-    moq: 5000,
+    minOrderQuantity: 5000,
     dailyCapacity: 15000,
     unitType: "units",
-    inventoryLevel: 8200,
+    currentAvailable: 8200,
+    pricePerUnit: 1.25,
+    productType: "Packaging Material",
     image: "/placeholder.svg",
     createdAt: "2023-04-10",
     description: "Eco-friendly packaging for granola products",
     updatedAt: "2023-09-05",
     lastProduced: "2023-09-05",
-    reorderPoint: 0
+    leadTime: "1-2",
+    leadTimeUnit: "weeks",
+    reorderPoint: 0,
+    sustainable: true
   },
   {
     id: 4,
     name: "Energy Drink Mix",
     category: "Beverage",
     sku: "ENE-DRK-004",
-    status: "Development",
-    moq: 1500,
+    minOrderQuantity: 1500,
     dailyCapacity: 5000,
     unitType: "sachets",
-    inventoryLevel: 1200,
+    currentAvailable: 1200,
+    pricePerUnit: 3.75,
+    productType: "Raw Material",
     image: "/placeholder.svg",
     createdAt: "2023-07-05",
     description: "Powdered energy drink mix with electrolytes and vitamins",
     updatedAt: "2023-09-12",
     lastProduced: "2023-09-12",
-    reorderPoint: 0
+    leadTime: "1-2",
+    leadTimeUnit: "weeks",
+    reorderPoint: 0,
+    sustainable: false
   },
   {
     id: 5,
     name: "Vitamin Supplements",
     category: "Health",
     sku: "VIT-SUP-005",
-    status: "Inactive",
-    moq: 3000,
+    minOrderQuantity: 3000,
     dailyCapacity: 12000,
     unitType: "bottles",
-    inventoryLevel: 0,
+    currentAvailable: 0,
+    pricePerUnit: 7.99,
+    productType: "Component",
     image: "/placeholder.svg",
     createdAt: "2023-03-18",
     description: "Daily multivitamin supplements for general health",
     updatedAt: "2023-06-25",
     lastProduced: "2023-06-25",
-    reorderPoint: 0
+    leadTime: "1-2",
+    leadTimeUnit: "weeks",
+    reorderPoint: 0,
+    sustainable: true
   }
 ];
 
@@ -704,40 +734,35 @@ export const Production = () => {
                          product.sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          product.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = categoryFilter === "all" || product.category === categoryFilter;
-    const matchesStatus = statusFilter === "all" || product.status === statusFilter;
     
-    return matchesSearch && matchesCategory && matchesStatus;
+    return matchesSearch && matchesCategory;
   });
   
   // Get unique categories for filter dropdown
   const categories = ["all", ...Array.from(new Set(products.map(p => p.category)))];
   
   // Create a new product
-  const handleCreateProduct = (newProduct: Omit<Product, "id" | "createdAt" | "updatedAt" | "lastProduced" | "reorderPoint">) => {
-    setIsLoading(true);
+  const handleCreateProduct = (newProduct: Omit<Product, "id" | "createdAt" | "updatedAt" | "lastProduced" | "reorderPoint" | "sku">) => {
+    // Tự động tạo SKU
+    const randomSKU = `SKU-${Math.floor(Math.random() * 90000) + 10000}`;
     
-    // Simulate API call
-    setTimeout(() => {
-      const product: Product = {
-        ...newProduct,
-        id: Math.max(...products.map(p => p.id), 0) + 1,
-        createdAt: new Date().toISOString().split('T')[0],
-        updatedAt: new Date().toISOString().split('T')[0],
-        lastProduced: new Date().toISOString().split('T')[0],
-        reorderPoint: Math.round(newProduct.moq * 0.2) // Default reorder point is 20% of MOQ
-      };
-      
-      setProducts([...products, product]);
-      setIsLoading(false);
-      setIsEditDialogOpen(false);
-      
-      toast({
-        title: "Product created",
-        description: `${product.name} has been added successfully.`,
-        variant: "default",
-      });
-    }, 600);
-  };
+    const productToAdd = {
+      ...newProduct,
+      id: products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1,
+      sku: randomSKU,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      lastProduced: new Date().toISOString(),
+      reorderPoint: Math.floor(newProduct.minOrderQuantity * 0.5), // Mặc định là 50% của MOQ
+    };
+    
+    setProducts([...products, productToAdd]);
+    toast({
+      title: "Product created",
+      description: `${productToAdd.name} has been added to your product list.`,
+    });
+    setIsEditDialogOpen(false);
+  }
   
   // Update an existing product
   const handleUpdateProduct = (updatedProduct: Product) => {
@@ -802,6 +827,26 @@ export const Production = () => {
         return <Badge variant="outline" className="text-gray-500 border-gray-500">Inactive</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
+    }
+  };
+
+  // Function to generate badge based on product type
+  const getProductTypeBadge = (productType: string) => {
+    switch(productType) {
+      case "Finished Good":
+        return <Badge className="bg-green-500">Finished Good</Badge>;
+      case "Raw Material":
+        return <Badge variant="outline" className="text-amber-500 border-amber-500">Raw Material</Badge>;
+      case "Component":
+        return <Badge variant="secondary">Component</Badge>;
+      case "Packaging Material":
+        return <Badge className="bg-blue-500">Packaging Material</Badge>;
+      case "Semi-finished Good":
+        return <Badge variant="outline" className="text-indigo-500 border-indigo-500">Semi-finished</Badge>;
+      case "Bulk Product":
+        return <Badge variant="outline" className="text-purple-500 border-purple-500">Bulk Product</Badge>;
+      default:
+        return <Badge variant="outline">{productType}</Badge>;
     }
   };
 
@@ -1280,7 +1325,7 @@ export const Production = () => {
                         openEditDialog={openEditDialog}
                         openDeleteDialog={openDeleteDialog}
                         viewProductDetails={viewProductDetails}
-                        getStatusBadge={getStatusBadge}
+                        getProductTypeBadge={getProductTypeBadge}
                       />
                     </TabsContent>
                   </motion.div>
@@ -1294,322 +1339,455 @@ export const Production = () => {
       {/* Product Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[850px] p-0 max-h-[90vh] overflow-hidden">
-          <DialogHeader className="px-6 pt-6 pb-2">
-            <DialogTitle className="text-xl flex items-center gap-2">
-              {selectedProduct ? <Pencil className="h-5 w-5 text-primary" /> : <PlusCircle className="h-5 w-5 text-primary" />}
-              <span>{selectedProduct ? "Edit Product" : "Create New Product"}</span>
-            </DialogTitle>
-            <DialogDescription className="text-base">
-              {selectedProduct 
-                ? "Edit the details of your existing product." 
-                : "Add a new product to your catalog."}
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="px-6 pb-6 overflow-y-auto max-h-[calc(90vh-130px)]">
-            <ProductForm 
-              product={selectedProduct} 
-              onSubmit={selectedProduct ? handleUpdateProduct : handleCreateProduct} 
-              isLoading={isLoading} 
-            />
-          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <DialogHeader className="px-6 pt-6 pb-2 border-b sticky top-0 z-10 bg-background/95 backdrop-blur-sm">
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: 0.1 }}
+                  className="flex items-center gap-2"
+                >
+                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    {selectedProduct ? 
+                      <Edit className="h-4 w-4 text-primary" /> : 
+                      <Plus className="h-4 w-4 text-primary" />
+                    }
+                  </div>
+                  <div>
+                    <DialogTitle className="text-xl">
+                      {selectedProduct ? "Edit Product" : "Create New Product"}
+                    </DialogTitle>
+                    <DialogDescription className="text-sm">
+                      {selectedProduct 
+                        ? "Update the details of your existing product." 
+                        : "Add a new product to your manufacturing catalog."}
+                    </DialogDescription>
+                  </div>
+                </motion.div>
+              </DialogHeader>
+              
+              <div className="px-6 py-6 overflow-y-auto max-h-[calc(90vh-130px)]">
+                <ProductForm 
+                  product={selectedProduct} 
+                  onSubmit={selectedProduct ? handleUpdateProduct : handleCreateProduct} 
+                  isLoading={isLoading} 
+                />
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </DialogContent>
       </Dialog>
 
       {/* Product Delete Confirmation Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle className="text-xl flex items-center gap-2 text-destructive">
-              <AlertTriangle className="h-5 w-5" />
-              <span>Delete Product</span>
-            </DialogTitle>
-            <DialogDescription className="text-base">
-              Are you sure you want to delete this product? This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          
-          {selectedProduct && (
-            <>
-              <div className="flex items-center gap-4 py-6 bg-destructive/5 px-4 rounded-lg border border-destructive/20">
-                <div className="h-16 w-16 rounded-md bg-destructive/10 flex items-center justify-center flex-shrink-0">
-                  <Package className="h-8 w-8 text-destructive" />
-                </div>
-                <div>
-                  <h4 className="font-medium text-lg">{selectedProduct.name}</h4>
-                  <p className="text-sm text-muted-foreground">
-                    SKU: {selectedProduct.sku} | Category: {selectedProduct.category}
-                  </p>
-                </div>
-              </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <DialogHeader>
+                <motion.div 
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.1 }}
+                  className="flex items-center gap-2 text-destructive"
+                >
+                  <div className="h-8 w-8 rounded-full bg-destructive/10 flex items-center justify-center">
+                    <AlertTriangle className="h-4 w-4" />
+                  </div>
+                  <DialogTitle className="text-xl">Delete Product</DialogTitle>
+                </motion.div>
+                <DialogDescription className="text-base mt-2">
+                  Are you sure you want to delete this product? This action cannot be undone.
+                </DialogDescription>
+              </DialogHeader>
               
-              <DialogFooter className="gap-2 mt-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setIsDeleteDialogOpen(false)}
-                  className="flex-1"
+              {selectedProduct && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.2 }}
                 >
-                  Cancel
-                </Button>
-                <Button 
-                  variant="destructive" 
-                  onClick={() => handleDeleteProduct(selectedProduct.id)}
-                  disabled={isLoading}
-                  className="flex-1"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Deleting...
-                    </>
-                  ) : (
-                    <>
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Delete Product
-                    </>
-                  )}
-                </Button>
-              </DialogFooter>
-            </>
-          )}
+                  <div className="flex items-center gap-4 py-6 bg-destructive/5 px-4 rounded-lg border border-destructive/20 my-4">
+                    <div className="h-16 w-16 rounded-md bg-destructive/10 flex items-center justify-center flex-shrink-0">
+                      <Package className="h-8 w-8 text-destructive" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-lg">{selectedProduct.name}</h4>
+                      <p className="text-sm text-muted-foreground">
+                        SKU: {selectedProduct.sku} | Category: {selectedProduct.category}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <DialogFooter className="gap-2 mt-6 flex">
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsDeleteDialogOpen(false)}
+                      className="flex-1 hover:bg-background hover-scale-subtle"
+                    >
+                      Cancel
+                    </Button>
+                    <Button 
+                      variant="destructive" 
+                      onClick={() => handleDeleteProduct(selectedProduct.id)}
+                      disabled={isLoading}
+                      className="flex-1 hover-scale-subtle"
+                    >
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Deleting...
+                        </>
+                      ) : (
+                        <>
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete Product
+                        </>
+                      )}
+                    </Button>
+                  </DialogFooter>
+                </motion.div>
+              )}
+            </motion.div>
+          </AnimatePresence>
         </DialogContent>
       </Dialog>
 
       {/* View Product Details Dialog */}
       <Dialog open={isViewDetailsOpen} onOpenChange={setIsViewDetailsOpen}>
         <DialogContent className="sm:max-w-[900px] p-0 max-h-[90vh] overflow-hidden">
-          <DialogHeader className="sticky top-0 z-10 bg-background px-6 pt-6 pb-2 border-b">
-            <DialogTitle className="text-xl flex items-center gap-2">
-              <Package className="h-5 w-5 text-primary" />
-              <span>Product Details</span>
-            </DialogTitle>
-            <DialogDescription className="text-base">
-              Detailed information about this product.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="p-6 overflow-y-auto max-h-[calc(90vh-130px)]">
-            {selectedProductDetails && (
-              <ProductDetailsContent 
-                product={selectedProductDetails} 
-                getStatusBadge={getStatusBadge}
-                onEdit={() => {
-                  setIsViewDetailsOpen(false);
-                  setTimeout(() => openEditDialog(selectedProductDetails), 100);
-                }}
-              />
-            )}
-          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <DialogHeader className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm px-6 pt-6 pb-2 border-b">
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: 0.1 }}
+                  className="flex items-center gap-2"
+                >
+                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Eye className="h-4 w-4 text-primary" />
+                  </div>
+                  <div>
+                    <DialogTitle className="text-xl">Product Details</DialogTitle>
+                    <DialogDescription className="text-sm">
+                      Detailed information about this product.
+                    </DialogDescription>
+                  </div>
+                </motion.div>
+              </DialogHeader>
+              
+              <div className="px-6 py-6 overflow-y-auto max-h-[calc(90vh-130px)]">
+                {selectedProductDetails && (
+                  <ProductDetailsContent 
+                    product={selectedProductDetails} 
+                    getProductTypeBadge={getProductTypeBadge}
+                    onEdit={() => {
+                      setIsViewDetailsOpen(false);
+                      setTimeout(() => openEditDialog(selectedProductDetails), 100);
+                    }}
+                  />
+                )}
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </DialogContent>
       </Dialog>
 
       {/* Production Line Details Dialog */}
       <Dialog open={isLineDetailsOpen} onOpenChange={setIsLineDetailsOpen}>
         <DialogContent className="sm:max-w-[900px] p-0 max-h-[90vh] overflow-hidden">
-          <DialogHeader className="sticky top-0 z-10 bg-background px-6 pt-6 pb-2 border-b">
-            <DialogTitle className="text-xl flex items-center gap-2">
-              <Factory className="h-5 w-5 text-primary" />
-              <span>Production Line Details</span>
-            </DialogTitle>
-            <DialogDescription className="text-base">
-              View and manage details for this production line.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="p-6 overflow-y-auto max-h-[calc(90vh-130px)]">
-            {selectedProductionLine && (
-              <LineDetailsContent 
-                line={selectedProductionLine}
-                products={products}
-                handleToggleLineStatus={handleToggleLineStatus}
-                handleScheduleMaintenance={() => {
-                  setIsLineDetailsOpen(false);
-                  setTimeout(() => handleScheduleMaintenance(selectedProductionLine), 100);
-                }}
-                handleAssignProduct={() => {
-                  setIsLineDetailsOpen(false);
-                  setTimeout(() => handleAssignProduct(selectedProductionLine), 100);
-                }}
-                activeBatches={activeBatches}
-                efficiencyHistory={efficiencyHistory}
-                lineUtilization={lineUtilization}
-                isRealTimeMonitoring={isRealTimeMonitoring}
-                handleStartNewBatch={handleStartNewBatch}
-                handleCompleteBatch={handleCompleteBatch}
-              />
-            )}
-          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <DialogHeader className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm px-6 pt-6 pb-2 border-b">
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: 0.1 }}
+                  className="flex items-center gap-2"
+                >
+                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Factory className="h-4 w-4 text-primary" />
+                  </div>
+                  <div>
+                    <DialogTitle className="text-xl">Production Line Details</DialogTitle>
+                    <DialogDescription className="text-sm">
+                      View and manage details for this production line.
+                    </DialogDescription>
+                  </div>
+                </motion.div>
+              </DialogHeader>
+              
+              <div className="px-6 py-6 overflow-y-auto max-h-[calc(90vh-130px)]">
+                {selectedProductionLine && (
+                  <LineDetailsContent 
+                    line={selectedProductionLine}
+                    products={products}
+                    handleToggleLineStatus={handleToggleLineStatus}
+                    handleScheduleMaintenance={() => {
+                      setIsLineDetailsOpen(false);
+                      setTimeout(() => handleScheduleMaintenance(selectedProductionLine), 100);
+                    }}
+                    handleAssignProduct={() => {
+                      setIsLineDetailsOpen(false);
+                      setTimeout(() => handleAssignProduct(selectedProductionLine), 100);
+                    }}
+                    activeBatches={activeBatches}
+                    efficiencyHistory={efficiencyHistory}
+                    lineUtilization={lineUtilization}
+                    isRealTimeMonitoring={isRealTimeMonitoring}
+                    handleStartNewBatch={handleStartNewBatch}
+                    handleCompleteBatch={handleCompleteBatch}
+                  />
+                )}
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </DialogContent>
       </Dialog>
 
       {/* Add Production Line Dialog */}
       <Dialog open={isAddLineOpen} onOpenChange={setIsAddLineOpen}>
         <DialogContent className="sm:max-w-[800px] p-0 max-h-[90vh] overflow-hidden">
-          <DialogHeader className="px-6 pt-6 pb-2">
-            <DialogTitle className="text-xl flex items-center gap-2">
-              <PlusCircle className="h-5 w-5 text-primary" />
-              <span>Add Production Line</span>
-            </DialogTitle>
-            <DialogDescription className="text-base">
-              Create a new production line in your facility.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="px-6 pb-6 overflow-y-auto max-h-[calc(90vh-130px)]">
-            <AddProductionLineForm
-              onSubmit={(newLine) => {
-                setIsLoading(true);
-                
-                // Simulate API call
-                setTimeout(() => {
-                  const line: ProductionLine = {
-                    ...newLine,
-                    id: Math.max(...productionLines.map(l => l.id), 0) + 1,
-                    maintenance_history: [],
-                    downtime_incidents: [],
-                    quality_metrics: {
-                      defect_rate: 0.5,
-                      quality_score: 95,
-                      last_inspection: new Date().toISOString().split('T')[0]
-                    },
-                    alerts: []
-                  };
-                  
-                  setProductionLines([...productionLines, line]);
-                  setIsLoading(false);
-                  setIsAddLineOpen(false);
-                  
-                  toast({
-                    title: "Production line added",
-                    description: `${line.name} has been added successfully.`,
-                    variant: "default",
-                  });
-                }, 600);
-              }}
-              isLoading={isLoading}
-            />
-          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <DialogHeader className="px-6 pt-6 pb-2 border-b sticky top-0 z-10 bg-background/95 backdrop-blur-sm">
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: 0.1 }}
+                  className="flex items-center gap-2"
+                >
+                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <PlusCircle className="h-4 w-4 text-primary" />
+                  </div>
+                  <div>
+                    <DialogTitle className="text-xl">Add Production Line</DialogTitle>
+                    <DialogDescription className="text-sm">
+                      Create a new production line in your manufacturing facility.
+                    </DialogDescription>
+                  </div>
+                </motion.div>
+              </DialogHeader>
+              
+              <div className="px-6 py-6 overflow-y-auto max-h-[calc(90vh-130px)]">
+                <AddProductionLineForm
+                  onSubmit={(newLine) => {
+                    setIsLoading(true);
+                    
+                    // Simulate API call
+                    setTimeout(() => {
+                      const line: ProductionLine = {
+                        ...newLine,
+                        id: Math.max(...productionLines.map(l => l.id), 0) + 1,
+                        maintenance_history: [],
+                        downtime_incidents: [],
+                        quality_metrics: {
+                          defect_rate: 0.5,
+                          quality_score: 95,
+                          last_inspection: new Date().toISOString().split('T')[0]
+                        },
+                        alerts: []
+                      };
+                      
+                      setProductionLines([...productionLines, line]);
+                      setIsLoading(false);
+                      setIsAddLineOpen(false);
+                      
+                      toast({
+                        title: "Production line added",
+                        description: `${line.name} has been added successfully.`,
+                        variant: "default",
+                      });
+                    }, 600);
+                  }}
+                  isLoading={isLoading}
+                />
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </DialogContent>
       </Dialog>
 
       {/* Schedule Maintenance Dialog */}
       <Dialog open={isScheduleMaintenanceOpen} onOpenChange={setIsScheduleMaintenanceOpen}>
         <DialogContent className="sm:max-w-[650px] p-0">
-          <DialogHeader className="px-6 pt-6 pb-2">
-            <DialogTitle className="text-xl flex items-center gap-2">
-              <Wrench className="h-5 w-5 text-primary" />
-              <span>Schedule Maintenance</span>
-            </DialogTitle>
-            <DialogDescription className="text-base">
-              {selectedProductionLine ? `Schedule maintenance for ${selectedProductionLine.name}` : "Schedule maintenance for production line"}
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="px-6 pb-6">
-            {selectedProductionLine && (
-              <ScheduleMaintenanceForm
-                productionLine={selectedProductionLine}
-                onSubmit={(maintenanceData) => {
-                  setIsLoading(true);
-                  
-                  // Simulate API call
-                  setTimeout(() => {
-                    const updatedLines = productionLines.map(line => {
-                      if (line.id === selectedProductionLine.id) {
-                        // Create new maintenance record
-                        const newRecord: MaintenanceRecord = {
-                          id: Math.max(...(line.maintenance_history.map(m => m.id) || [0]), 0) + 1,
-                          date: maintenanceData.date,
-                          type: maintenanceData.type,
-                          technician: maintenanceData.technician,
-                          duration: maintenanceData.duration,
-                          notes: maintenanceData.notes
-                        };
+          <AnimatePresence mode="wait">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <DialogHeader className="px-6 pt-6 pb-2 border-b sticky top-0 z-10 bg-background/95 backdrop-blur-sm">
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: 0.1 }}
+                  className="flex items-center gap-2"
+                >
+                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Wrench className="h-4 w-4 text-primary" />
+                  </div>
+                  <div>
+                    <DialogTitle className="text-xl">Schedule Maintenance</DialogTitle>
+                    <DialogDescription className="text-sm">
+                      {selectedProductionLine ? `Schedule maintenance for ${selectedProductionLine.name}` : "Schedule maintenance for production line"}
+                    </DialogDescription>
+                  </div>
+                </motion.div>
+              </DialogHeader>
+              
+              <div className="px-6 py-6">
+                {selectedProductionLine && (
+                  <ScheduleMaintenanceForm
+                    productionLine={selectedProductionLine}
+                    onSubmit={(maintenanceData) => {
+                      setIsLoading(true);
+                      
+                      // Simulate API call
+                      setTimeout(() => {
+                        const updatedLines = productionLines.map(line => {
+                          if (line.id === selectedProductionLine.id) {
+                            // Create new maintenance record
+                            const newRecord: MaintenanceRecord = {
+                              id: Math.max(...(line.maintenance_history.map(m => m.id) || [0]), 0) + 1,
+                              date: maintenanceData.date,
+                              type: maintenanceData.type,
+                              technician: maintenanceData.technician,
+                              duration: maintenanceData.duration,
+                              notes: maintenanceData.notes
+                            };
+                            
+                            // Update line status if maintenance starts now
+                            const status = maintenanceData.startNow ? "Maintenance" : line.status;
+                            
+                            return {
+                              ...line,
+                              status: status as "Active" | "Maintenance" | "Idle" | "Setup" | "Offline",
+                              maintenance_history: [newRecord, ...line.maintenance_history],
+                              next_maintenance: maintenanceData.date,
+                              // If maintenance starts now, set efficiency to 0
+                              efficiency: status === "Maintenance" ? 0 : line.efficiency
+                            };
+                          }
+                          return line;
+                        });
                         
-                        // Update line status if maintenance starts now
-                        const status = maintenanceData.startNow ? "Maintenance" : line.status;
+                        setProductionLines(updatedLines);
+                        setIsLoading(false);
+                        setIsScheduleMaintenanceOpen(false);
                         
-                        return {
-                          ...line,
-                          status: status as "Active" | "Maintenance" | "Idle" | "Setup" | "Offline",
-                          maintenance_history: [newRecord, ...line.maintenance_history],
-                          next_maintenance: maintenanceData.date,
-                          // If maintenance starts now, set efficiency to 0
-                          efficiency: status === "Maintenance" ? 0 : line.efficiency
-                        };
-                      }
-                      return line;
-                    });
-                    
-                    setProductionLines(updatedLines);
-                    setIsLoading(false);
-                    setIsScheduleMaintenanceOpen(false);
-                    
-                    toast({
-                      title: "Maintenance scheduled",
-                      description: `Maintenance for ${selectedProductionLine.name} has been scheduled for ${maintenanceData.date}.`,
-                      variant: "default",
-                    });
-                  }, 600);
-                }}
-                isLoading={isLoading}
-              />
-            )}
-          </div>
+                        toast({
+                          title: "Maintenance scheduled",
+                          description: `Maintenance for ${selectedProductionLine.name} has been scheduled for ${maintenanceData.date}.`,
+                          variant: "default",
+                        });
+                      }, 600);
+                    }}
+                    isLoading={isLoading}
+                  />
+                )}
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </DialogContent>
       </Dialog>
 
       {/* Assign Product Dialog */}
       <Dialog open={isAssignProductOpen} onOpenChange={setIsAssignProductOpen}>
         <DialogContent className="sm:max-w-[650px] p-0">
-          <DialogHeader className="px-6 pt-6 pb-2">
-            <DialogTitle className="text-xl flex items-center gap-2">
-              <Package className="h-5 w-5 text-primary" />
-              <span>Assign Product</span>
-            </DialogTitle>
-            <DialogDescription className="text-base">
-              {selectedProductionLine ? `Assign a product to ${selectedProductionLine.name}` : "Assign a product to production line"}
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="px-6 pb-6">
-            {selectedProductionLine && (
-              <AssignProductForm
-                productionLine={selectedProductionLine}
-                products={products}
-                onSubmit={(productId) => {
-                  setIsLoading(true);
-                  
-                  // Find the selected product
-                  const selectedProduct = products.find(p => p.id === productId);
-                  
-                  // Simulate API call
-                  setTimeout(() => {
-                    const updatedLines = productionLines.map(line => {
-                      if (line.id === selectedProductionLine.id) {
-                        return {
-                          ...line,
-                          product: selectedProduct ? selectedProduct.name : "N/A"
-                        };
-                      }
-                      return line;
-                    });
-                    
-                    setProductionLines(updatedLines);
-                    setIsLoading(false);
-                    setIsAssignProductOpen(false);
-                    
-                    toast({
-                      title: "Product assigned",
-                      description: `${selectedProduct?.name || "Product"} has been assigned to ${selectedProductionLine.name}.`,
-                      variant: "default",
-                    });
-                  }, 600);
-                }}
-                isLoading={isLoading}
-              />
-            )}
-          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <DialogHeader className="px-6 pt-6 pb-2 border-b sticky top-0 z-10 bg-background/95 backdrop-blur-sm">
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: 0.1 }}
+                  className="flex items-center gap-2"
+                >
+                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Package className="h-4 w-4 text-primary" />
+                  </div>
+                  <div>
+                    <DialogTitle className="text-xl">Assign Product</DialogTitle>
+                    <DialogDescription className="text-sm">
+                      {selectedProductionLine ? `Assign a product to ${selectedProductionLine.name}` : "Assign a product to production line"}
+                    </DialogDescription>
+                  </div>
+                </motion.div>
+              </DialogHeader>
+              
+              <div className="px-6 py-6">
+                {selectedProductionLine && (
+                  <AssignProductForm
+                    productionLine={selectedProductionLine}
+                    products={products}
+                    onSubmit={(productId) => {
+                      setIsLoading(true);
+                      
+                      // Find the selected product
+                      const selectedProduct = products.find(p => p.id === productId);
+                      
+                      // Simulate API call
+                      setTimeout(() => {
+                        const updatedLines = productionLines.map(line => {
+                          if (line.id === selectedProductionLine.id) {
+                            return {
+                              ...line,
+                              product: selectedProduct ? selectedProduct.name : "N/A"
+                            };
+                          }
+                          return line;
+                        });
+                        
+                        setProductionLines(updatedLines);
+                        setIsLoading(false);
+                        setIsAssignProductOpen(false);
+                        
+                        toast({
+                          title: "Product assigned",
+                          description: `${selectedProduct?.name || "Product"} has been assigned to ${selectedProductionLine.name}.`,
+                          variant: "default",
+                        });
+                      }, 600);
+                    }}
+                    isLoading={isLoading}
+                  />
+                )}
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </DialogContent>
       </Dialog>
     </ManufacturerLayout>
@@ -1632,7 +1810,7 @@ interface ProductsTabProps {
   openEditDialog: (product?: Product) => void;
   openDeleteDialog: (product: Product) => void;
   viewProductDetails: (product: Product) => void;
-  getStatusBadge: (status: string) => JSX.Element;
+  getProductTypeBadge: (productType: string) => JSX.Element;
 }
 
 const ProductsTab: React.FC<ProductsTabProps> = ({
@@ -1647,7 +1825,7 @@ const ProductsTab: React.FC<ProductsTabProps> = ({
   openEditDialog,
   openDeleteDialog,
   viewProductDetails,
-  getStatusBadge
+  getProductTypeBadge
 }) => {
   const [animateCards, setAnimateCards] = useState(false);
   
@@ -1854,7 +2032,7 @@ const ProductsTab: React.FC<ProductsTabProps> = ({
                           <h3 className="text-white font-medium truncate">
                             {product.name}
                           </h3>
-                          {getStatusBadge(product.status)}
+                          {getProductTypeBadge(product.productType)}
                         </div>
                       </div>
                     </div>
@@ -1869,7 +2047,7 @@ const ProductsTab: React.FC<ProductsTabProps> = ({
                       </div>
                       <div className="flex flex-col items-end">
                         <div className="text-sm font-medium">MOQ</div>
-                        <div className="text-xl font-semibold">{product.moq}</div>
+                        <div className="text-xl font-semibold">{product.minOrderQuantity}</div>
             </div>
           </div>
           
@@ -1877,21 +2055,21 @@ const ProductsTab: React.FC<ProductsTabProps> = ({
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Inventory</span>
                         <span className={
-                          product.inventoryLevel < product.moq * 0.5
+                          product.currentAvailable < product.minOrderQuantity * 0.5
                             ? "text-red-500 font-medium"
-                            : product.inventoryLevel < product.moq
+                            : product.currentAvailable < product.minOrderQuantity
                               ? "text-amber-500 font-medium"
                               : "text-green-600 font-medium"
                         }>
-                          {product.inventoryLevel} {product.unitType}
+                          {product.currentAvailable} {product.unitType}
                         </span>
                       </div>
                       <Progress 
-                        value={(product.inventoryLevel / (product.moq * 3)) * 100} 
+                        value={(product.currentAvailable / (product.minOrderQuantity * 3)) * 100} 
                         className={`h-1.5 rounded-full ${
-                          product.inventoryLevel < product.moq * 0.5
+                          product.currentAvailable < product.minOrderQuantity * 0.5
                             ? "bg-red-500"
-                            : product.inventoryLevel < product.moq
+                            : product.currentAvailable < product.minOrderQuantity
                               ? "bg-amber-500"
                               : "bg-green-600"
                         }`}
@@ -2617,637 +2795,470 @@ const LineDetailsContent: React.FC<LineDetailsContentProps> = ({
 // Product Form Component
 interface ProductFormProps {
   product: Product | null;
-  onSubmit: (product: Product | Omit<Product, "id" | "createdAt" | "updatedAt" | "lastProduced" | "reorderPoint">) => void;
+  onSubmit: (product: Product | Omit<Product, "id" | "createdAt" | "updatedAt" | "lastProduced" | "reorderPoint" | "sku">) => void;
   isLoading: boolean;
 }
 
 const ProductForm: React.FC<ProductFormProps> = ({ product, onSubmit, isLoading }) => {
-  const [formData, setFormData] = useState<Omit<Product, "id" | "createdAt" | "updatedAt" | "lastProduced" | "reorderPoint">>({
-    name: product?.name || "",
-    category: product?.category || "",
-    sku: product?.sku || "",
-    status: product?.status || "Active",
-    moq: product?.moq || 100,
-    dailyCapacity: product?.dailyCapacity || 1000,
-    unitType: product?.unitType || "units",
-    inventoryLevel: product?.inventoryLevel || 500,
-    image: product?.image || "",
-    description: product?.description || ""
-  });
-  
-  const [previewFile, setPreviewFile] = useState<string | null>(null);
-  const [dragActive, setDragActive] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  useEffect(() => {
-    if (product) {
-      setFormData({
-        name: product.name,
-        category: product.category,
-        sku: product.sku,
-        status: product.status,
-        moq: product.moq,
-        dailyCapacity: product.dailyCapacity,
-        unitType: product.unitType,
-        inventoryLevel: product.inventoryLevel,
-        image: product.image,
-        description: product.description || ""
-      });
+  const [formData, setFormData] = useState<Partial<Product>>(
+    product ? { ...product } : {
+      name: "",
+      category: "",
+      minOrderQuantity: 1000,
+      dailyCapacity: 5000,
+      unitType: "units",
+      currentAvailable: 0,
+      pricePerUnit: 0,
+      productType: "Finished Good",
+      image: "",
+      description: "",
+      leadTime: "1-2",
+      leadTimeUnit: "weeks",
+      sustainable: false
     }
-  }, [product]);
-  
-  // Handle file input change
+  );
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     handleFile(file);
   };
-  
-  // Handle drag events
+
   const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     
     if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
+      setIsDragging(true);
     } else if (e.type === "dragleave") {
-      setDragActive(false);
+      setIsDragging(false);
     }
   };
-  
-  // Handle drop event
+
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    setDragActive(false);
+    setIsDragging(false);
     
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFile(e.dataTransfer.files[0]);
-    }
+    const file = e.dataTransfer.files?.[0];
+    handleFile(file);
   };
-  
-  // Process the uploaded file
+
   const handleFile = (file: File | undefined) => {
-    if (!file) return;
-    
-    // Check if file is an image
-    if (!file.type.match('image.*')) {
-      setErrors({
-        ...errors,
-        image: "Please upload an image file (png, jpg, jpeg, gif)"
-      });
-      return;
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setFormData({
+          ...formData,
+          image: e.target?.result as string
+        });
+      };
+      reader.readAsDataURL(file);
     }
-    
-    // Check file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      setErrors({
-        ...errors,
-        image: "File is too large. Maximum size is 5MB."
-      });
-      return;
-    }
-    
-    // Clear any existing errors
-    if (errors.image) {
-      setErrors({
-        ...errors,
-        image: ""
-      });
-    }
-    
-    // Create a preview URL
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const result = e.target?.result as string;
-      setPreviewFile(result);
-      setFormData({
-        ...formData,
-        image: result
-      });
-    };
-    reader.readAsDataURL(file);
   };
-  
-  // Handle form input changes
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+    const { name, value, type } = e.target;
     
-    // Clear error when field is edited
-    if (errors[name]) {
-      setErrors({
-        ...errors,
-        [name]: ""
-      });
-    }
-    
-    // Mark field as touched
-    if (!touched[name]) {
-      setTouched({
-        ...touched,
-        [name]: true
-      });
-    }
-    
-    // Handle numeric fields
-    if (["moq", "dailyCapacity", "inventoryLevel"].includes(name)) {
-      const numValue = parseInt(value);
+    // Handle checkbox inputs
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked;
       setFormData({
         ...formData,
-        [name]: isNaN(numValue) ? 0 : numValue
+        [name]: checked
       });
-    } else {
+      return;
+    }
+    
+    // Handle numeric inputs
+    if (type === 'number') {
       setFormData({
         ...formData,
-        [name]: value
+        [name]: parseFloat(value) || 0
       });
+      return;
     }
+    
+    // Handle text and other inputs
+    setFormData({
+      ...formData,
+      [name]: value
+    });
   };
-  
-  // Validate form before submission
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     
-    if (!formData.name.trim()) {
+    if (!formData.name) {
       newErrors.name = "Product name is required";
     }
     
-    if (!formData.sku.trim()) {
-      newErrors.sku = "SKU is required";
-    }
-    
-    if (!formData.category.trim()) {
+    if (!formData.category) {
       newErrors.category = "Category is required";
     }
     
-    if (formData.moq <= 0) {
-      newErrors.moq = "MOQ must be greater than 0";
+    if (!formData.minOrderQuantity || formData.minOrderQuantity <= 0) {
+      newErrors.minOrderQuantity = "Minimum order quantity must be greater than zero";
     }
     
-    if (formData.dailyCapacity <= 0) {
-      newErrors.dailyCapacity = "Daily capacity must be greater than 0";
+    if (!formData.dailyCapacity || formData.dailyCapacity <= 0) {
+      newErrors.dailyCapacity = "Daily capacity must be greater than zero";
     }
     
-    if (!formData.unitType.trim()) {
+    if (!formData.pricePerUnit || formData.pricePerUnit <= 0) {
+      newErrors.pricePerUnit = "Price per unit must be greater than zero";
+    }
+    
+    if (!formData.description) {
+      newErrors.description = "Description is required";
+    }
+    
+    if (!formData.unitType) {
       newErrors.unitType = "Unit type is required";
     }
     
-    if (!formData.description.trim()) {
-      newErrors.description = "Product description is required";
-    }
-    
     setErrors(newErrors);
-    // Mark all fields as touched
-    const allTouched: Record<string, boolean> = {};
-    Object.keys(formData).forEach(key => {
-      allTouched[key] = true;
-    });
-    setTouched(allTouched);
     
     return Object.keys(newErrors).length === 0;
   };
-  
-  // Handle form submission
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm()) {
-      return;
-    }
-    
-    if (product) {
-      // If editing, include the id and createdAt
-      onSubmit({
-        ...formData,
-        id: product.id,
-        createdAt: product.createdAt,
-      });
-    } else {
-      // If creating new product
-      onSubmit({
-        ...formData,
-        reorderPoint: Math.round(formData.moq * 0.2) // Default reorder point is 20% of MOQ
-      });
+    if (validateForm()) {
+      if (product) {
+        // Update existing product
+        onSubmit({
+          ...product,
+          ...formData
+        } as Product);
+      } else {
+        // Create new product
+        onSubmit(formData as Omit<Product, "id" | "createdAt" | "updatedAt" | "lastProduced" | "reorderPoint" | "sku">);
+      }
     }
   };
 
-  // Handle image preview
-  const imagePreview = previewFile || formData.image || "/placeholder.svg";
-  
   return (
-    <>
-      <form onSubmit={handleSubmit} className="space-y-6 max-h-[70vh] overflow-y-auto pr-1 product-form-container no-scrollbar">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Left Column - Image Preview */}
-          <div className="md:col-span-1 space-y-4">
-            <div 
-              className={`aspect-square rounded-lg overflow-hidden border-2 border-dashed ${dragActive ? "border-primary bg-primary/5" : "border-muted-foreground/25 bg-muted"} flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-300 relative image-upload-area`}
-              onDragEnter={handleDrag}
-              onDragLeave={handleDrag}
-              onDragOver={handleDrag}
-              onDrop={handleDrop}
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                className="hidden" 
-                accept="image/*" 
-                onChange={handleFileChange}
+    <motion.form 
+      onSubmit={handleSubmit}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+      className="space-y-6"
+    >
+      <motion.div 
+        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+      >
+        <div className="space-y-2">
+          <Label htmlFor="name" className="text-base">Product Name</Label>
+          <Input
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="Enter product name"
+            className={cn("enhanced-input form-field-animation", errors.name && "error")}
+          />
+          {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="category" className="text-base">Category</Label>
+          <Select
+            name="category"
+            value={formData.category}
+            onValueChange={(value) => setFormData({...formData, category: value})}
+          >
+            <SelectTrigger className={cn("enhanced-input form-field-animation", errors.category && "error")}>
+              <SelectValue placeholder="Select a category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Food">Food</SelectItem>
+              <SelectItem value="Beverage">Beverage</SelectItem>
+              <SelectItem value="Health">Health</SelectItem>
+              <SelectItem value="Packaging">Packaging</SelectItem>
+              <SelectItem value="Ingredients">Ingredients</SelectItem>
+              <SelectItem value="Other">Other</SelectItem>
+            </SelectContent>
+          </Select>
+          {errors.category && <p className="text-sm text-destructive">{errors.category}</p>}
+        </div>
+      </motion.div>
+      
+      <motion.div 
+        className="grid grid-cols-1 md:grid-cols-3 gap-6"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.2 }}
+      >
+        <div className="space-y-2">
+          <Label htmlFor="minOrderQuantity" className="text-base">Minimum Order Quantity</Label>
+          <Input
+            id="minOrderQuantity"
+            name="minOrderQuantity"
+            type="number"
+            value={formData.minOrderQuantity}
+            onChange={handleChange}
+            className={cn("enhanced-input form-field-animation", errors.minOrderQuantity && "error")}
+          />
+          {errors.minOrderQuantity && <p className="text-sm text-destructive">{errors.minOrderQuantity}</p>}
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="dailyCapacity" className="text-base">Daily Capacity</Label>
+          <Input
+            id="dailyCapacity"
+            name="dailyCapacity"
+            type="number"
+            value={formData.dailyCapacity}
+            onChange={handleChange}
+            className={cn("enhanced-input form-field-animation", errors.dailyCapacity && "error")}
+          />
+          {errors.dailyCapacity && <p className="text-sm text-destructive">{errors.dailyCapacity}</p>}
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="unitType" className="text-base">Unit Type</Label>
+          <Select
+            name="unitType"
+            value={formData.unitType}
+            onValueChange={(value) => setFormData({...formData, unitType: value})}
+          >
+            <SelectTrigger className={cn("enhanced-input form-field-animation", errors.unitType && "error")}>
+              <SelectValue placeholder="Select unit type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="units">Units</SelectItem>
+              <SelectItem value="boxes">Boxes</SelectItem>
+              <SelectItem value="bottles">Bottles</SelectItem>
+              <SelectItem value="kg">Kilograms</SelectItem>
+              <SelectItem value="liters">Liters</SelectItem>
+              <SelectItem value="sachets">Sachets</SelectItem>
+              <SelectItem value="pairs">Pairs</SelectItem>
+              <SelectItem value="cases">Cases</SelectItem>
+            </SelectContent>
+          </Select>
+          {errors.unitType && <p className="text-sm text-destructive">{errors.unitType}</p>}
+        </div>
+      </motion.div>
+      
+      <motion.div 
+        className="grid grid-cols-1 md:grid-cols-3 gap-6"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.3 }}
+      >
+        <div className="space-y-2">
+          <Label htmlFor="currentAvailable" className="text-base">Current Available</Label>
+          <Input
+            id="currentAvailable"
+            name="currentAvailable"
+            type="number"
+            value={formData.currentAvailable}
+            onChange={handleChange}
+            className="enhanced-input form-field-animation"
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="pricePerUnit" className="text-base">Price Per Unit ($)</Label>
+          <Input
+            id="pricePerUnit"
+            name="pricePerUnit"
+            type="number"
+            step="0.01"
+            value={formData.pricePerUnit}
+            onChange={handleChange}
+            className={cn("enhanced-input form-field-animation", errors.pricePerUnit && "error")}
+          />
+          {errors.pricePerUnit && <p className="text-sm text-destructive">{errors.pricePerUnit}</p>}
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="productType" className="text-base">Product Type</Label>
+          <Select
+            name="productType"
+            value={formData.productType}
+            onValueChange={(value) => setFormData({...formData, productType: value})}
+          >
+            <SelectTrigger className="enhanced-input form-field-animation">
+              <SelectValue placeholder="Select product type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Finished Good">Finished Good</SelectItem>
+              <SelectItem value="Raw Material">Raw Material</SelectItem>
+              <SelectItem value="Component">Component</SelectItem>
+              <SelectItem value="Packaging Material">Packaging Material</SelectItem>
+              <SelectItem value="Semi-finished Good">Semi-finished Good</SelectItem>
+              <SelectItem value="Bulk Product">Bulk Product</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </motion.div>
+      
+      <motion.div 
+        className="grid grid-cols-1 md:grid-cols-3 gap-6"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.4 }}
+      >
+        <div className="space-y-2">
+          <Label htmlFor="leadTime" className="text-base">Lead Time</Label>
+          <Input
+            id="leadTime"
+            name="leadTime"
+            value={formData.leadTime}
+            onChange={handleChange}
+            className="enhanced-input form-field-animation"
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="leadTimeUnit" className="text-base">Lead Time Unit</Label>
+          <Select
+            name="leadTimeUnit"
+            value={formData.leadTimeUnit}
+            onValueChange={(value) => setFormData({...formData, leadTimeUnit: value})}
+          >
+            <SelectTrigger className="enhanced-input form-field-animation">
+              <SelectValue placeholder="Select unit" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="days">Days</SelectItem>
+              <SelectItem value="weeks">Weeks</SelectItem>
+              <SelectItem value="months">Months</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div className="space-y-2 flex items-center">
+          <div className="flex-1 pt-6">
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="sustainable" 
+                name="sustainable"
+                checked={formData.sustainable}
+                onCheckedChange={(checked) => 
+                  setFormData({...formData, sustainable: checked as boolean})
+                }
               />
-              
-              {imagePreview ? (
-                <motion.div 
-                  className="h-full w-full relative group"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <motion.img 
-                    src={imagePreview}
-                    alt="Product preview"
-                    className="h-full w-full object-cover"
-                    initial={{ scale: 1.1 }}
-                    animate={{ scale: 1 }}
-                    transition={{ duration: 0.3 }}
-                  />
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center text-white">
-                    <Upload className="h-8 w-8 mb-2" />
-                    <p className="text-sm">Click or drop to replace</p>
-                  </div>
-                </motion.div>
-              ) : (
-                <div className="text-center p-4 cursor-pointer">
-                  <motion.div
-                    className="upload-icon-animation"
-                    initial={{ scale: 1 }}
-                    animate={{ scale: [1, 1.05, 1], rotate: [0, 5, 0] }}
-                    transition={{ duration: 1.5, repeat: Infinity, repeatType: "reverse" }}
-                  >
-                    <Upload className="h-16 w-16 text-muted-foreground/50 mx-auto mb-3" />
-                  </motion.div>
-                  <p className="text-sm text-muted-foreground">Drop your image here</p>
-                  <p className="text-xs text-muted-foreground mt-1">or click to browse</p>
-                  <p className="text-xs text-muted-foreground/70 mt-3">PNG, JPG, JPEG, GIF up to 5MB</p>
-                </div>
-              )}
-              
-              {dragActive && (
-                <motion.div 
-                  className="absolute inset-0 bg-primary/10 border-2 border-primary flex items-center justify-center"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <div className="text-center">
-                    <Upload className="h-16 w-16 text-primary mx-auto mb-3" />
-                    <p className="text-primary font-medium">Drop image here</p>
-                  </div>
-                </motion.div>
-              )}
-            </div>
-            
-            {errors.image && touched.image && (
-              <motion.p 
-                className="text-xs text-red-500 flex items-center"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
+              <label
+                htmlFor="sustainable"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center"
               >
-                <X className="h-3 w-3 mr-1" />
-                {errors.image}
-              </motion.p>
-            )}
+                <Zap className="h-4 w-4 mr-2 text-green-600" />
+                Sustainable Product
+              </label>
+            </div>
           </div>
+        </div>
+      </motion.div>
+      
+      <motion.div 
+        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.5 }}
+      >
+        <div className="space-y-2">
+          <Label htmlFor="description" className="text-base">Description</Label>
+          <Textarea
+            id="description"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            placeholder="Enter product description"
+            className={cn("h-[120px] enhanced-input form-field-animation", errors.description && "error")}
+          />
+          {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
+        </div>
+        
+        <div className="space-y-2">
+          <Label className="text-base">Product Image</Label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            ref={fileInputRef}
+            className="hidden"
+          />
           
-          {/* Middle and Right Columns - Form Fields */}
-          <div className="md:col-span-2 space-y-4">
-                  <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-sm flex items-center">
-                  <Package className="h-4 w-4 mr-2 text-muted-foreground" />
-                  Product Name
-                </Label>
-                <div className={`enhanced-input form-field-animation ${errors.name && touched.name ? 'error' : ''}`}>
-                  <Input
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="Enter product name"
-                    className="transition-all duration-200"
-                  />
-                      </div>
-                {errors.name && touched.name && (
-                  <motion.p 
-                    className="text-xs text-red-500 flex items-center"
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                  >
-                    <X className="h-3 w-3 mr-1" />
-                    {errors.name}
-                  </motion.p>
-                )}
-                    </div>
-                    
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="category" className="text-sm flex items-center">
-                    <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
-                    Category
-                  </Label>
-                  <div className={`enhanced-input form-field-animation ${errors.category && touched.category ? 'error' : ''}`}>
-                    <Input
-                      id="category"
-                      name="category"
-                      value={formData.category}
-                      onChange={handleChange}
-                      placeholder="e.g., Beverages, Snacks"
-                      className="transition-all duration-200"
-                    />
-                      </div>
-                  {errors.category && touched.category && (
-                    <motion.p 
-                      className="text-xs text-red-500 flex items-center"
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                    >
-                      <X className="h-3 w-3 mr-1" />
-                      {errors.category}
-                    </motion.p>
-                  )}
-                    </div>
-                    
-                <div className="space-y-2">
-                  <Label htmlFor="status" className="text-sm flex items-center">
-                    <CheckCircle className="h-4 w-4 mr-2 text-muted-foreground" />
-                    Status
-                  </Label>
-                  <div className="form-field-animation">
-                    <Select 
-                      value={formData.status} 
-                      onValueChange={(value) => 
-                        setFormData({...formData, status: value})
-                      }
-                    >
-                      <SelectTrigger id="status">
-                        <SelectValue placeholder="Select status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Active">Active</SelectItem>
-                        <SelectItem value="Low Stock">Low Stock</SelectItem>
-                        <SelectItem value="Out of Stock">Out of Stock</SelectItem>
-                        <SelectItem value="Discontinued">Discontinued</SelectItem>
-                      </SelectContent>
-                    </Select>
-                      </div>
-                    </div>
-                  </div>
-                  
-              <div className="space-y-2">
-                <Label htmlFor="sku" className="text-sm flex items-center">
-                  <BarChart className="h-4 w-4 mr-2 text-muted-foreground" />
-                  SKU (Stock Keeping Unit)
-                </Label>
-                <div className={`enhanced-input form-field-animation ${errors.sku && touched.sku ? 'error' : ''}`}>
-                  <Input
-                    id="sku"
-                    name="sku"
-                    value={formData.sku}
-                    onChange={handleChange}
-                    placeholder="e.g., PROD-12345"
-                    className="transition-all duration-200"
-                  />
-            </div>
-                {errors.sku && touched.sku && (
-                  <motion.p 
-                    className="text-xs text-red-500 flex items-center"
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                  >
-                    <X className="h-3 w-3 mr-1" />
-                    {errors.sku}
-                  </motion.p>
-                )}
-                <p className="text-xs text-muted-foreground">
-                  Unique identifier for inventory management
-                </p>
-          </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="description" className="text-sm flex items-center">
-                  <Pencil className="h-4 w-4 mr-2 text-muted-foreground" />
-                  Product Description
-                </Label>
-                <div className={`enhanced-input form-field-animation ${errors.description && touched.description ? 'error' : ''}`}>
-                  <Textarea
-                    id="description"
-                    name="description"
-                    value={formData.description}
-                    onChange={handleChange}
-                    placeholder="Enter product description"
-                    className="min-h-[100px] resize-none"
-                  />
-        </div>
-                {errors.description && touched.description && (
-                  <motion.p 
-                    className="text-xs text-red-500 flex items-center"
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                  >
-                    <X className="h-3 w-3 mr-1" />
-                    {errors.description}
-                  </motion.p>
-                )}
-                <p className="text-xs text-muted-foreground">
-                  Detailed description of the product
-                </p>
-      </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="moq" className="text-sm flex items-center">
-                    <TrendingUp className="h-4 w-4 mr-2 text-muted-foreground" />
-                    Minimum Order Quantity (MOQ)
-                  </Label>
-                  <div className={`relative enhanced-input form-field-animation ${errors.moq && touched.moq ? 'error' : ''}`}>
-                    <Input
-                      id="moq"
-                      name="moq"
-                      type="number"
-                      value={formData.moq}
-                      onChange={handleChange}
-                      min="1"
-                      placeholder="100"
-                      className="transition-all duration-200"
-                    />
-    </div>
-                  {errors.moq && touched.moq && (
-                    <motion.p 
-                      className="text-xs text-red-500 flex items-center"
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                    >
-                      <X className="h-3 w-3 mr-1" />
-                      {errors.moq}
-                    </motion.p>
-                  )}
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="unitType" className="text-sm flex items-center">
-                    <Package className="h-4 w-4 mr-2 text-muted-foreground" />
-                    Unit Type
-                  </Label>
-                  <div className={`enhanced-input form-field-animation ${errors.unitType && touched.unitType ? 'error' : ''}`}>
-                    <Input
-                      id="unitType"
-                      name="unitType"
-                      value={formData.unitType}
-                      onChange={handleChange}
-                      placeholder="e.g., boxes, units, bottles"
-                      className="transition-all duration-200"
-                    />
-                  </div>
-                  {errors.unitType && touched.unitType && (
-                    <motion.p 
-                      className="text-xs text-red-500 flex items-center"
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                    >
-                      <X className="h-3 w-3 mr-1" />
-                      {errors.unitType}
-                    </motion.p>
-                  )}
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="dailyCapacity" className="text-sm flex items-center">
-                    <Factory className="h-4 w-4 mr-2 text-muted-foreground" />
-                    Daily Production Capacity
-                  </Label>
-                  <div className={`relative enhanced-input form-field-animation ${errors.dailyCapacity && touched.dailyCapacity ? 'error' : ''}`}>
-                    <Input
-                      id="dailyCapacity"
-                      name="dailyCapacity"
-                      type="number"
-                      value={formData.dailyCapacity}
-                      onChange={handleChange}
-                      min="1"
-                      placeholder="1000"
-                      className="transition-all duration-200"
-                    />
-                  </div>
-                  {errors.dailyCapacity && touched.dailyCapacity && (
-                    <motion.p 
-                      className="text-xs text-red-500 flex items-center"
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                    >
-                      <X className="h-3 w-3 mr-1" />
-                      {errors.dailyCapacity}
-                    </motion.p>
-                  )}
-                  <p className="text-xs text-muted-foreground">
-                    Maximum number of units that can be produced daily
-                  </p>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="inventoryLevel" className="text-sm flex items-center">
-                    <PackageCheck className="h-4 w-4 mr-2 text-muted-foreground" />
-                    Current Inventory Level
-                  </Label>
-                  <div className={`relative enhanced-input form-field-animation ${errors.inventoryLevel && touched.inventoryLevel ? 'error' : ''}`}>
-                    <Input
-                      id="inventoryLevel"
-                      name="inventoryLevel"
-                      type="number"
-                      value={formData.inventoryLevel}
-                      onChange={handleChange}
-                      min="0"
-                      placeholder="500"
-                      className="transition-all duration-200"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Inventory Status Visualization */}
-            {formData.inventoryLevel > 0 && formData.dailyCapacity > 0 && (
-              <motion.div 
-                className="p-4 border rounded-lg mt-4"
-                initial={{ opacity: 0, height: 0, scale: 0.95 }}
-                animate={{ opacity: 1, height: 'auto', scale: 1 }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
-              >
-                <div className="flex justify-between text-sm">
-                  <span className="flex items-center">
-                    <BarChart className="h-4 w-4 mr-2 text-primary" />
-                    Inventory Level
-                  </span>
-                  <Badge 
-                    className={
-                      (formData.inventoryLevel / formData.dailyCapacity) > 0.7 
-                        ? "bg-green-500" 
-                        : (formData.inventoryLevel / formData.dailyCapacity) > 0.3 
-                          ? "bg-yellow-500" 
-                          : "bg-red-500"
-                    }
-                  >
-                    {Math.round((formData.inventoryLevel / formData.dailyCapacity) * 100)}%
-                  </Badge>
-                </div>
-                <Progress 
-                  value={(formData.inventoryLevel / formData.dailyCapacity) * 100} 
-                  className={`h-2 ${
-                    (formData.inventoryLevel / formData.dailyCapacity) > 0.7 ? "bg-green-500" :
-                    (formData.inventoryLevel / formData.dailyCapacity) > 0.3 ? "bg-yellow-500" :
-                    "bg-red-500"
-                  }`}
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Current inventory as percentage of daily capacity
-                </p>
-              </motion.div>
+          <motion.div
+            className={cn(
+              "image-upload-area w-full h-[120px] border-2 border-dashed rounded-md flex flex-col items-center justify-center cursor-pointer",
+              isDragging 
+                ? "border-primary bg-primary/5" 
+                : formData.image 
+                  ? "border-primary/30 bg-primary/5"
+                  : "border-muted-foreground/25 hover:border-primary/30 hover:bg-primary/5"
             )}
-            
-            {/* Submit Button */}
-            <div className="pt-4">
-              <Button 
-                type="submit" 
-                className="w-full submit-button-hover"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    {product ? "Saving Changes..." : "Creating Product..."}
-                  </>
-                ) : (
-                  <>
-                    {product ? (
-                      <>
-                        <Save className="h-4 w-4 mr-2" />
-                        Save Changes
-                      </>
-                    ) : (
-                      <>
-                        <PlusCircle className="h-4 w-4 mr-2" />
-                        Create Product
-                      </>
-                    )}
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
+            onDragEnter={handleDrag}
+            onDragLeave={handleDrag}
+            onDragOver={handleDrag}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+            whileHover={{ y: -5 }}
+            transition={{ type: "spring", stiffness: 500, damping: 15 }}
+          >
+            {formData.image ? (
+              <div className="relative w-full h-full">
+                <img 
+                  src={formData.image} 
+                  alt="Product preview" 
+                  className="w-full h-full object-contain p-2" 
+                />
+                <div className="absolute inset-0 bg-black/0 hover:bg-black/60 transition-all flex items-center justify-center opacity-0 hover:opacity-100">
+                  <p className="text-white text-sm font-medium">Click or drop to change</p>
+                </div>
+              </div>
+            ) : (
+              <>
+                <motion.div 
+                  className="upload-icon-animation text-primary/60"
+                  animate={{ y: [0, -5, 0] }}
+                  transition={{ duration: 2, repeat: Infinity, repeatType: "loop" }}
+                >
+                  <UploadCloud className="h-8 w-8 mb-2" />
+                </motion.div>
+                <p className="text-sm text-muted-foreground">Click or drag & drop an image</p>
+                <p className="text-xs text-muted-foreground mt-1">PNG, JPG or GIF up to 5MB</p>
+              </>
+            )}
+          </motion.div>
         </div>
-      </form>
-    </>
+      </motion.div>
+      
+      <motion.div 
+        className="flex justify-end mt-6 space-x-2"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.6 }}
+      >
+        <Button
+          type="submit"
+          disabled={isLoading}
+          className="submit-button-hover hover-scale-subtle"
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              {product ? "Updating..." : "Creating..."}
+            </>
+          ) : (
+            <>
+              <Save className="mr-2 h-4 w-4" />
+              {product ? "Update Product" : "Create Product"}
+            </>
+          )}
+        </Button>
+      </motion.div>
+    </motion.form>
   );
 };
 
@@ -3756,7 +3767,8 @@ const AssignProductForm: React.FC<AssignProductFormProps> = ({
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   
-  const activeProducts = products.filter(p => p.status === "Active");
+  // Filter products with current available inventory
+  const availableProducts = products.filter(p => p.currentAvailable > 0);
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -3777,9 +3789,9 @@ const AssignProductForm: React.FC<AssignProductFormProps> = ({
           Select Product*
         </Label>
         
-        {activeProducts.length === 0 ? (
+        {availableProducts.length === 0 ? (
           <div className="p-4 border rounded-md bg-muted/50 text-center">
-            <span className="text-sm text-muted-foreground">No active products available</span>
+            <span className="text-sm text-muted-foreground">No products available in stock</span>
           </div>
         ) : (
           <div className="grid gap-3 pt-2">
@@ -3790,7 +3802,7 @@ const AssignProductForm: React.FC<AssignProductFormProps> = ({
                 setError(null);
               }}
             >
-              {activeProducts.map((product) => (
+              {availableProducts.map((product) => (
                 <div key={product.id} className="flex items-center space-x-2">
                   <RadioGroupItem value={product.id.toString()} id={`product-${product.id}`} />
                   <Label 
@@ -3833,7 +3845,7 @@ const AssignProductForm: React.FC<AssignProductFormProps> = ({
       <DialogFooter className="mt-6">
         <Button 
           type="submit" 
-          disabled={isLoading || activeProducts.length === 0}
+          disabled={isLoading || availableProducts.length === 0}
           className="w-full sm:w-auto hover-scale-subtle"
         >
           {isLoading ? (
@@ -3856,183 +3868,203 @@ const AssignProductForm: React.FC<AssignProductFormProps> = ({
 // ProductDetailsContent Component
 interface ProductDetailsContentProps {
   product: Product;
-  getStatusBadge: (status: string) => JSX.Element;
+  getProductTypeBadge: (productType: string) => JSX.Element;
   onEdit: () => void;
 }
 
 const ProductDetailsContent: React.FC<ProductDetailsContentProps> = ({ 
   product, 
-  getStatusBadge,
+  getProductTypeBadge,
   onEdit
 }) => {
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row gap-6">
-        {/* Product Image */}
-        <div className="w-full md:w-1/3">
-          <motion.div 
-            className="rounded-lg overflow-hidden border bg-muted/20 aspect-square"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4 }}
-          >
+    <div className="space-y-8">
+      <div className="flex justify-between items-start">
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="flex gap-4 items-start"
+        >
+          <div className="h-20 w-20 rounded-lg bg-muted overflow-hidden flex-shrink-0">
             {product.image ? (
-              <img 
-                src={product.image} 
-                alt={product.name} 
-                className="w-full h-full object-cover"
-              />
+              <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-muted">
-                <PackageCheck className="h-16 w-16 text-muted-foreground/30" />
+              <div className="h-full w-full flex items-center justify-center bg-muted">
+                <Package className="h-8 w-8 text-muted-foreground/40" />
               </div>
             )}
-          </motion.div>
-                  
-                  <div className="mt-4">
-            <Button variant="outline" className="w-full" onClick={onEdit}>
-              <Pencil className="h-4 w-4 mr-2" />
-              Edit Product
-            </Button>
-                  </div>
-        </div>
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold flex items-center gap-2">
+              {product.name}
+              {product.sustainable && 
+                <Badge variant="outline" className="ml-2 bg-green-500/10 text-green-600 text-xs">
+                  <Zap className="h-3 w-3 mr-1" />
+                  Sustainable
+                </Badge>
+              }
+            </h2>
+            <p className="text-muted-foreground">{getProductTypeBadge(product.productType)}</p>
+          </div>
+        </motion.div>
         
-        {/* Product Details */}
-        <div className="w-full md:w-2/3 space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <div>
-              <motion.h2 
-                className="text-2xl font-bold"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                {product.name}
-              </motion.h2>
-              <motion.div 
-                className="text-sm text-muted-foreground flex gap-2 items-center"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.3, delay: 0.1 }}
-              >
-                <Tag className="h-3 w-3" />
-                {product.category}
-                <span className="text-muted-foreground/30">•</span>
-                <BarChart className="h-3 w-3" />
-                SKU: {product.sku}
-              </motion.div>
-            </div>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3, delay: 0.2 }}
-            >
-              {getStatusBadge(product.status)}
-            </motion.div>
-          </div>
-          
-          <motion.div 
-            className="grid grid-cols-1 sm:grid-cols-2 gap-4"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.3 }}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={onEdit}
+            className="hover-scale-subtle"
           >
-            <Card className="bg-muted/10 hover:bg-muted/20 transition-colors duration-200">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium flex items-center">
-                  <LineChartIcon className="h-4 w-4 mr-2 text-primary/70" />
-                  Inventory Status
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {product.inventoryLevel} <span className="text-sm font-normal text-muted-foreground">{product.unitType}</span>
-                </div>
-                <div className="text-xs text-muted-foreground mt-1 flex items-center justify-between">
-                  <span>MOQ: {product.moq} {product.unitType}</span>
-                  <span>Reorder point: {product.reorderPoint} {product.unitType}</span>
-                </div>
-                <Progress 
-                  value={(product.inventoryLevel / product.moq) * 100} 
-                  className="h-2 mt-2" 
-                />
-                </CardContent>
-              </Card>
-              
-            <Card className="bg-muted/10 hover:bg-muted/20 transition-colors duration-200">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium flex items-center">
-                  <Factory className="h-4 w-4 mr-2 text-primary/70" />
-                  Production Capacity
-                </CardTitle>
-                </CardHeader>
-                <CardContent>
-                <div className="text-2xl font-bold">
-                  {product.dailyCapacity} <span className="text-sm font-normal text-muted-foreground">{product.unitType}/day</span>
-                      </div>
-                <div className="text-xs text-muted-foreground mt-1 flex items-center">
-                  Last produced: {product.lastProduced || "Never"}
-                    </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.4 }}
-          >
-            <h3 className="text-sm font-medium mb-2">Description</h3>
-            <div className="p-3 rounded-md border bg-muted/10">
-              {product.description ? (
-                <p className="text-sm">{product.description}</p>
-              ) : (
-                <p className="text-sm text-muted-foreground italic">No description available</p>
-              )}
-                      </div>
-          </motion.div>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.5 }}
-            className="border-t pt-4 mt-4"
-          >
-            <h3 className="text-sm font-medium mb-2">Product Timeline</h3>
-            <div className="space-y-3">
-              <div className="flex items-start">
-                <div className="mr-3 h-8 w-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">
-                  <Package className="h-4 w-4" />
-                </div>
-                <div>
-                  <div className="text-sm font-medium">Product Created</div>
-                  <div className="text-xs text-muted-foreground">{product.createdAt}</div>
-                </div>
-                    </div>
-                    
-              <div className="flex items-start">
-                <div className="mr-3 h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                  <RefreshCw className="h-4 w-4" />
-                      </div>
-                <div>
-                  <div className="text-sm font-medium">Last Updated</div>
-                  <div className="text-xs text-muted-foreground">{product.updatedAt}</div>
-                    </div>
-                  </div>
-                  
-              <div className="flex items-start">
-                <div className="mr-3 h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
-                  <Factory className="h-4 w-4" />
-            </div>
-                <div>
-                  <div className="text-sm font-medium">Last Production Run</div>
-                  <div className="text-xs text-muted-foreground">{product.lastProduced || "No production recorded"}</div>
-          </div>
+            <Edit className="h-4 w-4 mr-2" />
+            Edit Product
+          </Button>
+        </motion.div>
+      </div>
+      
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
+        <Card className="card-hover-effect">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center">
+              <InfoIcon className="h-5 w-5 mr-2 text-primary" />
+              Product Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+              <div>
+                <h4 className="text-sm font-medium text-muted-foreground">SKU</h4>
+                <p className="font-medium">{product.sku}</p>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium text-muted-foreground">Category</h4>
+                <p className="font-medium">{product.category}</p>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium text-muted-foreground">Minimum Order Quantity</h4>
+                <p className="font-medium">{product.minOrderQuantity} {product.unitType}</p>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium text-muted-foreground">Daily Capacity</h4>
+                <p className="font-medium">{product.dailyCapacity} {product.unitType}/day</p>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium text-muted-foreground">Price Per Unit</h4>
+                <p className="font-medium">${product.pricePerUnit.toFixed(2)} per {product.unitType}</p>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium text-muted-foreground">Lead Time</h4>
+                <p className="font-medium">{product.leadTime} {product.leadTimeUnit}</p>
+              </div>
+              <div className="md:col-span-2">
+                <h4 className="text-sm font-medium text-muted-foreground">Description</h4>
+                <p className="text-sm mt-1">{product.description}</p>
               </div>
             </div>
-          </motion.div>
-        </div>
-      </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+      
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+      >
+        <Card className="card-hover-effect">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg flex items-center">
+              <Package className="h-5 w-5 mr-2 text-primary" />
+              Inventory Status
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <h4 className="text-sm font-medium">Current Available</h4>
+                  <span className={
+                    product.currentAvailable < product.minOrderQuantity * 0.5
+                      ? "text-red-500 font-medium"
+                      : product.currentAvailable < product.minOrderQuantity
+                        ? "text-amber-500 font-medium"
+                        : "text-green-600 font-medium"
+                  }>
+                    {product.currentAvailable} {product.unitType}
+                  </span>
+                </div>
+                <Progress 
+                  value={(product.currentAvailable / (product.minOrderQuantity * 3)) * 100} 
+                  className={`h-2 rounded-full ${
+                    product.currentAvailable < product.minOrderQuantity * 0.5
+                      ? "bg-red-500"
+                      : product.currentAvailable < product.minOrderQuantity
+                        ? "bg-amber-500"
+                        : "bg-green-600"
+                  }`}
+                />
+              </div>
+              
+              <div>
+                <h4 className="text-sm font-medium mb-1">Reorder Point</h4>
+                <p className="font-medium">{product.reorderPoint} {product.unitType}</p>
+              </div>
+              
+              <div>
+                <h4 className="text-sm font-medium mb-1">Last Produced</h4>
+                <p className="font-medium">{new Date(product.lastProduced).toLocaleDateString()}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="card-hover-effect">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg flex items-center">
+              <CalendarCheck className="h-5 w-5 mr-2 text-primary" />
+              Production History
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <h4 className="text-sm font-medium mb-1">Created</h4>
+                <p className="font-medium">{new Date(product.createdAt).toLocaleDateString()}</p>
+              </div>
+              
+              <div>
+                <h4 className="text-sm font-medium mb-1">Last Updated</h4>
+                <p className="font-medium">{new Date(product.updatedAt).toLocaleDateString()}</p>
+              </div>
+              
+              <div>
+                <h4 className="text-sm font-medium mb-1">Production Status</h4>
+                <Badge variant="outline" className={
+                  product.currentAvailable === 0
+                    ? "bg-red-500/10 text-red-600"
+                    : product.currentAvailable < product.minOrderQuantity
+                      ? "bg-amber-500/10 text-amber-600"
+                      : "bg-green-500/10 text-green-600"
+                }>
+                  {product.currentAvailable === 0
+                    ? "Out of Stock"
+                    : product.currentAvailable < product.minOrderQuantity
+                      ? "Low Stock"
+                      : "In Stock"}
+                </Badge>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 };

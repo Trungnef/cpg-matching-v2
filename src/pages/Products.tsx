@@ -56,9 +56,31 @@ import { cn } from "@/lib/utils";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
+
+// Define the Product interface to match the data structure
+interface Product {
+  id: number;
+  name: string;
+  category: string;
+  manufacturer: string;
+  image: string;
+  price: string;
+  pricePerUnit?: number;
+  rating: number;
+  productType: string;
+  description: string;
+  minOrderQuantity: number;
+  leadTime: string;
+  leadTimeUnit?: string;
+  sustainable: boolean;
+  sku?: string;
+  unitType?: string;
+  currentAvailable?: number;
+}
 
 // Mock product data - in a real app, this would come from an API
-const mockProducts = [
+const mockProducts: Product[] = [
   {
     id: 1,
     name: "Organic Granola",
@@ -66,13 +88,17 @@ const mockProducts = [
     manufacturer: "Nature's Best",
     image: "/placeholder.svg",
     price: "$4.99",
-    certifications: ["Organic", "Non-GMO"],
+    pricePerUnit: 4.99,
     rating: 4.5,
-    packagingType: "Cardboard Box",
+    productType: "Finished Good",
     description: "Delicious organic granola made with whole grain oats, honey, and mixed nuts. Perfect for breakfast or as a healthy snack.",
     minOrderQuantity: 100,
-    leadTime: "2-3 weeks",
-    sustainable: true
+    leadTime: "2-3",
+    leadTimeUnit: "weeks",
+    sustainable: true,
+    sku: "ORG-GRA-001",
+    unitType: "boxes",
+    currentAvailable: 1200
   },
   {
     id: 2,
@@ -81,13 +107,17 @@ const mockProducts = [
     manufacturer: "Mountain Roasters",
     image: "/placeholder.svg",
     price: "$12.99",
-    certifications: ["Fair Trade", "Organic"],
+    pricePerUnit: 12.99,
     rating: 4.8,
-    packagingType: "Resealable Bag",
+    productType: "Finished Good",
     description: "Premium arabica coffee beans sourced from high-altitude farms. Medium roast with notes of chocolate and caramel.",
     minOrderQuantity: 50,
-    leadTime: "1-2 weeks",
-    sustainable: true
+    leadTime: "1-2",
+    leadTimeUnit: "weeks",
+    sustainable: true,
+    sku: "COF-BNS-002",
+    unitType: "bags",
+    currentAvailable: 500
   },
   {
     id: 3,
@@ -96,13 +126,17 @@ const mockProducts = [
     manufacturer: "Pure Foods Co.",
     image: "/placeholder.svg",
     price: "$7.99",
-    certifications: ["Non-GMO", "Gluten-Free"],
+    pricePerUnit: 7.99,
     rating: 4.2,
-    packagingType: "Glass Jar",
+    productType: "Finished Good",
     description: "Creamy almond butter made from dry roasted almonds. No added sugar or preservatives.",
     minOrderQuantity: 75,
-    leadTime: "2 weeks",
-    sustainable: false
+    leadTime: "2",
+    leadTimeUnit: "weeks",
+    sustainable: false,
+    sku: "ALM-BTR-003",
+    unitType: "jars",
+    currentAvailable: 320
   },
   {
     id: 4,
@@ -111,13 +145,17 @@ const mockProducts = [
     manufacturer: "Fitness Nutrition",
     image: "/placeholder.svg",
     price: "$2.49",
-    certifications: ["High-Protein", "Low-Sugar"],
+    pricePerUnit: 2.49,
     rating: 4.0,
-    packagingType: "Wrapper",
+    productType: "Finished Good",
     description: "High-protein bars with 20g of protein per serving. Great for post-workout recovery or a quick snack on the go.",
     minOrderQuantity: 200,
-    leadTime: "1 week",
-    sustainable: false
+    leadTime: "1",
+    leadTimeUnit: "week",
+    sustainable: false,
+    sku: "PRO-BAR-004",
+    unitType: "units",
+    currentAvailable: 1450
   },
   {
     id: 5,
@@ -126,13 +164,17 @@ const mockProducts = [
     manufacturer: "Clear Springs",
     image: "/placeholder.svg",
     price: "$1.29",
-    certifications: ["Zero-Calorie"],
+    pricePerUnit: 1.29,
     rating: 4.3,
-    packagingType: "Aluminum Can",
+    productType: "Finished Good",
     description: "Refreshing sparkling water with natural flavors. Zero calories, zero sweeteners, and zero sodium.",
     minOrderQuantity: 300,
-    leadTime: "1-2 weeks",
-    sustainable: true
+    leadTime: "1-2",
+    leadTimeUnit: "weeks",
+    sustainable: true,
+    sku: "SPK-WTR-005",
+    unitType: "bottles",
+    currentAvailable: 2400
   },
   {
     id: 6,
@@ -141,13 +183,17 @@ const mockProducts = [
     manufacturer: "Harvest Farms",
     image: "/placeholder.svg",
     price: "$5.49",
-    certifications: ["No Added Sugar", "Organic"],
+    pricePerUnit: 5.49,
     rating: 4.6,
-    packagingType: "Resealable Pouch",
+    productType: "Finished Good",
     description: "A delicious mix of organic dried fruits, including apples, cranberries, and mangoes. Perfect for snacking or baking.",
     minOrderQuantity: 100,
-    leadTime: "1-3 weeks",
-    sustainable: true
+    leadTime: "1-3",
+    leadTimeUnit: "weeks",
+    sustainable: true,
+    sku: "DRY-FRT-006",
+    unitType: "packages",
+    currentAvailable: 800
   }
 ];
 
@@ -163,44 +209,34 @@ const categories = [
   "Baking"
 ];
 
-// Certification options
-const certifications = [
-  "Organic",
-  "Non-GMO",
-  "Gluten-Free",
-  "Fair Trade",
-  "No Added Sugar",
-  "High-Protein",
-  "Low-Sugar",
-  "Zero-Calorie"
-];
-
-// Packaging types
-const packagingTypes = [
-  "Cardboard Box",
-  "Glass Jar",
-  "Aluminum Can",
-  "Plastic Bottle",
-  "Resealable Bag",
-  "Resealable Pouch",
-  "Wrapper",
-  "Tetra Pak"
+// Product Type options
+const productTypes = [
+  "Finished Good",
+  "Raw Material",
+  "Component",
+  "Packaging Material",
+  "Semi-finished Good",
+  "Bulk Product"
 ];
 
 // Sort options
 const sortOptions = [
-  { label: "Relevance", value: "relevance" },
-  { label: "Price: Low to High", value: "price-asc" },
-  { label: "Price: High to Low", value: "price-desc" },
-  { label: "Rating: High to Low", value: "rating-desc" },
-  { label: "Name: A to Z", value: "name-asc" },
-  { label: "Name: Z to A", value: "name-desc" }
+  { value: "relevance", label: "Relevance" },
+  { value: "price-asc", label: "Price: Low to High" },
+  { value: "price-desc", label: "Price: High to Low" },
+  { value: "rating", label: "Rating" }
 ];
 
-// Animation variants
+// Enhanced animation variants with better physics and timing
 const fadeIn = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.5 } }
+  visible: { 
+    opacity: 1, 
+    transition: { 
+      duration: 0.2, 
+      ease: "easeOut" 
+    } 
+  }
 };
 
 const staggerContainer = {
@@ -208,14 +244,121 @@ const staggerContainer = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1
+      staggerChildren: 0.03,
+      delayChildren: 0.05,
+      ease: "easeOut"
     }
   }
 };
 
 const cardVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { 
+      type: "spring", 
+      stiffness: 400, 
+      damping: 25,
+      duration: 0.2 
+    } 
+  }
+};
+
+// Filter animations - optimized for faster transitions
+const filterVariants = {
+  hidden: { opacity: 0, height: 0 },
+  visible: { 
+    opacity: 1, 
+    height: "auto", 
+    transition: { 
+      height: { type: "spring", stiffness: 400, damping: 25 },
+      opacity: { duration: 0.15 }
+    } 
+  },
+  exit: { 
+    opacity: 0, 
+    height: 0, 
+    transition: { 
+      height: { duration: 0.15 },
+      opacity: { duration: 0.1 }
+    } 
+  }
+};
+
+// Button hover animations
+const buttonHoverVariants = {
+  rest: { scale: 1 },
+  hover: { 
+    scale: 1.05, 
+    transition: { 
+      type: "spring", 
+      stiffness: 400, 
+      damping: 10 
+    } 
+  },
+  tap: { scale: 0.95 }
+};
+
+// Badge animations
+const badgeVariants = {
+  rest: { scale: 1, opacity: 0.9 },
+  hover: { 
+    scale: 1.05, 
+    opacity: 1, 
+    transition: { 
+      type: "spring", 
+      stiffness: 400, 
+      damping: 10 
+    } 
+  },
+  tap: { scale: 0.95 }
+};
+
+// Page transitions
+const pageTransition = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { 
+      type: "spring", 
+      stiffness: 300, 
+      damping: 30,
+      duration: 0.4 
+    } 
+  },
+  exit: { 
+    opacity: 0, 
+    y: 20, 
+    transition: { 
+      duration: 0.2 
+    } 
+  }
+};
+
+// Dialog animations - optimized for faster transitions
+const dialogContentVariants = {
+  hidden: { opacity: 0, scale: 0.98, y: 8 },
+  visible: { 
+    opacity: 1, 
+    scale: 1, 
+    y: 0, 
+    transition: { 
+      type: "spring", 
+      stiffness: 400, 
+      damping: 25,
+      duration: 0.2 
+    } 
+  },
+  exit: { 
+    opacity: 0, 
+    scale: 0.98, 
+    y: 8, 
+    transition: { 
+      duration: 0.15 
+    } 
+  }
 };
 
 const Products = () => {
@@ -224,8 +367,7 @@ const Products = () => {
   const [products, setProducts] = useState(mockProducts);
   const [showFilters, setShowFilters] = useState(false);
   const [activeCategory, setActiveCategory] = useState("All Categories");
-  const [selectedCertifications, setSelectedCertifications] = useState<string[]>([]);
-  const [selectedPackaging, setSelectedPackaging] = useState<string[]>([]);
+  const [selectedProductTypes, setSelectedProductTypes] = useState<string[]>([]);
   const [activeView, setActiveView] = useState("grid");
   const [isLoading, setIsLoading] = useState(true);
   const [sortBy, setSortBy] = useState("relevance");
@@ -243,6 +385,7 @@ const Products = () => {
   const [selectedOrigins, setSelectedOrigins] = useState<string[]>([]);
   const [hasCustomization, setHasCustomization] = useState(false);
   const [hasSamples, setHasSamples] = useState(false);
+  const [showBackToTop, setShowBackToTop] = useState(false);
 
   const {
     favorites: favoritedProducts,
@@ -255,11 +398,17 @@ const Products = () => {
     document.title = "Browse Products - CPG Matchmaker";
   }, []);
 
-  // Simulate loading state
+  // Further optimize loading state to possibly skip showing skeletons
   useEffect(() => {
+    // If we have cached products already, skip the loading state entirely
+    if (mockProducts.length > 0 && products.length > 0) {
+      setIsLoading(false);
+      return;
+    }
+    
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1000);
+    }, 200); // Further reduce to 200ms for faster display
     
     return () => clearTimeout(timer);
   }, []);
@@ -336,36 +485,27 @@ const Products = () => {
       );
     }
 
-    // Filter by certifications
-    if (selectedCertifications.length > 0) {
+    // Filter by productType
+    if (selectedProductTypes.length > 0) {
       filteredProducts = filteredProducts.filter(product => 
-        selectedCertifications.every(cert => 
-          product.certifications.includes(cert)
-        )
+        selectedProductTypes.includes(product.productType)
       );
     }
 
-    // Filter by packaging type
-    if (selectedPackaging.length > 0) {
-      filteredProducts = filteredProducts.filter(product => 
-        selectedPackaging.includes(product.packagingType)
-      );
-      }
+    // Filter by sustainability
+    if (sustainableOnly) {
+      filteredProducts = filteredProducts.filter(product => product.sustainable);
+    }
 
-      // Filter by sustainability
-      if (sustainableOnly) {
-        filteredProducts = filteredProducts.filter(product => product.sustainable);
-      }
+    // Filter by stock status (mock data - you would need to add this to your product data)
+    if (inStockOnly) {
+      filteredProducts = filteredProducts.filter(product => product.minOrderQuantity <= 100);
+    }
 
-      // Filter by stock status (mock data - you would need to add this to your product data)
-      if (inStockOnly) {
-        filteredProducts = filteredProducts.filter(product => product.minOrderQuantity <= 100);
-      }
-
-      // Filter by new arrivals (mock data - you would need to add this to your product data)
-      if (newArrivalsOnly) {
-        filteredProducts = filteredProducts.filter(product => product.id > 4);
-      }
+    // Filter by new arrivals (mock data - you would need to add this to your product data)
+    if (newArrivalsOnly) {
+      filteredProducts = filteredProducts.filter(product => product.id > 4);
+    }
     }
 
     // Sort products
@@ -380,14 +520,8 @@ const Products = () => {
           parseFloat(b.price.replace('$', '')) - parseFloat(a.price.replace('$', ''))
         );
         break;
-      case "rating-desc":
+      case "rating":
         filteredProducts.sort((a, b) => b.rating - a.rating);
-        break;
-      case "name-asc":
-        filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case "name-desc":
-        filteredProducts.sort((a, b) => b.name.localeCompare(a.name));
         break;
       default:
         // Default is relevance
@@ -395,41 +529,22 @@ const Products = () => {
     }
 
     setProducts(filteredProducts);
-  }, [searchTerm, activeCategory, selectedCertifications, selectedPackaging, sortBy, sustainableOnly, 
+  }, [searchTerm, activeCategory, selectedProductTypes, sortBy, sustainableOnly, 
       searchParams, isFavorite, priceRange, minOrder, selectedLeadTime, inStockOnly, newArrivalsOnly, minRating]);
 
-  // Toggle certification selection
-  const toggleCertification = (cert: string) => {
-    setSelectedCertifications(prev => 
-      prev.includes(cert) 
-        ? prev.filter(c => c !== cert) 
-        : [...prev, cert]
-    );
-  };
-
-  // Toggle packaging selection
-  const togglePackaging = (packaging: string) => {
-    setSelectedPackaging(prev => 
-      prev.includes(packaging) 
-        ? prev.filter(p => p !== packaging) 
-        : [...prev, packaging]
-    );
-  };
-
-  // Toggle lead time selection
-  const toggleLeadTime = (time: string) => {
-    setSelectedLeadTime(prev => 
-      prev.includes(time)
-        ? prev.filter(t => t !== time)
-        : [...prev, time]
+  // Toggle productType selection
+  const toggleProductType = (type: string) => {
+    setSelectedProductTypes(prev => 
+      prev.includes(type) 
+        ? prev.filter(t => t !== type) 
+        : [...prev, type]
     );
   };
 
   // Clear all filters including advanced filters
   const clearFilters = () => {
     setActiveCategory("All Categories");
-    setSelectedCertifications([]);
-    setSelectedPackaging([]);
+    setSelectedProductTypes([]);
     setSearchTerm("");
     setSustainableOnly(false);
     setPriceRange([0, 100]);
@@ -458,6 +573,12 @@ const Products = () => {
   // Render product list based on view type
   const renderProducts = () => {
     if (isLoading) {
+      // If we already have products, show them immediately instead of skeletons
+      if (products.length > 0) {
+        setIsLoading(false);
+        return renderLoadedProducts();
+      }
+      
       return (
         <motion.div 
           className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6`}
@@ -466,20 +587,24 @@ const Products = () => {
           animate="visible"
         >
           {[...Array(6)].map((_, idx) => (
-            <motion.div key={idx} variants={cardVariants}>
-              <div className="rounded-lg overflow-hidden border">
-                <Skeleton className="h-48 w-full" />
+            <motion.div 
+              key={idx} 
+              variants={cardVariants}
+              className="relative overflow-hidden"
+            >
+              <div className="rounded-lg overflow-hidden border group hover:border-primary/20 transition-all duration-300">
+                <Skeleton className="h-48 w-full animate-pulse" />
                 <div className="p-4">
-                  <Skeleton className="h-6 w-3/4 mb-2" />
-                  <Skeleton className="h-4 w-1/2 mb-4" />
+                  <Skeleton className="h-6 w-3/4 mb-2 animate-pulse" />
+                  <Skeleton className="h-4 w-1/2 mb-4 animate-pulse" />
                   <div className="flex gap-2 mb-3">
-                    <Skeleton className="h-5 w-16" />
-                    <Skeleton className="h-5 w-16" />
+                    <Skeleton className="h-5 w-16 animate-pulse" />
+                    <Skeleton className="h-5 w-16 animate-pulse" />
                   </div>
-                  <Skeleton className="h-4 w-28 mb-2" />
+                  <Skeleton className="h-4 w-28 mb-2 animate-pulse" />
                   <div className="flex justify-between mt-3">
-                    <Skeleton className="h-6 w-12" />
-                    <Skeleton className="h-6 w-24" />
+                    <Skeleton className="h-6 w-12 animate-pulse" />
+                    <Skeleton className="h-6 w-24 animate-pulse" />
                   </div>
                 </div>
               </div>
@@ -489,20 +614,66 @@ const Products = () => {
       );
     }
     
+    return renderLoadedProducts();
+  };
+
+  // Extract the loaded products rendering to a separate function for clarity
+  const renderLoadedProducts = () => {
     if (products.length === 0) {
       return (
         <motion.div 
           className="text-center py-20 bg-muted/30 rounded-lg"
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ 
+            type: "spring",
+            stiffness: 400,
+            damping: 25,
+            duration: 0.3 
+          }}
         >
-          <ShoppingBag className="w-12 h-12 text-muted-foreground/50 mx-auto mb-4" />
-          <p className="text-lg text-foreground/70 mb-2">No products found matching your criteria.</p>
-          <p className="text-sm text-muted-foreground mb-6">Try adjusting your filters or search terms.</p>
-          <Button variant="outline" onClick={clearFilters}>
-            Clear All Filters
-          </Button>
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ 
+              scale: 1,
+              transition: { 
+                type: "spring", 
+                stiffness: 400, 
+                damping: 10 
+              }
+            }}
+          >
+            <ShoppingBag className="w-16 h-16 text-muted-foreground/50 mx-auto mb-4" />
+          </motion.div>
+          <motion.p 
+            className="text-xl font-medium text-foreground/70 mb-2"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            No products found matching your criteria.
+          </motion.p>
+          <motion.p 
+            className="text-sm text-muted-foreground mb-6"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            Try adjusting your filters or search terms.
+          </motion.p>
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 400, damping: 10 }}
+          >
+            <Button 
+              variant="outline" 
+              onClick={clearFilters}
+              className="hover:bg-primary hover:text-primary-foreground transition-colors duration-300"
+            >
+              Clear All Filters
+            </Button>
+          </motion.div>
         </motion.div>
       );
     }
@@ -515,17 +686,41 @@ const Products = () => {
           initial="hidden"
           animate="visible"
         >
-          {products.map(product => (
-            <motion.div key={product.id} variants={cardVariants}>
-              <ProductCard 
-                product={product} 
-                isFavorite={isFavorite(product.id)}
-                onFavoriteToggle={() => toggleFavorite(product)}
-                onDetailsClick={() => handleProductDetailsClick(product)}
-                className="h-full"
-              />
-            </motion.div>
-          ))}
+          <AnimatePresence mode="popLayout">
+            {products.map(product => (
+              <motion.div 
+                key={product.id} 
+                variants={cardVariants}
+                layout
+                initial={{ opacity: 0, scale: 0.98, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.98, y: 10 }}
+                transition={{ 
+                  type: "spring", 
+                  stiffness: 400, 
+                  damping: 25,
+                  duration: 0.2 
+                }}
+                whileHover={{ 
+                  y: -5, 
+                  boxShadow: "0px 10px 25px rgba(0, 0, 0, 0.1)", 
+                  transition: { 
+                    type: "spring", 
+                    stiffness: 400, 
+                    damping: 25 
+                  } 
+                }}
+              >
+                <ProductCard 
+                  product={product} 
+                  isFavorite={isFavorite(product.id)}
+                  onFavoriteToggle={() => toggleFavorite(product)}
+                  onDetailsClick={() => handleProductDetailsClick(product)}
+                  className="h-full transition-all duration-300"
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </motion.div>
       );
     } else {
@@ -536,169 +731,283 @@ const Products = () => {
           initial="hidden"
           animate="visible"
         >
-          {products.map(product => (
-            <motion.div 
-              key={product.id} 
-              variants={cardVariants}
-              className="flex flex-col sm:flex-row gap-4 p-4 border rounded-lg hover:shadow-md transition-all bg-card"
-            >
-              <div className="w-full sm:w-32 h-32 bg-muted rounded-md flex items-center justify-center relative group">
-                <img 
-                  src={product.image} 
-                  alt={product.name} 
-                  className="w-16 h-16 object-contain transition-transform group-hover:scale-110 duration-300"
-                />
-                {product.sustainable && (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="absolute top-2 left-2 bg-green-100 text-green-800 rounded-full p-1">
-                          <CheckCircle2 className="h-4 w-4" />
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Sustainable Product</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                )}
-              </div>
-              
-              <div className="flex-1">
-                <div className="flex justify-between">
-                  <div>
-                    <h3 className="font-semibold text-lg">{product.name}</h3>
-                    <p className="text-sm text-foreground/70">{product.manufacturer}</p>
+          <AnimatePresence mode="popLayout">
+            {products.map(product => (
+              <motion.div 
+                key={product.id} 
+                variants={cardVariants}
+                layout
+                initial={{ opacity: 0, scale: 0.98, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.98, y: 10 }}
+                transition={{ 
+                  type: "spring", 
+                  stiffness: 400, 
+                  damping: 25,
+                  duration: 0.2 
+                }}
+                whileHover={{ 
+                  y: -2, 
+                  boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.08)",
+                  transition: { 
+                    type: "spring", 
+                    stiffness: 400, 
+                    damping: 25 
+                  } 
+                }}
+                className="flex flex-col sm:flex-row gap-4 p-4 border rounded-lg hover:border-primary/20 transition-all bg-card"
+              >
+                <motion.div 
+                  className="w-full sm:w-32 h-32 bg-muted rounded-md flex items-center justify-center relative group overflow-hidden"
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                >
+                  <motion.img 
+                    src={product.image} 
+                    alt={product.name} 
+                    className="w-16 h-16 object-contain"
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                  />
+                  {product.sustainable && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <motion.div 
+                            className="absolute top-2 left-2 bg-green-100 text-green-800 rounded-full p-1"
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                          >
+                            <CheckCircle2 className="h-4 w-4" />
+                          </motion.div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Sustainable Product</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+                </motion.div>
+                
+                <div className="flex-1">
+                  <div className="flex justify-between">
+                    <div>
+                      <h3 className="font-semibold text-lg">{product.name}</h3>
+                      <p className="text-sm text-foreground/70">{product.manufacturer}</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <motion.button 
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                        onClick={() => toggleFavorite(product)}
+                        className={`p-2 rounded-full ${isFavorite(product.id) ? "text-red-500" : "text-muted-foreground"}`}
+                      >
+                        <Heart className="h-4 w-4" fill={isFavorite(product.id) ? "currentColor" : "none"} />
+                      </motion.button>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className={isFavorite(product.id) ? "text-red-500" : "text-muted-foreground"}
-                      onClick={() => toggleFavorite(product)}
+                  
+                  <div className="flex flex-wrap items-center gap-2 mb-2 mt-1">
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 10 }}
                     >
-                      <Heart className="h-4 w-4" fill={isFavorite(product.id) ? "currentColor" : "none"} />
-                    </Button>
-                  </div>
-                </div>
-                
-                <div className="flex flex-wrap items-center gap-2 mb-2 mt-1">
-                  <Badge>{product.category}</Badge>
-                  <Badge variant="outline">{product.packagingType}</Badge>
-                  <span className="text-sm text-foreground/70">
-                    Min. Order: {product.minOrderQuantity} units
-                  </span>
-                </div>
-                
-                <div className="flex flex-wrap gap-1 mb-2">
-                  {product.certifications.map(cert => (
-                    <Badge key={cert} variant="secondary" className="text-xs">
-                      {cert}
-                    </Badge>
-                  ))}
-                </div>
-                
-                <div className="flex justify-between items-center mt-3">
-                  <p className="font-medium text-lg">{product.price}</p>
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => handleProductDetailsClick(product)}
+                      <Badge>{product.category}</Badge>
+                    </motion.div>
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 10 }}
                     >
-                      Details
-                    </Button>
-                    <Button size="sm">
-                      Match
-                    </Button>
+                      <Badge variant="outline">{product.productType}</Badge>
+                    </motion.div>
+                    <span className="text-sm text-foreground/70">
+                      Min. Order: {product.minOrderQuantity} units
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-foreground/70">
+                      Lead Time: {product.leadTime} {product.leadTimeUnit}
+                    </span>
+                    <span className="text-sm text-foreground/70">
+                      Rating: {product.rating}/5
+                    </span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center mt-3">
+                    <p className="font-medium text-lg">{product.price}</p>
+                    <div className="flex gap-2">
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                      >
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleProductDetailsClick(product)}
+                          className="transition-all duration-200 hover:bg-muted/80"
+                        >
+                          Details
+                        </Button>
+                      </motion.div>
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                      >
+                        <Button 
+                          size="sm"
+                          className="transition-all duration-200"
+                        >
+                          Match
+                        </Button>
+                      </motion.div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </motion.div>
       );
     }
   };
 
+  // Add effect for scroll position detection
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 300);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       <Navbar />
       
       <motion.div 
         className="container mx-auto px-4 pt-24 pb-12"
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ 
+          type: "spring", 
+          stiffness: 400, 
+          damping: 30,
+          duration: 0.3 
+        }}
       >
         <div className="max-w-7xl mx-auto">
           <motion.div 
             className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4"
-            variants={fadeIn}
+            variants={staggerContainer}
             initial="hidden"
             animate="visible"
           >
-            <div>
+            <motion.div variants={cardVariants}>
               <h1 className="text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary animate-gradient bg-300%">
                 Browse Products
               </h1>
               <p className="text-foreground/70">
                 Discover the perfect products for your CPG business
               </p>
-            </div>
+            </motion.div>
             
-            <div className="flex flex-wrap items-center gap-3">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="flex items-center gap-2"
-                  >
-                    <ArrowUpDown className="h-4 w-4" />
-                    Sort: {sortOptions.find(option => option.value === sortBy)?.label}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>Sort by</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  {sortOptions.map(option => (
-                    <DropdownMenuItem 
-                      key={option.value}
-                      onClick={() => setSortBy(option.value)}
-                      className={sortBy === option.value ? "bg-muted" : ""}
+            <motion.div 
+              className="flex flex-wrap items-center gap-3"
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
+            >
+              <motion.div variants={cardVariants}>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="flex items-center gap-2 transition-all duration-200"
                     >
-                      {option.label}
-                      {sortBy === option.value && (
-                        <CheckCircle2 className="h-4 w-4 ml-2" />
-                      )}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                      <ArrowUpDown className="h-4 w-4" />
+                      Sort: {sortOptions.find(option => option.value === sortBy)?.label}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="animate-in slide-in-from-top-5 duration-200">
+                    <DropdownMenuLabel>Sort by</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {sortOptions.map(option => (
+                      <DropdownMenuItem 
+                        key={option.value}
+                        onClick={() => setSortBy(option.value)}
+                        className={sortBy === option.value ? "bg-muted" : ""}
+                      >
+                        {option.label}
+                        {sortBy === option.value && (
+                          <CheckCircle2 className="h-4 w-4 ml-2" />
+                        )}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </motion.div>
               
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2"
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <Filter className="h-4 w-4" />
-                Filters
-                {(selectedCertifications.length > 0 || selectedPackaging.length > 0 || activeCategory !== "All Categories" || sustainableOnly) && (
-                  <Badge variant="secondary" className="ml-1">
-                    {selectedCertifications.length + selectedPackaging.length + (activeCategory !== "All Categories" ? 1 : 0) + (sustainableOnly ? 1 : 0)}
-                  </Badge>
-                )}
-              </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="flex items-center gap-2 transition-all duration-200"
+                >
+                  <Filter className="h-4 w-4" />
+                  Filters
+                  {(selectedProductTypes.length > 0 || activeCategory !== "All Categories" || sustainableOnly) && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ 
+                        scale: 1,
+                        transition: {
+                          type: "spring",
+                          stiffness: 500,
+                          damping: 15
+                        }  
+                      }}
+                    >
+                      <Badge variant="secondary" className="ml-1">
+                        {selectedProductTypes.length + (activeCategory !== "All Categories" ? 1 : 0) + (sustainableOnly ? 1 : 0)}
+                      </Badge>
+                    </motion.div>
+                  )}
+                </Button>
+              </motion.div>
               
-              <Tabs defaultValue={activeView} onValueChange={setActiveView} className="w-auto">
-                <TabsList className="grid w-[120px] grid-cols-2">
-                  <TabsTrigger value="grid">Grid</TabsTrigger>
-                  <TabsTrigger value="list">List</TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </div>
+              <motion.div variants={cardVariants}>
+                <Tabs defaultValue={activeView} onValueChange={setActiveView} className="w-auto">
+                  <TabsList className="grid w-[120px] grid-cols-2">
+                    <TabsTrigger 
+                      value="grid"
+                      className="transition-all duration-200 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                    >
+                      Grid
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="list"
+                      className="transition-all duration-200 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                    >
+                      List
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              </motion.div>
+            </motion.div>
           </motion.div>
           
           <motion.div 
@@ -712,306 +1021,135 @@ const Products = () => {
               <Input
                 type="search"
                 placeholder="Search products, manufacturers, or categories..."
-                className="pl-10 pr-24 w-full"
+                className="pl-10 pr-24 w-full transition-all duration-300 focus:border-primary"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
-                className={cn(
-                  "absolute right-2 top-1/2 transform -translate-y-1/2",
-                  showAdvancedSearch ? "text-primary" : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <SlidersHorizontal className="h-4 w-4 mr-1" />
-                Advanced
-              </Button>
-            </div>
-
-            <AnimatePresence>
-              {showAdvancedSearch && (
+              {searchTerm && (
                 <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="mt-4 p-6 bg-card rounded-lg border shadow-sm"
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
                 >
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Rating Filter */}
-                    <div className="space-y-3">
-                      <Label className="text-sm font-medium flex items-center gap-2">
-                        <Star className="h-4 w-4 text-yellow-500" />
-                        Product Rating
-                      </Label>
-                      <div className="pt-2 px-2">
-                        <Slider
-                          value={[minRating]}
-                          onValueChange={([value]) => setMinRating(value)}
-                          min={0}
-                          max={5}
-                          step={0.5}
-                          className="w-full"
-                        />
-                        <div className="flex justify-between mt-2">
-                          <span className="text-sm text-muted-foreground flex items-center gap-1">
-                            <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-                            {minRating}+
-                          </span>
-                          <span className="text-sm text-muted-foreground flex items-center gap-1">
-                            <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-                            5.0
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Price Range */}
-                    <div className="space-y-3">
-                      <Label className="text-sm font-medium flex items-center gap-2">
-                        <Package className="h-4 w-4 text-emerald-500" />
-                        Price Range
-                      </Label>
-                      <div className="pt-2 px-2">
-                        <Slider
-                          value={priceRange}
-                          onValueChange={(value) => setPriceRange(value as [number, number])}
-                          max={100}
-                          step={1}
-                          className="w-full"
-                        />
-                        <div className="flex justify-between mt-2">
-                          <span className="text-sm font-medium text-emerald-600">${priceRange[0]}</span>
-                          <span className="text-sm font-medium text-emerald-600">${priceRange[1] === 100 ? '100+' : priceRange[1]}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Lead Time */}
-                    <div className="space-y-3">
-                      <Label className="text-sm font-medium flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-blue-500" />
-                        Lead Time
-                      </Label>
-                      <div className="flex flex-wrap gap-2">
-                        {["1 week", "2 weeks", "3 weeks", "4+ weeks"].map((time) => (
-                          <Badge
-                            key={time}
-                            variant={selectedLeadTime.includes(time) ? "default" : "outline"}
-                            className={cn(
-                              "cursor-pointer transition-colors",
-                              selectedLeadTime.includes(time) 
-                                ? "bg-blue-500 hover:bg-blue-600" 
-                                : "hover:bg-blue-100"
-                            )}
-                            onClick={() => toggleLeadTime(time)}
-                          >
-                            {time}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Minimum Order */}
-                    <div className="space-y-3">
-                      <Label className="text-sm font-medium flex items-center gap-2">
-                        <ShoppingBag className="h-4 w-4 text-purple-500" />
-                        Minimum Order
-                      </Label>
-                      <div className="pt-2 px-2">
-                        <Slider
-                          value={[minOrder]}
-                          onValueChange={([value]) => setMinOrder(value)}
-                          min={50}
-                          max={5000}
-                          step={50}
-                          className="w-full"
-                        />
-                        <div className="flex justify-between mt-2">
-                          <span className="text-sm font-medium text-purple-600">{minOrder} units</span>
-                          <span className="text-sm font-medium text-purple-600">5K+ units</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Certifications */}
-                    <div className="col-span-full space-y-3">
-                      <Label className="text-sm font-medium flex items-center gap-2">
-                        <Award className="h-4 w-4 text-amber-500" />
-                        Certifications
-                      </Label>
-                      <div className="flex flex-wrap gap-2">
-                        {certifications.map((cert) => (
-                          <Badge
-                            key={cert}
-                            variant={selectedCertifications.includes(cert) ? "default" : "outline"}
-                            className={cn(
-                              "cursor-pointer transition-colors",
-                              selectedCertifications.includes(cert)
-                                ? "bg-amber-500 hover:bg-amber-600"
-                                : "hover:bg-amber-100"
-                            )}
-                            onClick={() => toggleCertification(cert)}
-                          >
-                            {cert}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Additional Filters */}
-                    <div className="col-span-full border-t pt-4 mt-2">
-                      <Label className="text-sm font-medium flex items-center gap-2 mb-4">
-                        <Filter className="h-4 w-4 text-gray-600" />
-                        Additional Filters
-                      </Label>
-                      <div className="grid grid-cols-2 gap-6">
-                        <div className="space-y-4">
-                          <div className="flex items-center space-x-3">
-                            <Switch id="inStock" checked={inStockOnly} onCheckedChange={setInStockOnly} />
-                            <Label htmlFor="inStock" className="text-sm flex items-center gap-2">
-                              <Package className="h-4 w-4 text-green-500" />
-                              In Stock Only
-                            </Label>
-                          </div>
-                          <div className="flex items-center space-x-3">
-                            <Switch id="newArrivals" checked={newArrivalsOnly} onCheckedChange={setNewArrivalsOnly} />
-                            <Label htmlFor="newArrivals" className="text-sm flex items-center gap-2">
-                              <Star className="h-4 w-4 text-orange-500" />
-                              New Arrivals Only
-                            </Label>
-                          </div>
-                          <div className="flex items-center space-x-3">
-                            <Switch id="customization" checked={hasCustomization} onCheckedChange={setHasCustomization} />
-                            <Label htmlFor="customization" className="text-sm flex items-center gap-2">
-                              <Building2 className="h-4 w-4 text-indigo-500" />
-                              Customization Available
-                            </Label>
-                          </div>
-                        </div>
-                        <div className="space-y-4">
-                          <div className="flex items-center space-x-3">
-                            <Switch id="sustainable" checked={sustainableOnly} onCheckedChange={setSustainableOnly} />
-                            <Label htmlFor="sustainable" className="text-sm flex items-center gap-2">
-                              <CheckCircle2 className="h-4 w-4 text-green-500" />
-                              Sustainable Only
-                            </Label>
-                          </div>
-                          <div className="flex items-center space-x-3">
-                            <Switch id="samples" checked={hasSamples} onCheckedChange={setHasSamples} />
-                            <Label htmlFor="samples" className="text-sm flex items-center gap-2">
-                              <Package className="h-4 w-4 text-blue-500" />
-                              Sample Available
-                            </Label>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-between mt-8 pt-4 border-t">
-                    <Button
-                      variant="ghost"
-                      onClick={() => {
-                        clearFilters();
-                        setShowAdvancedSearch(false);
-                      }}
-                      className="flex items-center gap-2 text-red-500 hover:text-red-600 hover:bg-red-50"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      Reset All
-                    </Button>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowAdvancedSearch(false)}
-                        className="flex items-center gap-2"
-                      >
-                        <X className="h-4 w-4" />
-                        Cancel
-                      </Button>
-                      <Button
-                        onClick={applyAdvancedFilters}
-                        className="flex items-center gap-2 bg-primary hover:bg-primary/90"
-                      >
-                        <Filter className="h-4 w-4" />
-                        Apply Filters
-                      </Button>
-                    </div>
-                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSearchTerm("")}
+                    className="absolute right-20 top-1/2 transform -translate-y-1/2"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
                 </motion.div>
               )}
-            </AnimatePresence>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
+                  className={cn(
+                    "absolute right-2 top-1/2 transform -translate-y-1/2 transition-colors duration-200",
+                    showAdvancedSearch ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <SlidersHorizontal className="h-4 w-4 mr-1" />
+                  Advanced
+                </Button>
+              </motion.div>
+            </div>
           </motion.div>
           
-          {/* Active filters */}
+          {/* Active filters with enhanced animations */}
           <AnimatePresence>
-            {(selectedCertifications.length > 0 || selectedPackaging.length > 0 || activeCategory !== "All Categories" || sustainableOnly) && (
+            {(selectedProductTypes.length > 0 || activeCategory !== "All Categories" || sustainableOnly) && (
               <motion.div 
                 className="mb-6 flex flex-wrap items-center gap-2"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
+                initial={{ opacity: 0, y: -5, height: 0 }}
+                animate={{ opacity: 1, y: 0, height: "auto" }}
+                exit={{ opacity: 0, y: -5, height: 0 }}
+                transition={{ 
+                  duration: 0.2, 
+                  height: { duration: 0.15 },
+                  opacity: { duration: 0.2 }
+                }}
               >
-              <span className="text-sm text-foreground/70">Active filters:</span>
-              
-              {activeCategory !== "All Categories" && (
-                  <Badge variant="secondary" className="flex items-center gap-1 animate-fadeIn">
-                  {activeCategory}
-                    <motion.button 
-                      onClick={() => setActiveCategory("All Categories")}
-                      whileTap={{ scale: 0.9 }}
-                    >
-                    <X className="h-3 w-3" />
-                    </motion.button>
-                </Badge>
-              )}
-              
-              {selectedCertifications.map(cert => (
-                  <Badge key={cert} variant="secondary" className="flex items-center gap-1 animate-fadeIn">
-                  {cert}
-                    <motion.button 
-                      onClick={() => toggleCertification(cert)}
-                      whileTap={{ scale: 0.9 }}
-                    >
-                    <X className="h-3 w-3" />
-                    </motion.button>
-                </Badge>
-              ))}
-              
-              {selectedPackaging.map(pkg => (
-                  <Badge key={pkg} variant="secondary" className="flex items-center gap-1 animate-fadeIn">
-                  {pkg}
-                    <motion.button 
-                      onClick={() => togglePackaging(pkg)}
-                      whileTap={{ scale: 0.9 }}
-                    >
-                    <X className="h-3 w-3" />
-                    </motion.button>
-                </Badge>
-              ))}
-              
-                {sustainableOnly && (
-                  <Badge variant="secondary" className="flex items-center gap-1 animate-fadeIn bg-green-100 text-green-800 hover:bg-green-200">
-                    Sustainable Only
-                    <motion.button 
-                      onClick={() => setSustainableOnly(false)}
-                      whileTap={{ scale: 0.9 }}
-                    >
-                      <X className="h-3 w-3" />
-                    </motion.button>
-                  </Badge>
+                <span className="text-sm text-foreground/70">Active filters:</span>
+                
+                {activeCategory !== "All Categories" && (
+                  <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.9, opacity: 0 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Badge variant="secondary" className="flex items-center gap-1 animate-fadeIn">
+                      {activeCategory}
+                      <motion.button 
+                        onClick={() => setActiveCategory("All Categories")}
+                        whileTap={{ scale: 0.9 }}
+                      >
+                        <X className="h-3 w-3" />
+                      </motion.button>
+                    </Badge>
+                  </motion.div>
                 )}
                 
-                <motion.div whileTap={{ scale: 0.95 }}>
-              <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs">
-                Clear all
-              </Button>
+                {selectedProductTypes.map(type => (
+                  <motion.div
+                    key={type}
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.9, opacity: 0 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Badge variant="secondary" className="flex items-center gap-1 animate-fadeIn">
+                      {type}
+                      <motion.button 
+                        onClick={() => toggleProductType(type)}
+                        whileTap={{ scale: 0.9 }}
+                      >
+                        <X className="h-3 w-3" />
+                      </motion.button>
+                    </Badge>
+                  </motion.div>
+                ))}
+                
+                {sustainableOnly && (
+                  <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.9, opacity: 0 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Badge variant="secondary" className="flex items-center gap-1 animate-fadeIn bg-green-100 text-green-800 hover:bg-green-200">
+                      Sustainable Only
+                      <motion.button 
+                        onClick={() => setSustainableOnly(false)}
+                        whileTap={{ scale: 0.9 }}
+                      >
+                        <X className="h-3 w-3" />
+                      </motion.button>
+                    </Badge>
+                  </motion.div>
+                )}
+                
+                <motion.div 
+                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs">
+                    Clear all
+                  </Button>
                 </motion.div>
               </motion.div>
-          )}
+            )}
           </AnimatePresence>
           
           {/* Filter sidebar and product grid */}
@@ -1021,113 +1159,191 @@ const Products = () => {
             {showFilters && (
                 <motion.div
                   className="md:col-span-1 space-y-6 bg-card p-4 rounded-lg shadow-sm border"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
+                  initial={{ opacity: 0, x: -15, boxShadow: "0 0 0 rgba(0,0,0,0)" }}
+                  animate={{ 
+                    opacity: 1, 
+                    x: 0, 
+                    boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+                    transition: { 
+                      type: "spring", 
+                      stiffness: 400, 
+                      damping: 25,
+                      duration: 0.15
+                    }
+                  }}
+                  exit={{ 
+                    opacity: 0, 
+                    x: -15, 
+                    transition: { 
+                      duration: 0.1 
+                    }
+                  }}
                 >
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold flex items-center gap-2">
-                    <SlidersHorizontal className="h-4 w-4" />
-                    Filters
-                  </h3>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="md:hidden"
-                    onClick={() => setShowFilters(false)}
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold flex items-center gap-2">
+                      <SlidersHorizontal className="h-4 w-4" />
+                      Filters
+                    </h3>
+                    <motion.div
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="md:hidden"
+                        onClick={() => setShowFilters(false)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </motion.div>
+                  </div>
+                  
+                  <motion.div
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ 
+                      opacity: 1, 
+                      y: 0,
+                      transition: {
+                        delay: 0.1,
+                        duration: 0.2
+                      }
+                    }}
+                    className="space-y-1 border-t pt-4"
                   >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-                
-                  <div className="space-y-1 border-t pt-4">
                     <div className="flex items-center gap-2 mb-2">
                       <CheckCircle2 className="h-4 w-4 text-green-600" />
                       <h4 className="text-sm font-medium">Sustainability</h4>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Button
-                        variant={sustainableOnly ? "default" : "outline"}
-                        size="sm"
-                        className={`py-1 px-3 h-auto text-xs ${sustainableOnly ? "bg-green-600 text-white hover:bg-green-700" : ""}`}
-                        onClick={() => setSustainableOnly(!sustainableOnly)}
+                      <motion.div
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                       >
-                        Sustainable Only
-                      </Button>
+                        <Button
+                          variant={sustainableOnly ? "default" : "outline"}
+                          size="sm"
+                          className={`py-1 px-3 h-auto text-xs transition-all duration-200 ${sustainableOnly ? "bg-green-600 text-white hover:bg-green-700" : ""}`}
+                          onClick={() => setSustainableOnly(!sustainableOnly)}
+                        >
+                          Sustainable Only
+                        </Button>
+                      </motion.div>
                     </div>
-                  </div>
+                  </motion.div>
                   
-                  <div className="border-t pt-4">
+                  <motion.div
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ 
+                      opacity: 1, 
+                      y: 0,
+                      transition: {
+                        delay: 0.2,
+                        duration: 0.2
+                      }
+                    }}
+                    className="border-t pt-4"
+                  >
                     <h4 className="text-sm font-medium mb-2 flex justify-between items-center">
                       <span>Categories</span>
                       <ChevronUp className="h-4 w-4 text-muted-foreground" />
                     </h4>
-                    <div className="space-y-1 max-h-48 overflow-y-auto pr-1 custom-scrollbar no-scrollbar">
-                      {categories.map(category => (
-                        <motion.div key={category} whileTap={{ scale: 0.98 }}>
+                    <div className="space-y-1 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
+                      {categories.map((category, index) => (
+                        <motion.div 
+                          key={category} 
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ 
+                            opacity: 1, 
+                            x: 0,
+                            transition: {
+                              delay: 0.05 * index,
+                              duration: 0.2
+                            }
+                          }}
+                        >
                           <Button
                             variant={activeCategory === category ? "secondary" : "ghost"}
-                        size="sm"
-                        className="w-full justify-start text-sm h-8"
-                        onClick={() => setActiveCategory(category)}
-                      >
-                        {category}
-                      </Button>
+                            size="sm"
+                            className={cn(
+                              "w-full justify-start text-sm h-8 transition-all duration-200",
+                              activeCategory === category && "bg-primary/10 text-primary font-medium"
+                            )}
+                            onClick={() => setActiveCategory(category)}
+                          >
+                            {category}
+                          </Button>
                         </motion.div>
-                    ))}
-                  </div>
-                </div>
-                
-                  <div className="border-t pt-4">
+                      ))}
+                    </div>
+                  </motion.div>
+                  
+                  <motion.div
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ 
+                      opacity: 1, 
+                      y: 0,
+                      transition: {
+                        delay: 0.3,
+                        duration: 0.2
+                      }
+                    }}
+                    className="border-t pt-4"
+                  >
                     <h4 className="text-sm font-medium mb-2 flex justify-between items-center">
-                      <span>Certifications</span>
+                      <span>Product Types</span>
                       <ChevronUp className="h-4 w-4 text-muted-foreground" />
                     </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {certifications.map(cert => (
-                        <motion.div key={cert} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                      <Badge
-                        variant={selectedCertifications.includes(cert) ? "default" : "outline"}
-                        className="cursor-pointer"
-                        onClick={() => toggleCertification(cert)}
-                      >
-                        {cert}
-                      </Badge>
+                    <div className="flex flex-wrap gap-2">
+                      {productTypes.map((type, index) => (
+                        <motion.div 
+                          key={type}
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ 
+                            opacity: 1, 
+                            scale: 1,
+                            transition: {
+                              delay: 0.05 * index,
+                              duration: 0.2
+                            }
+                          }}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <Badge
+                            variant={selectedProductTypes.includes(type) ? "default" : "outline"}
+                            className={cn(
+                              "cursor-pointer transition-colors duration-200",
+                              selectedProductTypes.includes(type) 
+                                ? "bg-primary/10 text-primary hover:bg-primary/20" 
+                                : "hover:bg-muted"
+                            )}
+                            onClick={() => toggleProductType(type)}
+                          >
+                            {type}
+                          </Badge>
                         </motion.div>
-                    ))}
-                  </div>
-                </div>
+                      ))}
+                    </div>
+                  </motion.div>
                 
-                  <div className="border-t pt-4">
-                    <h4 className="text-sm font-medium mb-2 flex justify-between items-center">
-                      <span>Packaging Type</span>
-                      <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                    </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {packagingTypes.map(pkg => (
-                        <motion.div key={pkg} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                      <Badge
-                        variant={selectedPackaging.includes(pkg) ? "default" : "outline"}
-                        className="cursor-pointer"
-                        onClick={() => togglePackaging(pkg)}
-                      >
-                        {pkg}
-                      </Badge>
-                        </motion.div>
-                    ))}
-                  </div>
-                </div>
-                
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  variant="outline"
-                  size="sm"
-                      className="w-full mt-4"
-                  onClick={clearFilters}
-                >
-                  Clear All Filters
-                </Button>
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full mt-4 hover:bg-destructive hover:text-destructive-foreground transition-all duration-300"
+                      onClick={clearFilters}
+                    >
+                      Clear All Filters
+                    </Button>
                   </motion.div>
                 </motion.div>
             )}
@@ -1151,101 +1367,282 @@ const Products = () => {
       
       {/* Product Details Dialog */}
       <Dialog open={showProductDetails} onOpenChange={setShowProductDetails}>
-        <DialogContent className="sm:max-w-2xl">
-          {selectedProduct && (
-            <>
-              <DialogHeader>
-                <DialogTitle className="text-xl">{selectedProduct.name}</DialogTitle>
-                <DialogDescription>
-                  By {selectedProduct.manufacturer}
-                </DialogDescription>
-              </DialogHeader>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
-                <div className="md:col-span-1 bg-muted rounded-lg p-4 flex items-center justify-center">
-                  <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 0.5 }}
+        <DialogContent className="sm:max-w-2xl overflow-hidden">
+          <motion.div
+            variants={dialogContentVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+          >
+            {selectedProduct && (
+              <>
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <DialogHeader>
+                    <DialogTitle className="text-xl">{selectedProduct.name}</DialogTitle>
+                    <DialogDescription>
+                      By {selectedProduct.manufacturer}
+                    </DialogDescription>
+                  </DialogHeader>
+                </motion.div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                  <motion.div 
+                    className="md:col-span-1 bg-muted rounded-lg p-4 flex items-center justify-center overflow-hidden"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ 
+                      type: "spring",
+                      stiffness: 300,
+                      damping: 25,
+                      duration: 0.4 
+                    }}
                   >
-                    <img 
+                    <motion.img 
                       src={selectedProduct.image} 
                       alt={selectedProduct.name} 
                       className="w-32 h-32 object-contain"
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ 
+                        delay: 0.2,
+                        type: "spring",
+                        stiffness: 200,
+                        damping: 20
+                      }}
+                      whileHover={{ 
+                        scale: 1.1,
+                        transition: { 
+                          type: "spring", 
+                          stiffness: 300, 
+                          damping: 25 
+                        }
+                      }}
                     />
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="md:col-span-2 space-y-4"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 0.1 }}
+                  >
+                    <motion.p 
+                      className="text-foreground/80"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.3, delay: 0.2 }}
+                    >
+                      {selectedProduct.description}
+                    </motion.p>
+                    
+                    <motion.div 
+                      className="grid grid-cols-2 gap-4"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: 0.3 }}
+                    >
+                      <motion.div 
+                        whileHover={{ scale: 1.02 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                      >
+                        <p className="text-sm text-foreground/70">Price</p>
+                        <p className="font-semibold text-lg">{selectedProduct.price}</p>
+                      </motion.div>
+                      <motion.div 
+                        whileHover={{ scale: 1.02 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                      >
+                        <p className="text-sm text-foreground/70">Category</p>
+                        <p className="font-medium">{selectedProduct.category}</p>
+                      </motion.div>
+                      <motion.div 
+                        whileHover={{ scale: 1.02 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                      >
+                        <p className="text-sm text-foreground/70">Minimum Order</p>
+                        <p className="font-medium">{selectedProduct.minOrderQuantity} {selectedProduct.unitType || 'units'}</p>
+                      </motion.div>
+                      <motion.div 
+                        whileHover={{ scale: 1.02 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                      >
+                        <p className="text-sm text-foreground/70">Lead Time</p>
+                        <p className="font-medium">{selectedProduct.leadTime} {selectedProduct.leadTimeUnit}</p>
+                      </motion.div>
+                    </motion.div>
+                    
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: 0.4 }}
+                      className="grid grid-cols-2 gap-4"
+                    >
+                      <div>
+                        <p className="text-sm text-foreground/70 mb-1">Product Type</p>
+                        <motion.div
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                        >
+                          <Badge variant="secondary">
+                            {selectedProduct.productType}
+                          </Badge>
+                        </motion.div>
+                      </div>
+                      
+                      {selectedProduct.sku && (
+                        <div>
+                          <p className="text-sm text-foreground/70 mb-1">SKU</p>
+                          <p className="font-medium text-sm">{selectedProduct.sku}</p>
+                        </div>
+                      )}
+                    </motion.div>
+                    
+                    {selectedProduct.currentAvailable !== undefined && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: 0.5 }}
+                      >
+                        <p className="text-sm text-foreground/70 mb-1">Availability</p>
+                        <Progress 
+                          value={(selectedProduct.currentAvailable / (selectedProduct.minOrderQuantity * 3)) * 100}
+                          className="h-2 mb-1"
+                        />
+                        <p className="text-sm">
+                          {selectedProduct.currentAvailable} {selectedProduct.unitType || 'units'} available
+                        </p>
+                      </motion.div>
+                    )}
+                    
+                    {selectedProduct.sustainable && (
+                      <motion.div 
+                        className="flex items-center gap-2 text-green-600 font-medium"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: 0.6 }}
+                        whileHover={{ scale: 1.02, x: 2 }}
+                      >
+                        <CheckCircle2 className="h-5 w-5" />
+                        <span>Sustainable Product</span>
+                      </motion.div>
+                    )}
                   </motion.div>
                 </div>
                 
-                <div className="md:col-span-2 space-y-4">
-                  <p className="text-foreground/80">{selectedProduct.description}</p>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-foreground/70">Price</p>
-                      <p className="font-semibold text-lg">{selectedProduct.price}</p>
-                          </div>
-                    <div>
-                      <p className="text-sm text-foreground/70">Category</p>
-                      <p className="font-medium">{selectedProduct.category}</p>
-                            </div>
-                    <div>
-                      <p className="text-sm text-foreground/70">Minimum Order</p>
-                      <p className="font-medium">{selectedProduct.minOrderQuantity} units</p>
-                            </div>
-                    <div>
-                      <p className="text-sm text-foreground/70">Lead Time</p>
-                      <p className="font-medium">{selectedProduct.leadTime}</p>
-                          </div>
-                        </div>
-                  
-                  <div>
-                    <p className="text-sm text-foreground/70 mb-1">Certifications</p>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedProduct.certifications.map((cert: string) => (
-                        <Badge key={cert} variant="secondary">
-                          {cert}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <p className="text-sm text-foreground/70 mb-1">Packaging</p>
-                    <Badge>{selectedProduct.packagingType}</Badge>
-                  </div>
-                  
-                  {selectedProduct.sustainable && (
-                    <div className="flex items-center gap-2 text-green-600 font-medium">
-                      <CheckCircle2 className="h-5 w-5" />
-                      <span>Sustainable Product</span>
-                    </div>
-                  )}
-            </div>
-          </div>
-              
-              <div className="flex justify-between items-center mt-4 pt-4 border-t">
-                <Button
-                  variant="outline"
-                  onClick={() => toggleFavorite(selectedProduct)}
+                <motion.div 
+                  className="flex justify-between items-center mt-4 pt-4 border-t"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.7 }}
                 >
-                  <Heart className="h-4 w-4 mr-2" fill={isFavorite(selectedProduct.id) ? "currentColor" : "none"} />
-                  {isFavorite(selectedProduct.id) ? "Saved" : "Save"}
-                </Button>
-                
-                <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setShowProductDetails(false)}>
-                    Close
-                  </Button>
-                  <Button className="gap-1">
-                    Find Match
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-        </div>
-      </div>
-            </>
-          )}
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                  >
+                    <Button
+                      variant="outline"
+                      onClick={() => toggleFavorite(selectedProduct)}
+                      className="transition-all duration-200"
+                    >
+                      <Heart 
+                        className="h-4 w-4 mr-2" 
+                        fill={isFavorite(selectedProduct.id) ? "currentColor" : "none"} 
+                      />
+                      {isFavorite(selectedProduct.id) ? "Saved" : "Save"}
+                    </Button>
+                  </motion.div>
+                  
+                  <div className="flex gap-2">
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                    >
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setShowProductDetails(false)}
+                        className="transition-all duration-200"
+                      >
+                        Close
+                      </Button>
+                    </motion.div>
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                    >
+                      <Button className="gap-1 transition-all duration-200">
+                        Find Match
+                        <ArrowRight className="h-4 w-4" />
+                      </Button>
+                    </motion.div>
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </motion.div>
         </DialogContent>
       </Dialog>
+
+      {/* Add custom keyframes for animations */}
+      <style>
+        {`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.05); }
+        }
+        
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out forwards;
+        }
+        
+        .animate-slideUp {
+          animation: slideUp 0.4s ease-out forwards;
+        }
+        
+        .animate-pulse {
+          animation: pulse 1.5s infinite;
+        }
+        `}
+      </style>
+
+      {/* Add back-to-top button */}
+      <AnimatePresence>
+        {showBackToTop && (
+          <motion.div
+            className="fixed bottom-6 right-6 z-50"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.15 }}
+          >
+            <motion.button
+              className="bg-primary text-primary-foreground rounded-full p-3 shadow-lg hover:shadow-xl transition-all"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            >
+              <ChevronUp className="h-5 w-5" />
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

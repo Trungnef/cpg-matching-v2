@@ -32,7 +32,8 @@ import {
   Paintbrush,
   Tag,
   Store,
-  Settings2
+  Settings2,
+  ChevronUp
 } from "lucide-react";
 import {
   Select,
@@ -192,23 +193,28 @@ const sortOptions = [
   { value: "name-desc", label: "Name Z-A" }
 ];
 
-// Animation variants
+// Enhanced animation variants with smoother physics
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1
+      staggerChildren: 0.05,
+      delayChildren: 0.05,
+      ease: "easeOut"
     }
   }
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 15 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
+      type: "spring",
+      stiffness: 300,
+      damping: 25,
       duration: 0.3
     }
   }
@@ -216,7 +222,13 @@ const itemVariants = {
 
 const fadeIn = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.3 } }
+  visible: { 
+    opacity: 1, 
+    transition: { 
+      duration: 0.3,
+      ease: "easeOut"
+    } 
+  }
 };
 
 const staggerContainer = {
@@ -224,21 +236,91 @@ const staggerContainer = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1
+      staggerChildren: 0.05,
+      delayChildren: 0.1,
+      ease: "easeOut"
     }
   }
 };
 
-// Add this new constant for advanced sort options
-const advancedSortOptions = [
-  { value: "relevance", label: "Most Relevant" },
-  { value: "rating-desc", label: "Highest Rating" },
-  { value: "rating-asc", label: "Lowest Rating" },
-  { value: "orders-desc", label: "Highest Orders" },
-  { value: "orders-asc", label: "Lowest Orders" },
-  { value: "name-asc", label: "Name A-Z" },
-  { value: "name-desc", label: "Name Z-A" }
-];
+// New animation variants for modern UI
+const cardHoverAnimation = {
+  rest: { 
+    scale: 1,
+    y: 0,
+    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.05)",
+    transition: {
+      type: "spring",
+      stiffness: 400,
+      damping: 40
+    }
+  },
+  hover: { 
+    scale: 1.02,
+    y: -5,
+    boxShadow: "0px 10px 25px rgba(0, 0, 0, 0.1)",
+    transition: {
+      type: "spring",
+      stiffness: 400,
+      damping: 17
+    }
+  },
+  tap: { 
+    scale: 0.98,
+    transition: {
+      type: "spring",
+      stiffness: 400,
+      damping: 10
+    }
+  }
+};
+
+const buttonAnimation = {
+  rest: { scale: 1 },
+  hover: { 
+    scale: 1.05,
+    transition: {
+      type: "spring",
+      stiffness: 400,
+      damping: 10
+    }
+  },
+  tap: { scale: 0.95 }
+};
+
+const badgeAnimation = {
+  rest: { scale: 1, backgroundColor: "transparent" },
+  hover: { 
+    scale: 1.05,
+    backgroundColor: "var(--primary-light)",
+    transition: {
+      duration: 0.2
+    }
+  },
+  tap: { scale: 0.95 }
+};
+
+// Page transitions for smoother navigation
+const pageTransition = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { 
+      type: "spring", 
+      stiffness: 300, 
+      damping: 30,
+      duration: 0.4 
+    } 
+  },
+  exit: { 
+    opacity: 0, 
+    y: 20, 
+    transition: { 
+      duration: 0.2 
+    } 
+  }
+};
 
 const Manufacturers = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -277,6 +359,9 @@ const Manufacturers = () => {
   const [hasDesign, setHasDesign] = useState(false);
   const [hasTradeShows, setHasTradeShows] = useState(false);
   const [hasSamples, setHasSamples] = useState(false);
+
+  // Add new state for scroll-to-top button
+  const [showBackToTop, setShowBackToTop] = useState(false);
 
   // Page title effect
   useEffect(() => {
@@ -468,453 +553,153 @@ const Manufacturers = () => {
     "Halal"
   ];
 
+  // Add effect for scroll detection
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 300);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-background/50">
+    <div className="min-h-screen bg-gradient-to-b from-background to-background/50 overflow-x-hidden">
       <Navbar />
       
-      <div className="container mx-auto px-4 pt-24 pb-12">
+      <motion.div 
+        className="container mx-auto px-4 pt-24 pb-12"
+        variants={pageTransition}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+      >
         <div className="max-w-7xl mx-auto">
           <motion.div 
             className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
           >
-            <div className="space-y-4">
-              <motion.h1 
-                className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/50 bg-clip-text text-transparent"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 }}
-              >
+            <motion.div variants={itemVariants} className="space-y-4">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/50 bg-clip-text text-transparent">
                 Manufacturers
-              </motion.h1>
-              <motion.p 
-                className="text-lg text-muted-foreground max-w-2xl"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 }}
-              >
+              </h1>
+              <p className="text-lg text-muted-foreground max-w-2xl">
                 Find the perfect manufacturer for your CPG products. Compare capabilities, certifications, and connect directly with trusted partners.
-              </motion.p>
-            </div>
+              </p>
+            </motion.div>
             
             <motion.div 
               className="flex items-center gap-3"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 }}
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
             >
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setShowFavoritesSheet(true)}
-                className={cn(
-                  "flex items-center gap-2 transition-colors hover:bg-primary hover:text-primary-foreground relative group",
-                  showFavoritesSheet && "bg-primary text-primary-foreground"
-                )}
-              >
-                <Heart className={cn(
-                  "h-4 w-4 transition-all",
-                  favorites.length > 0 ? "fill-current" : "group-hover:fill-current"
-                )} />
-                Favorites
-                {favorites.length > 0 && (
-                  <Badge variant="secondary" className="bg-background/20">
-                    {favorites.length}
-                  </Badge>
-                )}
-              </Button>
-
-              <Sheet open={showFavoritesSheet} onOpenChange={setShowFavoritesSheet}>
-                <SheetContent side="right" className="w-[400px]">
-                  <SheetHeader>
-                    <SheetTitle className="text-2xl font-bold flex items-center gap-2">
-                      <Heart className="h-5 w-5" />
-                      Favorite Manufacturers
-                    </SheetTitle>
-                    <SheetDescription>
-                      Your list of favorite manufacturers
-                    </SheetDescription>
-                  </SheetHeader>
-
-                  <div className="mt-6 space-y-4">
-                    {favorites.length === 0 ? (
-                      <div className="text-center py-8 space-y-4">
-                        <Heart className="h-12 w-12 mx-auto text-muted-foreground" />
-                        <div className="space-y-2">
-                          <p className="text-lg font-medium">No favorites yet</p>
-                          <p className="text-sm text-muted-foreground">
-                            Add manufacturers to your favorites to see them here
-                          </p>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        {favorites.map((manufacturer) => (
-                          <motion.div
-                            key={manufacturer.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            className="group relative bg-card rounded-lg p-4 border shadow-sm hover:shadow-md transition-all"
-                          >
-                            <div className="absolute -top-2 -right-2 z-10">
-                              <Button
-                                variant="destructive"
-                                size="icon"
-                                className="h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                                onClick={() => toggleFavorite(manufacturer)}
-                              >
-                                <X className="h-4 w-4" />
-                              </Button>
-            </div>
-            
-                            <div className="flex items-center gap-4">
-                              <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center">
-                                <img src={manufacturer.logo} alt={manufacturer.name} className="w-8 h-8" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <h4 className="text-base font-medium truncate">{manufacturer.name}</h4>
-                                <p className="text-sm text-muted-foreground flex items-center gap-1">
-                                  <MapPin className="h-3 w-3" />
-                                  {manufacturer.location}
-                                </p>
-                              </div>
-                            </div>
-                            
-                            <div className="mt-3 flex flex-wrap gap-1">
-                              {manufacturer.categories.map(category => (
-                                <Badge key={category} variant="secondary" className="text-xs">
-                                  {category}
-                                </Badge>
-                              ))}
-                            </div>
-                            
-                            <div className="mt-3 flex items-center justify-between">
-                              <div className="flex items-center gap-1">
-                                {Array.from({ length: 5 }).map((_, i) => (
-                                  <Star 
-                                    key={i}
-                                    className={cn(
-                                      "h-3 w-3",
-                                      i < Math.floor(manufacturer.rating) 
-                                        ? "fill-primary text-primary"
-                                        : "text-muted-foreground/40"
-                                    )}
-                                  />
-                                ))}
-                                <span className="ml-1 text-sm font-medium">{manufacturer.rating}</span>
-                              </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-xs hover:bg-primary hover:text-primary-foreground"
-                                onClick={() => {
-                                  handleViewDetails(manufacturer.id);
-                                  setShowFavoritesSheet(false);
-                                }}
-                              >
-                                View Details
-                              </Button>
-                            </div>
-                          </motion.div>
-                        ))}
-                      </div>
+              <motion.div variants={itemVariants}>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setShowFavoritesSheet(true)}
+                    className={cn(
+                      "flex items-center gap-2 transition-all duration-300 hover:bg-primary hover:text-primary-foreground relative group",
+                      showFavoritesSheet && "bg-primary text-primary-foreground"
                     )}
-                  </div>
-
-                  {favorites.length > 0 && (
-                    <SheetFooter className="mt-6">
-                      <Button
-                        variant="outline"
-                        className="w-full flex items-center justify-center gap-2 hover:bg-destructive hover:text-destructive-foreground"
-                        onClick={() => {
-                          favorites.forEach(manufacturer => toggleFavorite(manufacturer));
-                          setShowFavoritesSheet(false);
+                  >
+                    <motion.span 
+                      animate={favorites.length > 0 ? { scale: [1, 1.2, 1] } : {}}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <Heart className={cn(
+                        "h-4 w-4 transition-all",
+                        favorites.length > 0 ? "fill-current" : "group-hover:fill-current"
+                      )} />
+                    </motion.span>
+                    Favorites
+                    {favorites.length > 0 && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 500,
+                          damping: 15
                         }}
                       >
-                        <Trash2 className="h-4 w-4" />
-                        Clear All Favorites
-                      </Button>
-                    </SheetFooter>
-                  )}
-                </SheetContent>
-              </Sheet>
+                        <Badge variant="secondary" className="bg-background/20">
+                          {favorites.length}
+                        </Badge>
+                      </motion.div>
+                    )}
+                  </Button>
+                </motion.div>
+              </motion.div>
 
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setShowFilters(!showFilters)}
-                className={cn(
-                  "flex items-center gap-2 transition-colors hover:bg-primary hover:text-primary-foreground",
-                  showFilters && "bg-primary text-primary-foreground"
-                )}
-              >
-                <Filter className="h-4 w-4" />
-                Filters
-                {(selectedCertifications.length > 0 || activeCategory !== "All Categories" || activeLocation !== "All Locations") && (
-                  <Badge variant="secondary" className="ml-1 bg-background/20">
-                    {selectedCertifications.length + (activeCategory !== "All Categories" ? 1 : 0) + (activeLocation !== "All Locations" ? 1 : 0)}
-                  </Badge>
-                )}
-              </Button>
+              <motion.div variants={itemVariants}>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setShowFilters(!showFilters)}
+                    className={cn(
+                      "flex items-center gap-2 transition-colors duration-300 hover:bg-primary hover:text-primary-foreground",
+                      showFilters && "bg-primary text-primary-foreground"
+                    )}
+                  >
+                    <Filter className="h-4 w-4" />
+                    Filters
+                    {(selectedCertifications.length > 0 || activeCategory !== "All Categories" || activeLocation !== "All Locations") && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 500,
+                          damping: 15
+                        }}
+                      >
+                        <Badge variant="secondary" className="ml-1 bg-background/20">
+                          {selectedCertifications.length + (activeCategory !== "All Categories" ? 1 : 0) + (activeLocation !== "All Locations" ? 1 : 0)}
+                        </Badge>
+                      </motion.div>
+                    )}
+                  </Button>
+                </motion.div>
+              </motion.div>
 
-              <Sheet open={showCompareSheet} onOpenChange={setShowCompareSheet}>
-                <SheetTrigger asChild>
+              <motion.div variants={itemVariants}>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button 
                     variant="outline" 
                     size="sm"
                     className={cn(
-                      "flex items-center gap-2 transition-colors hover:bg-primary hover:text-primary-foreground",
+                      "flex items-center gap-2 transition-colors duration-300 hover:bg-primary hover:text-primary-foreground",
                       compareItems.length > 0 && "bg-primary text-primary-foreground"
                     )}
                     disabled={compareItems.length === 0}
+                    onClick={() => setShowCompareSheet(true)}
                   >
                     <Scale className="h-4 w-4" />
                     Compare
                     {compareItems.length > 0 && (
-                      <Badge variant="secondary" className="bg-background/20">{compareItems.length}</Badge>
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 500,
+                          damping: 15
+                        }}
+                      >
+                        <Badge variant="secondary" className="bg-background/20">{compareItems.length}</Badge>
+                      </motion.div>
                     )}
                   </Button>
-                </SheetTrigger>
-                <SheetContent side="right" className="w-full h-full p-0 border-none bg-transparent">
-                  <motion.div 
-                    className="fixed inset-0 bg-background/95 backdrop-blur-sm z-50 overflow-y-auto no-scrollbar"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                  >
-                    <div className="container mx-auto px-4 py-6 max-w-7xl">
-                      <div className="flex items-center justify-between mb-8">
-                        <div>
-                          <h2 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/50 bg-clip-text text-transparent">
-                            Compare Manufacturers
-                          </h2>
-                          <p className="text-muted-foreground mt-2">
-                            Compare up to 3 manufacturers side by side to make informed decisions
-                          </p>
-            </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="rounded-full hover:bg-destructive hover:text-destructive-foreground"
-                          onClick={() => setShowCompareSheet(false)}
-                        >
-                          <X className="h-5 w-5" />
-                        </Button>
-          </div>
-          
-                      {compareItems.length === 0 ? (
-                        <motion.div 
-                          className="text-center py-24 space-y-4 bg-card rounded-xl border"
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.3 }}
-                        >
-                          <Scale className="h-16 w-16 mx-auto text-muted-foreground" />
-                          <div className="space-y-2">
-                            <p className="text-2xl font-medium">No manufacturers selected</p>
-                            <p className="text-muted-foreground">
-                              Add up to 3 manufacturers to compare their capabilities
-                            </p>
-                          </div>
-                          <Button
-                            variant="outline"
-                            onClick={() => setShowCompareSheet(false)}
-                            className="mt-4"
-                          >
-                            Browse Manufacturers
-                          </Button>
-                        </motion.div>
-                      ) : (
-                        <motion.div 
-                          className="space-y-8"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ duration: 0.3 }}
-                        >
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {compareItems.map((item, index) => (
-                              <motion.div 
-                                key={item.id}
-                                className="relative group"
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: index * 0.1 }}
-                              >
-                                <div className="absolute -top-2 -right-2 z-10">
-                                  <Button
-                                    variant="destructive"
-                                    size="icon"
-                                    className="h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
-                                    onClick={() => toggleCompare(item)}
-                                  >
-                                    <X className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                                <div className="bg-card rounded-xl p-6 border shadow-sm">
-                                  <div className="flex items-center gap-4">
-                                    <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
-                                      <img src={item.logo} alt={item.name} className="w-10 h-10" />
-                                    </div>
-                                    <div>
-                                      <h4 className="text-lg font-medium">{item.name}</h4>
-                                      <p className="text-muted-foreground">{item.location}</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              </motion.div>
-                            ))}
-                          </div>
-
-                          <div className="bg-card rounded-xl border shadow-sm overflow-hidden">
-                            <div className="overflow-x-auto">
-                              <table className="w-full">
-                                <thead className="bg-muted/50">
-                                  <tr>
-                                    <th className="text-left p-4 text-sm font-medium text-muted-foreground w-[200px] sticky left-0 bg-muted/50">
-                                      Comparison Criteria
-                                    </th>
-                                    {compareItems.map((item) => (
-                                      <th key={item.id} className="text-left p-4 text-sm font-medium min-w-[250px]">
-                                        {item.name}
-                                      </th>
-                                    ))}
-                                  </tr>
-                                </thead>
-                                <tbody className="divide-y divide-border">
-                                  <tr>
-                                    <td className="p-4 text-sm font-medium text-muted-foreground sticky left-0 bg-card">
-                                      <div className="flex items-center gap-2">
-                                        <Star className="h-4 w-4" />
-                                        Rating
-                                      </div>
-                                    </td>
-                                    {compareItems.map((item) => (
-                                      <td key={item.id} className="p-4">
-                                        <div className="flex items-center gap-1">
-                                          {Array.from({ length: 5 }).map((_, i) => (
-                                            <Star 
-                                              key={i}
-                                              className={cn(
-                                                "h-4 w-4",
-                                                i < Math.floor(item.rating) 
-                                                  ? "fill-primary text-primary"
-                                                  : "text-muted-foreground/40"
-                                              )}
-                                            />
-                                          ))}
-                                          <span className="ml-2 font-medium">{item.rating}</span>
-                                        </div>
-                                      </td>
-                                    ))}
-                                  </tr>
-                                  <tr>
-                                    <td className="p-4 text-sm font-medium text-muted-foreground sticky left-0 bg-card">
-                                      <div className="flex items-center gap-2">
-                                        <Building2 className="h-4 w-4" />
-                                        Categories
-                                      </div>
-                                    </td>
-                                    {compareItems.map((item) => (
-                                      <td key={item.id} className="p-4">
-                                        <div className="flex flex-wrap gap-1">
-                                          {item.categories.map(cat => (
-                                            <Badge key={cat} variant="secondary" className="text-xs">
-                                              {cat}
-                                            </Badge>
-                                          ))}
-                                        </div>
-                                      </td>
-                                    ))}
-                                  </tr>
-                                  <tr>
-                                    <td className="p-4 text-sm font-medium text-muted-foreground sticky left-0 bg-card">
-                                      <div className="flex items-center gap-2">
-                                        <Award className="h-4 w-4" />
-                                        Certifications
-                                      </div>
-                                    </td>
-                                    {compareItems.map((item) => (
-                                      <td key={item.id} className="p-4">
-                                        <div className="flex flex-wrap gap-1">
-                                          {item.certifications.map(cert => (
-                                            <Badge key={cert} variant="outline" className="text-xs bg-background/50">
-                                              {cert}
-                                            </Badge>
-                                          ))}
-                                        </div>
-                                      </td>
-                                    ))}
-                                  </tr>
-                                  <tr>
-                                    <td className="p-4 text-sm font-medium text-muted-foreground sticky left-0 bg-card">
-                                      <div className="flex items-center gap-2">
-                                        <Package className="h-4 w-4" />
-                                        Minimum Order
-                                      </div>
-                                    </td>
-                                    {compareItems.map((item) => (
-                                      <td key={item.id} className="p-4">
-                                        <span className="text-sm font-medium">{item.minOrderSize}</span>
-                                      </td>
-                                    ))}
-                                  </tr>
-                                  <tr>
-                                    <td className="p-4 text-sm font-medium text-muted-foreground sticky left-0 bg-card">
-                                      <div className="flex items-center gap-2">
-                                        <Calendar className="h-4 w-4" />
-                                        Established Year
-                                      </div>
-                                    </td>
-                                    {compareItems.map((item) => (
-                                      <td key={item.id} className="p-4">
-                                        <span className="text-sm font-medium">{item.establishedYear}</span>
-                                      </td>
-                                    ))}
-                                  </tr>
-                                  <tr>
-                                    <td className="p-4 text-sm font-medium text-muted-foreground sticky left-0 bg-card">
-                                      <div className="flex items-center gap-2">
-                                        <MapPin className="h-4 w-4" />
-                                        Location
-                                      </div>
-                                    </td>
-                                    {compareItems.map((item) => (
-                                      <td key={item.id} className="p-4">
-                                        <span className="text-sm">{item.location}</span>
-                                      </td>
-                                    ))}
-                                  </tr>
-                                </tbody>
-                              </table>
-                            </div>
-                          </div>
-
-                          <div className="flex justify-between items-center pt-4">
-                            <Button
-                              variant="outline"
-                              onClick={() => {
-                                clearCompare();
-                                setShowCompareSheet(false);
-                              }}
-                              className="flex items-center gap-2 hover:bg-destructive hover:text-destructive-foreground transition-colors"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                              Clear All
-                            </Button>
-                            <Button className="flex items-center gap-2 bg-primary hover:bg-primary/90 transition-colors">
-                              <Mail className="h-4 w-4" />
-                              Contact Selected
-                            </Button>
-                          </div>
-                        </motion.div>
-                      )}
-                    </div>
-                  </motion.div>
-                </SheetContent>
-              </Sheet>
+                </motion.div>
+              </motion.div>
             </motion.div>
           </motion.div>
           
@@ -929,40 +714,63 @@ const Manufacturers = () => {
               <Input
                 type="search"
                 placeholder="Search manufacturers, products, or certifications..."
-                className="pl-10 w-full"
+                className="pl-10 w-full transition-all duration-300 border-opacity-50 focus:border-opacity-100"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
               {searchTerm && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-12 top-1/2 transform -translate-y-1/2"
-                  onClick={() => setSearchTerm("")}
+                <motion.div
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
                 >
-                  <X className="h-4 w-4" />
-                </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-12 top-1/2 transform -translate-y-1/2"
+                    onClick={() => setSearchTerm("")}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </motion.div>
               )}
-              <Button
-                variant="outline"
-                size="sm"
-                className={cn(
-                  "absolute right-2 top-1/2 transform -translate-y-1/2",
-                  showAdvancedSearch && "bg-primary text-primary-foreground"
-                )}
-                onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
-              >
-                <SlidersHorizontal className="h-4 w-4 mr-2" />
-                Advanced
-              </Button>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "absolute right-2 top-1/2 transform -translate-y-1/2 transition-colors duration-300",
+                    showAdvancedSearch && "bg-primary text-primary-foreground"
+                  )}
+                  onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
+                >
+                  <SlidersHorizontal className="h-4 w-4 mr-2" />
+                  Advanced
+                </Button>
+              </motion.div>
             </div>
 
             <AnimatePresence>
               {showAdvancedSearch && (
                 <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
+                  initial={{ opacity: 0, height: 0, overflow: "hidden" }}
+                  animate={{ 
+                    opacity: 1, 
+                    height: "auto", 
+                    transition: { 
+                      duration: 0.3,
+                      height: { duration: 0.3 }
+                    } 
+                  }}
+                  exit={{ 
+                    opacity: 0, 
+                    height: 0,
+                    transition: { 
+                      duration: 0.2,
+                      height: { duration: 0.2 }
+                    }
+                  }}
                   className="bg-card border rounded-lg p-6 space-y-6"
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -1221,219 +1029,369 @@ const Manufacturers = () => {
             </AnimatePresence>
           </motion.div>
           
-          {/* Active filters */}
+          {/* Active filters with enhanced animations */}
           <AnimatePresence>
             {(selectedCertifications.length > 0 || activeCategory !== "All Categories" || activeLocation !== "All Locations" || showFavoritesOnly || ratingRange[0] !== 0 || ratingRange[1] !== 5 || yearRange[0] !== 2000 || yearRange[1] !== new Date().getFullYear()) && (
               <motion.div 
                 className="mb-6 flex flex-wrap items-center gap-2 bg-muted/30 p-4 rounded-lg"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
+                initial={{ opacity: 0, y: -5, height: 0 }}
+                animate={{ opacity: 1, y: 0, height: "auto" }}
+                exit={{ opacity: 0, y: -5, height: 0 }}
+                transition={{ 
+                  duration: 0.2, 
+                  height: { duration: 0.15 },
+                  opacity: { duration: 0.2 }
+                }}
               >
                 <span className="text-sm font-medium text-foreground/70">Active filters:</span>
                 
                 {showFavoritesOnly && (
-                  <Badge variant="secondary" className="flex items-center gap-1 group hover:bg-destructive hover:text-destructive-foreground transition-colors">
-                    <Heart className="h-3 w-3" />
-                    Favorites Only
-                    <button 
-                      onClick={() => setShowFavoritesOnly(false)}
-                      className="group-hover:bg-destructive-foreground/20 rounded-full p-0.5"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.8, opacity: 0 }}
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Badge variant="secondary" className="flex items-center gap-1 group hover:bg-destructive hover:text-destructive-foreground transition-all duration-300">
+                      <Heart className="h-3 w-3" />
+                      Favorites Only
+                      <motion.button 
+                        onClick={() => setShowFavoritesOnly(false)}
+                        className="group-hover:bg-destructive-foreground/20 rounded-full p-0.5 transition-colors duration-300"
+                        whileHover={{ rotate: 90 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <X className="h-3 w-3" />
+                      </motion.button>
+                    </Badge>
+                  </motion.div>
                 )}
               
-              {activeCategory !== "All Categories" && (
-                  <Badge variant="secondary" className="flex items-center gap-1 group hover:bg-destructive hover:text-destructive-foreground transition-colors">
-                  {activeCategory}
-                    <button 
-                      onClick={() => setActiveCategory("All Categories")}
-                      className="group-hover:bg-destructive-foreground/20 rounded-full p-0.5"
-                    >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              )}
-              
-              {activeLocation !== "All Locations" && (
-                  <Badge variant="secondary" className="flex items-center gap-1 group hover:bg-destructive hover:text-destructive-foreground transition-colors">
-                  <MapPin className="h-3 w-3" />
-                  {activeLocation}
-                    <button 
-                      onClick={() => setActiveLocation("All Locations")}
-                      className="group-hover:bg-destructive-foreground/20 rounded-full p-0.5"
-                    >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              )}
-              
-              {selectedCertifications.map(cert => (
-                  <Badge
-                    key={cert}
-                    variant="secondary"
-                    className="flex items-center gap-1 group hover:bg-destructive hover:text-destructive-foreground transition-colors"
+                {activeCategory !== "All Categories" && (
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.8, opacity: 0 }}
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.2 }}
                   >
-                  {cert}
-                    <button 
-                      onClick={() => toggleCertification(cert)}
-                      className="group-hover:bg-destructive-foreground/20 rounded-full p-0.5"
+                    <Badge variant="secondary" className="flex items-center gap-1 group hover:bg-destructive hover:text-destructive-foreground transition-all duration-300">
+                      {activeCategory}
+                      <motion.button 
+                        onClick={() => setActiveCategory("All Categories")}
+                        className="group-hover:bg-destructive-foreground/20 rounded-full p-0.5 transition-colors duration-300"
+                        whileHover={{ rotate: 90 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <X className="h-3 w-3" />
+                      </motion.button>
+                    </Badge>
+                  </motion.div>
+                )}
+              
+                {activeLocation !== "All Locations" && (
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.8, opacity: 0 }}
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Badge variant="secondary" className="flex items-center gap-1 group hover:bg-destructive hover:text-destructive-foreground transition-all duration-300">
+                      <MapPin className="h-3 w-3" />
+                      {activeLocation}
+                      <motion.button 
+                        onClick={() => setActiveLocation("All Locations")}
+                        className="group-hover:bg-destructive-foreground/20 rounded-full p-0.5 transition-colors duration-300"
+                        whileHover={{ rotate: 90 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <X className="h-3 w-3" />
+                      </motion.button>
+                    </Badge>
+                  </motion.div>
+                )}
+              
+                {selectedCertifications.map(cert => (
+                  <motion.div
+                    key={cert}
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.8, opacity: 0 }}
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Badge
+                      variant="secondary"
+                      className="flex items-center gap-1 group hover:bg-destructive hover:text-destructive-foreground transition-all duration-300"
                     >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              ))}
+                      {cert}
+                      <motion.button 
+                        onClick={() => toggleCertification(cert)}
+                        className="group-hover:bg-destructive-foreground/20 rounded-full p-0.5 transition-colors duration-300"
+                        whileHover={{ rotate: 90 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <X className="h-3 w-3" />
+                      </motion.button>
+                    </Badge>
+                  </motion.div>
+                ))}
               
                 {(ratingRange[0] !== 0 || ratingRange[1] !== 5) && (
-                  <Badge variant="secondary" className="flex items-center gap-1 group hover:bg-destructive hover:text-destructive-foreground transition-colors">
-                    <Star className="h-3 w-3" />
-                    {ratingRange[0]} - {ratingRange[1]}
-                    <button 
-                      onClick={() => setRatingRange([0, 5])}
-                      className="group-hover:bg-destructive-foreground/20 rounded-full p-0.5"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.8, opacity: 0 }}
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Badge variant="secondary" className="flex items-center gap-1 group hover:bg-destructive hover:text-destructive-foreground transition-all duration-300">
+                      <Star className="h-3 w-3" />
+                      {ratingRange[0]} - {ratingRange[1]}
+                      <motion.button 
+                        onClick={() => setRatingRange([0, 5])}
+                        className="group-hover:bg-destructive-foreground/20 rounded-full p-0.5 transition-colors duration-300"
+                        whileHover={{ rotate: 90 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <X className="h-3 w-3" />
+                      </motion.button>
+                    </Badge>
+                  </motion.div>
                 )}
                 
                 {(yearRange[0] !== 2000 || yearRange[1] !== new Date().getFullYear()) && (
-                  <Badge variant="secondary" className="flex items-center gap-1 group hover:bg-destructive hover:text-destructive-foreground transition-colors">
-                    <Calendar className="h-3 w-3" />
-                    {yearRange[0]} - {yearRange[1]}
-                    <button 
-                      onClick={() => setYearRange([2000, new Date().getFullYear()])}
-                      className="group-hover:bg-destructive-foreground/20 rounded-full p-0.5"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.8, opacity: 0 }}
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Badge variant="secondary" className="flex items-center gap-1 group hover:bg-destructive hover:text-destructive-foreground transition-all duration-300">
+                      <Calendar className="h-3 w-3" />
+                      {yearRange[0]} - {yearRange[1]}
+                      <motion.button 
+                        onClick={() => setYearRange([2000, new Date().getFullYear()])}
+                        className="group-hover:bg-destructive-foreground/20 rounded-full p-0.5 transition-colors duration-300"
+                        whileHover={{ rotate: 90 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <X className="h-3 w-3" />
+                      </motion.button>
+                    </Badge>
+                  </motion.div>
                 )}
                 
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={clearFilters} 
-                  className="text-xs hover:bg-destructive hover:text-destructive-foreground transition-colors"
+                <motion.div 
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                Clear all
-              </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={clearFilters} 
+                    className="text-xs hover:bg-destructive hover:text-destructive-foreground transition-colors duration-300"
+                  >
+                    Clear all
+                  </Button>
+                </motion.div>
               </motion.div>
-          )}
+            )}
           </AnimatePresence>
           
           {/* Filter sidebar and manufacturers grid */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* Filter sidebar - shown/hidden on mobile */}
-            {showFilters && (
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="md:col-span-1 space-y-6 bg-card p-6 rounded-xl shadow-sm border"
-              >
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold flex items-center gap-2">
-                    <Filter className="h-4 w-4" />
-                    Filters
-                  </h3>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="md:hidden hover:bg-destructive hover:text-destructive-foreground"
-                    onClick={() => setShowFilters(false)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-                
-                <div className="space-y-6">
-                <div>
-                    <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
-                      <Building2 className="h-4 w-4" />
-                      Categories
-                    </h4>
-                  <div className="space-y-1">
-                    {categories.map(category => (
-                      <Button
-                        key={category}
-                        variant={activeCategory === category ? "secondary" : "ghost"}
-                        size="sm"
-                          className={cn(
-                            "w-full justify-start text-sm h-8",
-                            activeCategory === category && "bg-primary/10 text-primary font-medium"
-                          )}
-                        onClick={() => setActiveCategory(category)}
-                      >
-                        {category}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-                
-                <div>
-                    <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
-                      <MapPin className="h-4 w-4" />
-                      Location
-                    </h4>
-                  <div className="space-y-1">
-                    {locations.map(location => (
-                      <Button
-                        key={location}
-                        variant={activeLocation === location ? "secondary" : "ghost"}
-                        size="sm"
-                          className={cn(
-                            "w-full justify-start text-sm h-8",
-                            activeLocation === location && "bg-primary/10 text-primary font-medium"
-                          )}
-                        onClick={() => setActiveLocation(location)}
-                      >
-                        {location !== "All Locations" && <MapPin className="h-3 w-3 mr-2" />}
-                        {location}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-                
-                <div>
-                    <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
-                      <Award className="h-4 w-4" />
-                      Certifications
-                    </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {certifications.map(cert => (
-                      <Badge
-                        key={cert}
-                        variant={selectedCertifications.includes(cert) ? "default" : "outline"}
-                          className={cn(
-                            "cursor-pointer transition-colors",
-                            selectedCertifications.includes(cert) 
-                              ? "bg-primary/10 text-primary hover:bg-primary/20" 
-                              : "hover:bg-muted"
-                          )}
-                        onClick={() => toggleCertification(cert)}
-                      >
-                        {cert}
-                      </Badge>
-                    ))}
-                    </div>
-                  </div>
-                </div>
-                
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full mt-4 hover:bg-destructive hover:text-destructive-foreground"
-                  onClick={clearFilters}
+            {/* Filter sidebar - improved animations */}
+            <AnimatePresence>
+              {showFilters && (
+                <motion.div
+                  initial={{ opacity: 0, x: -20, boxShadow: "0px 0px 0px rgba(0,0,0,0)" }}
+                  animate={{ 
+                    opacity: 1, 
+                    x: 0, 
+                    boxShadow: "0px 4px 20px rgba(0,0,0,0.05)",
+                    transition: {
+                      type: "spring",
+                      stiffness: 400,
+                      damping: 30
+                    }
+                  }}
+                  exit={{ 
+                    opacity: 0, 
+                    x: -20,
+                    transition: {
+                      duration: 0.2
+                    }
+                  }}
+                  className="md:col-span-1 space-y-6 bg-card p-6 rounded-xl shadow-sm border"
                 >
-                  Clear All Filters
-                </Button>
-              </motion.div>
-            )}
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold flex items-center gap-2">
+                      <Filter className="h-4 w-4" />
+                      Filters
+                    </h3>
+                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="md:hidden hover:bg-destructive hover:text-destructive-foreground"
+                        onClick={() => setShowFilters(false)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </motion.div>
+                  </div>
+                  
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.1 }}
+                    className="space-y-6"
+                  >
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                    >
+                      <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
+                        <Building2 className="h-4 w-4" />
+                        Categories
+                      </h4>
+                      <div className="space-y-1">
+                        {categories.map((category, index) => (
+                          <motion.div
+                            key={category}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ 
+                              opacity: 1, 
+                              x: 0,
+                              transition: {
+                                delay: 0.05 * index
+                              }
+                            }}
+                          >
+                            <Button
+                              variant={activeCategory === category ? "secondary" : "ghost"}
+                              size="sm"
+                              className={cn(
+                                "w-full justify-start text-sm h-8 transition-all duration-200",
+                                activeCategory === category && "bg-primary/10 text-primary font-medium"
+                              )}
+                              onClick={() => setActiveCategory(category)}
+                            >
+                              {category}
+                            </Button>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </motion.div>
+                    
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
+                    >
+                      <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
+                        <MapPin className="h-4 w-4" />
+                        Location
+                      </h4>
+                      <div className="space-y-1">
+                        {locations.map((location, index) => (
+                          <motion.div
+                            key={location}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ 
+                              opacity: 1, 
+                              x: 0,
+                              transition: {
+                                delay: 0.05 * index
+                              }
+                            }}
+                          >
+                            <Button
+                              variant={activeLocation === location ? "secondary" : "ghost"}
+                              size="sm"
+                              className={cn(
+                                "w-full justify-start text-sm h-8 transition-all duration-200",
+                                activeLocation === location && "bg-primary/10 text-primary font-medium"
+                              )}
+                              onClick={() => setActiveLocation(location)}
+                            >
+                              {location !== "All Locations" && <MapPin className="h-3 w-3 mr-2" />}
+                              {location}
+                            </Button>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </motion.div>
+                    
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                    >
+                      <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
+                        <Award className="h-4 w-4" />
+                        Certifications
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {certifications.map((cert, index) => (
+                          <motion.div
+                            key={cert}
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ 
+                              opacity: 1, 
+                              scale: 1,
+                              transition: {
+                                delay: 0.05 * index
+                              }
+                            }}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <Badge
+                              variant={selectedCertifications.includes(cert) ? "default" : "outline"}
+                              className={cn(
+                                "cursor-pointer transition-colors duration-200",
+                                selectedCertifications.includes(cert) 
+                                  ? "bg-primary/10 text-primary hover:bg-primary/20" 
+                                  : "hover:bg-muted"
+                              )}
+                              onClick={() => toggleCertification(cert)}
+                            >
+                              {cert}
+                            </Badge>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  </motion.div>
+                  
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full mt-4 hover:bg-destructive hover:text-destructive-foreground transition-all duration-300"
+                      onClick={clearFilters}
+                    >
+                      Clear All Filters
+                    </Button>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
             
-            {/* Manufacturers grid */}
+            {/* Manufacturers grid with enhanced animations */}
             <motion.div 
               className={`${showFilters ? 'md:col-span-3' : 'md:col-span-4'}`}
               variants={containerVariants}
@@ -1443,15 +1401,28 @@ const Manufacturers = () => {
               {manufacturers.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   <AnimatePresence mode="popLayout">
-                  {manufacturers.map(manufacturer => (
+                    {manufacturers.map(manufacturer => (
                       <motion.div
                         key={manufacturer.id}
-                        variants={itemVariants}
                         layout
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        transition={{ duration: 0.3 }}
+                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                        transition={{ 
+                          type: "spring", 
+                          stiffness: 400, 
+                          damping: 25,
+                          duration: 0.3 
+                        }}
+                        whileHover={{ 
+                          y: -5, 
+                          boxShadow: "0px 10px 30px rgba(0, 0, 0, 0.1)", 
+                          transition: { 
+                            type: "spring", 
+                            stiffness: 400, 
+                            damping: 25 
+                          } 
+                        }}
                       >
                         <ManufacturerCard 
                           manufacturer={manufacturer}
@@ -1464,43 +1435,132 @@ const Manufacturers = () => {
               ) : (
                 <motion.div 
                   className="text-center py-16 bg-card rounded-xl border shadow-sm"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.2 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ 
+                    delay: 0.2, 
+                    type: "spring",
+                    stiffness: 200,
+                    damping: 20
+                  }}
                 >
                   {showFavoritesOnly ? (
                     <>
-                      <Heart className="h-16 w-16 mx-auto text-muted-foreground mb-6" />
-                      <p className="text-xl font-medium text-foreground/70 mb-2">No favorite manufacturers</p>
-                      <p className="text-muted-foreground mb-6">Add manufacturers to your favorites to see them here</p>
-                      <Button 
-                        variant="outline" 
-                        onClick={() => setShowFavoritesOnly(false)}
-                        className="hover:bg-primary hover:text-primary-foreground transition-colors"
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ 
+                          scale: 1,
+                          transition: { 
+                            type: "spring", 
+                            stiffness: 400, 
+                            damping: 10 
+                          }
+                        }}
                       >
-                        View All Manufacturers
-                  </Button>
+                        <Heart className="h-16 w-16 mx-auto text-muted-foreground mb-6" />
+                      </motion.div>
+                      <motion.p 
+                        className="text-xl font-medium text-foreground/70 mb-2"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                      >
+                        No favorite manufacturers
+                      </motion.p>
+                      <motion.p 
+                        className="text-muted-foreground mb-6"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 }}
+                      >
+                        Add manufacturers to your favorites to see them here
+                      </motion.p>
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <Button 
+                          variant="outline" 
+                          onClick={() => setShowFavoritesOnly(false)}
+                          className="hover:bg-primary hover:text-primary-foreground transition-colors duration-300"
+                        >
+                          View All Manufacturers
+                        </Button>
+                      </motion.div>
                     </>
                   ) : (
                     <>
-                      <Building className="h-16 w-16 mx-auto text-muted-foreground mb-6" />
-                      <p className="text-xl font-medium text-foreground/70 mb-2">No manufacturers found</p>
-                      <p className="text-muted-foreground mb-6">Try adjusting your filters or search terms</p>
-                      <Button 
-                        variant="outline" 
-                        onClick={clearFilters}
-                        className="hover:bg-primary hover:text-primary-foreground transition-colors"
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ 
+                          scale: 1,
+                          transition: { 
+                            type: "spring", 
+                            stiffness: 400, 
+                            damping: 10 
+                          }
+                        }}
                       >
-                        Clear All Filters
-                  </Button>
+                        <Building className="h-16 w-16 mx-auto text-muted-foreground mb-6" />
+                      </motion.div>
+                      <motion.p 
+                        className="text-xl font-medium text-foreground/70 mb-2"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                      >
+                        No manufacturers found
+                      </motion.p>
+                      <motion.p 
+                        className="text-muted-foreground mb-6"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 }}
+                      >
+                        Try adjusting your filters or search terms
+                      </motion.p>
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <Button 
+                          variant="outline" 
+                          onClick={clearFilters}
+                          className="hover:bg-primary hover:text-primary-foreground transition-colors duration-300"
+                        >
+                          Clear All Filters
+                        </Button>
+                      </motion.div>
                     </>
                   )}
                 </motion.div>
               )}
             </motion.div>
-            </div>
           </div>
         </div>
+      </motion.div>
+      
+      {/* Add floating back-to-top button */}
+      <AnimatePresence>
+        {showBackToTop && (
+          <motion.div
+            className="fixed bottom-6 right-6 z-50"
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <motion.button
+              className="bg-primary text-primary-foreground rounded-full p-3 shadow-lg hover:shadow-xl transition-all"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            >
+              <ChevronUp className="h-5 w-5" />
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
       
       {selectedManufacturer && (
         <ManufacturerDetails
