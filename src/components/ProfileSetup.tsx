@@ -36,6 +36,8 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
+import { useTheme } from "@/contexts/ThemeContext";
+import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { 
@@ -68,24 +70,50 @@ import { Checkbox } from "@/components/ui/checkbox";
 const accountTypes = ['manufacturer', 'brand', 'retailer'] as const;
 type AccountType = typeof accountTypes[number];
 
-// Base form schema
+// Base form schema with better error messages
 const baseFormSchema = z.object({
-  accountType: z.enum(accountTypes),
-  companyName: z.string().min(2, { message: "Company name must be at least 2 characters" }),
-  industry: z.string().min(1, { message: "Please select an industry" }),
-  phoneNumber: z.string().min(5, { message: "Please enter a valid phone number" }),
-  address: z.string().min(5, { message: "Please enter a valid address" }),
-  websiteUrl: z.string().url().optional().or(z.string().length(0)),
+  accountType: z.enum(accountTypes, {
+    errorMap: () => ({ message: "Please select an account type" }),
+  }),
+  companyName: z.string().min(2, { 
+    message: "Company name must be at least 2 characters" 
+  }).max(100, {
+    message: "Company name cannot exceed 100 characters"
+  }),
+  industry: z.string().min(1, { 
+    message: "Please select an industry" 
+  }),
+  phoneNumber: z.string().min(5, { 
+    message: "Please enter a valid phone number" 
+  }).max(20, {
+    message: "Phone number is too long"
+  }),
+  address: z.string().min(5, { 
+    message: "Please enter a complete address" 
+  }),
+  websiteUrl: z.string().url({ message: "Please enter a valid URL (e.g., https://example.com)" }).optional().or(z.string().length(0)),
   certificates: z.string().optional(),
-  companyDescription: z.string().min(10, { message: "Description must be at least 10 characters" }),
+  companyDescription: z.string().min(10, { 
+    message: "Description must be at least 10 characters" 
+  }).max(1000, {
+    message: "Description cannot exceed 1000 characters"
+  }),
 });
 
-// Connection preferences schema
+// Connection preferences schema with better error messages
 const connectionPreferencesSchema = z.object({
-  connectWith: z.array(z.string()).min(1, { message: "Select at least one option" }),
-  industryInterests: z.array(z.string()).min(1, { message: "Select at least one industry" }),
-  interests: z.array(z.string()).min(1, { message: "Select at least one interest" }),
-  lookingFor: z.array(z.string()).min(1, { message: "Select at least one role" }),
+  connectWith: z.array(z.string()).min(1, { 
+    message: "Please select at least one connection type" 
+  }),
+  industryInterests: z.array(z.string()).min(1, { 
+    message: "Please select at least one industry of interest" 
+  }),
+  interests: z.array(z.string()).min(1, { 
+    message: "Please select at least one interest" 
+  }),
+  lookingFor: z.array(z.string()).min(1, { 
+    message: "Please select at least one role you're looking for" 
+  }),
 });
 
 // Combined schema
@@ -95,6 +123,8 @@ type ProfileSetupFormValues = z.infer<typeof profileSetupSchema>;
 
 const ProfileSetup = () => {
   const { t } = useTranslation();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const [isLoading, setIsLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState<'account-type' | 'details' | 'connections' | 'complete'>('account-type');
   const [selectedAccountType, setSelectedAccountType] = useState<AccountType | null>(null);
@@ -127,7 +157,7 @@ const ProfileSetup = () => {
     form.setValue('accountType', type);
   };
 
-  // Move to details step
+  // Move to details step with improved validation feedback
   const goToDetailsStep = () => {
     if (!selectedAccountType) {
       toast({
@@ -140,7 +170,7 @@ const ProfileSetup = () => {
     setCurrentStep('details');
   };
 
-  // Move to connections step
+  // Move to connections step with improved validation
   const goToConnectionsStep = () => {
     // Validate the current step's fields based on account type
     const commonFields = ['companyName', 'industry', 'phoneNumber', 'address', 'companyDescription'];
@@ -155,25 +185,34 @@ const ProfileSetup = () => {
     const accountType = selectedAccountType || form.getValues('accountType');
     const fieldsToValidate = accountType ? [...commonFields, ...extraFields[accountType]] : commonFields;
     
-    const isValid = fieldsToValidate.every(field => {
-      const fieldState = form.getFieldState(field as any);
-      // Skip validation for optional fields
-      if (field === 'certificates' || field === 'websiteUrl') {
-        return true;
+    // Trigger validation for all required fields
+    form.trigger(fieldsToValidate as any).then(isValid => {
+      if (isValid) {
+        setCurrentStep('connections');
+      } else {
+        // Show a toast with error message
+        toast({
+          title: "Validation Error",
+          description: "Please fill in all required fields correctly before continuing.",
+          variant: "destructive",
+        });
+        
+        // Focus on the first field with an error
+        const firstErrorField = fieldsToValidate.find(field => 
+          form.getFieldState(field as any).error
+        );
+        if (firstErrorField) {
+          // Try to focus the field (this may not work for all field types)
+          const element = document.querySelector(`[name="${firstErrorField}"]`) as HTMLElement;
+          if (element) {
+            element.focus();
+          }
+        }
       }
-      return !fieldState.invalid;
     });
-
-    if (!isValid) {
-      // Trigger validation to show errors
-      void form.trigger(fieldsToValidate as any);
-      return;
-    }
-
-    setCurrentStep('connections');
   };
 
-  // Form submission handler
+  // Form submission handler with improved error handling
   const onSubmit = async (data: ProfileSetupFormValues) => {
     setIsLoading(true);
     
@@ -200,14 +239,15 @@ const ProfileSetup = () => {
       
       // Redirect to dashboard after a delay
       setTimeout(() => {
-        // The main dashboard route handles role-specific views internally
         navigate('/dashboard');
       }, 5000);
     } catch (error) {
       console.error("Profile setup error:", error);
       toast({
         title: "Setup Failed",
-        description: "There was a problem setting up your profile.",
+        description: error instanceof Error 
+          ? `Error: ${error.message}` 
+          : "There was a problem setting up your profile. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -238,7 +278,9 @@ const ProfileSetup = () => {
         >
           <Card 
             className={`cursor-pointer border-2 transition-all h-full ${
-              selectedAccountType === 'manufacturer' ? 'border-primary bg-primary/5' : 'hover:border-primary/50'
+              selectedAccountType === 'manufacturer' 
+                ? cn('border-primary', isDark ? 'bg-primary/5' : 'bg-primary/3') 
+                : cn('hover:border-primary/50', isDark ? '' : 'bg-white hover:bg-slate-50')
             }`}
             onClick={() => handleAccountTypeSelect('manufacturer')}
           >
@@ -296,7 +338,9 @@ const ProfileSetup = () => {
         >
           <Card 
             className={`cursor-pointer border-2 transition-all h-full ${
-              selectedAccountType === 'brand' ? 'border-primary bg-primary/5' : 'hover:border-primary/50'
+              selectedAccountType === 'brand' 
+                ? cn('border-primary', isDark ? 'bg-primary/5' : 'bg-primary/3') 
+                : cn('hover:border-primary/50', isDark ? '' : 'bg-white hover:bg-slate-50')
             }`}
             onClick={() => handleAccountTypeSelect('brand')}
           >
@@ -354,7 +398,9 @@ const ProfileSetup = () => {
         >
           <Card 
             className={`cursor-pointer border-2 transition-all h-full ${
-              selectedAccountType === 'retailer' ? 'border-primary bg-primary/5' : 'hover:border-primary/50'
+              selectedAccountType === 'retailer' 
+                ? cn('border-primary', isDark ? 'bg-primary/5' : 'bg-primary/3') 
+                : cn('hover:border-primary/50', isDark ? '' : 'bg-white hover:bg-slate-50')
             }`}
             onClick={() => handleAccountTypeSelect('retailer')}
           >
@@ -410,7 +456,10 @@ const ProfileSetup = () => {
         <Button 
           onClick={goToDetailsStep} 
           size="lg" 
-          className="w-full max-w-xs py-6 text-base"
+          className={cn(
+            "w-full max-w-xs py-6 text-base",
+            isDark ? "" : "shadow-sm"
+          )}
           disabled={!selectedAccountType}
         >
           {t("continue", "Continue")}
@@ -421,12 +470,29 @@ const ProfileSetup = () => {
 
   // Render company details form
   const renderDetailsStep = () => {
-    // Get field validation state for visual feedback
+    // Get field validation state for visual feedback with improved colors
     const getFieldState = (fieldName: string) => {
       const fieldState = form.getFieldState(fieldName as any);
       if (fieldState.invalid && fieldState.isDirty) return "error";
       if (!fieldState.invalid && fieldState.isDirty) return "success";
       return "default";
+    };
+
+    // Get validation status class with better theme support
+    const getValidationClass = (status: string) => {
+      if (status === 'error') {
+        return cn(
+          'border-destructive focus-visible:ring-destructive',
+          isDark ? 'bg-destructive/5' : 'bg-red-50'
+        );
+      }
+      if (status === 'success') {
+        return cn(
+          'border-green-500 focus-visible:ring-green-500',
+          isDark ? 'bg-green-500/5' : 'bg-green-50'
+        );
+      }
+      return '';
     };
 
     const accountType = selectedAccountType || form.getValues('accountType');
@@ -492,7 +558,10 @@ const ProfileSetup = () => {
           </p>
         </div>
 
-        <Card className="border border-muted p-6">
+        <Card className={cn(
+          "border p-6",
+          isDark ? "border-muted" : "border-slate-200 bg-white"
+        )}>
           <CardContent className="p-0 space-y-8">
             {/* Company Name */}
             <div className="flex flex-col md:flex-row gap-4 items-start">
@@ -528,20 +597,26 @@ const ProfileSetup = () => {
                           <Input 
                             placeholder={t("company-name-placeholder", "Enter your company name")} 
                             {...field} 
-                            className={`${
-                              getFieldState('companyName') === 'error' ? 'border-destructive focus-visible:ring-destructive' : 
-                              getFieldState('companyName') === 'success' ? 'border-green-500 focus-visible:ring-green-500' : ''
-                            }`}
+                            className={getValidationClass(getFieldState('companyName'))}
                           />
                           {getFieldState('companyName') === 'error' && (
-                            <AlertCircle className="w-5 h-5 text-destructive absolute right-3 top-1/2 -translate-y-1/2" />
+                            <div className={cn(
+                              "absolute right-3 top-1/2 -translate-y-1/2 flex items-center",
+                              isDark ? "text-destructive" : "text-red-600"
+                            )}>
+                              <AlertCircle className="w-5 h-5" />
+                            </div>
                           )}
                           {getFieldState('companyName') === 'success' && (
-                            <CheckCircle2 className="w-5 h-5 text-green-500 absolute right-3 top-1/2 -translate-y-1/2" />
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
+                              <CheckCircle2 className="w-5 h-5" />
+                            </div>
                           )}
                         </div>
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className={cn(
+                        isDark ? "text-destructive" : "text-red-600 font-medium"
+                      )} />
                     </FormItem>
                   )}
                 />
@@ -642,20 +717,26 @@ const ProfileSetup = () => {
                           <Input 
                             placeholder={t("phone-number-placeholder", "+1 (555) 123-4567")} 
                             {...field} 
-                            className={`${
-                              getFieldState('phoneNumber') === 'error' ? 'border-destructive focus-visible:ring-destructive' : 
-                              getFieldState('phoneNumber') === 'success' ? 'border-green-500 focus-visible:ring-green-500' : ''
-                            }`}
+                            className={getValidationClass(getFieldState('phoneNumber'))}
                           />
                           {getFieldState('phoneNumber') === 'error' && (
-                            <AlertCircle className="w-5 h-5 text-destructive absolute right-3 top-1/2 -translate-y-1/2" />
+                            <div className={cn(
+                              "absolute right-3 top-1/2 -translate-y-1/2 flex items-center",
+                              isDark ? "text-destructive" : "text-red-600"
+                            )}>
+                              <AlertCircle className="w-5 h-5" />
+                            </div>
                           )}
                           {getFieldState('phoneNumber') === 'success' && (
-                            <CheckCircle2 className="w-5 h-5 text-green-500 absolute right-3 top-1/2 -translate-y-1/2" />
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
+                              <CheckCircle2 className="w-5 h-5" />
+                            </div>
                           )}
                         </div>
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className={cn(
+                        isDark ? "text-destructive" : "text-red-600 font-medium"
+                      )} />
                     </FormItem>
                   )}
                 />
@@ -696,20 +777,26 @@ const ProfileSetup = () => {
                           <Input 
                             placeholder={t("address-placeholder", "123 Business St, City, Country")} 
                             {...field} 
-                            className={`${
-                              getFieldState('address') === 'error' ? 'border-destructive focus-visible:ring-destructive' : 
-                              getFieldState('address') === 'success' ? 'border-green-500 focus-visible:ring-green-500' : ''
-                            }`}
+                            className={getValidationClass(getFieldState('address'))}
                           />
                           {getFieldState('address') === 'error' && (
-                            <AlertCircle className="w-5 h-5 text-destructive absolute right-3 top-1/2 -translate-y-1/2" />
+                            <div className={cn(
+                              "absolute right-3 top-1/2 -translate-y-1/2 flex items-center",
+                              isDark ? "text-destructive" : "text-red-600"
+                            )}>
+                              <AlertCircle className="w-5 h-5" />
+                            </div>
                           )}
                           {getFieldState('address') === 'success' && (
-                            <CheckCircle2 className="w-5 h-5 text-green-500 absolute right-3 top-1/2 -translate-y-1/2" />
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
+                              <CheckCircle2 className="w-5 h-5" />
+                            </div>
                           )}
                         </div>
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className={cn(
+                        isDark ? "text-destructive" : "text-red-600 font-medium"
+                      )} />
                     </FormItem>
                   )}
                 />
@@ -836,24 +923,26 @@ const ProfileSetup = () => {
                           <Textarea 
                             placeholder={roleContent.descriptionPlaceholder} 
                             {...field}
-                            className={`min-h-[120px] ${
-                              getFieldState('companyDescription') === 'error' ? 'border-destructive focus-visible:ring-destructive' : 
-                              getFieldState('companyDescription') === 'success' ? 'border-green-500 focus-visible:ring-green-500' : ''
-                            }`}
+                            className={`min-h-[120px] ${getValidationClass(getFieldState('companyDescription'))}`}
                           />
                           {getFieldState('companyDescription') === 'error' && (
-                            <div className="absolute right-3 top-3">
-                              <AlertCircle className="w-5 h-5 text-destructive" />
+                            <div className={cn(
+                              "absolute right-3 top-3 flex items-center",
+                              isDark ? "text-destructive" : "text-red-600"
+                            )}>
+                              <AlertCircle className="w-5 h-5" />
                             </div>
                           )}
                           {getFieldState('companyDescription') === 'success' && (
-                            <div className="absolute right-3 top-3">
-                              <CheckCircle2 className="w-5 h-5 text-green-500" />
+                            <div className="absolute right-3 top-3 text-green-500">
+                              <CheckCircle2 className="w-5 h-5" />
                             </div>
                           )}
                         </div>
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className={cn(
+                        isDark ? "text-destructive" : "text-red-600 font-medium"
+                      )} />
                       <div className="text-xs text-muted-foreground mt-1 flex justify-between">
                         <span>{t("min-characters", "Minimum 10 characters")}</span>
                         <span>{field.value?.length || 0} {t("characters", "characters")}</span>
@@ -871,7 +960,7 @@ const ProfileSetup = () => {
             onClick={() => setCurrentStep('account-type')} 
             variant="outline"
             size="lg" 
-            className="px-6"
+            className={cn("px-6", isDark ? "" : "bg-white hover:bg-slate-50")}
           >
             {t("back", "Back")}
           </Button>
@@ -1064,17 +1153,29 @@ const ProfileSetup = () => {
           </p>
         </div>
 
-        <Card className="border border-muted">
+        <Card className={cn(
+          "border",
+          isDark ? "border-muted" : "border-slate-200 bg-white"
+        )}>
           <CardContent className="p-6 space-y-8">
             {/* Who do you want to connect with */}
             <div className="space-y-3">
               <div className="flex items-center gap-2 mb-4">
-                <Users className="h-5 w-5 text-primary" />
+                <Users className={cn("h-5 w-5 text-primary", isDark ? "" : "text-primary/90")} />
                 <h3 className="text-lg font-medium">{titles.connectTitle}</h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {connectOptions.map(option => (
-                  <Card key={option.value} className="border border-muted">
+                  <Card 
+                    key={option.value} 
+                    className={cn(
+                      "border",
+                      isDark ? "border-muted" : "border-slate-200 bg-white hover:bg-slate-50/80",
+                      // Add highlight for selected options
+                      form.watch("connectWith")?.includes(option.value) ? 
+                        (isDark ? "border-primary/50 bg-primary/5" : "border-primary/40 bg-primary/3") : ""
+                    )}
+                  >
                     <div className="p-4 flex gap-3 items-start">
                       <FormField
                         control={form.control}
@@ -1093,11 +1194,21 @@ const ProfileSetup = () => {
                                       field.onChange(currentValues.filter(value => value !== option.value));
                                     }
                                   }}
+                                  className={cn(
+                                    field.value?.includes(option.value) ? 
+                                      (isDark ? "border-primary" : "border-primary bg-primary/10") : 
+                                      (isDark ? "" : "border-slate-300")
+                                  )}
                                 />
                               </FormControl>
                               <div className="space-y-1 leading-none">
                                 <FormLabel className="font-medium text-base">{option.label}</FormLabel>
-                                <p className="text-sm text-muted-foreground">{option.description}</p>
+                                <p className={cn(
+                                  "text-sm",
+                                  isDark ? "text-muted-foreground" : "text-slate-500"
+                                )}>
+                                  {option.description}
+                                </p>
                               </div>
                             </FormItem>
                           )
@@ -1108,7 +1219,12 @@ const ProfileSetup = () => {
                 ))}
               </div>
               {form.formState.errors.connectWith && (
-                <p className="text-destructive text-sm mt-2">{form.formState.errors.connectWith.message}</p>
+                <p className={cn(
+                  "text-sm mt-2 font-medium",
+                  isDark ? "text-destructive" : "text-red-600"
+                )}>
+                  {form.formState.errors.connectWith.message}
+                </p>
               )}
             </div>
 
@@ -1257,7 +1373,7 @@ const ProfileSetup = () => {
             onClick={() => setCurrentStep('details')} 
             variant="outline" 
             size="lg"
-            className="px-6"
+            className={cn("px-6", isDark ? "" : "bg-white hover:bg-slate-50")}
           >
             {t("back", "Back")}
           </Button>
@@ -1302,7 +1418,10 @@ const ProfileSetup = () => {
             delay: 0.1 
           }}
         >
-          <div className="w-32 h-32 bg-primary/10 rounded-full mx-auto flex items-center justify-center">
+          <div className={cn(
+            "w-32 h-32 rounded-full mx-auto flex items-center justify-center",
+            isDark ? "bg-primary/10" : "bg-primary/5"
+          )}>
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -1342,7 +1461,10 @@ const ProfileSetup = () => {
         </motion.h2>
         
         <motion.p
-          className="text-muted-foreground text-lg"
+          className={cn(
+            "text-lg",
+            isDark ? "text-muted-foreground" : "text-slate-600"
+          )}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
@@ -1356,12 +1478,26 @@ const ProfileSetup = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
         >
-          <Card className="border border-green-200 bg-green-50 dark:bg-green-900/20 p-4 mb-6">
+          <Card className={cn(
+            "border p-4 mb-6",
+            isDark 
+              ? "border-green-200 bg-green-900/20" 
+              : "border-green-100 bg-green-50"
+          )}>
             <CardContent className="p-0 flex items-center gap-3">
-              <div className="bg-green-100 dark:bg-green-800/30 rounded-full p-2">
-                <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
+              <div className={cn(
+                "rounded-full p-2",
+                isDark ? "bg-green-800/30" : "bg-green-100"
+              )}>
+                <CheckCircle2 className={cn(
+                  "h-5 w-5",
+                  isDark ? "text-green-400" : "text-green-600"
+                )} />
               </div>
-              <p className="text-green-800 dark:text-green-400 text-sm">
+              <p className={cn(
+                "text-sm",
+                isDark ? "text-green-400" : "text-green-700"
+              )}>
                 {accountType 
                   ? t("redirecting-message-with-role", `You will be redirected to your ${accountType} dashboard in a few seconds...`)
                   : t("redirecting-message", "You will be redirected to the dashboard in a few seconds...")}
@@ -1385,7 +1521,7 @@ const ProfileSetup = () => {
     );
   };
 
-  // Render progress indicator
+  // Render progress indicator with improved light theme support
   const renderProgressIndicator = () => {
     const steps = [
       { key: 'account-type', label: t('account', 'Account') },
@@ -1398,28 +1534,31 @@ const ProfileSetup = () => {
         {steps.map((step, index) => (
           <div key={step.key} className="flex items-center">
             <div 
-              className={`flex items-center justify-center w-8 h-8 rounded-full ${
+              className={cn(
+                "flex items-center justify-center w-8 h-8 rounded-full",
                 currentStep === step.key 
-                  ? 'bg-primary text-primary-foreground' 
+                  ? "bg-primary text-primary-foreground" 
                   : (currentStep === 'complete' || 
                      (index === 1 && currentStep === 'connections') ||
                      (index === 0 && (currentStep === 'details' || currentStep === 'connections')))
-                    ? 'bg-primary/80 text-primary-foreground'
-                    : 'bg-muted text-muted-foreground'
-              }`}
+                    ? cn("bg-primary/80 text-primary-foreground", isDark ? "" : "shadow-sm") 
+                    : cn("text-muted-foreground", 
+                         isDark ? "bg-muted" : "bg-slate-100 text-slate-500")
+              )}
             >
               {index + 1}
             </div>
             
             {index < steps.length - 1 && (
               <div 
-                className={`w-16 h-1 ${
+                className={cn(
+                  "w-16 h-1",
                   (currentStep === 'complete' || 
                    (index === 0 && (currentStep === 'details' || currentStep === 'connections')) ||
                    (index === 1 && currentStep === 'connections'))
-                    ? 'bg-primary/80'
-                    : 'bg-muted'
-                }`}
+                    ? isDark ? "bg-primary/80" : "bg-primary/70"
+                    : isDark ? "bg-muted" : "bg-slate-200"
+                )}
               />
             )}
           </div>
@@ -1429,7 +1568,12 @@ const ProfileSetup = () => {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-6 bg-background rounded-xl shadow-sm">
+    <div className={cn(
+      "w-full max-w-4xl mx-auto p-6 rounded-xl",
+      isDark 
+        ? "bg-background shadow-sm" 
+        : "bg-white border border-slate-200 shadow-md"
+    )}>
       {currentStep !== 'complete' && renderProgressIndicator()}
       
       <Form {...form}>

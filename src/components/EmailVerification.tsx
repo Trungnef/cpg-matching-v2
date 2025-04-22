@@ -17,6 +17,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { useTheme } from "@/contexts/ThemeContext";
+import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
   verificationCode: z.string().length(6, {
@@ -28,6 +30,8 @@ type FormValues = z.infer<typeof formSchema>;
 
 const EmailVerification = () => {
   const { t } = useTranslation();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const [isLoading, setIsLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const [countdown, setCountdown] = useState(0);
@@ -128,7 +132,12 @@ const EmailVerification = () => {
   };
 
   return (
-    <div className="glass p-8 rounded-xl w-full max-w-md">
+    <div className={cn(
+      "p-8 rounded-xl w-full max-w-md",
+      isDark 
+        ? "glass" 
+        : "bg-white border border-slate-200 shadow-sm"
+    )}>
       {/* Animated Title Section */}
       <motion.div 
         className="text-center mb-8"
@@ -144,7 +153,10 @@ const EmailVerification = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
           >
             <motion.span
-              className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary bg-300% animate-gradient"
+              className={cn(
+                "inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary bg-300% animate-gradient",
+                isDark ? "" : "text-shadow-sm"
+              )}
             >
               {t("verify-email", "Verify Your Email")}
             </motion.span>
@@ -158,7 +170,12 @@ const EmailVerification = () => {
         </motion.div>
 
         <motion.div
-          className="relative h-1 w-32 mx-auto mt-4 overflow-hidden rounded-full bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20"
+          className={cn(
+            "relative h-1 w-32 mx-auto mt-4 overflow-hidden rounded-full",
+            isDark 
+              ? "bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20" 
+              : "bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10"
+          )}
         >
           <motion.div
             className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-primary"
@@ -212,7 +229,12 @@ const EmailVerification = () => {
       >
         {/* Envelope Base */}
         <motion.div
-          className="absolute inset-0 rounded-lg bg-gradient-to-r from-primary to-accent"
+          className={cn(
+            "absolute inset-0 rounded-lg",
+            isDark 
+              ? "bg-gradient-to-r from-primary to-accent" 
+              : "bg-gradient-to-r from-primary/90 to-accent/90"
+          )}
           animate={{
             scale: [1, 1.05, 1],
           }}
@@ -225,7 +247,10 @@ const EmailVerification = () => {
         
         {/* Envelope Content */}
         <motion.div
-          className="absolute inset-[3px] rounded-[6px] bg-background flex items-center justify-center"
+          className={cn(
+            "absolute inset-[3px] rounded-[6px] flex items-center justify-center",
+            isDark ? "bg-background" : "bg-white"
+          )}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
@@ -257,7 +282,10 @@ const EmailVerification = () => {
         {[...Array(3)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-2.5 h-2.5 rounded-full bg-accent"
+            className={cn(
+              "absolute w-2.5 h-2.5 rounded-full",
+              isDark ? "bg-accent" : "bg-accent/90"
+            )}
             style={{
               top: "50%",
               left: "50%",
@@ -291,7 +319,10 @@ const EmailVerification = () => {
                   <Input 
                     placeholder="123456" 
                     {...field} 
-                    className="text-center text-lg tracking-widest"
+                    className={cn(
+                      "text-center text-lg tracking-widest",
+                      isDark ? "" : "border-slate-300 focus:border-primary"
+                    )}
                     maxLength={6}
                   />
                 </FormControl>
@@ -333,8 +364,8 @@ const EmailVerification = () => {
         transition={{ duration: 0.5, delay: 0.8 }}
       >
         <motion.div className="h-2 w-10 rounded-full bg-primary" />
-        <motion.div className="h-2 w-2 rounded-full bg-muted" />
-        <motion.div className="h-2 w-2 rounded-full bg-muted" />
+        <motion.div className={cn("h-2 w-2 rounded-full", isDark ? "bg-muted" : "bg-slate-200")} />
+        <motion.div className={cn("h-2 w-2 rounded-full", isDark ? "bg-muted" : "bg-slate-200")} />
       </motion.div>
     </div>
   );

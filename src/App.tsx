@@ -48,6 +48,7 @@ import BrandProducts from "./pages/brand/Products";
 import BrandManufacturers from "./pages/brand/Manufacturers";
 import BrandAnalytics from "./pages/brand/Analytics";
 import BrandBrands from "./pages/brand/Brands";
+import BrandRetailers from "./pages/brand/Retailers";
 import BrandSettings from "./pages/brand/Settings";
 
 // Retailer pages
@@ -56,9 +57,10 @@ import RetailerBrands from "./pages/retailer/Brands";
 import RetailerAnalytics from "./pages/retailer/Analytics";
 import RetailerPartnerships from "./pages/retailer/Partnerships";
 import RetailerSettings from "./pages/retailer/Settings";
+import RetailerOrders from "./pages/retailer/Orders";
+
 
 // TODO: Create ThemeContext and FavoriteContext files in src/contexts/
-import { ThemeProvider } from "@/contexts/ThemeContext";
 import { FavoriteProvider } from "@/contexts/FavoriteContext";
 import { CompareProvider } from "@/contexts/CompareContext";
 import { ManufacturerFavoriteProvider } from "@/contexts/ManufacturerFavoriteContext";
@@ -71,6 +73,8 @@ import AdminLogin from './pages/AdminLogin';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import UserManagement from './pages/admin/UserManagement';
+
+import { ThemeProvider } from "./contexts/ThemeContext";
 
 const queryClient = new QueryClient();
 
@@ -226,6 +230,15 @@ const App = () => (
                               } 
                             />
                             <Route 
+                              path="/brand/retailers" 
+                              element={
+                                <ProtectedRoute 
+                                  element={<BrandRetailers />} 
+                                  allowedRoles={["brand"]} 
+                                />
+                              } 
+                            />
+                            <Route 
                               path="/brand/settings" 
                               element={
                                 <ProtectedRoute 
@@ -277,6 +290,15 @@ const App = () => (
                               element={
                                 <ProtectedRoute 
                                   element={<RetailerSettings />} 
+                                  allowedRoles={["retailer"]} 
+                                />
+                              } 
+                            />
+                            <Route 
+                              path="/retailer/orders" 
+                              element={
+                                <ProtectedRoute 
+                                  element={<RetailerOrders />} 
                                   allowedRoles={["retailer"]} 
                                 />
                               } 

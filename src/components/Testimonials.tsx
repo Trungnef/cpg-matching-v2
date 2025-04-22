@@ -110,7 +110,7 @@ const Testimonials = () => {
         transition={{ duration: 1 }}
       >
         <motion.div 
-          className="absolute top-20 left-[10%] w-64 h-64 bg-primary/5 rounded-full filter blur-[80px]"
+          className="absolute top-20 left-[10%] w-64 h-64 bg-primary/5 dark:bg-primary/10 rounded-full filter blur-[80px]"
           animate={{
             scale: [1, 1.2, 1],
             opacity: [0.3, 0.5, 0.3],
@@ -122,7 +122,7 @@ const Testimonials = () => {
           }}
         />
         <motion.div 
-          className="absolute bottom-40 right-[5%] w-72 h-72 bg-accent/5 rounded-full filter blur-[80px]"
+          className="absolute bottom-40 right-[5%] w-72 h-72 bg-accent/5 dark:bg-accent/10 rounded-full filter blur-[80px]"
           animate={{
             scale: [1.2, 1, 1.2],
             opacity: [0.4, 0.6, 0.4],
@@ -172,12 +172,18 @@ const Testimonials = () => {
             variants={containerVariants}
           >
             <motion.div 
-              className="relative overflow-hidden rounded-2xl glass border border-white/10 p-8 md:p-12"
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 400, damping: 20 }}
+              className="relative overflow-hidden rounded-2xl bg-background/80 dark:bg-background/30 backdrop-blur-md border border-border dark:border-border/50 p-8 md:p-12 shadow-lg"
+              whileHover={{ 
+                scale: 1.02,
+                transition: { 
+                  type: "spring", 
+                  stiffness: 400, 
+                  damping: 20 
+                }
+              }}
             >
               <motion.div
-                className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5"
+                className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 dark:from-primary/10 dark:to-accent/10"
                 animate={{
                   opacity: [0.3, 0.5, 0.3],
                   scale: [1, 1.1, 1],
@@ -194,7 +200,7 @@ const Testimonials = () => {
                 initial="initial"
                 animate="animate"
               >
-                <Quote className="absolute top-6 left-6 h-12 w-12 text-primary/10" />
+                <Quote className="absolute top-6 left-6 h-12 w-12 text-primary/10 dark:text-primary/20" />
               </motion.div>
               
               <div className="relative z-10">
@@ -208,7 +214,7 @@ const Testimonials = () => {
                     exit="exit"
                   >
                     <motion.blockquote 
-                      className="text-lg md:text-xl mb-6"
+                      className="text-lg md:text-xl mb-6 text-foreground dark:text-foreground/90"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2 }}
@@ -223,8 +229,11 @@ const Testimonials = () => {
                       transition={{ delay: 0.3 }}
                     >
                       <motion.div 
-                        className="h-12 w-12 rounded-full overflow-hidden bg-muted"
-                        whileHover={{ scale: 1.1 }}
+                        className="h-12 w-12 rounded-full overflow-hidden bg-muted dark:bg-muted/50 ring-2 ring-primary/10 dark:ring-primary/20"
+                        whileHover={{ 
+                          scale: 1.1,
+                          transition: { type: "spring", stiffness: 300, damping: 10 } 
+                        }}
                       >
                         <img 
                           src={testimonials[activeIndex].image} 
@@ -234,7 +243,7 @@ const Testimonials = () => {
                       </motion.div>
                       <div>
                         <motion.h4 
-                          className="font-semibold"
+                          className="font-semibold text-foreground dark:text-foreground/90"
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ delay: 0.4 }}
@@ -242,7 +251,7 @@ const Testimonials = () => {
                           {t(`testimonial-${activeIndex+1}-name`, testimonials[activeIndex].name)}
                         </motion.h4>
                         <motion.p 
-                          className="text-sm text-foreground/70"
+                          className="text-sm text-muted-foreground dark:text-muted-foreground/90"
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ delay: 0.5 }}
@@ -268,7 +277,7 @@ const Testimonials = () => {
                 <Button 
                   variant="outline" 
                   size="icon" 
-                  className="rounded-full"
+                  className="rounded-full bg-background/80 backdrop-blur-sm dark:bg-background/20 hover:bg-background/90 dark:hover:bg-background/30"
                   onClick={prevTestimonial}
                 >
                   <ChevronLeft className="h-5 w-5" />
@@ -281,7 +290,9 @@ const Testimonials = () => {
                     key={index}
                     className={cn(
                       "h-2 rounded-full transition-all",
-                      index === activeIndex ? "w-6 bg-primary" : "w-2 bg-muted"
+                      index === activeIndex 
+                        ? "w-6 bg-primary" 
+                        : "w-2 bg-muted dark:bg-muted/50 hover:bg-muted-foreground/50 dark:hover:bg-muted-foreground/30"
                     )}
                     onClick={() => setActiveIndex(index)}
                     whileHover={{ scale: 1.2 }}
@@ -297,7 +308,7 @@ const Testimonials = () => {
                 <Button 
                   variant="outline" 
                   size="icon" 
-                  className="rounded-full"
+                  className="rounded-full bg-background/80 backdrop-blur-sm dark:bg-background/20 hover:bg-background/90 dark:hover:bg-background/30"
                   onClick={nextTestimonial}
                 >
                   <ChevronRight className="h-5 w-5" />

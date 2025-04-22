@@ -44,7 +44,7 @@ const useInView = (ref: React.RefObject<HTMLElement>, options = { once: false })
       }
     }, {
       threshold: 0.1, // Trigger when at least 10% is visible
-      rootMargin: '50px' // Start animation slightly before element enters viewport
+      rootMargin: '20px' // Start animation slightly before element enters viewport - reduced from 50px
     });
 
     observer.observe(ref.current);
@@ -134,35 +134,36 @@ const Suppliers = () => {
   // Transition properties based on reduced motion preference
   const getTransition = (delay = 0) => ({
     type: prefersReducedMotion ? "tween" : "spring",
-    duration: prefersReducedMotion ? 0.1 : 0.5,
-    delay,
-    stiffness: 120,
-    damping: 20
+    duration: prefersReducedMotion ? 0.1 : 0.3, // Reduced from 0.5 to 0.3
+    delay: prefersReducedMotion ? 0 : delay * 0.5, // Scale down delays by half
+    stiffness: 250, // Increased from 120
+    damping: 15, // Decreased from 20 for snappier animations
+    mass: 0.8 // Added mass parameter to make animations more responsive
   });
 
   // Animation variants for consistent animations
   const fadeIn = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 10 }, // Reduced y distance from 20 to 10
     visible: { opacity: 1, y: 0 }
   };
 
   const cardVariants = {
-    hidden: { opacity: 0, y: 30, scale: 0.95 },
+    hidden: { opacity: 0, y: 15, scale: 0.98 }, // Reduced values for subtler initial state
     visible: (i: number) => ({
       opacity: 1,
       y: 0,
       scale: 1,
       transition: {
-        delay: i * 0.05,
-        duration: 0.5,
+        delay: i * 0.03, // Reduced delay multiplier from 0.05 to 0.03
+        duration: 0.3, // Reduced from 0.5
         ease: "easeOut"
       }
     }),
     hover: {
-      y: -5,
-      scale: 1.02,
+      y: -3, // Reduced from -5
+      scale: 1.01, // Reduced from 1.02
       transition: {
-        duration: 0.2,
+        duration: 0.15, // Reduced from 0.2
         ease: "easeOut"
       }
     }
@@ -505,9 +506,9 @@ const Suppliers = () => {
           {/* Header with actions and theme toggle */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <motion.div 
-              initial={{ opacity: 0, y: -10 }}
+              initial={{ opacity: 0, y: -5 }} // Reduced y from -10 to -5
               animate={{ opacity: 1, y: 0 }}
-              transition={getTransition(0.1)}
+              transition={getTransition(0.05)} // Reduced from 0.1
             >
               <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-primary/90 to-primary/70 bg-clip-text text-transparent">
                 Supplier Management
@@ -517,9 +518,9 @@ const Suppliers = () => {
             
             <motion.div 
               className="flex items-center gap-2 flex-wrap justify-end"
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={{ opacity: 0, scale: 0.95 }} // Changed from 0.9 to 0.95
               animate={{ opacity: 1, scale: 1 }}
-              transition={getTransition(0.2)}
+              transition={getTransition(0.1)} // Reduced from 0.2
             >
               <Button 
                 variant="outline" 
@@ -629,7 +630,7 @@ const Suppliers = () => {
             className="space-y-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={getTransition(0.5)}
+            transition={getTransition(0.25)} // Reduced from 0.5
           >
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-card border border-border p-4 rounded-lg shadow-sm transition-colors duration-300">
               <div className="relative w-full md:w-72">
@@ -695,10 +696,10 @@ const Suppliers = () => {
           {/* Empty state with improved contrast */}
           {filteredSuppliers.length === 0 ? (
             <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.98 }} // Changed from 0.95 to 0.98
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.3 }}
+              exit={{ opacity: 0, scale: 0.98 }} // Changed from 0.95 to 0.98
+              transition={{ duration: 0.2 }} // Reduced from 0.3
               className="bg-card border border-border shadow-md rounded-lg p-12 text-center"
             >
               <motion.div
@@ -761,12 +762,12 @@ const Suppliers = () => {
                   Array.from({ length: 3 }).map((_, index) => (
                     <motion.div
                       key={`skeleton-${index}`}
-                      initial={{ opacity: 0, y: 20 }}
+                      initial={{ opacity: 0, y: 10 }} // Reduced from 20 to 10
                       animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
+                      exit={{ opacity: 0, y: -10 }} // Reduced from -20 to -10
                       transition={{ 
-                        duration: 0.3, 
-                        delay: index * 0.05
+                        duration: 0.2, // Reduced from 0.3
+                        delay: index * 0.03 // Reduced from 0.05
                       }}
                     >
                       <SupplierCardSkeleton />
@@ -831,9 +832,9 @@ const Suppliers = () => {
             <div className="space-y-6 mt-4">
               <motion.div 
                 className="flex items-center gap-4"
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 5 }} // Reduced from 10 to 5
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.2 }} // Reduced from 0.3
               >
                 <Avatar className="h-16 w-16 rounded border-2 border-primary/20 shadow-sm transition-colors duration-300">
                   <AvatarImage src={selectedSupplier.logoUrl} alt={selectedSupplier.name} />
@@ -858,9 +859,9 @@ const Suppliers = () => {
               
               <motion.div 
                 className="text-sm p-3 bg-card border border-border rounded-lg shadow-sm transition-colors duration-300"
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 5 }} // Reduced from 10 to 5
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.1 }}
+                transition={{ duration: 0.2, delay: 0.1 }} // Reduced from 0.3, 0.1
               >
                 <p className="font-medium mb-1 text-foreground transition-colors duration-300">Description</p>
                 <p className="text-muted-foreground transition-colors duration-300">{selectedSupplier.description}</p>
@@ -868,9 +869,9 @@ const Suppliers = () => {
               
               <motion.div 
                 className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm"
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 5 }} // Reduced from 10 to 5
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.2 }}
+                transition={{ duration: 0.2, delay: 0.2 }} // Reduced from 0.3, 0.2
               >
                 <div className="p-3 bg-card border border-border rounded-lg shadow-sm transition-colors duration-300">
                   <p className="font-medium mb-1 text-primary/90 transition-colors duration-300">Contact Person</p>
@@ -901,9 +902,9 @@ const Suppliers = () => {
 
               <motion.div 
                 className="text-sm p-3 bg-card border border-border rounded-lg shadow-sm transition-colors duration-300"
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 5 }} // Reduced from 10 to 5
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.3 }}
+                transition={{ duration: 0.2, delay: 0.3 }} // Reduced from 0.3, 0.3
               >
                 <p className="font-medium mb-2 text-primary/90 transition-colors duration-300">Available Materials</p>
                 {selectedSupplier.materials && selectedSupplier.materials.length > 0 ? (
@@ -912,9 +913,9 @@ const Suppliers = () => {
                       <motion.span 
                         key={i} 
                         className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-background text-foreground border border-border shadow-sm hover:bg-primary/5 hover:border-primary/30 transition-all duration-300"
-                        initial={{ opacity: 0, scale: 0.8 }}
+                        initial={{ opacity: 0, scale: 0.9 }} // Changed from 0.8 to 0.9
                         animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.3, delay: 0.3 + i * 0.05 }}
+                        transition={{ duration: 0.2, delay: 0.1 + i * 0.03 }} // Reduced from 0.3, 0.3, 0.05
                       >
                         {material}
                       </motion.span>
@@ -922,9 +923,9 @@ const Suppliers = () => {
                     {selectedSupplier.materials.length > 3 && (
                       <motion.span 
                         className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-muted text-muted-foreground border border-border shadow-sm hover:bg-primary/5 hover:border-primary/30 transition-all duration-300"
-                        initial={{ opacity: 0, scale: 0.8 }}
+                        initial={{ opacity: 0, scale: 0.9 }} // Changed from 0.8 to 0.9
                         animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.3, delay: 0.3 + 3 * 0.05 }}
+                        transition={{ duration: 0.2, delay: 0.1 + 3 * 0.03 }} // Reduced from 0.3, 0.3, 0.05
                       >
                         +{selectedSupplier.materials.length - 3} more
                       </motion.span>
@@ -984,9 +985,9 @@ const Suppliers = () => {
             <div className="space-y-5 mt-4">
               <motion.div 
                 className="flex items-center justify-between p-3 bg-card border border-border rounded-lg shadow-sm transition-colors duration-300"
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 5 }} // Reduced from 10 to 5
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.2 }} // Reduced from 0.3
               >
                 <div className="flex items-center gap-2">
                   <Avatar className="h-10 w-10 rounded border-2 border-primary/20 transition-colors duration-300">
@@ -1003,9 +1004,9 @@ const Suppliers = () => {
           
               <motion.div 
                 className="space-y-3 p-4 border rounded-lg border-border shadow-sm transition-colors duration-300"
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 5 }} // Reduced from 10 to 5
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.1 }}
+                transition={{ duration: 0.2, delay: 0.1 }} // Reduced from 0.3, 0.1
               >
                 <Label className="mb-2 block font-medium text-foreground transition-colors duration-300">Order Materials</Label>
                 <AnimatePresence>
@@ -1016,7 +1017,7 @@ const Suppliers = () => {
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: 10, height: 0 }}
-                      transition={{ duration: 0.3, delay: index * 0.05 }}
+                      transition={{ duration: 0.2, delay: index * 0.03 }} // Reduced from 0.3, 0.05
                     >
                       <Input 
                         value={material.name}
@@ -1102,9 +1103,9 @@ const Suppliers = () => {
               </motion.div>
               
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 5 }} // Reduced from 10 to 5
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.2 }}
+                transition={{ duration: 0.2, delay: 0.2 }} // Reduced from 0.3, 0.2
               >
                 <Label htmlFor="order-notes" className="mb-2 block font-medium text-foreground transition-colors duration-300">Order Notes</Label>
                 <Textarea 
@@ -1116,9 +1117,9 @@ const Suppliers = () => {
             
               <motion.div 
                 className="rounded-md border border-border p-4 bg-card shadow-sm transition-colors duration-300"
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 5 }} // Reduced from 10 to 5
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
+                transition={{ duration: 0.3, delay: 0.3 }} // Reduced from 0.5, 0.3
               >
                 <div className="flex justify-between mb-2">
                   <span className="text-muted-foreground transition-colors duration-300">Materials:</span>
@@ -1293,7 +1294,7 @@ const SupplierCard = ({
               }`}
               initial={{ width: 0 }}
               animate={{ width: isInView ? `${supplier.reliability}%` : 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+              transition={{ duration: 0.5, delay: 0.1 }} // Reduced from 0.8, 0.2
             />
           </div>
           
@@ -1315,20 +1316,20 @@ const SupplierCard = ({
                 {supplier.materials.slice(0, 3).map((material, i) => (
                   <motion.span 
                     key={i} 
-                    className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-background text-foreground border border-border"
-                    initial={{ opacity: 0, scale: 0.8 }}
+                    className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-background text-foreground border border-border shadow-sm hover:bg-primary/5 hover:border-primary/30 transition-all duration-300"
+                    initial={{ opacity: 0, scale: 0.9 }} // Changed from 0.8 to 0.9
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3, delay: 0.3 + i * 0.05 }}
+                    transition={{ duration: 0.2, delay: 0.1 + i * 0.03 }} // Reduced from 0.3, 0.3, 0.05
                   >
                     {material}
                   </motion.span>
                 ))}
                 {supplier.materials.length > 3 && (
                   <motion.span 
-                    className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-muted text-muted-foreground border border-border"
-                    initial={{ opacity: 0, scale: 0.8 }}
+                    className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-muted text-muted-foreground border border-border shadow-sm hover:bg-primary/5 hover:border-primary/30 transition-all duration-300"
+                    initial={{ opacity: 0, scale: 0.9 }} // Changed from 0.8 to 0.9
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3, delay: 0.3 + 3 * 0.05 }}
+                    transition={{ duration: 0.2, delay: 0.1 + 3 * 0.03 }} // Reduced from 0.3, 0.3, 0.05
                   >
                     +{supplier.materials.length - 3} more
                   </motion.span>
@@ -1492,7 +1493,7 @@ const AddSupplierDialog = ({ onAdd }: AddSupplierProps) => {
       <form onSubmit={handleSubmit} className="space-y-6 mt-4">
         <motion.div 
           className="space-y-4"
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 5 }} // Reduced from 10 to 5
           animate={{ opacity: 1, y: 0 }}
           transition={getTransition()}
         >
@@ -1536,7 +1537,7 @@ const AddSupplierDialog = ({ onAdd }: AddSupplierProps) => {
         
         <motion.div 
           className="space-y-4"
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 5 }} // Reduced from 10 to 5
           animate={{ opacity: 1, y: 0 }}
           transition={getTransition(0.1)}
         >
@@ -1579,7 +1580,7 @@ const AddSupplierDialog = ({ onAdd }: AddSupplierProps) => {
         
         <motion.div 
           className="grid grid-cols-1 md:grid-cols-2 gap-4"
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 5 }} // Reduced from 10 to 5
           animate={{ opacity: 1, y: 0 }}
           transition={getTransition(0.2)}
         >
@@ -1621,7 +1622,7 @@ const AddSupplierDialog = ({ onAdd }: AddSupplierProps) => {
         
         <motion.div 
           className="space-y-2"
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 5 }} // Reduced from 10 to 5
           animate={{ opacity: 1, y: 0 }}
           transition={getTransition(0.3)}
         >
@@ -1637,7 +1638,7 @@ const AddSupplierDialog = ({ onAdd }: AddSupplierProps) => {
         
         <motion.div 
           className="space-y-2"
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 5 }} // Reduced from 10 to 5
           animate={{ opacity: 1, y: 0 }}
           transition={getTransition(0.4)}
         >
@@ -1654,9 +1655,9 @@ const AddSupplierDialog = ({ onAdd }: AddSupplierProps) => {
         
         <motion.div 
           className="space-y-2"
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 5 }} // Reduced from 10 to 5
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.5 }}
+          transition={{ duration: 0.3, delay: 0.5 }} // Reduced from 0.5, 0.3
         >
           <Label htmlFor="description" className="font-medium text-foreground transition-colors duration-300">Description</Label>
           <Textarea

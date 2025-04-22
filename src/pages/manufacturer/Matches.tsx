@@ -408,15 +408,15 @@ const Matches = () => {
     // Here you would implement the actual action logic
   };
 
-  // Animation variants for the stats banner
+  // Animation variants for the stats banner - optimized for smoother transitions
   const statsVariants = {
     hidden: { 
       opacity: 0, 
       height: 0, 
       marginBottom: 0,
       transition: {
-        opacity: { duration: 0.2 },
-        height: { duration: 0.3, delay: 0.1 }
+        opacity: { duration: 0.15 }, // Reduced from 0.2
+        height: { duration: 0.2, delay: 0.05 } // Reduced from 0.3, 0.1
       }
     },
     visible: { 
@@ -424,8 +424,8 @@ const Matches = () => {
       height: 'auto', 
       marginBottom: '1.5rem',
       transition: { 
-        opacity: { duration: 0.3 },
-        height: { duration: 0.4, type: "spring", stiffness: 100, damping: 20 }
+        opacity: { duration: 0.2 }, // Reduced from 0.3
+        height: { duration: 0.3, type: "spring", stiffness: 200, damping: 15 } // Increased stiffness, reduced damping
       } 
     }
   };
@@ -573,16 +573,16 @@ const Matches = () => {
     <ManufacturerLayout>
       <motion.div 
         className="max-w-none px-4 sm:px-6 lg:px-8 pb-6"
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 10 }} // Reduced y from 20 to 10
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.3 }} // Reduced from 0.5
       >
         <div className="space-y-6">
           <motion.div 
             className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
+            transition={{ duration: 0.2 }} // Reduced from delay: 0.2 to duration: 0.2 for immediate start
           >
           <div>
             <div className="flex items-center gap-2">
@@ -847,54 +847,54 @@ const Matches = () => {
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                   <motion.div 
                     className="space-y-1"
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
+                    transition={{ duration: 0.2, delay: 0.1 }}
                   >
                     <p className="text-sm text-muted-foreground">Total Matches</p>
                     <p className="text-2xl font-bold">{matchStats.totalMatches}</p>
                   </motion.div>
                   <motion.div 
                     className="space-y-1"
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 5 }} // Reduced from y: 10
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.15 }}
+                    transition={{ duration: 0.2, delay: 0.15 }} // Reduced from 0.2, 0.15
                   >
                     <p className="text-sm text-muted-foreground">Pending</p>
                     <p className="text-2xl font-bold text-yellow-500 dark:text-yellow-400">{matchStats.pending}</p>
                   </motion.div>
                   <motion.div 
                     className="space-y-1"
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 5 }} // Reduced from y: 10
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
+                    transition={{ duration: 0.2, delay: 0.2 }} // Reduced from 0.2, 0.2
                   >
                     <p className="text-sm text-muted-foreground">Accepted</p>
                     <p className="text-2xl font-bold text-green-500 dark:text-green-400">{matchStats.accepted}</p>
                   </motion.div>
                   <motion.div 
                     className="space-y-1" 
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 5 }} // Reduced from y: 10
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.25 }}
+                    transition={{ duration: 0.2, delay: 0.25 }} // Reduced from 0.2, 0.25
                   >
                     <p className="text-sm text-muted-foreground">Declined</p>
                     <p className="text-2xl font-bold text-red-500 dark:text-red-400">{matchStats.declined}</p>
                   </motion.div>
                   <motion.div 
                     className="space-y-1"
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 5 }} // Reduced from y: 10
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
+                    transition={{ duration: 0.2, delay: 0.3 }} // Reduced from 0.2, 0.3
                   >
                     <p className="text-sm text-muted-foreground">Premium Matches</p>
                     <p className="text-2xl font-bold text-primary">{matchStats.highMatches}</p>
                   </motion.div>
                   <motion.div 
                     className="space-y-1"
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 5 }} // Reduced from y: 10
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.35 }}
+                    transition={{ duration: 0.2, delay: 0.35 }} // Reduced from 0.2, 0.35
                   >
                     <p className="text-sm text-muted-foreground">Avg. Score</p>
                     <p className="text-2xl font-bold">{matchStats.averageScore}%</p>
@@ -913,7 +913,7 @@ const Matches = () => {
                     className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
                     initial={{ scaleX: 0 }}
                     animate={{ scaleX: activeStatus === "all" ? 1 : 0 }}
-                    transition={{ duration: 0.3 }}
+                    transition={{ duration: 0.2 }} // Reduced from 0.3
                   />
                 </TabsTrigger>
                 <TabsTrigger value="pending" className="relative overflow-hidden group data-[state=active]:bg-yellow-500 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:font-semibold transition-all duration-300 py-2.5">
@@ -937,7 +937,7 @@ const Matches = () => {
                     className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
                     initial={{ scaleX: 0 }}
                     animate={{ scaleX: activeStatus === "pending" ? 1 : 0 }}
-                    transition={{ duration: 0.3 }}
+                    transition={{ duration: 0.2 }} // Reduced from 0.3
                   />
                 </TabsTrigger>
                 <TabsTrigger value="accepted" className="relative overflow-hidden group data-[state=active]:bg-green-500 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:font-semibold transition-all duration-300 py-2.5">
@@ -946,7 +946,7 @@ const Matches = () => {
                     className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
                     initial={{ scaleX: 0 }}
                     animate={{ scaleX: activeStatus === "accepted" ? 1 : 0 }}
-                    transition={{ duration: 0.3 }}
+                    transition={{ duration: 0.2 }} // Reduced from 0.3
                   />
                 </TabsTrigger>
                 <TabsTrigger value="declined" className="relative overflow-hidden group data-[state=active]:bg-red-500 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:font-semibold transition-all duration-300 py-2.5">
@@ -955,7 +955,7 @@ const Matches = () => {
                     className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
                     initial={{ scaleX: 0 }}
                     animate={{ scaleX: activeStatus === "declined" ? 1 : 0 }}
-                    transition={{ duration: 0.3 }}
+                    transition={{ duration: 0.2 }} // Reduced from 0.3
                   />
                 </TabsTrigger>
               </TabsList>
@@ -1033,35 +1033,35 @@ const Matches = () => {
                     {filteredAndSortedMatches.length === 0 ? (
                       <motion.div 
                         className="flex flex-col items-center justify-center p-8 text-center"
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 10 }} // Reduced from y: 20
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ 
                           type: "spring",
-                          stiffness: 100,
-                          damping: 15,
-                          duration: 0.5 
+                          stiffness: 200, // Increased from 100
+                          damping: 12, // Reduced from 15
+                          duration: 0.3 // Reduced from 0.5
                         }}
                       >
                         <motion.div
-                          initial={{ scale: 0.8, opacity: 0 }}
+                          initial={{ scale: 0.9, opacity: 0 }} // Changed from 0.8 to 0.9
                           animate={{ scale: 1, opacity: 1 }}
-                          transition={{ delay: 0.2, duration: 0.4 }}
+                          transition={{ delay: 0.1, duration: 0.3 }} // Reduced from 0.2, 0.4
                         >
                           <Search className="h-12 w-12 text-muted-foreground mb-4" />
                         </motion.div>
                         <motion.h3 
                           className="text-xl font-medium"
-                          initial={{ opacity: 0, y: 10 }}
+                          initial={{ opacity: 0, y: 5 }} // Reduced from y: 10
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.3, duration: 0.4 }}
+                          transition={{ delay: 0.2, duration: 0.3 }} // Reduced from 0.3, 0.4
                         >
                           No matches found
                         </motion.h3>
                         <motion.p 
                           className="text-muted-foreground"
-                          initial={{ opacity: 0, y: 10 }}
+                          initial={{ opacity: 0, y: 5 }} // Reduced from y: 10
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.4, duration: 0.4 }}
+                          transition={{ delay: 0.25, duration: 0.3 }} // Reduced from 0.4, 0.4
                         >
                           Try adjusting your search or filters to find more matches
                         </motion.p>
@@ -1090,20 +1090,20 @@ const Matches = () => {
                                 <motion.div
                                   key={match.id}
                                   layout
-                                  initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                                  initial={{ opacity: 0, scale: 0.97, y: 10 }} // Reduced values for smoother appearance
                                   animate={{ opacity: 1, scale: 1, y: 0 }}
-                                  exit={{ opacity: 0, scale: 0.95, y: -20 }}
+                                  exit={{ opacity: 0, scale: 0.97, y: -10 }}
                                   transition={{ 
-                                    duration: 0.4, 
-                                    delay: index * 0.05,
+                                    duration: 0.25, // Faster animation
+                                    delay: index * 0.03, // Reduced stagger delay
                                     type: "spring",
-                                    stiffness: 100,
-                                    damping: 15,
-                                    layout: { duration: 0.3 }
+                                    stiffness: 200, // Increased for snappier animation
+                                    damping: 12, // Lower damping for more responsive feel
+                                    layout: { duration: 0.2 } // Faster layout transitions
                                   }}
                                   whileHover={{ 
-                                    y: -5,
-                                    transition: { duration: 0.2 }
+                                    y: -3, // Subtler hover effect
+                                    transition: { duration: 0.15 } // Faster hover transition
                                   }}
                                 >
                                   <Card className="h-full border border-border/50 overflow-hidden hover:shadow-lg hover:border-primary/40 transition-all duration-300 group bg-card dark:bg-card/95">
@@ -1120,13 +1120,13 @@ const Matches = () => {
                                 <MotionCard 
                                   key={match.id}
                                   layout
-                                  initial={{ opacity: 0, y: 20 }}
+                                  initial={{ opacity: 0, y: 10 }} // Reduced y value
                                   animate={{ opacity: 1, y: 0 }}
-                                  exit={{ opacity: 0, y: -20 }}
+                                  exit={{ opacity: 0, y: -10 }}
                                   transition={{ 
-                                    duration: 0.3, 
-                                    delay: index * 0.05,
-                                    layout: { duration: 0.3 }
+                                    duration: 0.2, // Faster animation
+                                    delay: index * 0.03, // Reduced stagger delay
+                                    layout: { duration: 0.2 } // Faster layout transitions
                                   }}
                                   className="border overflow-hidden"
                                 >
@@ -1169,7 +1169,7 @@ const Matches = () => {
                                               className={`h-full ${getProgressColor(match.matchScore)}`}
                                               initial={{ width: 0 }}
                                               animate={{ width: `${match.matchScore}%` }}
-                                              transition={{ duration: 0.8, ease: "easeOut" }}
+                                              transition={{ duration: 0.5, ease: "easeOut" }} // Reduced from 0.8
                                             />
                                           </div>
                                           <span className={`text-xs font-medium ${getMatchScoreColor(match.matchScore)}`}>
@@ -1252,9 +1252,9 @@ const Matches = () => {
                         
                         <div className="flex justify-center mt-8">
                           <motion.div
-                            whileHover={{ scale: 1.03 }}
-                            whileTap={{ scale: 0.97 }}
-                            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                            whileHover={{ scale: 1.02 }} // Reduced from 1.03
+                            whileTap={{ scale: 0.98 }} // Changed from 0.97
+                            transition={{ type: "spring", stiffness: 500, damping: 17 }} // Increased stiffness from 400
                           >
                             <Button 
                               variant="outline" 
@@ -1278,7 +1278,7 @@ const Matches = () => {
       
       {/* Match Detail Dialog */}
       <Dialog open={showMatchDetails} onOpenChange={setShowMatchDetails}>
-        <DialogContent className="sm:max-w-[90vw] max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[90vw] max-h-[90vh] overflow-y-auto transition-all duration-200">
           {selectedMatch && (
             <>
               <DialogHeader className="mb-6">
@@ -1553,7 +1553,7 @@ const Matches = () => {
 
       {/* Message Dialog */}
       <Dialog open={showMessageDialog} onOpenChange={setShowMessageDialog}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[500px] transition-all duration-200">
           <DialogHeader>
             <DialogTitle>Send Message</DialogTitle>
             <DialogDescription>
@@ -1598,7 +1598,7 @@ const Matches = () => {
 
       {/* Schedule Meeting Dialog */}
       <Dialog open={showScheduleDialog} onOpenChange={setShowScheduleDialog}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[500px] transition-all duration-200">
           <DialogHeader>
             <DialogTitle>Schedule Meeting</DialogTitle>
             <DialogDescription>
@@ -1717,10 +1717,10 @@ const EnhancedMatchCard = ({ match, onAction, onViewDetails }: MatchCardProps) =
   const [showDetails, setShowDetails] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Animation variants for expandable details
+  // Animation variants for expandable details - optimized for speed
   const detailsVariants = {
-    hidden: { height: 0, opacity: 0 },
-    visible: { height: 'auto', opacity: 1, transition: { duration: 0.3, ease: "easeOut" } }
+    hidden: { height: 0, opacity: 0, transition: { duration: 0.2, ease: "easeInOut" } }, // Reduced from 0.3
+    visible: { height: 'auto', opacity: 1, transition: { duration: 0.2, ease: "easeOut" } } // Reduced from 0.3
   };
 
   const handleAction = (action: string) => {
@@ -1753,10 +1753,10 @@ const EnhancedMatchCard = ({ match, onAction, onViewDetails }: MatchCardProps) =
                   className="absolute -top-1 -right-1 bg-yellow-400 rounded-full p-0.5 border-2 border-white dark:border-gray-800 shadow-sm"
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 12 }} // Increased stiffness, reduced damping
                   whileHover={{ 
-                    scale: 1.2,
-                    transition: { duration: 0.2 }  
+                    scale: 1.15, // Reduced from 1.2
+                    transition: { duration: 0.15 } // Reduced from 0.2
                   }}
                 >
                   <Star className="h-3 w-3 fill-white text-white" />
@@ -1809,7 +1809,7 @@ const EnhancedMatchCard = ({ match, onAction, onViewDetails }: MatchCardProps) =
                         className={`h-full ${getProgressColor(match.matchScore)}`}
                         initial={{ width: 0 }}
                         animate={{ width: `${match.matchScore}%` }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
+                        transition={{ duration: 0.5, ease: "easeOut" }} // Reduced from 0.8
                       />
                     </div>
                     <span className={`text-xs ${getMatchScoreColor(match.matchScore)}`}>
@@ -1980,7 +1980,7 @@ const EnhancedMatchCard = ({ match, onAction, onViewDetails }: MatchCardProps) =
         className="absolute inset-0 rounded-md bg-primary/5 pointer-events-none"
         initial={{ opacity: 0 }}
         animate={{ opacity: isHovered ? 1 : 0 }}
-        transition={{ duration: 0.3 }}
+        transition={{ duration: 0.2 }} // Reduced from 0.3
       />
     </div>
   );

@@ -1,4 +1,4 @@
-import { FC, ReactNode, useState, useEffect, useRef } from 'react';
+import { FC, ReactNode, useState, useEffect, useRef, useCallback, KeyboardEvent } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
 import { 
@@ -25,7 +25,9 @@ import {
   ChevronDown,
   LayoutDashboard,
   User,
-  ShoppingBag
+  ShoppingBag,
+  ArrowRight,
+  HandHelpingIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
@@ -44,6 +46,9 @@ import {
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { useTheme } from '@/contexts/ThemeContext';
+import ThemeToggle from '@/components/ThemeToggle';
+import { useTranslation } from 'react-i18next';
 
 interface BrandLayoutProps {
   children: ReactNode;
@@ -54,33 +59,34 @@ const BrandLayout: FC<BrandLayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const { theme } = useTheme();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [hasNotifications, setHasNotifications] = useState(true);
   const [hasMessages, setHasMessages] = useState(true);
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [language, setLanguage] = useState('en');
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
+  const [searchResults, setSearchResults] = useState<{
+    pages: { title: string; path: string; icon: JSX.Element }[];
+    products: { name: string; category: string; id: string }[];
+    reports: { title: string; type: string; id: string }[];
+  }>({
+    pages: [],
+    products: [],
+    reports: []
+  });
+  const { t, i18n } = useTranslation();
 
-  // Toggle theme function
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    document.documentElement.classList.toggle('dark', newTheme === 'dark');
-    localStorage.setItem('theme', newTheme);
-  };
-
-  // Load theme from localStorage
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' || 'light';
-    setTheme(savedTheme);
-    document.documentElement.classList.toggle('dark', savedTheme === 'dark');
-  }, []);
+  // Languages available
+  const languages = [
+    { code: 'en', name: 'English', flag: '🇺🇸' },
+    { code: 'ja', name: 'Japanese', flag: '🇯🇵' },
+  ];
 
   // Check if the current route is active
   const isRouteActive = (path: string) => {
@@ -174,21 +180,42 @@ const BrandLayout: FC<BrandLayoutProps> = ({ children }) => {
     };
   }, [searchOpen]);
 
-  if (!isAuthenticated || role !== 'brand') {
-    return null;
-  }
+  // Add a useEffect for keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Command/Ctrl + K to open search
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+      
+      // Escape to close search
+      if (e.key === 'Escape' && searchOpen) {
+        e.preventDefault();
+        setSearchOpen(false);
+      }
+    };
+    
+    // Add event listener
+    document.addEventListener('keydown', handleKeyDown as any);
+    
+    // Clean up
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown as any);
+    };
+  }, [searchOpen]);
 
   // Navigation items for brand
   const navigationItems = [
     {
-      name: 'Dashboard',
-      path: '/dashboard',
-      icon: <LayoutDashboard className="h-5 w-5" />,
-    },
-    {
       name: 'Home',
       path: '/',
       icon: <Home className="h-5 w-5" />,
+    },
+    {
+      name: 'Dashboard',
+      path: '/dashboard',
+      icon: <LayoutDashboard className="h-5 w-5" />,
     },
     {
       name: 'Products',
@@ -196,12 +223,17 @@ const BrandLayout: FC<BrandLayoutProps> = ({ children }) => {
       icon: <Package className="h-5 w-5" />,
     },
     {
-      name: 'Manufacturers',
+      name: 'Manufacturers Partners',
       path: '/brand/manufacturers',
       icon: <Building className="h-5 w-5" />,
     },
     {
-      name: 'Retailers',
+      name: 'Brands Partners',
+      path: '/brand/brands',
+      icon: <HandHelpingIcon className="h-5 w-5" />,
+    },
+    {
+      name: 'Retailers Partners',
       path: '/brand/retailers',
       icon: <Store className="h-5 w-5" />,
     },
@@ -212,13 +244,156 @@ const BrandLayout: FC<BrandLayoutProps> = ({ children }) => {
     },
   ];
 
-  // Languages available
-  const languages = [
-    { value: 'en', label: 'English' },
-    { value: 'vi', label: 'Tiếng Việt' },
-    { value: 'fr', label: 'Français' },
-    { value: 'es', label: 'Español' },
-  ];
+  // Define a search handler
+  const handleSearch = useCallback((query: string) => {
+    if (!query.trim()) {
+      setSearchResults({ pages: [], products: [], reports: [] });
+      return;
+    }
+    
+    // In a real app, this would be an API call
+    // For now, just simulate some results based on the navigation items
+    setTimeout(() => {
+      // Filter navigation items that match the query
+      const matchingPages = navigationItems
+        .filter(item => 
+          item.name.toLowerCase().includes(query.toLowerCase()) ||
+          item.path.toLowerCase().includes(query.toLowerCase())
+        )
+        .map(item => ({
+          title: item.name,
+          path: item.path,
+          icon: item.icon
+        }));
+      
+      // Mock some product results for brand
+      const mockProducts = [
+        { name: "Organic Cereal", category: "Food", id: "p1" },
+        { name: "Protein Powder", category: "Supplements", id: "p2" },
+        { name: "Vitamin Tablets", category: "Health", id: "p3" },
+        { name: "Energy Bars", category: "Snacks", id: "p4" }
+      ];
+      
+      // Mock some report results
+      const mockReports = [
+        { title: "Sales Analytics", type: "Chart", id: "r1" },
+        { title: "Retailer Performance", type: "PDF", id: "r2" },
+        { title: "Distribution Status", type: "Dashboard", id: "r3" }
+      ];
+      
+      // Filter mock data
+      const matchingProducts = mockProducts.filter(p => 
+        p.name.toLowerCase().includes(query.toLowerCase()) || 
+        p.category.toLowerCase().includes(query.toLowerCase())
+      );
+      
+      const matchingReports = mockReports.filter(r => 
+        r.title.toLowerCase().includes(query.toLowerCase())
+      );
+      
+      setSearchResults({
+        pages: matchingPages,
+        products: matchingProducts,
+        reports: matchingReports
+      });
+    }, 300); // Simulate network delay
+  }, [navigationItems]);
+
+  // Update search handler when query changes
+  useEffect(() => {
+    handleSearch(searchQuery);
+  }, [searchQuery, handleSearch]);
+
+  if (!isAuthenticated || role !== 'brand') {
+    return null;
+  }
+
+  // Enhanced Language Switcher Component
+  const EnhancedLanguageSwitcher = () => {
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+    const { i18n, t } = useTranslation();
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+          setIsOpen(false);
+        }
+      };
+
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }, []);
+
+    // Languages available
+    const languages = [
+      { code: 'en', name: 'English', flag: '🇺🇸' },
+      { code: 'ja', name: '日本語', flag: '🇯🇵' },
+    ];
+
+    // Handle language change
+    const changeLanguage = (code: string) => {
+      i18n.changeLanguage(code);
+      setIsOpen(false);
+    };
+
+    // Get current language
+    const currentLang = languages.find(lang => lang.code === i18n.language) || languages[0];
+
+    return (
+      <div className="relative" ref={dropdownRef}>
+        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative hover:bg-primary/5 transition-colors"
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            <span className="text-base">{currentLang.flag}</span>
+          </Button>
+        </motion.div>
+
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: 5, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 5, scale: 0.95 }}
+              transition={{ duration: 0.15, ease: "easeOut" }}
+              className="absolute right-0 mt-2 z-50 min-w-[180px] overflow-hidden rounded-xl border border-border bg-popover text-popover-foreground shadow-lg"
+            >
+              <div className="p-1">
+                {languages.map((lang) => (
+                  <motion.button
+                    key={lang.code}
+                    className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-primary/10 ${
+                      lang.code === i18n.language ? "bg-primary/5" : ""
+                    }`}
+                    onClick={() => changeLanguage(lang.code)}
+                    whileHover={{ x: 3 }}
+                  >
+                    <span className="text-lg">{lang.flag}</span>
+                    <span>{lang.name}</span>
+                    {lang.code === i18n.language && (
+                      <motion.div 
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                        className="ml-auto h-2 w-2 rounded-full bg-primary"
+                      />
+                    )}
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    );
+  };
 
   return (
     <div className="flex h-screen bg-background">
@@ -260,7 +435,7 @@ const BrandLayout: FC<BrandLayoutProps> = ({ children }) => {
             </Button>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-1">
             <AnimatePresence>
               {navigationItems.map((item, index) => (
                 <motion.div
@@ -275,28 +450,47 @@ const BrandLayout: FC<BrandLayoutProps> = ({ children }) => {
                   <Link
                     to={item.path}
                     className={cn(
-                      "flex items-center p-3 text-base font-normal rounded-lg hover:bg-primary/10 group transition-all",
+                      "flex items-center p-2 text-base font-normal rounded-lg transition-all duration-200",
                       isRouteActive(item.path) 
-                        ? "bg-primary text-primary-foreground hover:bg-primary/90" 
-                        : "text-muted-foreground hover:text-primary",
-                      sidebarCollapsed && "justify-center px-3"
+                        ? "bg-primary text-primary-foreground shadow-md" 
+                        : "text-muted-foreground hover:text-primary hover:bg-primary/10",
+                      sidebarCollapsed ? "justify-center px-3" : "pl-3 pr-2"
                     )}
                   >
-                    <div className={isRouteActive(item.path) ? "text-primary-foreground" : "text-muted-foreground group-hover:text-primary"}>
+                    <motion.div 
+                      className={cn(
+                        "flex items-center justify-center",
+                        isRouteActive(item.path) ? "text-primary-foreground" : "text-muted-foreground group-hover:text-primary"
+                      )}
+                      whileHover={{ scale: isRouteActive(item.path) ? 1 : 1.15 }}
+                      transition={{ duration: 0.2 }}
+                    >
                       {item.icon}
-                    </div>
+                    </motion.div>
+                    
                     {!sidebarCollapsed && (
-                      <motion.span 
-                        className="ml-3"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        {item.name}
-                      </motion.span>
+                      <motion.div className="ml-3 flex-1 flex items-center justify-between">
+                        <motion.span 
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          {item.name}
+                        </motion.span>
+                        
+                        {/* Indicator for active item */}
+                        {isRouteActive(item.path) && (
+                          <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className="h-2 w-2 rounded-full bg-primary-foreground"
+                          ></motion.div>
+                        )}
+                      </motion.div>
                     )}
+                    
                     {sidebarCollapsed && (
-                      <span className="absolute left-full rounded-md px-2 py-1 ml-6 bg-popover text-popover-foreground text-sm invisible opacity-0 -translate-x-3 group-hover:visible group-hover:opacity-100 group-hover:translate-x-0 transition-all shadow-md">
+                      <span className="absolute left-full rounded-md px-2 py-1 ml-6 bg-popover text-popover-foreground text-sm invisible opacity-0 -translate-x-3 group-hover:visible group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 shadow-md z-50">
                         {item.name}
                       </span>
                     )}
@@ -304,6 +498,25 @@ const BrandLayout: FC<BrandLayoutProps> = ({ children }) => {
                 </motion.div>
               ))}
             </AnimatePresence>
+          </div>
+
+          {/* Settings at bottom */}
+          <div className="absolute bottom-4 left-0 right-0 px-3">
+            <Link
+              to="/brand/settings"
+              className={cn(
+                "flex items-center p-2 text-base font-normal rounded-lg transition-all duration-200",
+                isRouteActive('/brand/settings') 
+                  ? "bg-primary text-primary-foreground shadow-md" 
+                  : "text-muted-foreground hover:text-primary hover:bg-primary/10",
+                sidebarCollapsed ? "justify-center px-3" : "pl-3 pr-2"
+              )}
+            >
+              <Settings className="h-5 w-5" />
+              {!sidebarCollapsed && (
+                <span className="ml-3">Settings</span>
+              )}
+            </Link>
           </div>
         </div>
       </motion.aside>
@@ -399,6 +612,53 @@ const BrandLayout: FC<BrandLayoutProps> = ({ children }) => {
                     </motion.div>
                   </AnimatePresence>
                 </div>
+
+                {/* Language Switcher in Mobile Menu - Enhanced version */}
+                <div className="py-3 border-t border-border/30 dark:border-border/20 mt-2">
+                  <p className="text-sm text-muted-foreground mb-2">{t('language')}</p>
+                  <div className="flex space-x-2">
+                    <Button
+                      variant={i18n.language === 'en' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => i18n.changeLanguage('en')}
+                      className="flex-1 flex items-center gap-2 justify-center group transition-all duration-300"
+                    >
+                      <motion.div
+                        className="flex items-center justify-center w-7 h-7 rounded-full bg-background/80 dark:bg-background/60 shadow-sm border border-border/30 dark:border-border/20 group-hover:scale-110 transition-transform"
+                      >
+                        <span className="text-base">🇺🇸</span>
+                      </motion.div>
+                      <span className="text-xs">{t('english')}</span>
+                      {i18n.language === 'en' && (
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          className="h-1.5 w-1.5 rounded-full bg-background ml-1"
+                        />
+                      )}
+                    </Button>
+                    <Button
+                      variant={i18n.language === 'ja' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => i18n.changeLanguage('ja')}
+                      className="flex-1 flex items-center gap-2 justify-center group transition-all duration-300"
+                    >
+                      <motion.div
+                        className="flex items-center justify-center w-7 h-7 rounded-full bg-background/80 dark:bg-background/60 shadow-sm border border-border/30 dark:border-border/20 group-hover:scale-110 transition-transform"
+                      >
+                        <span className="text-base">🇯🇵</span>
+                      </motion.div>
+                      <span className="text-xs">{t('japanese')}</span>
+                      {i18n.language === 'ja' && (
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          className="h-1.5 w-1.5 rounded-full bg-background ml-1"
+                        />
+                      )}
+                    </Button>
+                  </div>
+                </div>
               </div>
             </motion.div>
           </motion.div>
@@ -436,7 +696,7 @@ const BrandLayout: FC<BrandLayoutProps> = ({ children }) => {
             <AnimatePresence mode="wait">
               {searchOpen ? (
                 <motion.div 
-                  className="absolute inset-0 flex items-center justify-center bg-background/95 px-4 md:px-6 h-16 backdrop-blur-md"
+                  className="absolute inset-0 flex items-center justify-center bg-background/95 dark:bg-background/90 px-4 md:px-6 h-16 backdrop-blur-md"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
@@ -448,14 +708,14 @@ const BrandLayout: FC<BrandLayoutProps> = ({ children }) => {
                       initial={{ scale: 0.8 }}
                       animate={{ scale: 1 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute left-3 top-1/2 transform -translate-y-1/2"
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
                     >
-                      <Search className="h-4 w-4 text-muted-foreground" />
+                      <Search className="h-4 w-4" />
                     </motion.div>
                     <Input 
                       type="text" 
                       placeholder="Search dashboards, products, reports..." 
-                      className="w-full pl-10 pr-4 bg-transparent border-primary/30 focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all shadow-none focus:shadow-sm dark:bg-background/60 dark:border-primary/20 dark:focus:border-primary/40 focus:outline-none"
+                      className="w-full pl-10 pr-4 py-2 bg-background border-input focus:border-ring focus:ring-1 focus:ring-ring transition-colors shadow-sm"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       autoFocus
@@ -479,78 +739,43 @@ const BrandLayout: FC<BrandLayoutProps> = ({ children }) => {
                     )}
                   </div>
                 </motion.div>
-              ) : null}
+              ) : (
+                <div className="hidden md:flex relative w-64 lg:w-96">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start text-muted-foreground border rounded-md shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring"
+                    onClick={() => setSearchOpen(true)}
+                  >
+                    <Search className="h-4 w-4 mr-2" />
+                    <span>Search...</span> 
+                    <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+                      <span className="text-xs">⌘</span>K
+                    </kbd>
+                  </Button>
+                </div>
+              )}
             </AnimatePresence>
             
             {/* Right section - Actions */}
             <div className="flex items-center gap-2">
-              {/* Search button */}
-              <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+              {/* Search button - Only in mobile view */}
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="md:hidden">
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="text-muted-foreground hover:text-foreground"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
                   onClick={() => setSearchOpen(true)}
                 >
-                  <motion.div
-                    whileHover={{ rotate: 15, scale: 1.1 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                  >
-                    <Search className="h-5 w-5" />
-                  </motion.div>
+                  <Search className="h-5 w-5" />
                 </Button>
               </motion.div>
               
               {/* Language toggle */}
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground hover:bg-primary/5 transition-colors">
-                      <Languages className="h-5 w-5" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuLabel>Select Language</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuRadioGroup value={language} onValueChange={setLanguage}>
-                      {languages.map((lang) => (
-                        <DropdownMenuRadioItem
-                          key={lang.value}
-                          value={lang.value}
-                          className="cursor-pointer"
-                        >
-                          {lang.label}
-                        </DropdownMenuRadioItem>
-                      ))}
-                    </DropdownMenuRadioGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </motion.div>
+              <EnhancedLanguageSwitcher />
               
               {/* Theme toggle */}
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="text-muted-foreground hover:text-foreground hover:bg-primary/5 transition-colors"
-                  onClick={toggleTheme}
-                >
-                  <AnimatePresence mode="wait" initial={false}>
-                    <motion.div
-                      key={theme}
-                      initial={{ opacity: 0, rotate: -30, scale: 0.5, y: -20 }}
-                      animate={{ opacity: 1, rotate: 0, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, rotate: 30, scale: 0.5, y: 20 }}
-                      transition={{ duration: 0.4, type: "spring", stiffness: 200 }}
-                    >
-                      {theme === 'dark' ? (
-                        <Moon className="h-5 w-5" />
-                      ) : (
-                        <Sun className="h-5 w-5" />
-                      )}
-                    </motion.div>
-                  </AnimatePresence>
-                </Button>
+                <ThemeToggle />
               </motion.div>
               
               {/* Help */}
@@ -683,14 +908,19 @@ const BrandLayout: FC<BrandLayoutProps> = ({ children }) => {
               </motion.div>
               
               {/* User avatar */}
-              <UserMenu />
+              <UserProfileDropdown />
             </div>
           </div>
           
-          {/* Secondary nav with actions or tabs - hidden to match other layouts */}
-          <div className="hidden">
+          {/* Secondary nav with actions or tabs - kept hidden as in most recent update */}
+          <motion.div 
+            className="hidden"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+          >
             {/* Secondary navigation content */}
-          </div>
+          </motion.div>
         </header>
         
         {/* Page content */}
@@ -702,8 +932,10 @@ const BrandLayout: FC<BrandLayoutProps> = ({ children }) => {
   );
 };
 
+export default BrandLayout;
+
 // User dropdown menu
-const UserMenu = () => {
+const UserProfileDropdown = () => {
   const { user, logout, updateUserStatus } = useUser();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
@@ -769,9 +1001,9 @@ const UserMenu = () => {
             transition={{ duration: 0.15, ease: "easeOut" }}
             className="absolute right-0 mt-2 w-80 z-50 overflow-hidden origin-top-right"
           >
-            <div className="rounded-xl border border-border bg-background/95 backdrop-blur-sm shadow-lg">
+            <div className="rounded-xl border border-border bg-popover text-popover-foreground shadow-lg">
               {/* User info section with darker background */}
-              <div className="p-4 border-b border-border bg-muted/80">
+              <div className="p-4 border-b border-border bg-muted">
                 <div className="flex items-start gap-4">
                   <Avatar className="h-14 w-14 border-2 border-primary/20">
                     <AvatarImage src={user?.avatar || ""} alt={user?.name || "User"} />
@@ -794,7 +1026,7 @@ const UserMenu = () => {
                             <ChevronDown className="h-3.5 w-3.5 ml-1" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" className="w-40">
+                        <DropdownMenuContent align="start" className="w-40 bg-popover text-popover-foreground border-border">
                           <DropdownMenuItem onClick={() => handleStatusChange("online")}>
                             <div className="flex items-center">
                               <span className="h-2 w-2 rounded-full bg-green-500 mr-2" />
@@ -824,15 +1056,15 @@ const UserMenu = () => {
 
                 {/* Brand-specific stats */}
                 <div className="grid grid-cols-3 gap-2 mt-4 text-center">
-                  <div className="bg-background/70 rounded-lg p-2">
+                  <div className="bg-muted rounded-lg p-2">
                     <p className="text-lg font-semibold">{user?.brandSettings?.productCategories?.length || "0"}</p>
                     <p className="text-xs text-muted-foreground">Categories</p>
                   </div>
-                  <div className="bg-background/70 rounded-lg p-2">
+                  <div className="bg-muted rounded-lg p-2">
                     <p className="text-lg font-semibold">12</p>
                     <p className="text-xs text-muted-foreground">Products</p>
                   </div>
-                  <div className="bg-background/70 rounded-lg p-2">
+                  <div className="bg-muted rounded-lg p-2">
                     <p className="text-lg font-semibold">8</p>
                     <p className="text-xs text-muted-foreground">Retailers</p>
                   </div>
@@ -842,53 +1074,55 @@ const UserMenu = () => {
               {/* Menu items */}
               <div className="p-2">
                 <div className="grid grid-cols-1 gap-1">
-                  <button
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent"
-                    onClick={() => navigateTo("/brand/dashboard")}
+                  <motion.button
+                    className="flex items-center gap-3 rounded-md px-2.5 py-2 text-sm transition-colors hover:bg-primary/10 text-left w-full"
+                    onClick={() => navigateTo("/dashboard")}
+                    whileHover={{ x: 3 }}
                   >
-                    <LayoutDashboard className="h-4 w-4" />
-                    <div className="flex-1 text-left">
-                      <p>Dashboard</p>
-                      <p className="text-xs text-muted-foreground">Brand overview</p>
-                    </div>
-                  </button>
-
-                  <button
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent"
+                    <LayoutDashboard className="h-4 w-4 text-primary" />
+                    <span className="truncate">Dashboard</span>
+                  </motion.button>
+                  
+                  <motion.button
+                    className="flex items-center gap-3 rounded-md px-2.5 py-2 text-sm transition-colors hover:bg-primary/10 text-left w-full"
                     onClick={() => navigateTo("/profile")}
+                    whileHover={{ x: 3 }}
                   >
-                    <User className="h-4 w-4" />
-                    <div className="flex-1 text-left">
-                      <p>Profile</p>
-                      <p className="text-xs text-muted-foreground">Manage your information</p>
-                    </div>
-                  </button>
+                    <User className="h-4 w-4 text-primary" />
+                    <span className="truncate">Profile</span>
+                  </motion.button>
 
-                  <button
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent"
+                  <motion.button
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-primary/10 text-left"
                     onClick={() => navigateTo("/brand/settings")}
+                    whileHover={{ x: 3 }}
                   >
-                    <Settings className="h-4 w-4" />
+                    <div className="p-1.5 rounded-md bg-primary/15 dark:bg-primary/20 text-primary dark:text-primary/90">
+                      <Settings className="h-4 w-4" />
+                    </div>
                     <div className="flex-1 text-left">
-                      <p>Settings</p>
+                      <p className="font-medium">Settings</p>
                       <p className="text-xs text-muted-foreground">Account preferences</p>
                     </div>
-                  </button>
+                  </motion.button>
                 </div>
               </div>
 
-              {/* Logout */}
+              {/* Logout button with improved contrast */}
               <div className="p-2 border-t border-border">
-                <button
-                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-destructive transition-colors hover:bg-destructive/10 hover:text-destructive"
+                <motion.button
+                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-destructive/10 dark:hover:bg-red-900/20 transition-colors duration-300 text-left"
                   onClick={handleLogout}
+                  whileHover={{ x: 3 }}
                 >
-                  <LogOut className="h-4 w-4" />
+                  <div className="p-1.5 rounded-md bg-destructive/10 dark:bg-red-500/20 text-destructive dark:text-red-400">
+                    <LogOut className="h-4 w-4" />
+                  </div>
                   <div className="flex-1 text-left">
-                    <p>Log out</p>
+                    <p className="font-bold text-destructive dark:text-red-400">Log out</p>
                     <p className="text-xs text-muted-foreground">Sign out of your account</p>
                   </div>
-                </button>
+                </motion.button>
               </div>
             </div>
           </motion.div>
@@ -896,6 +1130,4 @@ const UserMenu = () => {
       </AnimatePresence>
     </div>
   );
-};
-
-export default BrandLayout; 
+}; 
