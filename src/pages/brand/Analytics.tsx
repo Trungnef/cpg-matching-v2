@@ -93,7 +93,9 @@ const Analytics = () => {
             <div className="mb-8">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                  <h1 className="text-3xl font-bold">Brand Analytics</h1>
+                  <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/70 text-transparent bg-clip-text">
+                    Analytics Management
+                  </h1>
                   <p className="text-muted-foreground">
                     {user?.companyName} - Performance Metrics
                   </p>

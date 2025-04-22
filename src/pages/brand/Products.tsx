@@ -776,7 +776,9 @@ const BrandProducts = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5, delay: 0.1 }}
                 >
+                <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/70 text-transparent bg-clip-text">
                   Product Management
+                </h1>
                 </motion.h1>
                 <motion.p 
                   className="text-muted-foreground"

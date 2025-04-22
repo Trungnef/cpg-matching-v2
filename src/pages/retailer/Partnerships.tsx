@@ -184,7 +184,7 @@ const RetailerPartnerships = () => {
           <div className="mb-8 px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
-                <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">Partnerships</h1>
+                <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">Partnerships Management</h1>
                 <p className="text-muted-foreground">{user?.companyName} - Manage Your Brand & Manufacturer Relationships</p>
               </div>
               

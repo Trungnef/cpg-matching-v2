@@ -735,20 +735,18 @@ const Manufacturers = () => {
                   </Button>
                 </motion.div>
               )}
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className={cn(
-                    "absolute right-2 top-1/2 transform -translate-y-1/2 transition-colors duration-300",
-                    showAdvancedSearch && "bg-primary text-primary-foreground"
-                  )}
-                  onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
-                >
-                  <SlidersHorizontal className="h-4 w-4 mr-2" />
-                  Advanced
-                </Button>
-              </motion.div>
+              <Button
+                variant="outline"
+                size="sm"
+                className={cn(
+                  "absolute right-2 top-1/2 transform -translate-y-1/2 transition-colors duration-300",
+                  showAdvancedSearch && "bg-primary text-primary-foreground"
+                )}
+                onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
+              >
+                <SlidersHorizontal className="h-4 w-4 mr-2" />
+                Advanced
+              </Button>
             </div>
 
             <AnimatePresence>

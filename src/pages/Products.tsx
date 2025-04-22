@@ -1042,26 +1042,215 @@ const Products = () => {
                   </Button>
                 </motion.div>
               )}
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ duration: 0.2 }}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
+                className={cn(
+                  "absolute right-2 top-1/2 transform -translate-y-1/2 transition-colors duration-200",
+                  showAdvancedSearch ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                )}
               >
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
-                  className={cn(
-                    "absolute right-2 top-1/2 transform -translate-y-1/2 transition-colors duration-200",
-                    showAdvancedSearch ? "text-primary" : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  <SlidersHorizontal className="h-4 w-4 mr-1" />
-                  Advanced
-                </Button>
-              </motion.div>
+                <SlidersHorizontal className="h-4 w-4 mr-1" />
+                Advanced
+              </Button>
             </div>
           </motion.div>
+          
+          <AnimatePresence>
+            {showAdvancedSearch && (
+              <motion.div
+                initial={{ opacity: 0, height: 0, overflow: "hidden" }}
+                animate={{ 
+                  opacity: 1, 
+                  height: "auto", 
+                  transition: { 
+                    duration: 0.3,
+                    height: { duration: 0.3 }
+                  } 
+                }}
+                exit={{ 
+                  opacity: 0, 
+                  height: 0,
+                  transition: { 
+                    duration: 0.2,
+                    height: { duration: 0.2 }
+                  }
+                }}
+                className="mb-6 bg-card border rounded-lg p-6 space-y-6"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {/* Price Range */}
+                  <div className="space-y-3">
+                    <label className="text-sm font-medium flex items-center gap-2">
+                      <ShoppingBag className="h-4 w-4 text-green-500" />
+                      Price Range ($)
+                    </label>
+                    <div className="pt-2">
+                      <div className="flex items-center gap-4">
+                        <span className="text-sm font-medium text-green-600">${priceRange[0]}</span>
+                        <Slider
+                          defaultValue={[0, 100]}
+                          min={0}
+                          max={100}
+                          step={1}
+                          value={priceRange}
+                          onValueChange={(value) => setPriceRange(value as [number, number])}
+                          className="flex-1 [&_[role=slider]]:h-4 [&_[role=slider]]:w-4 [&_[role=slider]]:border-2 [&_[role=slider]]:border-green-500 [&_[role=slider]]:shadow-md [&_[role=slider]]:transition-colors [&_[role=slider]]:hover:border-green-400"
+                        />
+                        <span className="text-sm font-medium text-green-600">${priceRange[1]}+</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Min Order */}
+                  <div className="space-y-3">
+                    <label className="text-sm font-medium flex items-center gap-2">
+                      <Package className="h-4 w-4 text-blue-500" />
+                      Min Order
+                    </label>
+                    <div className="pt-2">
+                      <div className="flex items-center gap-4">
+                        <span className="text-sm font-medium text-blue-600">{minOrder}</span>
+                        <Slider
+                          defaultValue={[50]}
+                          min={0}
+                          max={500}
+                          step={10}
+                          value={[minOrder]}
+                          onValueChange={(value) => setMinOrder(value[0])}
+                          className="flex-1 [&_[role=slider]]:h-4 [&_[role=slider]]:w-4 [&_[role=slider]]:border-2 [&_[role=slider]]:border-blue-500 [&_[role=slider]]:shadow-md"
+                        />
+                        <span className="text-sm font-medium text-blue-600">500+</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Rating */}
+                  <div className="space-y-3">
+                    <label className="text-sm font-medium flex items-center gap-2">
+                      <Star className="h-4 w-4 text-yellow-500" />
+                      Min Rating
+                    </label>
+                    <div className="pt-2">
+                      <div className="flex items-center gap-4">
+                        <span className="text-sm font-medium text-yellow-600">{minRating}</span>
+                        <Slider
+                          defaultValue={[0]}
+                          min={0}
+                          max={5}
+                          step={0.5}
+                          value={[minRating]}
+                          onValueChange={(value) => setMinRating(value[0])}
+                          className="flex-1 [&_[role=slider]]:h-4 [&_[role=slider]]:w-4 [&_[role=slider]]:border-2 [&_[role=slider]]:border-yellow-500"
+                        />
+                        <span className="text-sm font-medium text-yellow-600">5</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Lead Time */}
+                  <div className="space-y-3">
+                    <label className="text-sm font-medium flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-purple-500" />
+                      Lead Time
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {["1-2 weeks", "2-4 weeks", "4-8 weeks", "8+ weeks"].map((time) => (
+                        <Badge
+                          key={time}
+                          variant={selectedLeadTime.includes(time) ? "default" : "outline"}
+                          className={cn(
+                            "cursor-pointer transition-colors",
+                            selectedLeadTime.includes(time)
+                              ? "bg-purple-500 hover:bg-purple-600"
+                              : "hover:bg-purple-100"
+                          )}
+                          onClick={() => {
+                            setSelectedLeadTime(prev =>
+                              prev.includes(time)
+                                ? prev.filter(t => t !== time)
+                                : [...prev, time]
+                            );
+                          }}
+                        >
+                          {time}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Additional options */}
+                  <div className="space-y-3">
+                    <label className="text-sm font-medium">Product Options</label>
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <Switch 
+                          id="inStock" 
+                          checked={inStockOnly}
+                          onCheckedChange={setInStockOnly}
+                        />
+                        <label htmlFor="inStock" className="text-sm cursor-pointer">In Stock Only</label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Switch 
+                          id="newArrivals" 
+                          checked={newArrivalsOnly}
+                          onCheckedChange={setNewArrivalsOnly}
+                        />
+                        <label htmlFor="newArrivals" className="text-sm cursor-pointer">New Arrivals</label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Switch 
+                          id="samples" 
+                          checked={hasSamples}
+                          onCheckedChange={setHasSamples}
+                        />
+                        <label htmlFor="samples" className="text-sm cursor-pointer">Has Samples</label>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Customization */}
+                  <div className="space-y-3">
+                    <label className="text-sm font-medium">Additional Features</label>
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <Switch 
+                          id="customization" 
+                          checked={hasCustomization}
+                          onCheckedChange={setHasCustomization}
+                        />
+                        <label htmlFor="customization" className="text-sm cursor-pointer">Offers Customization</label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Switch 
+                          id="sustainable" 
+                          checked={sustainableOnly}
+                          onCheckedChange={setSustainableOnly}
+                        />
+                        <label htmlFor="sustainable" className="text-sm cursor-pointer">Sustainable Only</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-2 pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={clearFilters}
+                  >
+                    Reset Filters
+                  </Button>
+                  <Button
+                    onClick={applyAdvancedFilters}
+                  >
+                    Apply Filters
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
           
           {/* Active filters with enhanced animations */}
           <AnimatePresence>
