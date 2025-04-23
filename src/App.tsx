@@ -73,6 +73,12 @@ import AdminLogin from './pages/AdminLogin';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import UserManagement from './pages/admin/UserManagement';
+import Analytics from './pages/admin/Analytics';
+import ActivityLog from './pages/admin/ActivityLog';
+import Announcements from './pages/admin/Announcements';
+import Settings from './pages/admin/Settings';
+import AdminProfile from './pages/admin/AdminProfile';
+import AdminHelp from './pages/admin/AdminHelp';
 
 import { ThemeProvider } from "./contexts/ThemeContext";
 
@@ -310,12 +316,12 @@ const App = () => (
                               <Route index element={<Navigate to="/admin/dashboard" replace />} />
                               <Route path="dashboard" element={<AdminDashboard />} />
                               <Route path="users" element={<UserManagement />} />
-                              <Route path="announcements" element={<div>Announcements Management</div>} />
-                              <Route path="activity" element={<div>Activity Logs</div>} />
-                              <Route path="analytics" element={<div>Analytics Dashboard</div>} />
-                              <Route path="settings" element={<div>System Settings</div>} />
-                              <Route path="profile" element={<div>Admin Profile</div>} />
-                              <Route path="help" element={<div>Admin Help Center</div>} />
+                              <Route path="announcements" element={<Announcements />} />
+                              <Route path="activity" element={<ActivityLog />} />
+                              <Route path="analytics" element={<Analytics />} />
+                              <Route path="settings" element={<Settings />} />
+                              <Route path="profile" element={<AdminProfile />} />
+                              <Route path="help" element={<AdminHelp />} />
                             </Route>
                             
                             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
