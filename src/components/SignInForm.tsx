@@ -42,8 +42,15 @@ const SignInForm = () => {
 
   // Form schema
   const formSchema = z.object({
-    email: z.string().email({ message: t('invalid-email', "Please enter a valid email address") }),
-    password: z.string().min(8, { message: t('password-min-length', "Password must be at least 8 characters") }),
+    email: z.string().email({
+      message: t("invalid-email", "Please enter a valid email address"),
+    }),
+    password: z.string().min(8, {
+      message: t(
+        "password-min-length",
+        "Password must be at least 8 characters"
+      ),
+    }),
     accountType: z.enum(["manufacturer", "brand", "retailer"]),
   });
 
@@ -60,23 +67,23 @@ const SignInForm = () => {
   // Sign in form handler
   const onSubmit = async (data: FormValues) => {
     setIsLoading(true);
-    
+
     try {
       // Use the login function from context with the selected role
       await login(data.email, data.password, data.accountType);
-      
+
       toast({
-        title: t('welcome-back', 'Welcome back'),
-        description: t('sign-in-success', 'You\'ve successfully signed in.'),
+        title: t("welcome-back", "Welcome back"),
+        description: t("sign-in-success", "You've successfully signed in."),
       });
-      
+
       // Redirect to dashboard
       navigate("/dashboard");
     } catch (error) {
       console.error("Sign in error:", error);
       toast({
-        title: t('auth-failed', 'Authentication failed'),
-        description: t('incorrect-credentials', 'Incorrect email or password.'),
+        title: t("auth-failed", "Authentication failed"),
+        description: t("incorrect-credentials", "Incorrect email or password."),
         variant: "destructive",
       });
     } finally {
@@ -141,7 +148,7 @@ const SignInForm = () => {
     <div className="bg-background/80 dark:bg-background/60 backdrop-blur-md shadow-lg dark:shadow-primary/5 border border-border/40 dark:border-border/20 p-8 rounded-xl w-full max-w-md relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <motion.div 
+        <motion.div
           className="absolute -top-20 -right-20 w-40 h-40 bg-primary/10 dark:bg-primary/20 rounded-full blur-3xl opacity-60"
           animate={{
             scale: [1, 1.2, 1],
@@ -150,10 +157,10 @@ const SignInForm = () => {
           transition={{
             duration: 8,
             repeat: Infinity,
-            ease: "easeInOut"
+            ease: "easeInOut",
           }}
         />
-        <motion.div 
+        <motion.div
           className="absolute -bottom-20 -left-20 w-40 h-40 bg-accent/10 dark:bg-accent/20 rounded-full blur-3xl opacity-60"
           animate={{
             scale: [1, 1.2, 1],
@@ -163,20 +170,20 @@ const SignInForm = () => {
             duration: 8,
             repeat: Infinity,
             ease: "easeInOut",
-            delay: 1
+            delay: 1,
           }}
         />
       </div>
 
       {/* Animated Title Section */}
-      <motion.div 
+      <motion.div
         className="text-center mb-8 relative z-10"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
         <motion.div className="relative inline-block">
-          <motion.h2 
+          <motion.h2
             className="text-3xl font-bold"
             initial={{ scale: 0.95 }}
             animate={{ scale: 1 }}
@@ -185,16 +192,16 @@ const SignInForm = () => {
             <motion.span
               className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto]"
               animate={{
-                backgroundPosition: ["0%", "100%"]
+                backgroundPosition: ["0%", "100%"],
               }}
-              transition={{ 
+              transition={{
                 duration: 8,
                 repeat: Infinity,
                 ease: "linear",
-                repeatType: "mirror"
+                repeatType: "mirror",
               }}
             >
-              {t('lovely-mate', 'Lovely Mate')}
+              {t("lovely-mate", "Lovely Mate")}
             </motion.span>
           </motion.h2>
           <motion.div
@@ -205,25 +212,23 @@ const SignInForm = () => {
           />
         </motion.div>
 
-        <motion.div
-          className="relative h-1 w-32 mx-auto mt-4 overflow-hidden rounded-full bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20"
-        >
+        <motion.div className="relative h-1 w-32 mx-auto mt-4 overflow-hidden rounded-full bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20">
           <motion.div
             className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-primary"
             initial={{ x: "-100%" }}
-            animate={{ 
+            animate={{
               x: "100%",
               transition: {
                 repeat: Infinity,
                 duration: 2,
-                ease: "linear"
-              }
+                ease: "linear",
+              },
             }}
           />
         </motion.div>
 
         {/* Animated Welcome Text */}
-        <motion.p 
+        <motion.p
           className="text-muted-foreground mt-4 text-base relative"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -235,39 +240,37 @@ const SignInForm = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
           >
-            {t('great-to-see-you', 'Great to see you')}
-          </motion.span>
-          {" "}
+            {t("great-to-see-you", "Great to see you")}
+          </motion.span>{" "}
           <motion.span
             className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent font-medium"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.8 }}
           >
-            {t('again', 'again')}
-          </motion.span>
-          {" "}
+            {t("again", "again")}
+          </motion.span>{" "}
           <motion.span
             className="inline-block"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 1 }}
           >
-            {t('in-our-platform', 'in our platform')}
+            {t("in-our-platform", "in our platform")}
           </motion.span>
         </motion.p>
       </motion.div>
 
       {/* Social Login Options */}
-      <motion.div 
+      <motion.div
         className="mb-6 space-y-3 relative z-10"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3 }}
       >
-        <Button 
-          type="button" 
-          variant="outline" 
+        <Button
+          type="button"
+          variant="outline"
           className="w-full flex items-center h-11 transition-all group"
           onClick={handleGoogleSignIn}
         >
@@ -292,29 +295,29 @@ const SignInForm = () => {
             </svg>
           </div>
           <span className="flex-1 text-center group-hover:translate-x-1 transition-transform">
-            {t('continue-with-google', 'Continue with Google')}
+            {t("continue-with-google", "Continue with Google")}
           </span>
         </Button>
-        
-        <Button 
-          type="button" 
-          variant="outline" 
+
+        <Button
+          type="button"
+          variant="outline"
           className="w-full flex items-center h-11 transition-all group dark:text-white bg-[#06c755] dark:bg-[#06c755] text-white hover:bg-[#06c755]/90 dark:hover:bg-[#06c755]/90 border-[#06c755] dark:border-[#06c755]"
           onClick={handleLineSignIn}
         >
           <div className="w-8 flex justify-center">
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19.11 17.205c-.372 0-.754-.019-1.108-.058l-1.594-.132-.434.999c-.312.715-1.459 2.992-1.459 2.992s-1.248-2.754-1.462-3.217a2.975 2.975 0 0 1-.064-.582V7.21c0-1.645 1.353-2.999 3.007-2.999 1.653 0 2.996 1.345 2.996 2.999v6.997c0 1.644-1.343 2.998-2.997 2.998zM8.15 22.007c-2.054 0-3.729-1.666-3.729-3.719V7.208c0-2.045 1.675-3.71 3.73-3.71 2.053 0 3.729 1.665 3.729 3.71v11.08c0 2.054-1.676 3.719-3.73 3.719z"/>
+              <path d="M19.11 17.205c-.372 0-.754-.019-1.108-.058l-1.594-.132-.434.999c-.312.715-1.459 2.992-1.459 2.992s-1.248-2.754-1.462-3.217a2.975 2.975 0 0 1-.064-.582V7.21c0-1.645 1.353-2.999 3.007-2.999 1.653 0 2.996 1.345 2.996 2.999v6.997c0 1.644-1.343 2.998-2.997 2.998zM8.15 22.007c-2.054 0-3.729-1.666-3.729-3.719V7.208c0-2.045 1.675-3.71 3.73-3.71 2.053 0 3.729 1.665 3.729 3.71v11.08c0 2.054-1.676 3.719-3.73 3.719z" />
             </svg>
           </div>
           <span className="flex-1 text-center group-hover:translate-x-1 transition-transform">
-            {t('continue-with-line', 'Continue with Line')}
+            {t("continue-with-line", "Continue with Line")}
           </span>
         </Button>
-        
-        <Button 
-          type="button" 
-          variant="outline" 
+
+        <Button
+          type="button"
+          variant="outline"
           className="w-full flex items-center h-11 transition-all group dark:text-white bg-[#0078d4] dark:bg-[#0078d4] text-white hover:bg-[#0078d4]/90 dark:hover:bg-[#0078d4]/90 border-[#0078d4] dark:border-[#0078d4]"
           onClick={handleOutlookSignIn}
         >
@@ -327,56 +330,65 @@ const SignInForm = () => {
             </svg>
           </div>
           <span className="flex-1 text-center group-hover:translate-x-1 transition-transform">
-            {t('continue-with-outlook', 'Continue with Outlook')}
+            {t("continue-with-outlook", "Continue with Outlook")}
           </span>
         </Button>
       </motion.div>
 
       <div className="flex items-center gap-2 my-6 relative z-10">
         <Separator className="flex-1 bg-border/50 dark:bg-border/30" />
-        <span className="text-xs text-muted-foreground px-2">{t('or-continue-with', 'or continue with')}</span>
+        <span className="text-xs text-muted-foreground px-2">
+          {t("or-continue-with", "or continue with")}
+        </span>
         <Separator className="flex-1 bg-border/50 dark:bg-border/30" />
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 relative z-10">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-6 relative z-10"
+        >
           <FormField
             control={form.control}
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-foreground">{t('email', 'Email')}</FormLabel>
+                <FormLabel className="text-foreground">
+                  {t("email", "Email")}
+                </FormLabel>
                 <FormControl>
-                  <Input 
-                    placeholder={t('email-placeholder', 'your@email.com')} 
+                  <Input
+                    placeholder={t("email-placeholder", "your@email.com")}
                     {...field}
-                    className="bg-background/70 dark:bg-background/50 border-border/50 dark:border-border/30 focus:border-primary focus:ring-1 focus:ring-primary" 
+                    className="bg-background/70 dark:bg-background/50 border-border/50 dark:border-border/30 focus:border-primary focus:ring-1 focus:ring-primary"
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-foreground">{t('password', 'Password')}</FormLabel>
+                <FormLabel className="text-foreground">
+                  {t("password", "Password")}
+                </FormLabel>
                 <FormControl>
-                  <Input 
-                    type="password" 
-                    placeholder={t('password-placeholder', '********')} 
+                  <Input
+                    type="password"
+                    placeholder={t("password-placeholder", "********")}
                     {...field}
-                    className="bg-background/70 dark:bg-background/50 border-border/50 dark:border-border/30 focus:border-primary focus:ring-1 focus:ring-primary" 
+                    className="bg-background/70 dark:bg-background/50 border-border/50 dark:border-border/30 focus:border-primary focus:ring-1 focus:ring-primary"
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          
+
           {/* Account Type Selection - Development Testing Only */}
           <div className="border border-dashed border-yellow-300 bg-yellow-50/30 dark:bg-yellow-900/10 p-3 rounded-md relative">
             <div className="text-sm font-medium text-yellow-700 dark:text-yellow-300 mb-2 flex items-center gap-2">
@@ -442,28 +454,27 @@ const SignInForm = () => {
               )}
             />
           </div>
-          
+
           <div className="text-right">
-            <Button 
-              type="button" 
-              variant="link" 
+            <Button
+              type="button"
+              variant="link"
               className="p-0 h-auto text-xs text-primary hover:text-primary/80 dark:text-primary dark:hover:text-primary/80"
               onClick={() => setShowForgotPassword(true)}
             >
-              {t('forgot-password-question', 'Forgot password?')}
+              {t("forgot-password-question", "Forgot password?")}
             </Button>
           </div>
-          
-          <motion.div
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.99 }}
-          >
-            <Button 
-              type="submit" 
-              className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 transition-all duration-300" 
+
+          <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+            <Button
+              type="submit"
+              className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 transition-all duration-300"
               disabled={isLoading}
             >
-              {isLoading ? t('signing-in', 'Signing in...') : t('sign-in', 'Sign In')}
+              {isLoading
+                ? t("signing-in", "Signing in...")
+                : t("sign-in", "Sign In")}
             </Button>
           </motion.div>
         </form>
@@ -472,4 +483,4 @@ const SignInForm = () => {
   );
 };
 
-export default SignInForm; 
+export default SignInForm;

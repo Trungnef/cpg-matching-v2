@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/table";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 // Mock data
 const storeStats = {
@@ -135,6 +136,7 @@ interface RetailerDashboardProps {
 
 const RetailerDashboard = ({ activeTab = "overview" }: RetailerDashboardProps) => {
   const { user } = useUser();
+  const { t } = useTranslation();
   
   // Format today's date
   const today = format(new Date(), "EEEE, MMMM do, yyyy");
@@ -143,19 +145,19 @@ const RetailerDashboard = ({ activeTab = "overview" }: RetailerDashboardProps) =
   const getStatusBadge = (status: string) => {
     switch(status) {
       case "Processing":
-        return <Badge className="bg-blue-500">Processing</Badge>;
+        return <Badge className="bg-blue-500">{t('retailer-dashboard.status.processing', 'Processing')}</Badge>;
       case "Shipped":
-        return <Badge className="bg-yellow-500">Shipped</Badge>;
+        return <Badge className="bg-yellow-500">{t('retailer-dashboard.status.shipped', 'Shipped')}</Badge>;
       case "Delivered":
-        return <Badge className="bg-purple-500">Delivered</Badge>;
+        return <Badge className="bg-purple-500">{t('retailer-dashboard.status.delivered', 'Delivered')}</Badge>;
       case "Completed":
-        return <Badge className="bg-green-500">Completed</Badge>;
+        return <Badge className="bg-green-500">{t('retailer-dashboard.status.completed', 'Completed')}</Badge>;
       case "Pending Review":
-        return <Badge variant="outline">Pending Review</Badge>;
+        return <Badge variant="outline">{t('retailer-dashboard.status.pending-review', 'Pending Review')}</Badge>;
       case "Reviewing":
-        return <Badge className="bg-blue-500">Reviewing</Badge>;
+        return <Badge className="bg-blue-500">{t('retailer-dashboard.status.reviewing', 'Reviewing')}</Badge>;
       case "Negotiating":
-        return <Badge className="bg-purple-500">Negotiating</Badge>;
+        return <Badge className="bg-purple-500">{t('retailer-dashboard.status.negotiating', 'Negotiating')}</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -164,11 +166,11 @@ const RetailerDashboard = ({ activeTab = "overview" }: RetailerDashboardProps) =
   // Helper function for stock status
   const getStockStatus = (stockPercent: number) => {
     if (stockPercent < 25) {
-      return <Badge variant="outline" className="text-red-500 border-red-500">Low Stock</Badge>;
+      return <Badge variant="outline" className="text-red-500 border-red-500">{t('retailer-dashboard.stock.low', 'Low Stock')}</Badge>;
     } else if (stockPercent < 50) {
-      return <Badge variant="outline" className="text-yellow-500 border-yellow-500">Medium Stock</Badge>;
+      return <Badge variant="outline" className="text-yellow-500 border-yellow-500">{t('retailer-dashboard.stock.medium', 'Medium Stock')}</Badge>;
     } else {
-      return <Badge variant="outline" className="text-green-500 border-green-500">Good Stock</Badge>;
+      return <Badge variant="outline" className="text-green-500 border-green-500">{t('retailer-dashboard.stock.good', 'Good Stock')}</Badge>;
     }
   };
   
@@ -176,11 +178,11 @@ const RetailerDashboard = ({ activeTab = "overview" }: RetailerDashboardProps) =
   const getPriorityBadge = (priority: string) => {
     switch(priority) {
       case "High":
-        return <Badge className="bg-red-500">High</Badge>;
+        return <Badge className="bg-red-500">{t('retailer-dashboard.priority.high', 'High')}</Badge>;
       case "Medium":
-        return <Badge className="bg-yellow-500">Medium</Badge>;
+        return <Badge className="bg-yellow-500">{t('retailer-dashboard.priority.medium', 'Medium')}</Badge>;
       case "Low":
-        return <Badge className="bg-green-500">Low</Badge>;
+        return <Badge className="bg-green-500">{t('retailer-dashboard.priority.low', 'Low')}</Badge>;
       default:
         return <Badge variant="outline">{priority}</Badge>;
     }
@@ -190,11 +192,11 @@ const RetailerDashboard = ({ activeTab = "overview" }: RetailerDashboardProps) =
   const getTagBadge = (tag: string) => {
     switch(tag) {
       case "Partnership":
-        return <Badge variant="outline" className="border-purple-500 text-purple-500">Partnership</Badge>;
+        return <Badge variant="outline" className="border-purple-500 text-purple-500">{t('retailer-dashboard.tag.partnership', 'Partnership')}</Badge>;
       case "Inventory":
-        return <Badge variant="outline" className="border-blue-500 text-blue-500">Inventory</Badge>;
+        return <Badge variant="outline" className="border-blue-500 text-blue-500">{t('retailer-dashboard.tag.inventory', 'Inventory')}</Badge>;
       case "Products":
-        return <Badge variant="outline" className="border-green-500 text-green-500">Products</Badge>;
+        return <Badge variant="outline" className="border-green-500 text-green-500">{t('retailer-dashboard.tag.products', 'Products')}</Badge>;
       default:
         return <Badge variant="outline">{tag}</Badge>;
     }
@@ -216,20 +218,23 @@ const RetailerDashboard = ({ activeTab = "overview" }: RetailerDashboardProps) =
                 <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-background p-6 rounded-lg border">
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                      <h1 className="text-2xl font-bold">Welcome back, {user?.name?.split(' ')[0] || 'User'}!</h1>
+                      <h1 className="text-2xl font-bold">{t('retailer-dashboard.welcome.greeting', {name: user?.name?.split(' ')[0] || t('retailer-dashboard.welcome.user', 'User')})}</h1>
                       <p className="text-muted-foreground">{today}</p>
                       <p className="mt-2 text-sm max-w-xl">
-                        Your retail business is doing well. You have <span className="font-medium">{storeStats.lowStock} products with low stock</span> and <span className="font-medium">{partnershipRequests.length} partnership requests</span> to review.
+                        {t('retailer-dashboard.welcome.summary', {
+                          lowStock: storeStats.lowStock,
+                          requests: partnershipRequests.length
+                        })}
                       </p>
                     </div>
                     <div className="flex gap-3">
                       <Button>
                         <Store className="mr-2 h-4 w-4" />
-                        Store Management
+                        {t('retailer-dashboard.buttons.store-management', 'Store Management')}
                       </Button>
                       <Button variant="outline">
                         <BarChart3 className="mr-2 h-4 w-4" />
-                        View Analytics
+                        {t('retailer-dashboard.buttons.view-analytics', 'View Analytics')}
                       </Button>
                     </div>
                   </div>
@@ -243,8 +248,8 @@ const RetailerDashboard = ({ activeTab = "overview" }: RetailerDashboardProps) =
                     <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                       <ShoppingCart className="h-6 w-6 text-primary" />
                       </div>
-                    <CardTitle className="text-xl mb-1">New Order</CardTitle>
-                    <CardDescription>Place an order with a brand</CardDescription>
+                    <CardTitle className="text-xl mb-1">{t('retailer-dashboard.quick-actions.new-order.title', 'New Order')}</CardTitle>
+                    <CardDescription>{t('retailer-dashboard.quick-actions.new-order.description', 'Place an order with a brand')}</CardDescription>
                   </CardContent>
                 </Card>
                 
@@ -253,8 +258,8 @@ const RetailerDashboard = ({ activeTab = "overview" }: RetailerDashboardProps) =
                     <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                       <ShoppingBag className="h-6 w-6 text-primary" />
                     </div>
-                    <CardTitle className="text-xl mb-1">Product Catalog</CardTitle>
-                    <CardDescription>Browse available products</CardDescription>
+                    <CardTitle className="text-xl mb-1">{t('retailer-dashboard.quick-actions.product-catalog.title', 'Product Catalog')}</CardTitle>
+                    <CardDescription>{t('retailer-dashboard.quick-actions.product-catalog.description', 'Browse available products')}</CardDescription>
                 </CardContent>
               </Card>
               
@@ -263,8 +268,8 @@ const RetailerDashboard = ({ activeTab = "overview" }: RetailerDashboardProps) =
                     <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                       <BarChart3 className="h-6 w-6 text-primary" />
                     </div>
-                    <CardTitle className="text-xl mb-1">Analytics</CardTitle>
-                    <CardDescription>View sales performance</CardDescription>
+                    <CardTitle className="text-xl mb-1">{t('retailer-dashboard.quick-actions.analytics.title', 'Analytics')}</CardTitle>
+                    <CardDescription>{t('retailer-dashboard.quick-actions.analytics.description', 'View sales performance')}</CardDescription>
                   </CardContent>
                 </Card>
                 
@@ -273,8 +278,8 @@ const RetailerDashboard = ({ activeTab = "overview" }: RetailerDashboardProps) =
                     <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                       <Handshake className="h-6 w-6 text-primary" />
                     </div>
-                    <CardTitle className="text-xl mb-1">Partnerships</CardTitle>
-                    <CardDescription>Manage brand partnerships</CardDescription>
+                    <CardTitle className="text-xl mb-1">{t('retailer-dashboard.quick-actions.partnerships.title', 'Partnerships')}</CardTitle>
+                    <CardDescription>{t('retailer-dashboard.quick-actions.partnerships.description', 'Manage brand partnerships')}</CardDescription>
                 </CardContent>
               </Card>
             </div>
@@ -283,18 +288,21 @@ const RetailerDashboard = ({ activeTab = "overview" }: RetailerDashboardProps) =
               <div className="mb-8">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
                     <div>
-                    <h2 className="text-xl font-semibold mb-2">Retail Summary</h2>
+                    <h2 className="text-xl font-semibold mb-2">{t('retailer-dashboard.retail-summary.title', 'Retail Summary')}</h2>
                     <p className="text-muted-foreground max-w-md">
-                      You have {storeStats.lowStock} products with low stock and {partnershipRequests.length} pending partnership requests to review.
+                      {t('retailer-dashboard.retail-summary.description', {
+                        lowStock: storeStats.lowStock,
+                        requests: partnershipRequests.length
+                      })}
                     </p>
                     </div>
                   <div className="mt-4 md:mt-0 flex space-x-4">
                     <Button variant="secondary">
-                      View alerts
+                      {t('retailer-dashboard.buttons.view-alerts', 'View alerts')}
                       <AlertCircle className="ml-2 h-4 w-4" />
                     </Button>
                     <Button variant="default">
-                      Manage stores
+                      {t('retailer-dashboard.buttons.manage-stores', 'Manage stores')}
                       <Store className="ml-2 h-4 w-4" />
                     </Button>
                   </div>
@@ -303,7 +311,7 @@ const RetailerDashboard = ({ activeTab = "overview" }: RetailerDashboardProps) =
                   
               {/* Quick actions */}
               <div className="mb-8">
-                <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
+                <h2 className="text-xl font-semibold mb-4">{t('retailer-dashboard.quick-actions.title', 'Quick Actions')}</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                   {quickActions.map((action, index) => (
                     <Card key={index} className="hover:border-primary transition-colors duration-200">
@@ -311,11 +319,11 @@ const RetailerDashboard = ({ activeTab = "overview" }: RetailerDashboardProps) =
                         <div className="rounded-lg p-2 bg-muted mb-4">
                           {action.icon}
                     </div>
-                        <CardTitle className="text-lg mb-2">{action.title}</CardTitle>
-                        <p className="text-muted-foreground text-sm mb-4">{action.description}</p>
+                        <CardTitle className="text-lg mb-2">{t(`retailer-dashboard.quick-actions.items.${index}.title`, action.title)}</CardTitle>
+                        <p className="text-muted-foreground text-sm mb-4">{t(`retailer-dashboard.quick-actions.items.${index}.description`, action.description)}</p>
                         <Button variant="ghost" size="sm" className="mt-auto" asChild>
                           <a href={action.href}>
-                            Go to {action.title.split(' ')[1]}
+                            {t('retailer-dashboard.buttons.go-to', {section: action.title.split(' ')[1]})}
                             <ArrowRight className="ml-2 h-4 w-4" />
                           </a>
                         </Button>
@@ -327,12 +335,12 @@ const RetailerDashboard = ({ activeTab = "overview" }: RetailerDashboardProps) =
               
               {/* Stats with improved styling */}
               <div className="mb-8">
-                <h2 className="text-xl font-semibold mb-4">Store Performance</h2>
+                <h2 className="text-xl font-semibold mb-4">{t('retailer-dashboard.store-performance.title', 'Store Performance')}</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card>
                 <CardHeader className="pb-2">
                       <div className="flex justify-between items-center">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">Total Stores</CardTitle>
+                        <CardTitle className="text-sm font-medium text-muted-foreground">{t('retailer-dashboard.store-performance.total-stores.title', 'Total Stores')}</CardTitle>
                         <Store className="h-4 w-4 text-muted-foreground" />
                       </div>
                 </CardHeader>
@@ -341,7 +349,7 @@ const RetailerDashboard = ({ activeTab = "overview" }: RetailerDashboardProps) =
                         <div className="flex items-center mt-1 text-xs">
                           <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
                           <span className="text-green-500 font-medium">+2</span>
-                          <span className="text-muted-foreground ml-1">new locations this quarter</span>
+                          <span className="text-muted-foreground ml-1">{t('retailer-dashboard.store-performance.total-stores.description', 'new locations this quarter')}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -349,16 +357,16 @@ const RetailerDashboard = ({ activeTab = "overview" }: RetailerDashboardProps) =
                 <Card>
                   <CardHeader className="pb-2">
                         <div className="flex justify-between items-center">
-                          <CardTitle className="text-sm font-medium text-muted-foreground">Inventory Status</CardTitle>
+                          <CardTitle className="text-sm font-medium text-muted-foreground">{t('retailer-dashboard.store-performance.inventory-status.title', 'Inventory Status')}</CardTitle>
                           <Package className="h-4 w-4 text-muted-foreground" />
                         </div>
                   </CardHeader>
                   <CardContent>
-                        <div className="text-2xl font-bold">{storeStats.totalProducts} SKUs</div>
+                        <div className="text-2xl font-bold">{storeStats.totalProducts} {t('retailer-dashboard.store-performance.inventory-status.skus', 'SKUs')}</div>
                         <div className="flex items-center mt-1 text-xs">
                           <span className="text-muted-foreground">
-                            <span className="text-red-500 font-medium">{storeStats.lowStock}</span> low stock, 
-                            <span className="text-red-500 font-medium ml-1">{storeStats.outOfStock}</span> out of stock
+                            <span className="text-red-500 font-medium">{storeStats.lowStock}</span> {t('retailer-dashboard.store-performance.inventory-status.low-stock', 'low stock')}, 
+                            <span className="text-red-500 font-medium ml-1">{storeStats.outOfStock}</span> {t('retailer-dashboard.store-performance.inventory-status.out-of-stock', 'out of stock')}
                           </span>
                     </div>
                   </CardContent>
@@ -367,7 +375,7 @@ const RetailerDashboard = ({ activeTab = "overview" }: RetailerDashboardProps) =
                 <Card>
                   <CardHeader className="pb-2">
                         <div className="flex justify-between items-center">
-                          <CardTitle className="text-sm font-medium text-muted-foreground">Monthly Sales</CardTitle>
+                          <CardTitle className="text-sm font-medium text-muted-foreground">{t('retailer-dashboard.store-performance.monthly-sales.title', 'Monthly Sales')}</CardTitle>
                           <ShoppingCart className="h-4 w-4 text-muted-foreground" />
                 </div>
                   </CardHeader>
@@ -376,7 +384,7 @@ const RetailerDashboard = ({ activeTab = "overview" }: RetailerDashboardProps) =
                         <div className="flex items-center mt-1 text-xs">
                           <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
                           <span className="text-green-500 font-medium">+{storeStats.salesGrowth}%</span>
-                          <span className="text-muted-foreground ml-1">from last month</span>
+                          <span className="text-muted-foreground ml-1">{t('retailer-dashboard.store-performance.monthly-sales.description', 'from last month')}</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -384,7 +392,7 @@ const RetailerDashboard = ({ activeTab = "overview" }: RetailerDashboardProps) =
                 <Card>
                   <CardHeader className="pb-2">
                         <div className="flex justify-between items-center">
-                          <CardTitle className="text-sm font-medium text-muted-foreground">Active Partnerships</CardTitle>
+                          <CardTitle className="text-sm font-medium text-muted-foreground">{t('retailer-dashboard.store-performance.active-partnerships.title', 'Active Partnerships')}</CardTitle>
                           <ShoppingBag className="h-4 w-4 text-muted-foreground" />
                 </div>
                   </CardHeader>
@@ -392,8 +400,8 @@ const RetailerDashboard = ({ activeTab = "overview" }: RetailerDashboardProps) =
                           <div className="text-2xl font-bold">42</div>
                           <div className="flex items-center mt-1 text-xs">
                             <span className="text-muted-foreground">
-                              <span className="text-blue-500 font-medium">28</span> brands, 
-                              <span className="text-purple-500 font-medium ml-1">14</span> manufacturers
+                              <span className="text-blue-500 font-medium">28</span> {t('retailer-dashboard.store-performance.active-partnerships.brands', 'brands')}, 
+                              <span className="text-purple-500 font-medium ml-1">14</span> {t('retailer-dashboard.store-performance.active-partnerships.manufacturers', 'manufacturers')}
                             </span>
                   </div>
                 </CardContent>

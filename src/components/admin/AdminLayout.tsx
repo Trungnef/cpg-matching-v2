@@ -16,7 +16,9 @@ import {
   PanelLeft,
   UserCog,
   HelpCircle,
-  ChevronLeft
+  ChevronLeft,
+  Search,
+  ShoppingBag
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -73,7 +75,8 @@ const AdminLayout = () => {
   const navigation = [
     { name: 'Dashboard', path: '/admin/dashboard', icon: <Layers className="h-5 w-5" /> },
     { name: 'User Management', path: '/admin/users', icon: <Users className="h-5 w-5" /> },
-    // { name: 'Announcements', path: '/admin/announcements', icon: <Bell className="h-5 w-5" /> },
+    { name: 'AI Crawler', path: '/admin/crawler/webcrawler', icon: <Search className="h-5 w-5" /> },
+    { name: 'Product Catalog', path: '/admin/catalog/productcatalog', icon: <ShoppingBag className="h-5 w-5" /> },
     { name: 'Activity Log', path: '/admin/activity', icon: <Activity className="h-5 w-5" /> },
     { name: 'Analytics', path: '/admin/analytics', icon: <BarChart3 className="h-5 w-5" /> },
     // { name: 'System Settings', path: '/admin/settings', icon: <Settings className="h-5 w-5" /> },

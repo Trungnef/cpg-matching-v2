@@ -1,15 +1,41 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Users, Building, Search, Filter, MessageSquare, Star, 
-  Clock, Calendar, Check, X, ChevronRight, RefreshCw, Share2,
-  Info, BellRing, Bell, Sparkles, GridIcon, ListFilter, ArrowUpDown,
-  Send, Loader2
+import {
+  Users,
+  Building,
+  Search,
+  Filter,
+  MessageSquare,
+  Star,
+  Clock,
+  Calendar,
+  Check,
+  X,
+  ChevronRight,
+  RefreshCw,
+  Share2,
+  Info,
+  BellRing,
+  Bell,
+  Sparkles,
+  GridIcon,
+  ListFilter,
+  ArrowUpDown,
+  Send,
+  Loader2,
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -63,25 +89,111 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectTrigger, SelectValue, SelectItem, SelectContent } from "@/components/ui/select";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectItem,
+  SelectContent,
+} from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
+import { StatusBadge, StatusType } from "@/components/ui/status-badge";
 
 // Helper functions for match styling
 const getStatusBadge = (status: string) => {
-  switch (status) {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+  
+  switch (status.toLowerCase()) {
     case "pending":
-      return <Badge variant="outline" className="bg-yellow-100 text-yellow-600 border-yellow-300 dark:bg-yellow-900/40 dark:text-yellow-300 dark:border-yellow-700/70 shadow-sm font-medium transition-all duration-300">Pending</Badge>;
+      return (
+        <Badge 
+          className={`transition-colors ${
+            isDark 
+              ? "bg-amber-700/70 text-amber-100 border border-amber-600/50 shadow-sm hover:bg-amber-700" 
+              : "bg-amber-200 text-amber-700 border border-amber-300 shadow-sm hover:bg-amber-300"
+          }`}
+        >
+          {status}
+        </Badge>
+      );
     case "accepted":
-      return <Badge variant="outline" className="bg-green-100 text-green-600 border-green-300 dark:bg-green-900/40 dark:text-green-300 dark:border-green-700/70 shadow-sm font-medium transition-all duration-300">Accepted</Badge>;
+      return (
+        <Badge 
+          className={`transition-colors ${
+            isDark 
+              ? "bg-emerald-700/70 text-emerald-100 border border-emerald-600/50 shadow-sm hover:bg-emerald-700" 
+              : "bg-emerald-200 text-emerald-700 border border-emerald-300 shadow-sm hover:bg-emerald-300"
+          }`}
+        >
+          {status}
+        </Badge>
+      );
     case "declined":
-      return <Badge variant="outline" className="bg-red-100 text-red-600 border-red-300 dark:bg-red-900/40 dark:text-red-300 dark:border-red-700/70 shadow-sm font-medium transition-all duration-300">Declined</Badge>;
+      return (
+        <Badge 
+          className={`transition-colors ${
+            isDark 
+              ? "bg-rose-700/70 text-rose-100 border border-rose-600/50 shadow-sm hover:bg-rose-700" 
+              : "bg-rose-200 text-rose-700 border border-rose-300 shadow-sm hover:bg-rose-300"
+          }`}
+        >
+          {status}
+        </Badge>
+      );
+    case "contract negotiation":
+      return (
+        <Badge 
+          className={`transition-colors ${
+            isDark 
+              ? "bg-blue-700/70 text-blue-100 border border-blue-600/50 shadow-sm hover:bg-blue-700" 
+              : "bg-blue-200 text-blue-700 border border-blue-300 shadow-sm hover:bg-blue-300"
+          }`}
+        >
+          {status}
+        </Badge>
+      );
+    case "sample production":
+      return (
+        <Badge 
+          className={`transition-colors ${
+            isDark 
+              ? "bg-indigo-700/70 text-indigo-100 border border-indigo-600/50 shadow-sm hover:bg-indigo-700" 
+              : "bg-indigo-200 text-indigo-700 border border-indigo-300 shadow-sm hover:bg-indigo-300"
+          }`}
+        >
+          {status}
+        </Badge>
+      );
+    case "active production":
+      return (
+        <Badge 
+          className={`transition-colors ${
+            isDark 
+              ? "bg-purple-700/70 text-purple-100 border border-purple-600/50 shadow-sm hover:bg-purple-700" 
+              : "bg-purple-200 text-purple-700 border border-purple-300 shadow-sm hover:bg-purple-300"
+          }`}
+        >
+          {status}
+        </Badge>
+      );
     default:
-      return <Badge variant="outline" className="shadow-sm font-medium transition-all duration-300">Unknown</Badge>;
+      return (
+        <Badge 
+          className={`transition-colors ${
+            isDark 
+              ? "bg-slate-700/70 text-slate-100 border border-slate-600/50 shadow-sm hover:bg-slate-700" 
+              : "bg-slate-200 text-slate-700 border border-slate-300 shadow-sm hover:bg-slate-300"
+          }`}
+        >
+          {status}
+        </Badge>
+      );
   }
 };
 
-// Get color for match score
+// Get color for match score - updated for better theme compatibility
 const getMatchScoreColor = (score: number) => {
   if (score >= 90) return "text-green-600 dark:text-green-400 font-medium";
   if (score >= 80) return "text-green-600 dark:text-green-500 font-medium";
@@ -89,12 +201,57 @@ const getMatchScoreColor = (score: number) => {
   return "text-yellow-600 dark:text-yellow-500 font-medium";
 };
 
-// Get background color for progress bar
+// Get background color for progress bar - updated for better theme compatibility
 const getProgressColor = (score: number) => {
   if (score >= 90) return "bg-green-500 dark:bg-green-400";
   if (score >= 80) return "bg-green-500 dark:bg-green-500";
   if (score >= 70) return "bg-yellow-500 dark:bg-yellow-400";
   return "bg-yellow-500 dark:bg-yellow-500";
+};
+
+// Helper function for category badges
+const getCategoryBadge = (category: string, isDark: boolean) => {
+  let colorClasses = "";
+  
+  // Chọn màu dựa trên loại category và theme
+  switch (category) {
+    case "Cereals":
+      colorClasses = isDark 
+        ? "bg-amber-900/30 text-amber-300 border-amber-800/60" 
+        : "bg-amber-50 text-amber-700 border-amber-200";
+      break;
+    case "Protein Supplements":
+      colorClasses = isDark 
+        ? "bg-blue-900/30 text-blue-300 border-blue-800/60" 
+        : "bg-blue-50 text-blue-700 border-blue-200";
+      break;
+    case "Beverages":
+      colorClasses = isDark 
+        ? "bg-cyan-900/30 text-cyan-300 border-cyan-800/60" 
+        : "bg-cyan-50 text-cyan-700 border-cyan-200";
+      break;
+    case "Snack Bars":
+      colorClasses = isDark 
+        ? "bg-orange-900/30 text-orange-300 border-orange-800/60" 
+        : "bg-orange-50 text-orange-700 border-orange-200";
+      break;
+    default:
+      colorClasses = isDark 
+        ? "bg-primary/20 text-primary-foreground/90 border-primary/30" 
+        : "bg-primary/10 text-primary/90 border-primary/20";
+  }
+
+  return (
+    <Badge
+      variant="outline"
+      className={cn(
+        "transition-colors font-medium text-xs py-1",
+        colorClasses
+      )}
+    >
+      {category}
+    </Badge>
+  );
 };
 
 // Mock matches data
@@ -109,7 +266,7 @@ const potentialMatches = [
     matchScore: 92,
     location: "San Francisco, CA",
     size: "Medium",
-    status: "New"
+    status: "New",
   },
   {
     id: 2,
@@ -121,7 +278,7 @@ const potentialMatches = [
     matchScore: 88,
     location: "Denver, CO",
     size: "Large",
-    status: "New"
+    status: "New",
   },
   {
     id: 3,
@@ -133,7 +290,7 @@ const potentialMatches = [
     matchScore: 85,
     location: "Portland, OR",
     size: "Small",
-    status: "Reviewed"
+    status: "Reviewed",
   },
   {
     id: 4,
@@ -145,8 +302,8 @@ const potentialMatches = [
     matchScore: 79,
     location: "Austin, TX",
     size: "Medium",
-    status: "Reviewed"
-  }
+    status: "Reviewed",
+  },
 ];
 
 const activeMatches = [
@@ -158,7 +315,7 @@ const activeMatches = [
     product: "Organic Cereal",
     status: "Contract Negotiation",
     lastActivity: "2 days ago",
-    nextMeeting: "2023-10-05"
+    nextMeeting: "2023-10-05",
   },
   {
     id: 102,
@@ -168,7 +325,7 @@ const activeMatches = [
     product: "Energy Bars",
     status: "Sample Production",
     lastActivity: "5 days ago",
-    nextMeeting: "2023-10-12"
+    nextMeeting: "2023-10-12",
   },
   {
     id: 103,
@@ -178,8 +335,8 @@ const activeMatches = [
     product: "Organic Juice",
     status: "Active Production",
     lastActivity: "1 day ago",
-    nextMeeting: "2023-10-08"
-  }
+    nextMeeting: "2023-10-08",
+  },
 ];
 
 // Define role tabs
@@ -193,66 +350,73 @@ const roleTabs = [
   { id: "analytics", label: "Analytics", path: "/manufacturer/analytics" },
   { id: "suppliers", label: "Suppliers", path: "/manufacturer/suppliers" },
   { id: "matches", label: "Matches", path: "/manufacturer/matches" },
-  { id: "settings", label: "Settings", path: "/manufacturer/settings" }
+  { id: "settings", label: "Settings", path: "/manufacturer/settings" },
 ];
 
-  // Mock data for matches
-  const matchesData = [
-    {
-      id: 1,
-      companyName: "Organic Valley Foods",
-      matchScore: 95,
-      productCategory: "Cereals",
-      location: "Portland, OR",
-      status: "pending",
-      logoUrl: "https://placehold.co/100",
-      description: "A premium organic food brand looking for manufacturing partners for their new line of organic cereals."
-    },
-    {
-      id: 2,
-      companyName: "NutriBoost",
-      matchScore: 88,
-      productCategory: "Protein Supplements",
-      location: "Austin, TX",
-      status: "accepted",
-      logoUrl: "https://placehold.co/100",
-      description: "Leading protein supplement brand seeking manufacturing capabilities for plant-based protein powders."
-    },
-    {
-      id: 3,
-      companyName: "Green Earth Beverages",
-      matchScore: 92,
-      productCategory: "Beverages",
-      location: "Seattle, WA",
-      status: "declined",
-      logoUrl: "https://placehold.co/100",
-      description: "Eco-friendly beverage company looking for sustainable manufacturing practices for their new line of plant-based drinks."
-    },
-    {
-      id: 4,
-      companyName: "Snack Haven",
-      matchScore: 85,
-      productCategory: "Snack Bars",
-      location: "Chicago, IL",
-      status: "pending",
-      logoUrl: "https://placehold.co/100",
-      description: "Innovative snack company looking to partner with manufacturers for their healthy snack bar product line."
-    },
-    {
-      id: 5,
-      companyName: "Fresh Start Foods",
-      matchScore: 79,
-      productCategory: "Cereals",
-      location: "Denver, CO",
-      status: "pending",
-      logoUrl: "https://placehold.co/100",
-      description: "Health-focused food brand seeking manufacturing partners for breakfast products and ready-to-eat meals."
-    }
-  ];
+// Mock data for matches
+const matchesData = [
+  {
+    id: 1,
+    companyName: "Organic Valley Foods",
+    matchScore: 95,
+    productCategory: "Cereals",
+    location: "Portland, OR",
+    status: "pending",
+    logoUrl: "https://placehold.co/100",
+    description:
+      "A premium organic food brand looking for manufacturing partners for their new line of organic cereals.",
+  },
+  {
+    id: 2,
+    companyName: "NutriBoost",
+    matchScore: 88,
+    productCategory: "Protein Supplements",
+    location: "Austin, TX",
+    status: "accepted",
+    logoUrl: "https://placehold.co/100",
+    description:
+      "Leading protein supplement brand seeking manufacturing capabilities for plant-based protein powders.",
+  },
+  {
+    id: 3,
+    companyName: "Green Earth Beverages",
+    matchScore: 92,
+    productCategory: "Beverages",
+    location: "Seattle, WA",
+    status: "declined",
+    logoUrl: "https://placehold.co/100",
+    description:
+      "Eco-friendly beverage company looking for sustainable manufacturing practices for their new line of plant-based drinks.",
+  },
+  {
+    id: 4,
+    companyName: "Snack Haven",
+    matchScore: 85,
+    productCategory: "Snack Bars",
+    location: "Chicago, IL",
+    status: "pending",
+    logoUrl: "https://placehold.co/100",
+    description:
+      "Innovative snack company looking to partner with manufacturers for their healthy snack bar product line.",
+  },
+  {
+    id: 5,
+    companyName: "Fresh Start Foods",
+    matchScore: 79,
+    productCategory: "Cereals",
+    location: "Denver, CO",
+    status: "pending",
+    logoUrl: "https://placehold.co/100",
+    description:
+      "Health-focused food brand seeking manufacturing partners for breakfast products and ready-to-eat meals.",
+  },
+];
 
 const Matches = () => {
   const { isAuthenticated, user, role } = useUser();
   const navigate = useNavigate();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [activeTab, setActiveTab] = useState("matches");
   const [activeStatus, setActiveStatus] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -276,9 +440,9 @@ const Matches = () => {
     time: "",
     duration: "30 minutes",
     type: "Initial Meeting",
-    notes: ""
+    notes: "",
   });
-  
+
   // Advanced filters state
   const [filters, setFilters] = useState({
     minMatchScore: 70,
@@ -287,32 +451,38 @@ const Matches = () => {
     showVerifiedOnly: false,
     availability: "all", // all, immediate, future
   });
-  
+
   // Stats for the overview banner
-  const matchStats = useMemo(() => ({
-    totalMatches: matchesData.length,
-    pending: matchesData.filter(m => m.status === "pending").length,
-    accepted: matchesData.filter(m => m.status === "accepted").length,
-    declined: matchesData.filter(m => m.status === "declined").length,
-    highMatches: matchesData.filter(m => m.matchScore >= 90).length,
-    averageScore: Math.round(matchesData.reduce((acc, curr) => acc + curr.matchScore, 0) / matchesData.length),
-  }), [matchesData]);
-  
+  const matchStats = useMemo(
+    () => ({
+      totalMatches: matchesData.length,
+      pending: matchesData.filter((m) => m.status === "pending").length,
+      accepted: matchesData.filter((m) => m.status === "accepted").length,
+      declined: matchesData.filter((m) => m.status === "declined").length,
+      highMatches: matchesData.filter((m) => m.matchScore >= 90).length,
+      averageScore: Math.round(
+        matchesData.reduce((acc, curr) => acc + curr.matchScore, 0) /
+          matchesData.length
+      ),
+    }),
+    [matchesData]
+  );
+
   useEffect(() => {
     document.title = "Matches - CPG Matchmaker";
-    
+
     // If not authenticated or not a manufacturer, redirect
     if (!isAuthenticated) {
       navigate("/auth?type=signin");
     } else if (role !== "manufacturer") {
       navigate("/dashboard");
     }
-    
+
     // Simulate loading
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 800);
-    
+
     return () => clearTimeout(timer);
   }, [isAuthenticated, navigate, role]);
 
@@ -323,61 +493,71 @@ const Matches = () => {
   // Handle tab changes, including navigation to other pages
   const handleTabChange = (value: string) => {
     setActiveTab(value);
-    
+
     // Find the selected tab and navigate to its path
-    const selectedTab = roleTabs.find(tab => tab.id === value);
+    const selectedTab = roleTabs.find((tab) => tab.id === value);
     if (selectedTab?.path) {
       navigate(selectedTab.path);
     }
   };
 
   // Get unique product categories for filter
-  const productCategories = ["all", ...Array.from(new Set(matchesData.map(match => match.productCategory)))];
+  const productCategories = [
+    "all",
+    ...Array.from(new Set(matchesData.map((match) => match.productCategory))),
+  ];
 
   // Apply filters and sorting
   const filteredAndSortedMatches = useMemo(() => {
     let filtered = matchesData;
-    
+
     // Filter by status
     if (activeStatus !== "all") {
-      filtered = filtered.filter(match => match.status === activeStatus);
+      filtered = filtered.filter((match) => match.status === activeStatus);
     }
-    
+
     // Filter by search query
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(match => 
-        match.companyName.toLowerCase().includes(query) || 
-        match.description.toLowerCase().includes(query) ||
-        match.location.toLowerCase().includes(query) ||
-        match.productCategory.toLowerCase().includes(query)
+      filtered = filtered.filter(
+        (match) =>
+          match.companyName.toLowerCase().includes(query) ||
+          match.description.toLowerCase().includes(query) ||
+          match.location.toLowerCase().includes(query) ||
+          match.productCategory.toLowerCase().includes(query)
       );
     }
-    
+
     // Filter by category
     if (selectedCategory !== "all") {
-      filtered = filtered.filter(match => match.productCategory === selectedCategory);
+      filtered = filtered.filter(
+        (match) => match.productCategory === selectedCategory
+      );
     }
-    
+
     // Apply advanced filters
     if (filters.minMatchScore > 70) {
-      filtered = filtered.filter(match => match.matchScore >= filters.minMatchScore);
+      filtered = filtered.filter(
+        (match) => match.matchScore >= filters.minMatchScore
+      );
     }
-    
+
     if (filters.categories.length > 0) {
-      filtered = filtered.filter(match => filters.categories.includes(match.productCategory));
+      filtered = filtered.filter((match) =>
+        filters.categories.includes(match.productCategory)
+      );
     }
-    
+
     if (filters.showVerifiedOnly) {
       // For demo purposes, consider matches with score > 85 as "verified"
-      filtered = filtered.filter(match => match.matchScore > 85);
+      filtered = filtered.filter((match) => match.matchScore > 85);
     }
-    
+
     // Sort matches
     return [...filtered].sort((a, b) => {
       if (sortBy === "matchScore") {
-        return sortDirection === "desc" 
-          ? b.matchScore - a.matchScore 
+        return sortDirection === "desc"
+          ? b.matchScore - a.matchScore
           : a.matchScore - b.matchScore;
       } else if (sortBy === "name") {
         return sortDirection === "desc"
@@ -390,7 +570,15 @@ const Matches = () => {
       }
       return 0;
     });
-  }, [matchesData, activeStatus, searchQuery, sortBy, sortDirection, selectedCategory, filters]);
+  }, [
+    matchesData,
+    activeStatus,
+    searchQuery,
+    sortBy,
+    sortDirection,
+    selectedCategory,
+    filters,
+  ]);
 
   // Handle sort change
   const handleSortChange = (field: string) => {
@@ -410,32 +598,32 @@ const Matches = () => {
 
   // Animation variants for the stats banner - optimized for smoother transitions
   const statsVariants = {
-    hidden: { 
-      opacity: 0, 
-      height: 0, 
+    hidden: {
+      opacity: 0,
+      height: 0,
       marginBottom: 0,
       transition: {
         opacity: { duration: 0.15 }, // Reduced from 0.2
-        height: { duration: 0.2, delay: 0.05 } // Reduced from 0.3, 0.1
-      }
+        height: { duration: 0.2, delay: 0.05 }, // Reduced from 0.3, 0.1
+      },
     },
-    visible: { 
-      opacity: 1, 
-      height: 'auto', 
-      marginBottom: '1.5rem',
-      transition: { 
+    visible: {
+      opacity: 1,
+      height: "auto",
+      marginBottom: "1.5rem",
+      transition: {
         opacity: { duration: 0.2 }, // Reduced from 0.3
-        height: { duration: 0.3, type: "spring", stiffness: 200, damping: 15 } // Increased stiffness, reduced damping
-      } 
-    }
+        height: { duration: 0.3, type: "spring", stiffness: 200, damping: 15 }, // Increased stiffness, reduced damping
+      },
+    },
   };
-  
+
   // View match details handler
   const viewMatchDetails = (match: any) => {
     setSelectedMatch(match);
     setShowMatchDetails(true);
   };
-  
+
   // Search handler
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -443,7 +631,7 @@ const Matches = () => {
       setSearchQuery(searchInputRef.current.value);
     }
   };
-  
+
   // Reset all filters
   const resetFilters = () => {
     setSelectedCategory("all");
@@ -461,7 +649,7 @@ const Matches = () => {
       availability: "all",
     });
   };
-  
+
   // Handle match refresh - simulated API call
   const refreshMatches = () => {
     setIsLoading(true);
@@ -471,7 +659,7 @@ const Matches = () => {
       // Show a notification or toast here
       const updatedMatches = [...matchesData];
       // Simulate getting new match with high score
-      if (!updatedMatches.some(m => m.id === 6)) {
+      if (!updatedMatches.some((m) => m.id === 6)) {
         const newMatch = {
           id: 6,
           companyName: "Healthy Essentials",
@@ -480,10 +668,11 @@ const Matches = () => {
           location: "Boston, MA",
           status: "pending",
           logoUrl: "https://placehold.co/100",
-          description: "Fast-growing supplements brand looking for manufacturing partners with organic certifications."
+          description:
+            "Fast-growing supplements brand looking for manufacturing partners with organic certifications.",
         };
         // For demonstration purposes, just update notifications
-        setNotifications(prev => prev + 1);
+        setNotifications((prev) => prev + 1);
       }
     }, 1200);
   };
@@ -500,14 +689,18 @@ const Matches = () => {
       status: match.status,
       description: match.description,
       timestamp: new Date().toISOString(),
-      exportDate: new Date().toLocaleDateString()
+      exportDate: new Date().toLocaleDateString(),
     };
-    
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
+      type: "application/json",
+    });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = `match-details-${match.companyName.toLowerCase().replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `match-details-${match.companyName
+      .toLowerCase()
+      .replace(/\s+/g, "-")}-${new Date().toISOString().split("T")[0]}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -536,14 +729,17 @@ const Matches = () => {
     setIsLoading(true);
     // Simulate API call
     setTimeout(() => {
-      console.log(`Scheduling meeting with ${match.companyName}:`, scheduleData);
+      console.log(
+        `Scheduling meeting with ${match.companyName}:`,
+        scheduleData
+      );
       setShowScheduleDialog(false);
       setScheduleData({
         date: "",
         time: "",
         duration: "30 minutes",
         type: "Initial Meeting",
-        notes: ""
+        notes: "",
       });
       setIsLoading(false);
       toast({
@@ -571,34 +767,36 @@ const Matches = () => {
 
   return (
     <ManufacturerLayout>
-      <motion.div 
+      <motion.div
         className="max-w-none px-4 sm:px-6 lg:px-8 pb-6"
         initial={{ opacity: 0, y: 10 }} // Reduced y from 20 to 10
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }} // Reduced from 0.5
       >
         <div className="space-y-6">
-          <motion.div 
+          <motion.div
             className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.2 }} // Reduced from delay: 0.2 to duration: 0.2 for immediate start
           >
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-primary/90 to-primary/70 bg-clip-text text-transparent">
-                Brand Matches
-              </h1>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-primary/90 to-primary/70 bg-clip-text text-transparent">
+                  Brand Matches
+                </h1>
+              </div>
+              <p className="text-muted-foreground mt-1">
+                Discover and manage potential manufacturing partnerships
+              </p>
             </div>
-              <p className="text-muted-foreground mt-1">Discover and manage potential manufacturing partnerships</p>
-          </div>
-            
+
             <div className="flex flex-wrap gap-2 items-center">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="icon"
                       onClick={() => setShowStats(!showStats)}
                       className={showStats ? "bg-muted" : ""}
@@ -611,14 +809,16 @@ const Matches = () => {
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-              
+
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="icon"
-                      onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
+                      onClick={() =>
+                        setViewMode(viewMode === "grid" ? "list" : "grid")
+                      }
                     >
                       {viewMode === "grid" ? (
                         <GridIcon className="h-4 w-4" />
@@ -632,17 +832,19 @@ const Matches = () => {
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-              
+
               <Sheet open={showFilterSheet} onOpenChange={setShowFilterSheet}>
                 <SheetTrigger asChild>
                   <Button variant="outline" size="sm" className="gap-1">
                     <Filter className="h-4 w-4" />
                     <span>Filters</span>
-                    {(selectedCategory !== "all" || filters.minMatchScore > 70 || filters.showVerifiedOnly) && (
+                    {(selectedCategory !== "all" ||
+                      filters.minMatchScore > 70 ||
+                      filters.showVerifiedOnly) && (
                       <Badge className="ml-1 h-5 px-1.5" variant="secondary">
-                        {(selectedCategory !== "all" ? 1 : 0) + 
-                         (filters.minMatchScore > 70 ? 1 : 0) + 
-                         (filters.showVerifiedOnly ? 1 : 0)}
+                        {(selectedCategory !== "all" ? 1 : 0) +
+                          (filters.minMatchScore > 70 ? 1 : 0) +
+                          (filters.showVerifiedOnly ? 1 : 0)}
                       </Badge>
                     )}
                   </Button>
@@ -650,52 +852,70 @@ const Matches = () => {
                 <SheetContent className="w-full lg:w-2/3 xl:w-1/2 p-0">
                   <div className="h-full overflow-y-auto">
                     <SheetHeader className="pb-6">
-                      <SheetTitle className="text-xl">Filter Matches</SheetTitle>
+                      <SheetTitle className="text-xl">
+                        Filter Matches
+                      </SheetTitle>
                       <SheetDescription className="text-muted-foreground">
                         Apply filters to find the perfect manufacturing partners
                       </SheetDescription>
                     </SheetHeader>
                     <div className="py-4 space-y-6">
                       <div className="space-y-2">
-                        <h3 className="text-sm font-medium">Product Categories</h3>
+                        <h3 className="text-sm font-medium">
+                          Product Categories
+                        </h3>
                         <div className="grid grid-cols-2 gap-2">
-                          {productCategories.map((category) => (
-                            category !== "all" && (
-                              <div key={category} className="flex items-center space-x-2">
-                                <Checkbox 
-                                  id={`category-${category}`} 
-                                  checked={selectedCategory === category || filters.categories.includes(category)}
-                                  onCheckedChange={(checked) => {
-                                    if (checked) {
-                                      setFilters({
-                                        ...filters,
-                                        categories: [...filters.categories, category]
-                                      });
-                                    } else {
-                                      setFilters({
-                                        ...filters,
-                                        categories: filters.categories.filter(c => c !== category)
-                                      });
-                                    }
-                                  }}
-                                />
-                                <label
-                                  htmlFor={`category-${category}`}
-                                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          {productCategories.map(
+                            (category) =>
+                              category !== "all" && (
+                                <div
+                                  key={category}
+                                  className="flex items-center space-x-2"
                                 >
-                                  {category}
-                                </label>
-                              </div>
-                            )
-                          ))}
-            </div>
-          </div>
-                    
+                                  <Checkbox
+                                    id={`category-${category}`}
+                                    checked={
+                                      selectedCategory === category ||
+                                      filters.categories.includes(category)
+                                    }
+                                    onCheckedChange={(checked) => {
+                                      if (checked) {
+                                        setFilters({
+                                          ...filters,
+                                          categories: [
+                                            ...filters.categories,
+                                            category,
+                                          ],
+                                        });
+                                      } else {
+                                        setFilters({
+                                          ...filters,
+                                          categories: filters.categories.filter(
+                                            (c) => c !== category
+                                          ),
+                                        });
+                                      }
+                                    }}
+                                  />
+                                  <label
+                                    htmlFor={`category-${category}`}
+                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                  >
+                                    {category}
+                                  </label>
+                                </div>
+                              )
+                          )}
+                        </div>
+                      </div>
+
                       <div className="space-y-2">
                         <h3 className="text-sm font-medium">Match Score</h3>
                         <div className="space-y-4">
                           <div className="flex items-center justify-between">
-                            <span className="text-sm">Minimum score: {filters.minMatchScore}%</span>
+                            <span className="text-sm">
+                              Minimum score: {filters.minMatchScore}%
+                            </span>
                           </div>
                           <Slider
                             defaultValue={[filters.minMatchScore]}
@@ -705,27 +925,32 @@ const Matches = () => {
                             onValueChange={(value) => {
                               setFilters({
                                 ...filters,
-                                minMatchScore: value[0]
+                                minMatchScore: value[0],
                               });
                             }}
                           />
                         </div>
                       </div>
-                      
+
                       <div className="space-y-2">
-                        <h3 className="text-sm font-medium">Additional Options</h3>
+                        <h3 className="text-sm font-medium">
+                          Additional Options
+                        </h3>
                         <div className="space-y-3">
                           <div className="flex items-center justify-between">
-                            <Label htmlFor="verified-only" className="cursor-pointer">
+                            <Label
+                              htmlFor="verified-only"
+                              className="cursor-pointer"
+                            >
                               Verified companies only
                             </Label>
-                            <Switch 
-                              id="verified-only" 
+                            <Switch
+                              id="verified-only"
                               checked={filters.showVerifiedOnly}
                               onCheckedChange={(checked) => {
                                 setFilters({
                                   ...filters,
-                                  showVerifiedOnly: checked
+                                  showVerifiedOnly: checked,
                                 });
                               }}
                             />
@@ -733,24 +958,51 @@ const Matches = () => {
                           <div>
                             <h4 className="text-sm mb-2">Availability</h4>
                             <div className="grid grid-cols-3 gap-2">
-                              <Button 
-                                variant={filters.availability === "all" ? "default" : "outline"} 
+                              <Button
+                                variant={
+                                  filters.availability === "all"
+                                    ? "default"
+                                    : "outline"
+                                }
                                 size="sm"
-                                onClick={() => setFilters({...filters, availability: "all"})}
+                                onClick={() =>
+                                  setFilters({
+                                    ...filters,
+                                    availability: "all",
+                                  })
+                                }
                               >
                                 All
                               </Button>
-                              <Button 
-                                variant={filters.availability === "immediate" ? "default" : "outline"} 
+                              <Button
+                                variant={
+                                  filters.availability === "immediate"
+                                    ? "default"
+                                    : "outline"
+                                }
                                 size="sm"
-                                onClick={() => setFilters({...filters, availability: "immediate"})}
+                                onClick={() =>
+                                  setFilters({
+                                    ...filters,
+                                    availability: "immediate",
+                                  })
+                                }
                               >
                                 Immediate
                               </Button>
-                              <Button 
-                                variant={filters.availability === "future" ? "default" : "outline"} 
+                              <Button
+                                variant={
+                                  filters.availability === "future"
+                                    ? "default"
+                                    : "outline"
+                                }
                                 size="sm"
-                                onClick={() => setFilters({...filters, availability: "future"})}
+                                onClick={() =>
+                                  setFilters({
+                                    ...filters,
+                                    availability: "future",
+                                  })
+                                }
                               >
                                 Future
                               </Button>
@@ -760,7 +1012,9 @@ const Matches = () => {
                       </div>
                     </div>
                     <SheetFooter className="flex-row justify-between gap-3 sm:justify-between">
-                      <Button variant="outline" onClick={resetFilters}>Reset All</Button>
+                      <Button variant="outline" onClick={resetFilters}>
+                        Reset All
+                      </Button>
                       <SheetClose asChild>
                         <Button>Apply Filters</Button>
                       </SheetClose>
@@ -768,7 +1022,7 @@ const Matches = () => {
                   </div>
                 </SheetContent>
               </Sheet>
-              
+
               <form onSubmit={handleSearch} className="relative">
                 <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -779,7 +1033,7 @@ const Matches = () => {
                   type="search"
                 />
               </form>
-              
+
               <Dialog>
                 <DialogTrigger asChild>
                   <Button className="flex-nowrap gap-1 hover:shadow-md transition-all duration-300 hover:translate-y-[-1px]">
@@ -791,31 +1045,54 @@ const Matches = () => {
                   <DialogHeader>
                     <DialogTitle>Find New Brand Matches</DialogTitle>
                     <DialogDescription>
-                      Optimize your profile to find the best manufacturing partnerships
+                      Optimize your profile to find the best manufacturing
+                      partnerships
                     </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
                     <div className="space-y-2">
-                      <h3 className="text-sm font-medium">Matching Priorities</h3>
+                      <h3 className="text-sm font-medium">
+                        Matching Priorities
+                      </h3>
                       <p className="text-sm text-muted-foreground">
                         Choose what's most important in your brand matches
                       </p>
                       <div className="grid gap-2">
                         <div className="flex items-center space-x-2">
                           <Checkbox id="priority-location" />
-                          <label htmlFor="priority-location" className="text-sm font-medium">Location proximity</label>
+                          <label
+                            htmlFor="priority-location"
+                            className="text-sm font-medium"
+                          >
+                            Location proximity
+                          </label>
                         </div>
                         <div className="flex items-center space-x-2">
                           <Checkbox id="priority-size" defaultChecked />
-                          <label htmlFor="priority-size" className="text-sm font-medium">Company size</label>
+                          <label
+                            htmlFor="priority-size"
+                            className="text-sm font-medium"
+                          >
+                            Company size
+                          </label>
                         </div>
                         <div className="flex items-center space-x-2">
                           <Checkbox id="priority-specialty" defaultChecked />
-                          <label htmlFor="priority-specialty" className="text-sm font-medium">Product specialty</label>
+                          <label
+                            htmlFor="priority-specialty"
+                            className="text-sm font-medium"
+                          >
+                            Product specialty
+                          </label>
                         </div>
                         <div className="flex items-center space-x-2">
                           <Checkbox id="priority-certifications" />
-                          <label htmlFor="priority-certifications" className="text-sm font-medium">Certifications</label>
+                          <label
+                            htmlFor="priority-certifications"
+                            className="text-sm font-medium"
+                          >
+                            Certifications
+                          </label>
                         </div>
                       </div>
                     </div>
@@ -825,7 +1102,11 @@ const Matches = () => {
                       <Share2 className="h-4 w-4" />
                       Update Profile
                     </Button>
-                    <Button type="submit" className="gap-1" onClick={refreshMatches}>
+                    <Button
+                      type="submit"
+                      className="gap-1"
+                      onClick={refreshMatches}
+                    >
                       <RefreshCw className="h-4 w-4" />
                       Find Matches
                     </Button>
@@ -834,7 +1115,7 @@ const Matches = () => {
               </Dialog>
             </div>
           </motion.div>
-          
+
           <AnimatePresence>
             {showStats && (
               <motion.div
@@ -845,138 +1126,223 @@ const Matches = () => {
                 className="bg-muted/40 rounded-lg p-4 border border-border/50 hover:border-border/70 shadow-sm hover:shadow-md transition-all duration-300"
               >
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                  <motion.div 
+                  <motion.div
                     className="space-y-1"
                     initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.2, delay: 0.1 }}
                   >
-                    <p className="text-sm text-muted-foreground">Total Matches</p>
-                    <p className="text-2xl font-bold">{matchStats.totalMatches}</p>
+                    <p className="text-sm text-muted-foreground">
+                      Total Matches
+                    </p>
+                    <p className="text-2xl font-bold">
+                      {matchStats.totalMatches}
+                    </p>
                   </motion.div>
-                  <motion.div 
+                  <motion.div
                     className="space-y-1"
                     initial={{ opacity: 0, y: 5 }} // Reduced from y: 10
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.2, delay: 0.15 }} // Reduced from 0.2, 0.15
                   >
                     <p className="text-sm text-muted-foreground">Pending</p>
-                    <p className="text-2xl font-bold text-yellow-500 dark:text-yellow-400">{matchStats.pending}</p>
+                    <p className="text-2xl font-bold text-yellow-500 dark:text-yellow-400">
+                      {matchStats.pending}
+                    </p>
                   </motion.div>
-                  <motion.div 
+                  <motion.div
                     className="space-y-1"
                     initial={{ opacity: 0, y: 5 }} // Reduced from y: 10
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.2, delay: 0.2 }} // Reduced from 0.2, 0.2
                   >
                     <p className="text-sm text-muted-foreground">Accepted</p>
-                    <p className="text-2xl font-bold text-green-500 dark:text-green-400">{matchStats.accepted}</p>
+                    <p className="text-2xl font-bold text-green-500 dark:text-green-400">
+                      {matchStats.accepted}
+                    </p>
                   </motion.div>
-                  <motion.div 
-                    className="space-y-1" 
+                  <motion.div
+                    className="space-y-1"
                     initial={{ opacity: 0, y: 5 }} // Reduced from y: 10
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.2, delay: 0.25 }} // Reduced from 0.2, 0.25
                   >
                     <p className="text-sm text-muted-foreground">Declined</p>
-                    <p className="text-2xl font-bold text-red-500 dark:text-red-400">{matchStats.declined}</p>
+                    <p className="text-2xl font-bold text-red-500 dark:text-red-400">
+                      {matchStats.declined}
+                    </p>
                   </motion.div>
-                  <motion.div 
+                  <motion.div
                     className="space-y-1"
                     initial={{ opacity: 0, y: 5 }} // Reduced from y: 10
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.2, delay: 0.3 }} // Reduced from 0.2, 0.3
                   >
-                    <p className="text-sm text-muted-foreground">Premium Matches</p>
-                    <p className="text-2xl font-bold text-primary">{matchStats.highMatches}</p>
+                    <p className="text-sm text-muted-foreground">
+                      Premium Matches
+                    </p>
+                    <p className="text-2xl font-bold text-primary">
+                      {matchStats.highMatches}
+                    </p>
                   </motion.div>
-                  <motion.div 
+                  <motion.div
                     className="space-y-1"
                     initial={{ opacity: 0, y: 5 }} // Reduced from y: 10
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.2, delay: 0.35 }} // Reduced from 0.2, 0.35
                   >
                     <p className="text-sm text-muted-foreground">Avg. Score</p>
-                    <p className="text-2xl font-bold">{matchStats.averageScore}%</p>
+                    <p className="text-2xl font-bold">
+                      {matchStats.averageScore}%
+                    </p>
                   </motion.div>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
-          
+
           <div className="space-y-6">
-            <Tabs value={activeStatus} onValueChange={setActiveStatus} className="w-full">
+            <Tabs
+              value={activeStatus}
+              onValueChange={setActiveStatus}
+              className="w-full"
+            >
               <TabsList className="grid w-full grid-cols-4 mb-6 bg-card border border-border shadow-md rounded-md overflow-hidden transition-colors duration-300">
-                <TabsTrigger value="all" className="relative overflow-hidden group data-[state=active]:bg-primary/90 data-[state=active]:text-primary-foreground data-[state=active]:shadow-md data-[state=active]:font-semibold transition-all duration-300 py-2.5">
-                  <span className="relative z-10">All Matches ({matchesData.length})</span>
-                  <motion.div 
+                <TabsTrigger
+                  value="all"
+                  className="relative overflow-hidden group data-[state=active]:bg-primary/90 data-[state=active]:text-primary-foreground data-[state=active]:shadow-md data-[state=active]:font-semibold transition-all duration-300 py-2.5"
+                >
+                  <span className="relative z-10">
+                    All Matches ({matchesData.length})
+                  </span>
+                  <motion.div
                     className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
                     initial={{ scaleX: 0 }}
                     animate={{ scaleX: activeStatus === "all" ? 1 : 0 }}
                     transition={{ duration: 0.2 }} // Reduced from 0.3
                   />
                 </TabsTrigger>
-                <TabsTrigger value="pending" className="relative overflow-hidden group data-[state=active]:bg-yellow-500 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:font-semibold transition-all duration-300 py-2.5">
+                <TabsTrigger
+                  value="pending"
+                  className="relative overflow-hidden group data-[state=active]:bg-amber-500 dark:data-[state=active]:bg-amber-600 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:font-semibold transition-all duration-300 py-2.5"
+                >
                   <div className="flex items-center gap-1.5 relative z-10">
                     <span>Pending</span>
                     <AnimatePresence>
-                      {matchesData.filter(m => m.status === "pending").length > 0 && (
+                      {matchesData.filter((m) => m.status === "pending")
+                        .length > 0 && (
                         <motion.div
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
                           exit={{ scale: 0 }}
                         >
-                          <Badge variant="secondary" className="ml-0.5 bg-yellow-200 text-yellow-700 dark:bg-yellow-700/70 dark:text-yellow-100 border border-yellow-300 dark:border-yellow-600/50 shadow-sm">
-                            {matchesData.filter(m => m.status === "pending").length}
+                          <Badge
+                            variant="secondary"
+                            className={isDark 
+                              ? "ml-0.5 bg-amber-700/70 text-amber-100 border border-amber-600/50 shadow-sm" 
+                              : "ml-0.5 bg-amber-200 text-amber-700 border border-amber-300 shadow-sm"
+                            }
+                          >
+                            {
+                              matchesData.filter((m) => m.status === "pending")
+                                .length
+                            }
                           </Badge>
                         </motion.div>
                       )}
                     </AnimatePresence>
                   </div>
-                  <motion.div 
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
+                  <motion.div
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-600 dark:bg-amber-500"
                     initial={{ scaleX: 0 }}
                     animate={{ scaleX: activeStatus === "pending" ? 1 : 0 }}
-                    transition={{ duration: 0.2 }} // Reduced from 0.3
+                    transition={{ duration: 0.2 }}
                   />
                 </TabsTrigger>
-                <TabsTrigger value="accepted" className="relative overflow-hidden group data-[state=active]:bg-green-500 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:font-semibold transition-all duration-300 py-2.5">
-                  <span className="relative z-10">Accepted ({matchesData.filter(m => m.status === "accepted").length})</span>
-                  <motion.div 
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
+                <TabsTrigger
+                  value="accepted"
+                  className="relative overflow-hidden group data-[state=active]:bg-emerald-500 dark:data-[state=active]:bg-emerald-600 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:font-semibold transition-all duration-300 py-2.5"
+                >
+                  <span className="relative z-10">
+                    Accepted (
+                    {matchesData.filter((m) => m.status === "accepted").length})
+                  </span>
+                  <motion.div
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600 dark:bg-emerald-500"
                     initial={{ scaleX: 0 }}
                     animate={{ scaleX: activeStatus === "accepted" ? 1 : 0 }}
-                    transition={{ duration: 0.2 }} // Reduced from 0.3
+                    transition={{ duration: 0.2 }}
                   />
                 </TabsTrigger>
-                <TabsTrigger value="declined" className="relative overflow-hidden group data-[state=active]:bg-red-500 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:font-semibold transition-all duration-300 py-2.5">
-                  <span className="relative z-10">Declined ({matchesData.filter(m => m.status === "declined").length})</span>
-                  <motion.div 
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
+                <TabsTrigger
+                  value="declined"
+                  className="relative overflow-hidden group data-[state=active]:bg-rose-500 dark:data-[state=active]:bg-rose-600 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:font-semibold transition-all duration-300 py-2.5"
+                >
+                  <span className="relative z-10">
+                    Declined (
+                    {matchesData.filter((m) => m.status === "declined").length})
+                  </span>
+                  <motion.div
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-rose-600 dark:bg-rose-500"
                     initial={{ scaleX: 0 }}
                     animate={{ scaleX: activeStatus === "declined" ? 1 : 0 }}
-                    transition={{ duration: 0.2 }} // Reduced from 0.3
+                    transition={{ duration: 0.2 }}
                   />
                 </TabsTrigger>
+                {/* <TabsTrigger
+                  value="Contract Negotiation"
+                  className="relative overflow-hidden group data-[state=active]:bg-blue-500 dark:data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:font-semibold transition-all duration-300 py-2.5"
+                >
+                  <span className="relative z-10">
+                    Contract Negotiation (
+                    {matchesData.filter((m) => m.status === "Contract Negotiation").length})
+                  </span>
+                  <motion.div
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 dark:bg-blue-500"
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: activeStatus === "Contract Negotiation" ? 1 : 0 }}
+                    transition={{ duration: 0.2 }}
+                  />
+                </TabsTrigger>
+                <TabsTrigger
+                  value="Production"
+                  className="relative overflow-hidden group data-[state=active]:bg-purple-500 dark:data-[state=active]:bg-purple-600 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:font-semibold transition-all duration-300 py-2.5"
+                >
+                  <span className="relative z-10">
+                    Production (
+                    {matchesData.filter((m) => m.status === "Sample Production" || m.status === "Active Production").length})
+                  </span>
+                  <motion.div
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600 dark:bg-purple-500"
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: activeStatus === "Production" ? 1 : 0 }}
+                    transition={{ duration: 0.2 }}
+                  />
+                </TabsTrigger> */}
               </TabsList>
-              
+
               <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
                 <div className="flex items-center text-sm text-muted-foreground">
                   <span className="mr-1">Showing</span>
-                  <span className="font-medium text-foreground">{filteredAndSortedMatches.length}</span>
+                  <span className="font-medium text-foreground">
+                    {filteredAndSortedMatches.length}
+                  </span>
                   <span className="mx-1">of</span>
-                  <span className="font-medium text-foreground">{matchesData.length}</span>
+                  <span className="font-medium text-foreground">
+                    {matchesData.length}
+                  </span>
                   <span className="ml-1">matches</span>
                 </div>
-                
+
                 <div className="flex rounded-md overflow-hidden border">
-                  <Button 
-                    variant={sortBy === "matchScore" ? "default" : "ghost"} 
+                  <Button
+                    variant={sortBy === "matchScore" ? "default" : "ghost"}
                     size="sm"
                     onClick={() => handleSortChange("matchScore")}
                     className="rounded-none gap-1 transition-all duration-300 hover:bg-primary/10"
                   >
-                    Match % {sortBy === "matchScore" && (
+                    Match %{" "}
+                    {sortBy === "matchScore" && (
                       <motion.div
                         animate={{ rotate: sortDirection === "desc" ? 180 : 0 }}
                         transition={{ duration: 0.3 }}
@@ -985,29 +1351,39 @@ const Matches = () => {
                       </motion.div>
                     )}
                   </Button>
-                  <Button 
-                    variant={sortBy === "name" ? "default" : "ghost"} 
+                  <Button
+                    variant={sortBy === "name" ? "default" : "ghost"}
                     size="sm"
                     onClick={() => handleSortChange("name")}
                     className="rounded-none gap-1"
                   >
-                    Name {sortBy === "name" && (
-                      <ArrowUpDown className={`h-3.5 w-3.5 transition-transform duration-200 ${sortDirection === "desc" ? "rotate-180" : "rotate-0"}`} />
+                    Name{" "}
+                    {sortBy === "name" && (
+                      <ArrowUpDown
+                        className={`h-3.5 w-3.5 transition-transform duration-200 ${
+                          sortDirection === "desc" ? "rotate-180" : "rotate-0"
+                        }`}
+                      />
                     )}
                   </Button>
-                  <Button 
-                    variant={sortBy === "location" ? "default" : "ghost"} 
+                  <Button
+                    variant={sortBy === "location" ? "default" : "ghost"}
                     size="sm"
                     onClick={() => handleSortChange("location")}
                     className="rounded-none gap-1"
                   >
-                    Location {sortBy === "location" && (
-                      <ArrowUpDown className={`h-3.5 w-3.5 transition-transform duration-200 ${sortDirection === "desc" ? "rotate-180" : "rotate-0"}`} />
+                    Location{" "}
+                    {sortBy === "location" && (
+                      <ArrowUpDown
+                        className={`h-3.5 w-3.5 transition-transform duration-200 ${
+                          sortDirection === "desc" ? "rotate-180" : "rotate-0"
+                        }`}
+                      />
                     )}
                   </Button>
                 </div>
               </div>
-              
+
               <AnimatePresence mode="wait">
                 {isLoading ? (
                   <div className="space-y-4">
@@ -1031,15 +1407,15 @@ const Matches = () => {
                 ) : (
                   <TabsContent value={activeStatus} className="space-y-4">
                     {filteredAndSortedMatches.length === 0 ? (
-                      <motion.div 
+                      <motion.div
                         className="flex flex-col items-center justify-center p-8 text-center"
                         initial={{ opacity: 0, y: 10 }} // Reduced from y: 20
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ 
+                        transition={{
                           type: "spring",
                           stiffness: 200, // Increased from 100
                           damping: 12, // Reduced from 15
-                          duration: 0.3 // Reduced from 0.5
+                          duration: 0.3, // Reduced from 0.5
                         }}
                       >
                         <motion.div
@@ -1049,7 +1425,7 @@ const Matches = () => {
                         >
                           <Search className="h-12 w-12 text-muted-foreground mb-4" />
                         </motion.div>
-                        <motion.h3 
+                        <motion.h3
                           className="text-xl font-medium"
                           initial={{ opacity: 0, y: 5 }} // Reduced from y: 10
                           animate={{ opacity: 1, y: 0 }}
@@ -1057,13 +1433,14 @@ const Matches = () => {
                         >
                           No matches found
                         </motion.h3>
-                        <motion.p 
+                        <motion.p
                           className="text-muted-foreground"
                           initial={{ opacity: 0, y: 5 }} // Reduced from y: 10
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.25, duration: 0.3 }} // Reduced from 0.4, 0.4
                         >
-                          Try adjusting your search or filters to find more matches
+                          Try adjusting your search or filters to find more
+                          matches
                         </motion.p>
                         <motion.div
                           initial={{ opacity: 0, y: 10 }}
@@ -1072,8 +1449,8 @@ const Matches = () => {
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                         >
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             className="mt-4 bg-card hover:bg-muted hover:border-primary/30 transition-all duration-300 shadow-sm hover:shadow"
                             onClick={resetFilters}
                           >
@@ -1084,30 +1461,36 @@ const Matches = () => {
                     ) : (
                       <>
                         {viewMode === "grid" ? (
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                             <AnimatePresence initial={false} mode="sync">
                               {filteredAndSortedMatches.map((match, index) => (
                                 <motion.div
                                   key={match.id}
                                   layout
-                                  initial={{ opacity: 0, scale: 0.97, y: 10 }} // Reduced values for smoother appearance
+                                  initial={{ opacity: 0, scale: 0.97, y: 10 }}
                                   animate={{ opacity: 1, scale: 1, y: 0 }}
                                   exit={{ opacity: 0, scale: 0.97, y: -10 }}
-                                  transition={{ 
-                                    duration: 0.25, // Faster animation
-                                    delay: index * 0.03, // Reduced stagger delay
+                                  transition={{
+                                    duration: 0.25,
+                                    delay: index * 0.03,
                                     type: "spring",
-                                    stiffness: 200, // Increased for snappier animation
-                                    damping: 12, // Lower damping for more responsive feel
-                                    layout: { duration: 0.2 } // Faster layout transitions
+                                    stiffness: 200,
+                                    damping: 12,
+                                    layout: { duration: 0.2 },
                                   }}
-                                  whileHover={{ 
-                                    y: -3, // Subtler hover effect
-                                    transition: { duration: 0.15 } // Faster hover transition
+                                  whileHover={{
+                                    y: -3,
+                                    transition: { duration: 0.15 },
                                   }}
                                 >
                                   <Card className="h-full border border-border/50 overflow-hidden hover:shadow-lg hover:border-primary/40 transition-all duration-300 group bg-card dark:bg-card/95">
-                                    <EnhancedMatchCard match={match} onAction={handleMatchAction} onViewDetails={() => viewMatchDetails(match)} />
+                                    <EnhancedMatchCard
+                                      match={match}
+                                      onAction={handleMatchAction}
+                                      onViewDetails={() =>
+                                        viewMatchDetails(match)
+                                      }
+                                    />
                                   </Card>
                                 </motion.div>
                               ))}
@@ -1117,91 +1500,125 @@ const Matches = () => {
                           <div className="space-y-3">
                             <AnimatePresence initial={false}>
                               {filteredAndSortedMatches.map((match, index) => (
-                                <MotionCard 
+                                <MotionCard
                                   key={match.id}
                                   layout
                                   initial={{ opacity: 0, y: 10 }} // Reduced y value
                                   animate={{ opacity: 1, y: 0 }}
                                   exit={{ opacity: 0, y: -10 }}
-                                  transition={{ 
+                                  transition={{
                                     duration: 0.2, // Faster animation
                                     delay: index * 0.03, // Reduced stagger delay
-                                    layout: { duration: 0.2 } // Faster layout transitions
+                                    layout: { duration: 0.2 }, // Faster layout transitions
                                   }}
                                   className="border overflow-hidden"
                                 >
                                   <div className="flex flex-col md:flex-row md:items-center gap-4 p-4">
                                     <div className="flex items-center gap-3 flex-grow">
                                       <Avatar className="h-10 w-10 rounded-md border border-border/40 shadow-sm group-hover:border-primary/30 transition-all duration-300">
-                                        <AvatarImage src={match.logoUrl} alt={match.companyName} />
+                                        <AvatarImage
+                                          src={match.logoUrl}
+                                          alt={match.companyName}
+                                        />
                                         <AvatarFallback className="bg-primary/10 text-primary font-medium">
-                                          {match.companyName.substring(0, 2).toUpperCase()}
+                                          {match.companyName
+                                            .substring(0, 2)
+                                            .toUpperCase()}
                                         </AvatarFallback>
                                       </Avatar>
                                       <div>
                                         <h3 className="font-medium">
                                           {match.companyName}
                                           {match.matchScore > 90 && (
-                                            <motion.div 
+                                            <motion.div
                                               className="absolute -top-1 -right-1 bg-yellow-400 rounded-full p-0.5 border-2 border-white dark:border-gray-800 shadow-sm"
                                               initial={{ scale: 0 }}
                                               animate={{ scale: 1 }}
-                                              transition={{ type: "spring", stiffness: 300, damping: 15 }}
-                                              whileHover={{ 
+                                              transition={{
+                                                type: "spring",
+                                                stiffness: 300,
+                                                damping: 15,
+                                              }}
+                                              whileHover={{
                                                 scale: 1.2,
-                                                transition: { duration: 0.2 }  
+                                                transition: { duration: 0.2 },
                                               }}
                                             >
                                               <Star className="h-3 w-3 fill-white text-white" />
                                             </motion.div>
                                           )}
                                         </h3>
-                                        <p className="text-sm text-muted-foreground">{match.location} • {match.productCategory}</p>
+                                        <p className="text-sm text-muted-foreground">
+                                          {match.location} •{" "}
+                                          {match.productCategory}
+                                        </p>
                                       </div>
                                     </div>
-                                    
+
                                     <div className="flex flex-col md:flex-row items-center gap-3 md:gap-6">
                                       <div className="flex items-center gap-2">
                                         {getStatusBadge(match.status)}
                                         <div className="flex items-center gap-1.5">
                                           <div className="w-16 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden shadow-inner">
-                                            <motion.div 
-                                              className={`h-full ${getProgressColor(match.matchScore)}`}
+                                            <motion.div
+                                              className={`h-full ${getProgressColor(
+                                                match.matchScore
+                                              )}`}
                                               initial={{ width: 0 }}
-                                              animate={{ width: `${match.matchScore}%` }}
-                                              transition={{ duration: 0.5, ease: "easeOut" }} // Reduced from 0.8
+                                              animate={{
+                                                width: `${match.matchScore}%`,
+                                              }}
+                                              transition={{
+                                                duration: 0.5,
+                                                ease: "easeOut",
+                                              }} // Reduced from 0.8
                                             />
                                           </div>
-                                          <span className={`text-xs font-medium ${getMatchScoreColor(match.matchScore)}`}>
+                                          <span
+                                            className={`text-xs font-medium ${getMatchScoreColor(
+                                              match.matchScore
+                                            )}`}
+                                          >
                                             {match.matchScore}%
                                           </span>
                                         </div>
                                       </div>
-                                      
+
                                       <div className="flex gap-2">
-                                        <Button 
-                                          variant="outline" 
+                                        <Button
+                                          variant="outline"
                                           size="sm"
                                           className="gap-1.5 transition-all duration-300 hover:bg-primary/10 hover:border-primary/30 shadow-sm hover:shadow group"
-                                          onClick={() => viewMatchDetails(match)}
+                                          onClick={() =>
+                                            viewMatchDetails(match)
+                                          }
                                         >
                                           View Profile
                                           <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
                                         </Button>
-                                        
+
                                         {match.status === "pending" && (
                                           <>
-                                            <Button 
-                                              variant="outline" 
+                                            <Button
+                                              variant="outline"
                                               size="sm"
                                               className="hover:bg-red-50 hover:text-red-600 hover:border-red-200 dark:hover:bg-red-900/30 dark:hover:text-red-400 dark:hover:border-red-700/50 transition-all duration-300 shadow-sm hover:shadow"
-                                              onClick={() => handleMatchAction(match.id, "decline")}
+                                              onClick={() =>
+                                                handleMatchAction(
+                                                  match.id,
+                                                  "decline"
+                                                )
+                                              }
                                               disabled={isLoading}
                                             >
                                               {isLoading ? (
                                                 <motion.div
                                                   animate={{ rotate: 360 }}
-                                                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                                  transition={{
+                                                    duration: 1,
+                                                    repeat: Infinity,
+                                                    ease: "linear",
+                                                  }}
                                                 >
                                                   <RefreshCw className="h-4 w-4 mr-1" />
                                                 </motion.div>
@@ -1210,16 +1627,25 @@ const Matches = () => {
                                               )}
                                               Decline
                                             </Button>
-                                            <Button 
-                                              size="sm" 
+                                            <Button
+                                              size="sm"
                                               className="bg-green-600 hover:bg-green-700 text-white shadow-sm hover:shadow transition-all duration-300 hover:translate-y-[-1px]"
-                                              onClick={() => handleMatchAction(match.id, "accept")}
+                                              onClick={() =>
+                                                handleMatchAction(
+                                                  match.id,
+                                                  "accept"
+                                                )
+                                              }
                                               disabled={isLoading}
                                             >
                                               {isLoading ? (
                                                 <motion.div
                                                   animate={{ rotate: 360 }}
-                                                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                                  transition={{
+                                                    duration: 1,
+                                                    repeat: Infinity,
+                                                    ease: "linear",
+                                                  }}
                                                 >
                                                   <RefreshCw className="h-4 w-4 mr-1" />
                                                 </motion.div>
@@ -1231,10 +1657,15 @@ const Matches = () => {
                                           </>
                                         )}
                                         {match.status === "accepted" && (
-                                          <Button 
+                                          <Button
                                             size="sm"
                                             className="gap-1.5"
-                                            onClick={() => handleMatchAction(match.id, "contact")}
+                                            onClick={() =>
+                                              handleMatchAction(
+                                                match.id,
+                                                "contact"
+                                              )
+                                            }
                                             disabled={isLoading}
                                           >
                                             <Calendar className="h-4 w-4" />
@@ -1249,17 +1680,23 @@ const Matches = () => {
                             </AnimatePresence>
                           </div>
                         )}
-                        
+
                         <div className="flex justify-center mt-8">
                           <motion.div
                             whileHover={{ scale: 1.02 }} // Reduced from 1.03
                             whileTap={{ scale: 0.98 }} // Changed from 0.97
-                            transition={{ type: "spring", stiffness: 500, damping: 17 }} // Increased stiffness from 400
+                            transition={{
+                              type: "spring",
+                              stiffness: 500,
+                              damping: 17,
+                            }} // Increased stiffness from 400
                           >
-                            <Button 
-                              variant="outline" 
+                            <Button
+                              variant="outline"
                               className="gap-2 border-border/60 bg-card hover:bg-muted/50 hover:border-primary/30 shadow-sm hover:shadow transition-all duration-300"
-                              onClick={() => console.log("Loading more matches...")}
+                              onClick={() =>
+                                console.log("Loading more matches...")
+                              }
                             >
                               <RefreshCw className="h-4 w-4" />
                               Load More Matches
@@ -1268,14 +1705,14 @@ const Matches = () => {
                         </div>
                       </>
                     )}
-              </TabsContent>
+                  </TabsContent>
                 )}
               </AnimatePresence>
             </Tabs>
           </div>
         </div>
       </motion.div>
-      
+
       {/* Match Detail Dialog */}
       <Dialog open={showMatchDetails} onOpenChange={setShowMatchDetails}>
         <DialogContent className="sm:max-w-[90vw] max-h-[90vh] overflow-y-auto transition-all duration-200">
@@ -1284,31 +1721,55 @@ const Matches = () => {
               <DialogHeader className="mb-6">
                 <DialogTitle className="flex items-center gap-3 text-2xl">
                   <Avatar className="h-12 w-12 rounded-md">
-                    <AvatarImage src={selectedMatch.logoUrl} alt={selectedMatch.companyName} />
-                    <AvatarFallback>{selectedMatch.companyName.substring(0, 2).toUpperCase()}</AvatarFallback>
+                    <AvatarImage
+                      src={selectedMatch.logoUrl}
+                      alt={selectedMatch.companyName}
+                    />
+                    <AvatarFallback>
+                      {selectedMatch.companyName.substring(0, 2).toUpperCase()}
+                    </AvatarFallback>
                   </Avatar>
                   {selectedMatch.companyName}
                   {selectedMatch.matchScore > 90 && (
-                    <Badge variant="outline" className="bg-yellow-100 text-yellow-600 border-yellow-300 dark:bg-yellow-900/40 dark:text-yellow-300 dark:border-yellow-700/70 text-sm">
+                    <Badge
+                      variant="outline"
+                      className={isDark 
+                        ? "bg-yellow-900/40 text-yellow-300 border-yellow-700/70" 
+                        : "bg-yellow-100 text-yellow-600 border-yellow-300"
+                      }
+                    >
                       Premium Match
                     </Badge>
                   )}
                 </DialogTitle>
-                <DialogDescription className="text-lg">Match score: <span className="font-semibold">{selectedMatch.matchScore}%</span></DialogDescription>
+                <DialogDescription className="text-lg">
+                  Match score:{" "}
+                  <span className="font-semibold">
+                    {selectedMatch.matchScore}%
+                  </span>
+                </DialogDescription>
               </DialogHeader>
-              
+
               <div className="grid md:grid-cols-2 gap-8 mt-6">
                 <div>
                   <div className="space-y-4">
                     <div>
-                      <h3 className="text-sm font-medium mb-1">Company Profile</h3>
+                      <h3 className="text-sm font-medium mb-1">
+                        Company Profile
+                      </h3>
                       <Card className="p-4">
-                        <p className="text-sm text-muted-foreground mb-4">{selectedMatch.description}</p>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          {selectedMatch.description}
+                        </p>
                         <div className="grid grid-cols-2 gap-y-2 text-sm">
                           <div className="flex items-center gap-2">
                             <Building className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-muted-foreground">Location:</span>
-                            <span className="font-medium">{selectedMatch.location}</span>
+                            <span className="text-muted-foreground">
+                              Location:
+                            </span>
+                            <span className="font-medium">
+                              {selectedMatch.location}
+                            </span>
                           </div>
                           <div className="flex items-center gap-2">
                             <Users className="h-4 w-4 text-muted-foreground" />
@@ -1317,38 +1778,82 @@ const Matches = () => {
                           </div>
                           <div className="flex items-center gap-2">
                             <Calendar className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-muted-foreground">Established:</span>
+                            <span className="text-muted-foreground">
+                              Established:
+                            </span>
                             <span className="font-medium">2019</span>
                           </div>
                           <div className="flex items-center gap-2">
                             <MessageSquare className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-muted-foreground">Communication:</span>
+                            <span className="text-muted-foreground">
+                              Communication:
+                            </span>
                             <span className="font-medium">English</span>
                           </div>
                         </div>
                       </Card>
                     </div>
-                    
+
                     <div>
-                      <h3 className="text-sm font-medium mb-1">Product Requirements</h3>
+                      <h3 className="text-sm font-medium mb-1">
+                        Product Requirements
+                      </h3>
                       <Card className="p-4">
                         <div className="space-y-3">
                           <div>
-                            <h4 className="text-sm font-medium mb-1">Product Category</h4>
-                            <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
-                              {selectedMatch.productCategory}
-                            </Badge>
-                          </div>
-                          <div>
-                            <h4 className="text-sm font-medium mb-1">Production Volume</h4>
-                            <p className="text-sm text-muted-foreground">Medium-scale (5,000-10,000 units/month)</p>
-                          </div>
-                          <div>
-                            <h4 className="text-sm font-medium mb-1">Required Certifications</h4>
+                            <h4 className="text-sm font-medium mb-1">
+                              Product Category
+                            </h4>
                             <div className="flex flex-wrap gap-2">
-                              <Badge variant="outline">Organic</Badge>
-                              <Badge variant="outline">Non-GMO</Badge>
-                              <Badge variant="outline">GMP</Badge>
+                              {getCategoryBadge(selectedMatch.productCategory, isDark)}
+                            </div>
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-medium mb-1">
+                              Production Volume
+                            </h4>
+                            <p className="text-sm text-muted-foreground">
+                              Medium-scale (5,000-10,000 units/month)
+                            </p>
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-medium mb-1">
+                              Required Certifications
+                            </h4>
+                            <div className="flex flex-wrap gap-2">
+                              <Badge 
+                                variant="outline" 
+                                className={cn(
+                                  "transition-colors",
+                                  isDark 
+                                    ? "bg-slate-800/40 text-slate-300 border-slate-700/60" 
+                                    : "bg-slate-100 text-slate-700 border-slate-200"
+                                )}
+                              >
+                                Organic
+                              </Badge>
+                              <Badge 
+                                variant="outline" 
+                                className={cn(
+                                  "transition-colors",
+                                  isDark 
+                                    ? "bg-slate-800/40 text-slate-300 border-slate-700/60" 
+                                    : "bg-slate-100 text-slate-700 border-slate-200"
+                                )}
+                              >
+                                Non-GMO
+                              </Badge>
+                              <Badge 
+                                variant="outline" 
+                                className={cn(
+                                  "transition-colors",
+                                  isDark 
+                                    ? "bg-slate-800/40 text-slate-300 border-slate-700/60" 
+                                    : "bg-slate-100 text-slate-700 border-slate-200"
+                                )}
+                              >
+                                GMP
+                              </Badge>
                             </div>
                           </div>
                         </div>
@@ -1356,7 +1861,7 @@ const Matches = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="space-y-4">
                   <div>
                     <h3 className="text-sm font-medium mb-1">Match Analysis</h3>
@@ -1365,99 +1870,145 @@ const Matches = () => {
                         <div>
                           <div className="flex justify-between text-sm mb-1">
                             <span>Overall Match</span>
-                            <span className={getMatchScoreColor(selectedMatch.matchScore)}>{selectedMatch.matchScore}%</span>
+                            <span
+                              className={getMatchScoreColor(
+                                selectedMatch.matchScore
+                              )}
+                            >
+                              {selectedMatch.matchScore}%
+                            </span>
                           </div>
-                          <Progress value={selectedMatch.matchScore} max={100} className="h-2" />
+                          <Progress
+                            value={selectedMatch.matchScore}
+                            max={100}
+                            className={cn("h-2", 
+                              selectedMatch.matchScore >= 90 
+                                ? "bg-muted [&>div]:bg-green-500 dark:[&>div]:bg-green-400" 
+                                : selectedMatch.matchScore >= 80 
+                                ? "bg-muted [&>div]:bg-green-500 dark:[&>div]:bg-green-500" 
+                                : "bg-muted [&>div]:bg-yellow-500 dark:[&>div]:bg-yellow-400"
+                            )}
+                          />
                         </div>
-                        
+
                         <div>
                           <div className="flex justify-between text-sm mb-1">
                             <span>Location Compatibility</span>
                             <span className={getMatchScoreColor(85)}>85%</span>
                           </div>
-                          <Progress value={85} max={100} className="h-2" />
+                          <Progress 
+                            value={85} 
+                            max={100} 
+                            className="h-2 bg-muted [&>div]:bg-green-500 dark:[&>div]:bg-green-500" 
+                          />
                         </div>
-                        
+
                         <div>
                           <div className="flex justify-between text-sm mb-1">
                             <span>Production Capacity</span>
                             <span className={getMatchScoreColor(95)}>95%</span>
                           </div>
-                          <Progress value={95} max={100} className="h-2" />
+                          <Progress 
+                            value={95} 
+                            max={100} 
+                            className="h-2 bg-muted [&>div]:bg-green-500 dark:[&>div]:bg-green-400" 
+                          />
                         </div>
-                        
+
                         <div>
                           <div className="flex justify-between text-sm mb-1">
                             <span>Certification Match</span>
                             <span className={getMatchScoreColor(90)}>90%</span>
                           </div>
-                          <Progress value={90} max={100} className="h-2" />
+                          <Progress 
+                            value={90} 
+                            max={100} 
+                            className="h-2 bg-muted [&>div]:bg-green-500 dark:[&>div]:bg-green-400" 
+                          />
                         </div>
                       </div>
                     </Card>
                   </div>
-                  
+
                   <div>
-                    <h3 className="text-sm font-medium mb-1">Communication Timeline</h3>
+                    <h3 className="text-sm font-medium mb-1">
+                      Communication Timeline
+                    </h3>
                     <Card className="p-4">
                       <div className="space-y-4">
                         <div className="relative pl-5 pb-4 border-l-2 border-muted">
                           <div className="absolute w-3 h-3 bg-primary rounded-full -left-[7px] top-0"></div>
                           <div className="mb-1 text-sm">
                             <span className="font-medium">Match Created</span>
-                            <span className="text-muted-foreground ml-2 text-xs">Today</span>
+                            <span className="text-muted-foreground ml-2 text-xs">
+                              Today
+                            </span>
                           </div>
                           <p className="text-xs text-muted-foreground">
-                            {selectedMatch.companyName} was matched with your manufacturing profile.
+                            {selectedMatch.companyName} was matched with your
+                            manufacturing profile.
                           </p>
                         </div>
-                        
+
                         {selectedMatch.status === "pending" && (
                           <div className="relative pl-5 border-l-2 border-dashed border-muted">
                             <div className="absolute w-3 h-3 bg-muted rounded-full -left-[7px] top-0"></div>
                             <div className="mb-1 text-sm">
-                              <span className="font-medium">Awaiting Response</span>
+                              <span className="font-medium">
+                                Awaiting Response
+                              </span>
                             </div>
                             <p className="text-xs text-muted-foreground">
-                              Respond to this match to start the collaboration process.
+                              Respond to this match to start the collaboration
+                              process.
                             </p>
                           </div>
                         )}
-                        
+
                         {selectedMatch.status === "accepted" && (
                           <>
                             <div className="relative pl-5 pb-4 border-l-2 border-muted">
                               <div className="absolute w-3 h-3 bg-green-500 rounded-full -left-[7px] top-0"></div>
                               <div className="mb-1 text-sm">
-                                <span className="font-medium">Match Accepted</span>
-                                <span className="text-muted-foreground ml-2 text-xs">2 days ago</span>
+                                <span className="font-medium">
+                                  Match Accepted
+                                </span>
+                                <span className="text-muted-foreground ml-2 text-xs">
+                                  2 days ago
+                                </span>
                               </div>
                               <p className="text-xs text-muted-foreground">
                                 You accepted the connection request.
                               </p>
                             </div>
-                            
+
                             <div className="relative pl-5 border-l-2 border-dashed border-muted">
                               <div className="absolute w-3 h-3 bg-muted rounded-full -left-[7px] top-0"></div>
                               <div className="mb-1 text-sm">
                                 <span className="font-medium">Next Steps</span>
                               </div>
                               <p className="text-xs text-muted-foreground">
-                                Schedule a meeting or send a message to discuss specific requirements.
+                                Schedule a meeting or send a message to discuss
+                                specific requirements.
                               </p>
                             </div>
                           </>
                         )}
-                        
+
                         {selectedMatch.status === "declined" && (
                           <div className="relative pl-5 border-l-2 border-muted">
                             <div className="absolute w-3 h-3 bg-red-500 rounded-full -left-[7px] top-0"></div>
                             <div className="mb-1 text-sm">
-                              <span className="font-medium">Match Declined</span>
-                              <span className="text-muted-foreground ml-2 text-xs">3 days ago</span>
+                              <span className="font-medium">
+                                Match Declined
+                              </span>
+                              <span className="text-muted-foreground ml-2 text-xs">
+                                3 days ago
+                              </span>
                             </div>
                             <p className="text-xs text-muted-foreground">
-                              You declined this match. You can reconsider this decision if needed.
+                              You declined this match. You can reconsider this
+                              decision if needed.
                             </p>
                           </div>
                         )}
@@ -1466,22 +2017,22 @@ const Matches = () => {
                   </div>
                 </div>
               </div>
-              
+
               <DialogFooter className="flex-col sm:flex-row sm:justify-between gap-4 sm:gap-0 mt-8">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="gap-2"
                   onClick={() => handleExportDetails(selectedMatch)}
                 >
                   <Share2 className="h-5 w-5" />
                   Export Details
                 </Button>
-                
+
                 <div className="flex gap-4">
                   {selectedMatch?.status === "pending" && (
                     <>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="lg"
                         className="hover:bg-red-50 hover:text-red-600 hover:border-red-200 dark:hover:bg-red-900/30 dark:hover:text-red-400 dark:hover:border-red-700/50"
                         onClick={() => {
@@ -1492,7 +2043,7 @@ const Matches = () => {
                         <X className="h-5 w-5 mr-2" />
                         Decline
                       </Button>
-                      <Button 
+                      <Button
                         className="bg-green-600 hover:bg-green-700 text-white"
                         size="lg"
                         onClick={() => {
@@ -1505,10 +2056,10 @@ const Matches = () => {
                       </Button>
                     </>
                   )}
-                  
+
                   {selectedMatch?.status === "accepted" && (
                     <>
-                      <Button 
+                      <Button
                         variant="outline"
                         onClick={() => {
                           setShowMessageDialog(true);
@@ -1518,7 +2069,7 @@ const Matches = () => {
                         <MessageSquare className="h-4 w-4 mr-1" />
                         Message
                       </Button>
-                      <Button 
+                      <Button
                         size="sm"
                         className="gap-1.5"
                         onClick={() => {
@@ -1532,9 +2083,9 @@ const Matches = () => {
                       </Button>
                     </>
                   )}
-                  
+
                   {selectedMatch?.status === "declined" && (
-                    <Button 
+                    <Button
                       variant="outline"
                       onClick={() => {
                         handleReconsiderMatch(selectedMatch);
@@ -1573,10 +2124,13 @@ const Matches = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowMessageDialog(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setShowMessageDialog(false)}
+            >
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={() => handleSendMessage(selectedMatch)}
               disabled={isLoading || !messageContent.trim()}
             >
@@ -1612,8 +2166,10 @@ const Matches = () => {
                 id="date"
                 type="date"
                 value={scheduleData.date}
-                onChange={(e) => setScheduleData({...scheduleData, date: e.target.value})}
-                min={new Date().toISOString().split('T')[0]}
+                onChange={(e) =>
+                  setScheduleData({ ...scheduleData, date: e.target.value })
+                }
+                min={new Date().toISOString().split("T")[0]}
               />
             </div>
             <div className="space-y-2">
@@ -1622,14 +2178,18 @@ const Matches = () => {
                 id="time"
                 type="time"
                 value={scheduleData.time}
-                onChange={(e) => setScheduleData({...scheduleData, time: e.target.value})}
+                onChange={(e) =>
+                  setScheduleData({ ...scheduleData, time: e.target.value })
+                }
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="duration">Duration</Label>
               <Select
                 value={scheduleData.duration}
-                onValueChange={(value) => setScheduleData({...scheduleData, duration: value})}
+                onValueChange={(value) =>
+                  setScheduleData({ ...scheduleData, duration: value })
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select duration" />
@@ -1646,16 +2206,24 @@ const Matches = () => {
               <Label htmlFor="type">Meeting Type</Label>
               <Select
                 value={scheduleData.type}
-                onValueChange={(value) => setScheduleData({...scheduleData, type: value})}
+                onValueChange={(value) =>
+                  setScheduleData({ ...scheduleData, type: value })
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select meeting type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Initial Meeting">Initial Meeting</SelectItem>
+                  <SelectItem value="Initial Meeting">
+                    Initial Meeting
+                  </SelectItem>
                   <SelectItem value="Follow-up">Follow-up</SelectItem>
-                  <SelectItem value="Contract Discussion">Contract Discussion</SelectItem>
-                  <SelectItem value="Technical Review">Technical Review</SelectItem>
+                  <SelectItem value="Contract Discussion">
+                    Contract Discussion
+                  </SelectItem>
+                  <SelectItem value="Technical Review">
+                    Technical Review
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -1664,17 +2232,22 @@ const Matches = () => {
               <Textarea
                 id="notes"
                 value={scheduleData.notes}
-                onChange={(e) => setScheduleData({...scheduleData, notes: e.target.value})}
+                onChange={(e) =>
+                  setScheduleData({ ...scheduleData, notes: e.target.value })
+                }
                 placeholder="Add any additional notes..."
                 className="min-h-[100px]"
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowScheduleDialog(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setShowScheduleDialog(false)}
+            >
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={() => handleScheduleMeeting(selectedMatch)}
               disabled={isLoading || !scheduleData.date || !scheduleData.time}
             >
@@ -1712,15 +2285,29 @@ interface MatchCardProps {
   onViewDetails: () => void;
 }
 
-const EnhancedMatchCard = ({ match, onAction, onViewDetails }: MatchCardProps) => {
+const EnhancedMatchCard = ({
+  match,
+  onAction,
+  onViewDetails,
+}: MatchCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   // Animation variants for expandable details - optimized for speed
   const detailsVariants = {
-    hidden: { height: 0, opacity: 0, transition: { duration: 0.2, ease: "easeInOut" } }, // Reduced from 0.3
-    visible: { height: 'auto', opacity: 1, transition: { duration: 0.2, ease: "easeOut" } } // Reduced from 0.3
+    hidden: {
+      height: 0,
+      opacity: 0,
+      transition: { duration: 0.2, ease: "easeInOut" },
+    }, // Reduced from 0.3
+    visible: {
+      height: "auto",
+      opacity: 1,
+      transition: { duration: 0.2, ease: "easeOut" },
+    }, // Reduced from 0.3
   };
 
   const handleAction = (action: string) => {
@@ -1733,92 +2320,88 @@ const EnhancedMatchCard = ({ match, onAction, onViewDetails }: MatchCardProps) =
   };
 
   return (
-    <div 
+    <div
       className="relative group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-4">
         <div className="flex items-start justify-between">
           <div className="flex gap-4">
             <div className="relative">
-              <Avatar className="h-12 w-12 rounded-md border border-border/50 shadow-sm group-hover:border-primary/30 transition-all duration-300">
+              <Avatar className="h-16 w-16 rounded-md border border-border/50 shadow-sm group-hover:border-primary/30 transition-all duration-300">
                 <AvatarImage src={match.logoUrl} alt={match.companyName} />
-                <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                <AvatarFallback className="bg-primary/10 text-primary font-medium text-lg">
                   {match.companyName.substring(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               {match.matchScore > 90 && (
-                <motion.div 
-                  className="absolute -top-1 -right-1 bg-yellow-400 rounded-full p-0.5 border-2 border-white dark:border-gray-800 shadow-sm"
+                <motion.div
+                  className={cn(
+                    "absolute -top-1 -right-1 rounded-full p-1 border-2 shadow-sm",
+                    isDark 
+                      ? "bg-yellow-500 border-gray-800" 
+                      : "bg-yellow-400 border-white"
+                  )}
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 12 }} // Increased stiffness, reduced damping
-                  whileHover={{ 
-                    scale: 1.15, // Reduced from 1.2
-                    transition: { duration: 0.15 } // Reduced from 0.2
+                  transition={{ type: "spring", stiffness: 400, damping: 12 }}
+                  whileHover={{
+                    scale: 1.15,
+                    transition: { duration: 0.15 },
                   }}
                 >
-                  <Star className="h-3 w-3 fill-white text-white" />
+                  <Star className="h-4 w-4 fill-current text-white dark:text-gray-900" />
                 </motion.div>
               )}
             </div>
-            <div>
-              <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                {match.companyName}
-                <motion.span
-                  initial={{ scale: 1 }}
-                  animate={{ scale: isHovered && match.matchScore > 90 ? [1, 1.2, 1] : 1 }}
-                  transition={{ duration: 0.5, repeat: isHovered && match.matchScore > 90 ? Infinity : 0, repeatDelay: 1 }}
-                >
-                  {match.matchScore > 90 && (
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 drop-shadow-sm" />
-                        </TooltipTrigger>
-                        <TooltipContent side="right" align="center" sideOffset={10} className="bg-card/95 backdrop-blur-sm border border-border/50 shadow-md dark:shadow-black/20 animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 duration-200">
-                          <p className="font-medium">Match score: {match.matchScore}%</p>
-                          <div className="text-xs text-muted-foreground">
-                            Based on your manufacturing capabilities
-                          </div>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  )}
-                </motion.span>
+            <div className="space-y-2 overflow-hidden">
+              <CardTitle className="text-xl font-semibold flex items-center">
+                <span className="truncate mr-1">{match.companyName}</span>
+                <StarIcon score={match.matchScore} />
               </CardTitle>
-              <CardDescription className="flex items-center gap-1.5">
-                <Building className="h-3.5 w-3.5 text-muted-foreground" />
-                {match.location}
-                <span className="mx-1">•</span>
-                <Badge variant="secondary" className="px-1.5 py-0 h-5 text-xs font-normal bg-primary/10 text-primary/90 border border-primary/20 shadow-sm dark:bg-primary/20 dark:border-primary/30 dark:text-primary-foreground/90">
-                  {match.productCategory}
-                </Badge>
+              <CardDescription className="flex items-center gap-2 text-base">
+                <Building className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <span className="truncate">{match.location}</span>
+                <span className="mx-1 flex-shrink-0">•</span>
+                {getCategoryBadge(match.productCategory, isDark)}
               </CardDescription>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {getStatusBadge(match.status)}
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger className="cursor-default">
-                  <div className="flex items-center gap-1.5 group">
-                    <div className="w-16 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden shadow-inner">
-                      <motion.div 
-                        className={`h-full ${getProgressColor(match.matchScore)}`}
+                  <div className="flex items-center gap-2 group">
+                    <div className="w-20 h-2.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden shadow-inner">
+                      <motion.div
+                        className={`h-full ${getProgressColor(
+                          match.matchScore
+                        )}`}
                         initial={{ width: 0 }}
                         animate={{ width: `${match.matchScore}%` }}
-                        transition={{ duration: 0.5, ease: "easeOut" }} // Reduced from 0.8
+                        transition={{ duration: 0.5, ease: "easeOut" }}
                       />
                     </div>
-                    <span className={`text-xs ${getMatchScoreColor(match.matchScore)}`}>
+                    <span
+                      className={`text-sm font-medium ${getMatchScoreColor(
+                        match.matchScore
+                      )}`}
+                    >
                       {match.matchScore}%
                     </span>
                   </div>
                 </TooltipTrigger>
-                <TooltipContent side="right" align="center" sideOffset={10} className="bg-card/95 backdrop-blur-sm border border-border/50 shadow-md dark:shadow-black/20 animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 duration-200">
-                  <p className="font-medium">Match score: {match.matchScore}%</p>
+                <TooltipContent
+                  side="right"
+                  align="center"
+                  sideOffset={10}
+                  className="bg-card/95 backdrop-blur-sm border border-border/50 shadow-md dark:shadow-black/20 animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 duration-200"
+                >
+                  <p className="font-medium">
+                    Match score: {match.matchScore}%
+                  </p>
                   <div className="text-xs text-muted-foreground">
                     Based on your manufacturing capabilities
                   </div>
@@ -1828,20 +2411,20 @@ const EnhancedMatchCard = ({ match, onAction, onViewDetails }: MatchCardProps) =
           </div>
         </div>
       </CardHeader>
-      <CardContent>
-        <p className="text-sm text-muted-foreground">{match.description}</p>
-        
+      <CardContent className="space-y-4">
+        <p className="text-base text-muted-foreground leading-relaxed">{match.description}</p>
+
         <AnimatePresence>
           {showDetails && (
-            <motion.div 
+            <motion.div
               variants={detailsVariants}
               initial="hidden"
               animate="visible"
               exit="hidden"
-              className="mt-4 rounded-md bg-muted/50 p-3 overflow-hidden"
+              className="mt-4 rounded-md bg-muted/50 p-4 overflow-hidden"
             >
-              <h4 className="text-sm font-medium mb-2">Match Details</h4>
-              <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+              <h4 className="text-base font-medium mb-3">Match Details</h4>
+              <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4 text-muted-foreground" />
                   <span className="text-muted-foreground">Company Size:</span>
@@ -1867,18 +2450,18 @@ const EnhancedMatchCard = ({ match, onAction, onViewDetails }: MatchCardProps) =
           )}
         </AnimatePresence>
       </CardContent>
-      <CardFooter className="pt-1 flex flex-col gap-3">
+      <CardFooter className="pt-2 flex flex-col gap-4">
         <div className="w-full flex justify-between items-center">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="text-xs px-0 hover:bg-transparent hover:underline"
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-sm px-0 hover:bg-transparent hover:underline"
             onClick={() => setShowDetails(!showDetails)}
           >
             {showDetails ? "Hide details" : "Show details"}
           </Button>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             size="sm"
             className="gap-1.5 transition-all duration-300 hover:bg-primary/10 hover:border-primary/30 shadow-sm hover:shadow group"
             onClick={onViewDetails}
@@ -1887,13 +2470,13 @@ const EnhancedMatchCard = ({ match, onAction, onViewDetails }: MatchCardProps) =
             <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
           </Button>
         </div>
-        
-        <div className="w-full flex justify-end space-x-2">
+
+        <div className="w-full flex justify-end space-x-3">
           {match.status === "pending" && (
             <>
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 className="hover:bg-red-50 hover:text-red-600 hover:border-red-200 dark:hover:bg-red-900/30 dark:hover:text-red-400 dark:hover:border-red-700/50 transition-all duration-300 shadow-sm hover:shadow"
                 onClick={() => handleAction("decline")}
                 disabled={isLoading}
@@ -1901,7 +2484,11 @@ const EnhancedMatchCard = ({ match, onAction, onViewDetails }: MatchCardProps) =
                 {isLoading ? (
                   <motion.div
                     animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    transition={{
+                      duration: 1,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
                   >
                     <RefreshCw className="h-4 w-4 mr-1" />
                   </motion.div>
@@ -1910,8 +2497,8 @@ const EnhancedMatchCard = ({ match, onAction, onViewDetails }: MatchCardProps) =
                 )}
                 Decline
               </Button>
-              <Button 
-                size="sm" 
+              <Button
+                size="sm"
                 className="bg-green-600 hover:bg-green-700 text-white shadow-sm hover:shadow transition-all duration-300 hover:translate-y-[-1px]"
                 onClick={() => handleAction("accept")}
                 disabled={isLoading}
@@ -1919,7 +2506,11 @@ const EnhancedMatchCard = ({ match, onAction, onViewDetails }: MatchCardProps) =
                 {isLoading ? (
                   <motion.div
                     animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    transition={{
+                      duration: 1,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
                   >
                     <RefreshCw className="h-4 w-4 mr-1" />
                   </motion.div>
@@ -1932,14 +2523,11 @@ const EnhancedMatchCard = ({ match, onAction, onViewDetails }: MatchCardProps) =
           )}
           {match.status === "accepted" && (
             <>
-              <Button 
-                variant="outline"
-                onClick={() => handleAction("message")}
-              >
+              <Button variant="outline" size="sm" onClick={() => handleAction("message")}>
                 <MessageSquare className="h-4 w-4 mr-1" />
                 Message
               </Button>
-              <Button 
+              <Button
                 size="sm"
                 className="gap-1.5"
                 onClick={() => handleAction("contact")}
@@ -1951,8 +2539,9 @@ const EnhancedMatchCard = ({ match, onAction, onViewDetails }: MatchCardProps) =
             </>
           )}
           {match.status === "declined" && (
-            <Button 
+            <Button
               variant="outline"
+              size="sm"
               onClick={() => {
                 handleAction("reconsider");
                 setShowDetails(false);
@@ -1963,11 +2552,11 @@ const EnhancedMatchCard = ({ match, onAction, onViewDetails }: MatchCardProps) =
           )}
         </div>
       </CardFooter>
-      
-      <motion.div 
+
+      <motion.div
         className={`absolute top-0 left-0 h-full w-1.5 rounded-l-md ${
-          match.matchScore >= 80 
-            ? "bg-gradient-to-b from-green-500 to-green-600" 
+          match.matchScore >= 80
+            ? "bg-gradient-to-b from-green-500 to-green-600"
             : "bg-gradient-to-b from-yellow-500 to-yellow-600"
         }`}
         initial={{ scaleY: 0, opacity: 0 }}
@@ -1976,7 +2565,7 @@ const EnhancedMatchCard = ({ match, onAction, onViewDetails }: MatchCardProps) =
       />
 
       {/* Highlight effect on hover */}
-      <motion.div 
+      <motion.div
         className="absolute inset-0 rounded-md bg-primary/5 pointer-events-none"
         initial={{ opacity: 0 }}
         animate={{ opacity: isHovered ? 1 : 0 }}
@@ -1989,8 +2578,8 @@ const EnhancedMatchCard = ({ match, onAction, onViewDetails }: MatchCardProps) =
 // Checkbox component (simplified version if not already imported)
 const Checkbox = ({ id, checked, onCheckedChange, defaultChecked }: any) => {
   return (
-    <input 
-      type="checkbox" 
+    <input
+      type="checkbox"
       id={id}
       checked={checked}
       onChange={(e) => onCheckedChange?.(e.target.checked)}
@@ -2003,7 +2592,7 @@ const Checkbox = ({ id, checked, onCheckedChange, defaultChecked }: any) => {
 // Slider component (simplified version if not already imported)
 const Slider = ({ defaultValue, min, max, step, onValueChange }: any) => {
   return (
-    <input 
+    <input
       type="range"
       min={min}
       max={max}
@@ -2012,6 +2601,33 @@ const Slider = ({ defaultValue, min, max, step, onValueChange }: any) => {
       onChange={(e) => onValueChange?.([parseInt(e.target.value)])}
       className="w-full"
     />
+  );
+};
+
+// Thêm component hiển thị ngôi sao riêng biệt
+const StarIcon = ({ score }: { score: number }) => {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+  const isHighScore = score >= 90;
+
+  if (!isHighScore) return null;
+
+  return (
+    <motion.div
+      className={cn(
+        "ml-1.5 inline-flex items-center justify-center",
+        "rounded-full p-1",
+        isDark 
+          ? "bg-yellow-500/80 text-yellow-100" 
+          : "bg-yellow-400 text-yellow-900"
+      )}
+      initial={{ scale: 0 }}
+      animate={{ scale: 1 }}
+      transition={{ type: "spring", stiffness: 300, damping: 15 }}
+      whileHover={{ scale: 1.2, rotate: [0, 15, -15, 0] }}
+    >
+      <Star className="h-3 w-3 fill-current" />
+    </motion.div>
   );
 };
 

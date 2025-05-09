@@ -25,6 +25,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 // Enhanced custom hooks to replace the missing libraries
 const useInView = (ref: React.RefObject<HTMLElement>, options = { once: false }) => {
@@ -479,17 +480,59 @@ const Suppliers = () => {
     ? Math.round(suppliers.reduce((acc, curr) => acc + curr.reliability, 0) / suppliers.length)
     : 0;
 
-  // Component for displaying a status badge
+  // Status badge generator with improved styling for light/dark theme visibility
   const getStatusBadge = (status: string) => {
-    switch (status) {
+    const isDark = theme === 'dark';
+    
+    switch (status.toLowerCase()) {
       case "active":
-        return <Badge variant="outline" className="bg-green-500 hover:bg-green-600 text-white shadow-sm border border-green-600/20 font-medium dark:bg-green-600 dark:hover:bg-green-700 dark:border-green-500/40">Active</Badge>;
+        return (
+          <Badge 
+            className={`transition-colors ${
+              isDark 
+                ? "bg-emerald-700/70 text-emerald-100 border border-emerald-600/50 shadow-sm hover:bg-emerald-700" 
+                : "bg-emerald-200 text-emerald-700 border border-emerald-300 shadow-sm hover:bg-emerald-300"
+            }`}
+          >
+            {status}
+          </Badge>
+        );
       case "pending":
-        return <Badge variant="outline" className="bg-yellow-500 hover:bg-yellow-600 text-white shadow-sm border border-yellow-600/20 font-medium dark:bg-yellow-600 dark:hover:bg-yellow-700 dark:border-yellow-500/40">Pending</Badge>;
+        return (
+          <Badge 
+            className={`transition-colors ${
+              isDark 
+                ? "bg-amber-700/70 text-amber-100 border border-amber-600/50 shadow-sm hover:bg-amber-700" 
+                : "bg-amber-200 text-amber-700 border border-amber-300 shadow-sm hover:bg-amber-300"
+            }`}
+          >
+            {status}
+          </Badge>
+        );
       case "inactive":
-        return <Badge variant="outline" className="text-red-600 border-red-300 bg-red-50 hover:bg-red-100 shadow-sm font-medium dark:bg-red-900/30 dark:border-red-700/50 dark:text-red-400 dark:hover:bg-red-900/40">Inactive</Badge>;
+        return (
+          <Badge 
+            className={`transition-colors ${
+              isDark 
+                ? "bg-rose-700/70 text-rose-100 border border-rose-600/50 shadow-sm hover:bg-rose-700" 
+                : "bg-rose-200 text-rose-700 border border-rose-300 shadow-sm hover:bg-rose-300"
+            }`}
+          >
+            {status}
+          </Badge>
+        );
       default:
-        return <Badge variant="outline" className="font-semibold shadow-sm">Unknown</Badge>;
+        return (
+          <Badge 
+            className={`transition-colors ${
+              isDark 
+                ? "bg-slate-700/70 text-slate-100 border border-slate-600/50 shadow-sm hover:bg-slate-700" 
+                : "bg-slate-200 text-slate-700 border border-slate-300 shadow-sm hover:bg-slate-300"
+            }`}
+          >
+            {status}
+          </Badge>
+        );
     }
   };
 
@@ -673,7 +716,7 @@ const Suppliers = () => {
                 </TabsTrigger>
                 <TabsTrigger 
                   value="active" 
-                  className="data-[state=active]:bg-green-600 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:font-semibold data-[state=active]:border-b-2 data-[state=active]:border-white/20 transition-all duration-300 py-2.5"
+                  className="data-[state=active]:bg-emerald-500 dark:data-[state=active]:bg-emerald-600 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:font-semibold data-[state=active]:border-b-2 data-[state=active]:border-white/20 transition-all duration-300 py-2.5"
                 >
                   Active
                   <Badge variant="outline" className="ml-2 bg-background/90 text-foreground shadow-sm border-border/80 font-medium transition-colors duration-300">
@@ -682,7 +725,7 @@ const Suppliers = () => {
                 </TabsTrigger>
                 <TabsTrigger 
                   value="pending" 
-                  className="data-[state=active]:bg-amber-500 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:font-semibold data-[state=active]:border-b-2 data-[state=active]:border-white/20 transition-all duration-300 py-2.5"
+                  className="data-[state=active]:bg-amber-500 dark:data-[state=active]:bg-amber-600 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:font-semibold data-[state=active]:border-b-2 data-[state=active]:border-white/20 transition-all duration-300 py-2.5"
                 >
                   Pending
                   <Badge variant="outline" className="ml-2 bg-background/90 text-foreground shadow-sm border-border/80 font-medium transition-colors duration-300">
@@ -785,13 +828,13 @@ const Suppliers = () => {
                       whileHover="hover"
                     >
                       <SupplierCard 
-                        supplier={supplier} 
+                        supplier={supplier}
                         onStatusChange={updateSupplierStatus}
                         onSelectSupplier={setSelectedSupplier}
                         onViewDetails={() => {
                           setSelectedSupplier(supplier);
                           setIsViewDetailsOpen(true);
-                        }}
+                        } }
                         onPlaceOrder={() => {
                           setSelectedSupplier(supplier);
                           setIsPlaceOrderOpen(true);
@@ -805,9 +848,9 @@ const Suppliers = () => {
                               unit: ["kg", "litres", "pcs"][Math.floor(Math.random() * 3)]
                             })) || []
                           );
-                        }}
-                        getStatusBadge={getStatusBadge}
-                        prefersReducedMotion={prefersReducedMotion}
+                        } }
+                        prefersReducedMotion={prefersReducedMotion} 
+                        getStatusBadge={getStatusBadge}                      
                       />
                     </motion.div>
                   ))
@@ -848,7 +891,7 @@ const Suppliers = () => {
                     <span>{selectedSupplier.location}</span>
                   </div>
                   <div className="flex items-center gap-2 mt-1.5">
-                    {getStatusBadge(selectedSupplier.status)}
+                    <StatusBadge status={selectedSupplier.status} />
                     <div className="rounded-full bg-blue-100 dark:bg-blue-900/40 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:text-blue-300 flex items-center gap-1 border border-blue-200 dark:border-blue-700/50 shadow-sm transition-colors duration-300">
                       <Star className="h-3 w-3 text-blue-500 dark:text-blue-300 drop-shadow-sm" />
                       <span>{selectedSupplier.reliability}% Reliability</span>
@@ -999,7 +1042,7 @@ const Suppliers = () => {
                     <p className="text-xs text-muted-foreground transition-colors duration-300">{selectedSupplier.location}</p>
                   </div>
                 </div>
-                {getStatusBadge(selectedSupplier.status)}
+                <StatusBadge status={selectedSupplier.status} />
               </motion.div>
           
               <motion.div 
@@ -1227,19 +1270,27 @@ const SupplierCard = ({
   const cardRef = useRef(null);
   const isInView = useInView(cardRef, { once: true });
   const { toast } = useToast();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   // Status badge colors
   const statusColor = {
-    active: "bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-green-200 dark:border-green-800/60",
-    pending: "bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800/60",
-    inactive: "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800/60",
+    active: isDark 
+      ? "bg-emerald-900/30 text-emerald-300 border-emerald-800/60" 
+      : "bg-emerald-50 text-emerald-700 border-emerald-200",
+    pending: isDark 
+      ? "bg-amber-900/30 text-amber-300 border-amber-800/60" 
+      : "bg-amber-50 text-amber-700 border-amber-200",
+    inactive: isDark 
+      ? "bg-rose-900/30 text-rose-300 border-rose-800/60" 
+      : "bg-rose-50 text-rose-700 border-rose-200",
   };
 
   // Background gradient based on status
   const cardBackground = {
-    active: "bg-gradient-to-b from-green-50/50 to-transparent dark:from-green-950/10 dark:to-transparent",
+    active: "bg-gradient-to-b from-emerald-50/50 to-transparent dark:from-emerald-950/10 dark:to-transparent",
     pending: "bg-gradient-to-b from-amber-50/50 to-transparent dark:from-amber-950/10 dark:to-transparent",
-    inactive: "bg-gradient-to-b from-slate-50/50 to-transparent dark:from-slate-950/10 dark:to-transparent",
+    inactive: "bg-gradient-to-b from-rose-50/50 to-transparent dark:from-rose-950/10 dark:to-transparent",
   };
 
   return (
@@ -1289,12 +1340,12 @@ const SupplierCard = ({
           <div className="h-2 bg-muted rounded-full overflow-hidden mb-4">
             <motion.div 
               className={`h-full rounded-full ${
-                supplier.reliability > 85 ? "bg-green-500" :
-                supplier.reliability > 70 ? "bg-amber-500" : "bg-red-500"
+                supplier.reliability > 85 ? "bg-emerald-500 dark:bg-emerald-400" :
+                supplier.reliability > 70 ? "bg-amber-500 dark:bg-amber-400" : "bg-rose-500 dark:bg-rose-400"
               }`}
               initial={{ width: 0 }}
               animate={{ width: isInView ? `${supplier.reliability}%` : 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }} // Reduced from 0.8, 0.2
+              transition={{ duration: 0.5, delay: 0.1 }}
             />
           </div>
           

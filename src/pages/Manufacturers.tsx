@@ -584,7 +584,7 @@ const Manufacturers = () => {
             animate="visible"
           >
             <motion.div variants={itemVariants} className="space-y-4">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/50 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary animate-gradient bg-300%">
                 Manufacturers
               </h1>
               <p className="text-lg text-muted-foreground max-w-2xl">

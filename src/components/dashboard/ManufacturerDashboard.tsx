@@ -41,6 +41,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { StatusBadge } from "@/components/ui/status-badge";
+import { useTheme } from "@/contexts/ThemeContext";
 
 // Mock data
 const productionStats = {
@@ -81,25 +83,12 @@ interface ManufacturerDashboardProps {
 
 const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboardProps) => {
   const { user } = useUser();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
-  // Helper function for status badges
+  // Helper function for status badges - simplified
   const getStatusBadge = (status: string) => {
-    switch(status) {
-      case "Operational":
-        return <Badge className="bg-green-500">Operational</Badge>;
-      case "Maintenance":
-        return <Badge className="bg-yellow-500">Maintenance</Badge>;
-      case "Inactive":
-        return <Badge className="bg-gray-500">Inactive</Badge>;
-      case "In Production":
-        return <Badge className="bg-blue-500">In Production</Badge>;
-      case "Completed":
-        return <Badge className="bg-green-500">Completed</Badge>;
-      case "Scheduled":
-        return <Badge className="bg-purple-500">Scheduled</Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
-    }
+    return <StatusBadge status={status as any} />;
   };
 
   // Helper function for alert icons

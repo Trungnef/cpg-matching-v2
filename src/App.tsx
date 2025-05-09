@@ -22,6 +22,10 @@ import Blog from "./pages/Blog";
 import CaseStudies from "./pages/CaseStudies";
 import Webinars from "./pages/Webinars";
 
+// AI Web Crawler
+import WebCrawler from "./pages/admin/crawler/WebCrawler";
+import ProductCatalog from "./pages/admin/catalog/ProductCatalog";
+
 // Let's create page wrapper components to add Footer to specific pages
 import Footer from "./components/Footer";
 
@@ -322,6 +326,8 @@ const App = () => (
                               <Route path="settings" element={<Settings />} />
                               <Route path="profile" element={<AdminProfile />} />
                               <Route path="help" element={<AdminHelp />} />
+                              <Route path="crawler/webcrawler" element={<WebCrawler />} />
+                              <Route path="catalog/productcatalog" element={<ProductCatalog />} />
                             </Route>
                             
                             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

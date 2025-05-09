@@ -73,94 +73,24 @@ import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { StatusBadge, StatusType } from "@/components/ui/status-badge";
 
 // Mock inventory data
-const inventory = [
-  {
-    id: 1,
-    name: "Organic Cereal",
-    brand: "Green Earth Foods",
-    category: "Food",
-    status: "In Stock",
-    quantity: 5200,
-    threshold: 2000,
-    location: "Warehouse A",
-    image: "/placeholder.svg",
-    description: "Organic whole grain cereal made with natural ingredients. High in fiber and low in sugar, perfect for a healthy breakfast.",
-    price: 24.99,
-    sku: "ORG-CER-001"
-  },
-  {
-    id: 2,
-    name: "Protein Bars",
-    brand: "Pure Wellness",
-    category: "Food",
-    status: "Low Stock",
-    quantity: 850,
-    threshold: 1000,
-    location: "Warehouse B",
-    image: "/placeholder.svg",
-    description: "High protein bars with 20g of protein per serving. Great for pre or post workout snack or meal replacement.",
-    price: 18.50,
-    sku: "PRO-BAR-002"
-  },
-  {
-    id: 3,
-    name: "Cold Pressed Juice",
-    brand: "Fresh Press",
-    category: "Beverages",
-    status: "In Stock",
-    quantity: 3200,
-    threshold: 1500,
-    location: "Warehouse A",
-    image: "/placeholder.svg",
-    description: "Cold pressed juice made from organic fruits and vegetables. No added sugars or preservatives.",
-    price: 30.00,
-    sku: "JUI-CPR-003"
-  },
-  {
-    id: 4,
-    name: "Vitamin Supplements",
-    brand: "Wellness Essentials",
-    category: "Health",
-    status: "Out of Stock",
-    quantity: 0,
-    threshold: 800,
-    location: "Warehouse C",
-    image: "/placeholder.svg",
-    description: "Daily multivitamin supplement with essential vitamins and minerals for overall health and wellness.",
-    price: 42.50,
-    sku: "VIT-SUP-004"
-  },
-  {
-    id: 5,
-    name: "Eco-Friendly Dish Soap",
-    brand: "Clean Living",
-    category: "Household",
-    status: "In Stock",
-    quantity: 2400,
-    threshold: 1200,
-    location: "Warehouse B",
-    image: "/placeholder.svg",
-    description: "Plant-based dish soap that's tough on grease but gentle on the environment. Biodegradable and comes in recyclable packaging.",
-    price: 18.90,
-    sku: "ECO-SOP-005"
-  },
-  {
-    id: 6,
-    name: "Organic Trail Mix",
-    brand: "Nature's Harvest",
-    category: "Snacks",
-    status: "Low Stock",
-    quantity: 650,
-    threshold: 800,
-    location: "Warehouse A",
-    image: "/placeholder.svg",
-    description: "Mix of organic nuts, seeds, and dried fruits. Perfect healthy snack for on-the-go energy.",
-    price: 16.75,
-    sku: "ORG-MIX-006"
-  }
-];
+interface InventoryItem {
+  id: number;
+  name: string;
+  brand: string;
+  category: string;
+  status: "In Stock" | "Low Stock" | "Out of Stock";
+  quantity: number;
+  threshold: number;
+  location: string;
+  image?: string;
+  description: string;
+  price: number;
+  sku: string;
+  lastRestocked: string;
+}
 
 // Form schema for product validation
 const productSchema = z.object({
@@ -176,6 +106,94 @@ const productSchema = z.object({
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
+
+// Mock inventory data
+const inventory: InventoryItem[] = [
+  {
+    id: 1,
+    name: "Organic Cereal",
+    brand: "Green Earth Foods",
+    category: "Breakfast",
+    status: "In Stock",
+    quantity: 150,
+    threshold: 50,
+    location: "Warehouse A",
+    sku: "CER-001",
+    price: 4.99,
+    lastRestocked: "2024-03-15",
+    description: "Organic whole grain cereal with nuts and dried fruits"
+  },
+  {
+    id: 2,
+    name: "Protein Bars",
+    brand: "Pure Wellness",
+    category: "Snacks",
+    status: "Low Stock",
+    quantity: 25,
+    threshold: 30,
+    location: "Warehouse B",
+    sku: "PRB-002",
+    price: 2.99,
+    lastRestocked: "2024-03-10",
+    description: "High protein energy bars with natural ingredients"
+  },
+  {
+    id: 3,
+    name: "Cold Pressed Juice",
+    brand: "Fresh Press",
+    category: "Beverages",
+    status: "In Stock",
+    quantity: 80,
+    threshold: 40,
+    location: "Warehouse A",
+    sku: "JUC-003",
+    price: 5.99,
+    lastRestocked: "2024-03-12",
+    description: "Cold pressed organic juice blend"
+  },
+  {
+    id: 4,
+    name: "Vitamin Supplements",
+    brand: "Wellness Essentials",
+    category: "Health",
+    status: "Out of Stock",
+    quantity: 0,
+    threshold: 20,
+    location: "Warehouse C",
+    sku: "VIT-004",
+    price: 19.99,
+    lastRestocked: "2024-02-28",
+    description: "Daily multivitamin supplements"
+  },
+  {
+    id: 5,
+    name: "Eco-Friendly Dish Soap",
+    brand: "Clean Living",
+    category: "Household",
+    status: "In Stock",
+    quantity: 120,
+    threshold: 45,
+    location: "Warehouse B",
+    sku: "HOU-005",
+    price: 3.99,
+    lastRestocked: "2024-03-14",
+    description: "Biodegradable dish soap with natural ingredients"
+  },
+  {
+    id: 6,
+    name: "Organic Trail Mix",
+    brand: "Nature's Harvest",
+    category: "Snacks",
+    status: "Low Stock",
+    quantity: 15,
+    threshold: 25,
+    location: "Warehouse A",
+    sku: "SNK-006",
+    price: 6.99,
+    lastRestocked: "2024-03-08",
+    description: "Organic trail mix with nuts, seeds, and dried fruits"
+  }
+];
 
 const RetailerInventory = () => {
   const { isAuthenticated, user, role } = useUser();
@@ -252,20 +270,6 @@ const RetailerInventory = () => {
     return matchesSearch && matchesCategory && matchesStatus;
   });
 
-  // Helper function for status badges
-  const getStatusBadge = (status: string) => {
-    switch(status) {
-      case "In Stock":
-        return <Badge className="bg-green-500 hover:bg-green-600 text-white shadow-sm border border-green-600/20 font-medium dark:bg-green-600 dark:hover:bg-green-700 dark:border-green-500/40">In Stock</Badge>;
-      case "Low Stock":
-        return <Badge className="bg-yellow-500 hover:bg-yellow-600 text-white shadow-sm border border-yellow-600/20 font-medium dark:bg-yellow-600 dark:hover:bg-yellow-700 dark:border-yellow-500/40">Low Stock</Badge>;
-      case "Out of Stock":
-        return <Badge variant="outline" className="text-red-600 border-red-300 bg-red-50 hover:bg-red-100 shadow-sm font-medium dark:bg-red-900/30 dark:border-red-700/50 dark:text-red-400 dark:hover:bg-red-900/40">Out of Stock</Badge>;
-      default:
-        return <Badge variant="outline" className="shadow-sm font-medium">{status}</Badge>;
-    }
-  };
-
   // Calculate inventory level as percentage
   const getInventoryLevel = (quantity: number, threshold: number) => {
     if (quantity === 0) return 0;
@@ -317,14 +321,14 @@ const RetailerInventory = () => {
   // Handle add product form submission
   const onAddProductSubmit = (data: ProductFormValues) => {
     // Determine status based on quantity and threshold
-    let status = "In Stock";
+    let status: "In Stock" | "Low Stock" | "Out of Stock" = "In Stock";
     if (data.quantity === 0) {
       status = "Out of Stock";
     } else if (data.quantity < data.threshold) {
       status = "Low Stock";
     }
     
-    const newProduct = {
+    const newProduct: InventoryItem = {
       id: inventoryData.length + 1,
       name: data.name,
       brand: data.brand,
@@ -336,7 +340,8 @@ const RetailerInventory = () => {
       image: "/placeholder.svg",
       description: data.description || "",
       price: data.price,
-      sku: data.sku
+      sku: data.sku,
+      lastRestocked: new Date().toISOString().split('T')[0]
     };
     
     setInventoryData(prev => [...prev, newProduct]);
@@ -373,7 +378,8 @@ const RetailerInventory = () => {
       location: data.location,
       description: data.description || "",
       price: data.price,
-      sku: data.sku
+      sku: data.sku,
+      lastRestocked: new Date().toISOString().split('T')[0]
     };
     
     setInventoryData(prev => 
@@ -398,6 +404,16 @@ const RetailerInventory = () => {
       editProductForm.reset(defaultValues);
     }
   }, [addProductOpen, editProductOpen]);
+
+  const addItem = (item: Omit<InventoryItem, 'id' | 'lastRestocked'>) => {
+    const newItem: InventoryItem = {
+      ...item,
+      id: inventoryData.length + 1,
+      lastRestocked: new Date().toISOString().split('T')[0],
+      status: item.status as "In Stock" | "Low Stock" | "Out of Stock"
+    };
+    setInventoryData(prev => [...prev, newItem]);
+  };
 
   return (
     <RetailerLayout>
@@ -697,31 +713,22 @@ const RetailerInventory = () => {
                         </CardTitle>
                         <CardDescription>{item.brand}</CardDescription>
                       </div>
-                      {getStatusBadge(item.status)}
+                      <StatusBadge status={item.status} />
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-3 pb-2">
                     <div className="space-y-1">
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">Stock Level</span>
-                        <span className={`font-medium ${
-                          item.status === "Out of Stock" ? "text-red-600 dark:text-red-400" : 
-                          item.status === "Low Stock" ? "text-yellow-600 dark:text-yellow-400" : "text-green-600 dark:text-green-400"
-                        }`}>
+                        <span className="font-medium">
                           {item.quantity} units
                         </span>
                       </div>
                       <Progress 
                         value={getInventoryLevel(item.quantity, item.threshold)} 
-                        className={`h-2 ${
-                          item.status === "Out of Stock" ? "bg-red-200 dark:bg-red-950/50" : 
-                          item.status === "Low Stock" ? "bg-yellow-200 dark:bg-yellow-950/50" : "bg-green-200 dark:bg-green-950/50"
-                        } [&>div]:${
-                          item.status === "Out of Stock" ? "bg-red-500 dark:bg-red-600" : 
-                          item.status === "Low Stock" ? "bg-yellow-500 dark:bg-yellow-600" : "bg-green-500 dark:bg-green-600"
-                        }`} 
+                        className="h-2 bg-muted [&>div]:bg-primary" 
                       />
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <div className="flex justify-between items-center text-xs text-muted-foreground">
                         <span>Min threshold: {item.threshold}</span>
                         {item.status === "Low Stock" && (
                           <span className="flex items-center text-yellow-600 dark:text-yellow-400 font-medium">
@@ -908,7 +915,7 @@ const RetailerInventory = () => {
                   </div>
                   
                   <div className="flex items-center gap-2">
-                    {getStatusBadge(selectedProduct.status)}
+                    <StatusBadge status={selectedProduct.status} />
                     <span className="text-sm font-medium">${selectedProduct.price.toFixed(2)}</span>
                   </div>
                   

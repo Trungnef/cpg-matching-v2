@@ -9,6 +9,7 @@ import ManufacturerLayout from "@/components/layouts/ManufacturerLayout";
 import BrandLayout from "@/components/layouts/BrandLayout";
 import RetailerLayout from "@/components/layouts/RetailerLayout";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 // Define task tabs for each role
 type RoleTabs = {
@@ -19,6 +20,7 @@ type RoleTabs = {
   }[];
 };
 
+// Note: These labels will be translated when used in the UI
 const roleTabs: RoleTabs = {
   manufacturer: [
     { id: "overview", label: "Overview" },
@@ -30,58 +32,61 @@ const roleTabs: RoleTabs = {
     { id: "analytics", label: "Analytics", path: "/manufacturer/analytics" },
     { id: "suppliers", label: "Suppliers", path: "/manufacturer/suppliers" },
     { id: "matches", label: "Matches", path: "/manufacturer/matches" },
-    { id: "settings", label: "Settings", path: "/manufacturer/settings" }
+    { id: "settings", label: "Settings", path: "/manufacturer/settings" },
   ],
   brand: [
     { id: "overview", label: "Overview" },
     { id: "products", label: "Products" },
     { id: "orders", label: "Orders" },
     { id: "insights", label: "Market Insights" },
-    { id: "partnerships", label: "Partnerships" }
+    { id: "partnerships", label: "Partnerships" },
   ],
   retailer: [
     { id: "overview", label: "Overview" },
     { id: "inventory", label: "Inventory" },
     { id: "orders", label: "Orders" },
     { id: "sales", label: "Sales Analytics" },
-    { id: "partnerships", label: "Partnerships" }
-  ]
+    { id: "partnerships", label: "Partnerships" },
+  ],
 };
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user, role: userRole } = useUser();
   const [activeTab, setActiveTab] = useState("overview");
-  
+  const { t } = useTranslation();
+
   // Lấy role từ user
   const role = userRole || "";
-  
+
   useEffect(() => {
-    document.title = `${role.charAt(0).toUpperCase() + role.slice(1)} Dashboard - CPG Matchmaker`;
-    
+    document.title = `${
+      role.charAt(0).toUpperCase() + role.slice(1)
+    } ${t('dashboard')} - CPG Matchmaker`;
+
     // Nếu không authenticated, chuyển hướng đến trang auth
     if (!isAuthenticated) {
       navigate("/auth?type=signin");
       return;
     }
-  }, [role, navigate, isAuthenticated]);
+  }, [role, navigate, isAuthenticated, t]);
 
   if (!isAuthenticated) {
-      return (
+    return (
       <div className="flex items-center justify-center h-screen">
         <Loader2 className="h-8 w-8 animate-spin" />
-        </div>
-      );
-    }
-    
+      </div>
+    );
+  }
+
   // Handle tab changes, including navigation to external pages
   const handleTabChange = (value: string) => {
     setActiveTab(value);
-    
+
     // If tab has an external path, navigate to it
     const tabs = roleTabs[role] || [];
-    const selectedTab = tabs.find(tab => tab.id === value);
-    
+    const selectedTab = tabs.find((tab) => tab.id === value);
+
     if (selectedTab?.path) {
       navigate(selectedTab.path);
     }
@@ -89,7 +94,7 @@ const Dashboard = () => {
 
   // Render dashboard dựa trên role
   const renderDashboardByRole = () => {
-    switch(role) {
+    switch (role) {
       case "manufacturer":
         return (
           <ManufacturerLayout>
@@ -99,7 +104,7 @@ const Dashboard = () => {
               transition={{ duration: 0.5 }}
               className="space-y-6"
             >
-              <ManufacturerDashboard activeTab={activeTab} />
+              <ManufacturerDashboard />
             </motion.div>
           </ManufacturerLayout>
         );
@@ -130,11 +135,11 @@ const Dashboard = () => {
           </RetailerLayout>
         );
       default:
-    return (
+        return (
           <div className="flex items-center justify-center h-screen">
             <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
+          </div>
+        );
     }
   };
 

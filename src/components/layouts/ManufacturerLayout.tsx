@@ -1009,10 +1009,15 @@ const UserMenu = () => {
             <AvatarImage src={user?.avatar || ""} alt={user?.name || "User"} />
             <AvatarFallback>{user?.name?.charAt(0) || "U"}</AvatarFallback>
           </Avatar>
-          <span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-background ${
-            user?.status === "online" ? "bg-green-500" : 
-            user?.status === "away" ? "bg-yellow-500" : "bg-red-500"
-          }`} />
+          <span
+            className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-background ${
+              user?.status === "online"
+                ? "bg-green-500"
+                : user?.status === "away"
+                ? "bg-yellow-500"
+                : "bg-red-500"
+            }`}
+          />
         </div>
       </button>
 
@@ -1030,40 +1035,65 @@ const UserMenu = () => {
               <div className="p-4 border-b border-border bg-muted">
                 <div className="flex items-start gap-4">
                   <Avatar className="h-14 w-14 border-2 border-primary/20">
-                    <AvatarImage src={user?.avatar || ""} alt={user?.name || "User"} />
-                    <AvatarFallback className="text-lg">{user?.name?.charAt(0) || "U"}</AvatarFallback>
+                    <AvatarImage
+                      src={user?.avatar || ""}
+                      alt={user?.name || "User"}
+                    />
+                    <AvatarFallback className="text-lg">
+                      {user?.name?.charAt(0) || "U"}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-base font-semibold truncate">{user?.name}</h4>
-                    <p className="text-sm text-muted-foreground truncate">{user?.email}</p>
-                    
+                    <h4 className="text-base font-semibold truncate">
+                      {user?.name}
+                    </h4>
+                    <p className="text-sm text-muted-foreground truncate">
+                      {user?.email}
+                    </p>
+
                     <div className="flex items-center mt-1 space-x-2">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
-                            <span className={`h-2 w-2 rounded-full mr-2 ${
-                              user?.status === "online" ? "bg-green-500" : 
-                              user?.status === "away" ? "bg-yellow-500" : "bg-red-500"
-                            }`} />
-                            {user?.status === "online" ? "Online" : 
-                              user?.status === "away" ? "Away" : "Busy"}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 px-2 text-xs"
+                          >
+                            <span
+                              className={`h-2 w-2 rounded-full mr-2 ${
+                                user?.status === "online"
+                                  ? "bg-green-500"
+                                  : user?.status === "away"
+                                  ? "bg-yellow-500"
+                                  : "bg-red-500"
+                              }`}
+                            />
+                            {user?.status === "online"
+                              ? "Online"
+                              : user?.status === "away"
+                              ? "Away"
+                              : "Busy"}
                             <ChevronDown className="h-3.5 w-3.5 ml-1" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" className="w-40 bg-popover text-popover-foreground border-border">
+                        <DropdownMenuContent align="start" className="w-40 bg-background/95 dark:bg-background/80 backdrop-blur-md border-border">
                           <DropdownMenuItem onClick={() => handleStatusChange("online")}>
                             <div className="flex items-center">
                               <span className="h-2 w-2 rounded-full bg-green-500 mr-2" />
                               <span>Online</span>
                             </div>
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleStatusChange("away")}>
+                          <DropdownMenuItem
+                            onClick={() => handleStatusChange("away")}
+                          >
                             <div className="flex items-center">
                               <span className="h-2 w-2 rounded-full bg-yellow-500 mr-2" />
                               <span>Away</span>
                             </div>
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleStatusChange("busy")}>
+                          <DropdownMenuItem
+                            onClick={() => handleStatusChange("busy")}
+                          >
                             <div className="flex items-center">
                               <span className="h-2 w-2 rounded-full bg-red-500 mr-2" />
                               <span>Busy</span>
@@ -1071,7 +1101,10 @@ const UserMenu = () => {
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
-                      <Badge variant="secondary" className="text-xs px-2 py-0 h-5">
+                      <Badge
+                        variant="secondary"
+                        className="text-xs px-2 py-0 h-5"
+                      >
                         Manufacturer
                       </Badge>
                     </div>
@@ -1080,11 +1113,11 @@ const UserMenu = () => {
 
                 {/* Manufacturer-specific stats */}
                 <div className="grid grid-cols-3 gap-2 mt-4 text-center">
-                  <div className="bg-muted rounded-lg p-2">
+                  <div className="bg-background/60 rounded-lg p-2">
                     <p className="text-lg font-semibold">{user?.manufacturerSettings?.productionCapacity?.toLocaleString() || "0"}</p>
                     <p className="text-xs text-muted-foreground">Capacity</p>
                   </div>
-                  <div className="bg-muted rounded-lg p-2">
+                  <div className="bg-background/60 rounded-lg p-2">
                     <p className="text-lg font-semibold">{user?.manufacturerSettings?.preferredCategories?.length || "0"}</p>
                     <p className="text-xs text-muted-foreground">Products</p>
                   </div>
@@ -1103,18 +1136,23 @@ const UserMenu = () => {
                     onClick={() => navigateTo("/dashboard")}
                     whileHover={{ x: 3 }}
                   >
-                    <LayoutDashboard className="h-4 w-4 text-primary" />
-                    <span className="truncate">Dashboard</span>
+                    <LayoutDashboard className="h-4 w-4" />
+                    <div className="flex-1 text-left">
+                      <p>Dashboard</p>
+                      <p className="text-xs text-muted-foreground">Manufacturer overview</p>
+                    </div>
                   </motion.button>
-                  
-                  <motion.button
-                    className="flex items-center gap-3 rounded-md px-2.5 py-2 text-sm transition-colors hover:bg-primary/10 text-left w-full"
+
+                  <button
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent text-left"
                     onClick={() => navigateTo("/profile")}
-                    whileHover={{ x: 3 }}
                   >
-                    <User className="h-4 w-4 text-primary" />
-                    <span className="truncate">Profile</span>
-                  </motion.button>
+                    <User className="h-4 w-4" />
+                    <div className="flex-1 text-left">
+                      <p>Profile</p>
+                      <p className="text-xs text-muted-foreground">Manage your information</p>
+                    </div>
+                  </button>
 
                   <motion.button
                     className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-primary/10 text-left"
@@ -1125,7 +1163,7 @@ const UserMenu = () => {
                       <Settings className="h-4 w-4" />
                     </div>
                     <div className="flex-1 text-left">
-                      <p className="font-medium">Settings</p>
+                      <p>Settings</p>
                       <p className="text-xs text-muted-foreground">Account preferences</p>
                     </div>
                   </motion.button>
@@ -1143,7 +1181,7 @@ const UserMenu = () => {
                     <LogOut className="h-4 w-4" />
                   </div>
                   <div className="flex-1 text-left">
-                    <p className="font-bold text-destructive dark:text-red-400">Log out</p>
+                    <p className="font-bold text-destructive/90 dark:text-destructive">Log out</p>
                     <p className="text-xs text-muted-foreground">Sign out of your account</p>
                   </div>
                 </motion.button>

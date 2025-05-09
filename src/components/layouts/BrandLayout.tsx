@@ -1072,6 +1072,7 @@ const UserProfileDropdown = () => {
               </div>
 
               {/* Menu items */}
+              {/* Menu items */}
               <div className="p-2">
                 <div className="grid grid-cols-1 gap-1">
                   <motion.button
@@ -1079,18 +1080,23 @@ const UserProfileDropdown = () => {
                     onClick={() => navigateTo("/dashboard")}
                     whileHover={{ x: 3 }}
                   >
-                    <LayoutDashboard className="h-4 w-4 text-primary" />
-                    <span className="truncate">Dashboard</span>
+                    <LayoutDashboard className="h-4 w-4" />
+                    <div className="flex-1 text-left">
+                      <p>Dashboard</p>
+                      <p className="text-xs text-muted-foreground">Brands overview</p>
+                    </div>
                   </motion.button>
-                  
-                  <motion.button
-                    className="flex items-center gap-3 rounded-md px-2.5 py-2 text-sm transition-colors hover:bg-primary/10 text-left w-full"
+
+                  <button
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent text-left"
                     onClick={() => navigateTo("/profile")}
-                    whileHover={{ x: 3 }}
                   >
-                    <User className="h-4 w-4 text-primary" />
-                    <span className="truncate">Profile</span>
-                  </motion.button>
+                    <User className="h-4 w-4" />
+                    <div className="flex-1 text-left">
+                      <p>Profile</p>
+                      <p className="text-xs text-muted-foreground">Manage your information</p>
+                    </div>
+                  </button>
 
                   <motion.button
                     className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-primary/10 text-left"
@@ -1101,7 +1107,7 @@ const UserProfileDropdown = () => {
                       <Settings className="h-4 w-4" />
                     </div>
                     <div className="flex-1 text-left">
-                      <p className="font-medium">Settings</p>
+                      <p>Settings</p>
                       <p className="text-xs text-muted-foreground">Account preferences</p>
                     </div>
                   </motion.button>
