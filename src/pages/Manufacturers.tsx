@@ -6,6 +6,7 @@ import ManufacturerCard from "@/components/ManufacturerCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from "react-i18next";
 import { 
   Search, 
   Filter, 
@@ -323,6 +324,7 @@ const pageTransition = {
 };
 
 const Manufacturers = () => {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState(searchParams.get("q") || "");
   const [originalManufacturers] = useState<Manufacturer[]>(mockManufacturers);
@@ -585,10 +587,10 @@ const Manufacturers = () => {
           >
             <motion.div variants={itemVariants} className="space-y-4">
             <h1 className="text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary animate-gradient bg-300%">
-                Manufacturers
+                {t('manufacturers-title')}
               </h1>
               <p className="text-lg text-muted-foreground max-w-2xl">
-                Find the perfect manufacturer for your CPG products. Compare capabilities, certifications, and connect directly with trusted partners.
+                {t('manufacturers-description')}
               </p>
             </motion.div>
             
@@ -618,7 +620,7 @@ const Manufacturers = () => {
                         favorites.length > 0 ? "fill-current" : "group-hover:fill-current"
                       )} />
                     </motion.span>
-                    Favorites
+                    {t('favorites-button')}
                     {favorites.length > 0 && (
                       <motion.div
                         initial={{ scale: 0 }}
@@ -650,7 +652,7 @@ const Manufacturers = () => {
                     )}
                   >
                     <Filter className="h-4 w-4" />
-                    Filters
+                    {t('filters-heading')}
                     {(selectedCertifications.length > 0 || activeCategory !== "All Categories" || activeLocation !== "All Locations") && (
                       <motion.div
                         initial={{ scale: 0 }}
@@ -683,7 +685,7 @@ const Manufacturers = () => {
                     onClick={() => setShowCompareSheet(true)}
                   >
                     <Scale className="h-4 w-4" />
-                    Compare
+                    {t('compare-button')}
                     {compareItems.length > 0 && (
                       <motion.div
                         initial={{ scale: 0 }}
@@ -713,7 +715,7 @@ const Manufacturers = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
                 type="search"
-                placeholder="Search manufacturers, products, or certifications..."
+                placeholder={t('search-manufacturers-placeholder')}
                 className="pl-10 w-full transition-all duration-300 border-opacity-50 focus:border-opacity-100"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -745,7 +747,7 @@ const Manufacturers = () => {
                 onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
               >
                 <SlidersHorizontal className="h-4 w-4 mr-2" />
-                Advanced
+                {t('advanced-search-button')}
               </Button>
             </div>
 
@@ -776,7 +778,7 @@ const Manufacturers = () => {
                     <div className="space-y-3">
                       <label className="text-sm font-medium flex items-center gap-2">
                         <Star className="h-4 w-4 text-yellow-500" />
-                        Rating Range
+                        {t('rating-range')}
                       </label>
                       <div className="pt-2">
                         <div className="flex items-center gap-4">
@@ -805,7 +807,7 @@ const Manufacturers = () => {
                     <div className="space-y-3">
                       <label className="text-sm font-medium flex items-center gap-2">
                         <Building2 className="h-4 w-4 text-emerald-500" />
-                        Annual Revenue
+                        {t('annual-revenue')}
                       </label>
                       <div className="pt-2">
                         <div className="flex items-center gap-4">
@@ -828,7 +830,7 @@ const Manufacturers = () => {
                     <div className="space-y-3">
                       <label className="text-sm font-medium flex items-center gap-2">
                         <Users className="h-4 w-4 text-blue-500" />
-                        Employee Count
+                        {t('employee-count')}
                       </label>
                       <div className="pt-2">
                         <div className="flex items-center gap-4">
@@ -851,7 +853,7 @@ const Manufacturers = () => {
                     <div className="space-y-3">
                       <label className="text-sm font-medium flex items-center gap-2">
                         <Factory className="h-4 w-4 text-purple-500" />
-                        Production Capacity
+                        {t('production-capacity')}
                       </label>
                       <div className="pt-2">
                         <div className="flex items-center gap-4">
@@ -874,7 +876,7 @@ const Manufacturers = () => {
                     <div className="space-y-3">
                       <label className="text-sm font-medium flex items-center gap-2">
                         <Globe2 className="h-4 w-4 text-indigo-500" />
-                        Export Markets
+                        {t('export-markets')}
                       </label>
                       <div className="flex flex-wrap gap-2">
                         {locationOptions.map((location) => (
@@ -905,7 +907,7 @@ const Manufacturers = () => {
                     <div className="space-y-3">
                       <label className="text-sm font-medium flex items-center gap-2">
                         <ShieldCheck className="h-4 w-4 text-teal-500" />
-                        Quality Standards
+                        {t('quality-standards')}
                       </label>
                       <div className="flex flex-wrap gap-2">
                         {certificationOptions.map((cert) => (
@@ -936,7 +938,7 @@ const Manufacturers = () => {
                     <div className="col-span-full space-y-4 border-t pt-4">
                       <label className="text-sm font-medium flex items-center gap-2">
                         <Settings2 className="h-4 w-4 text-gray-600" />
-                        Additional Capabilities
+                        {t('additional-capabilities')}
                       </label>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                         <div className="space-y-4">
@@ -944,14 +946,14 @@ const Manufacturers = () => {
                             <Switch id="r_and_d" checked={hasRandD} onCheckedChange={setHasRandD} />
                             <Label htmlFor="r_and_d" className="text-sm flex items-center gap-2">
                               <Microscope className="h-4 w-4 text-rose-500" />
-                              R&D Facilities
+                              {t('r-and-d-facilities')}
                             </Label>
                           </div>
                           <div className="flex items-center space-x-3">
                             <Switch id="private_label" checked={hasPrivateLabel} onCheckedChange={setHasPrivateLabel} />
                             <Label htmlFor="private_label" className="text-sm flex items-center gap-2">
                               <Tag className="h-4 w-4 text-sky-500" />
-                              Private Label Service
+                              {t('private-label-service')}
                             </Label>
                           </div>
                         </div>
@@ -960,14 +962,14 @@ const Manufacturers = () => {
                             <Switch id="oem" checked={hasOEM} onCheckedChange={setHasOEM} />
                             <Label htmlFor="oem" className="text-sm flex items-center gap-2">
                               <Factory className="h-4 w-4 text-amber-500" />
-                              OEM Service
+                              {t('oem-service')}
                             </Label>
                           </div>
                           <div className="flex items-center space-x-3">
                             <Switch id="design" checked={hasDesign} onCheckedChange={setHasDesign} />
                             <Label htmlFor="design" className="text-sm flex items-center gap-2">
                               <Paintbrush className="h-4 w-4 text-violet-500" />
-                              Design Service
+                              {t('design-service')}
                             </Label>
                           </div>
                         </div>
@@ -976,14 +978,14 @@ const Manufacturers = () => {
                             <Switch id="trade_shows" checked={hasTradeShows} onCheckedChange={setHasTradeShows} />
                             <Label htmlFor="trade_shows" className="text-sm flex items-center gap-2">
                               <Store className="h-4 w-4 text-orange-500" />
-                              Trade Show Presence
+                              {t('trade-show-presence')}
                             </Label>
                           </div>
                           <div className="flex items-center space-x-3">
                             <Switch id="samples" checked={hasSamples} onCheckedChange={setHasSamples} />
                             <Label htmlFor="samples" className="text-sm flex items-center gap-2">
                               <Package className="h-4 w-4 text-blue-500" />
-                              Sample Development
+                              {t('sample-development')}
                             </Label>
                           </div>
                         </div>
@@ -1011,14 +1013,14 @@ const Manufacturers = () => {
                       }}
                       className="hover:bg-destructive hover:text-destructive-foreground"
                     >
-                      Reset Filters
+                      {t('reset-filters')}
                     </Button>
                     <div className="flex gap-2">
                       <Button variant="outline" onClick={() => setShowAdvancedSearch(false)}>
-                        Cancel
+                        {t('cancel-button')}
                       </Button>
                       <Button onClick={() => setShowAdvancedSearch(false)}>
-                        Apply Filters
+                        {t('apply-filters')}
                       </Button>
                     </div>
                   </div>
@@ -1041,7 +1043,7 @@ const Manufacturers = () => {
                   opacity: { duration: 0.2 }
                 }}
               >
-                <span className="text-sm font-medium text-foreground/70">Active filters:</span>
+                <span className="text-sm font-medium text-foreground/70">{t('active-filters')}</span>
                 
                 {showFavoritesOnly && (
                   <motion.div
@@ -1053,7 +1055,7 @@ const Manufacturers = () => {
                   >
                     <Badge variant="secondary" className="flex items-center gap-1 group hover:bg-destructive hover:text-destructive-foreground transition-all duration-300">
                       <Heart className="h-3 w-3" />
-                      Favorites Only
+                      {t('favorites-only')}
                       <motion.button 
                         onClick={() => setShowFavoritesOnly(false)}
                         className="group-hover:bg-destructive-foreground/20 rounded-full p-0.5 transition-colors duration-300"
@@ -1075,7 +1077,7 @@ const Manufacturers = () => {
                     transition={{ duration: 0.2 }}
                   >
                     <Badge variant="secondary" className="flex items-center gap-1 group hover:bg-destructive hover:text-destructive-foreground transition-all duration-300">
-                      {activeCategory}
+                      {activeCategory === "All Categories" ? t('all-categories') : activeCategory}
                       <motion.button 
                         onClick={() => setActiveCategory("All Categories")}
                         className="group-hover:bg-destructive-foreground/20 rounded-full p-0.5 transition-colors duration-300"
@@ -1098,7 +1100,7 @@ const Manufacturers = () => {
                   >
                     <Badge variant="secondary" className="flex items-center gap-1 group hover:bg-destructive hover:text-destructive-foreground transition-all duration-300">
                       <MapPin className="h-3 w-3" />
-                      {activeLocation}
+                      {activeLocation === "All Locations" ? t('all-locations') : activeLocation}
                       <motion.button 
                         onClick={() => setActiveLocation("All Locations")}
                         className="group-hover:bg-destructive-foreground/20 rounded-full p-0.5 transition-colors duration-300"
@@ -1193,7 +1195,7 @@ const Manufacturers = () => {
                     onClick={clearFilters} 
                     className="text-xs hover:bg-destructive hover:text-destructive-foreground transition-colors duration-300"
                   >
-                    Clear all
+                    {t('clear-all')}
                   </Button>
                 </motion.div>
               </motion.div>
@@ -1229,7 +1231,7 @@ const Manufacturers = () => {
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold flex items-center gap-2">
                       <Filter className="h-4 w-4" />
-                      Filters
+                      {t('filters-heading')}
                     </h3>
                     <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                       <Button 
@@ -1256,7 +1258,7 @@ const Manufacturers = () => {
                     >
                       <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
                         <Building2 className="h-4 w-4" />
-                        Categories
+                        {t('categories-heading')}
                       </h4>
                       <div className="space-y-1">
                         {categories.map((category, index) => (
@@ -1280,7 +1282,7 @@ const Manufacturers = () => {
                               )}
                               onClick={() => setActiveCategory(category)}
                             >
-                              {category}
+                              {category === "All Categories" ? t('all-categories') : category}
                             </Button>
                           </motion.div>
                         ))}
@@ -1294,7 +1296,7 @@ const Manufacturers = () => {
                     >
                       <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
                         <MapPin className="h-4 w-4" />
-                        Location
+                        {t('location-heading')}
                       </h4>
                       <div className="space-y-1">
                         {locations.map((location, index) => (
@@ -1319,7 +1321,7 @@ const Manufacturers = () => {
                               onClick={() => setActiveLocation(location)}
                             >
                               {location !== "All Locations" && <MapPin className="h-3 w-3 mr-2" />}
-                              {location}
+                              {location === "All Locations" ? t('all-locations') : location}
                             </Button>
                           </motion.div>
                         ))}
@@ -1333,7 +1335,7 @@ const Manufacturers = () => {
                     >
                       <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
                         <Award className="h-4 w-4" />
-                        Certifications
+                        {t('certifications-heading')}
                       </h4>
                       <div className="flex flex-wrap gap-2">
                         {certifications.map((cert, index) => (
@@ -1382,7 +1384,7 @@ const Manufacturers = () => {
                       className="w-full mt-4 hover:bg-destructive hover:text-destructive-foreground transition-all duration-300"
                       onClick={clearFilters}
                     >
-                      Clear All Filters
+                      {t('clear-all-filters')}
                     </Button>
                   </motion.div>
                 </motion.div>
@@ -1463,7 +1465,7 @@ const Manufacturers = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
                       >
-                        No favorite manufacturers
+                        {t('no-favorite-manufacturers')}
                       </motion.p>
                       <motion.p 
                         className="text-muted-foreground mb-6"
@@ -1471,7 +1473,7 @@ const Manufacturers = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 }}
                       >
-                        Add manufacturers to your favorites to see them here
+                        {t('add-manufacturers-favorites')}
                       </motion.p>
                       <motion.div
                         whileHover={{ scale: 1.05 }}
@@ -1482,7 +1484,7 @@ const Manufacturers = () => {
                           onClick={() => setShowFavoritesOnly(false)}
                           className="hover:bg-primary hover:text-primary-foreground transition-colors duration-300"
                         >
-                          View All Manufacturers
+                          {t('view-all-manufacturers')}
                         </Button>
                       </motion.div>
                     </>
@@ -1507,7 +1509,7 @@ const Manufacturers = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
                       >
-                        No manufacturers found
+                        {t('no-manufacturers-found')}
                       </motion.p>
                       <motion.p 
                         className="text-muted-foreground mb-6"
@@ -1515,7 +1517,7 @@ const Manufacturers = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 }}
                       >
-                        Try adjusting your filters or search terms
+                        {t('adjust-filters-or-search')}
                       </motion.p>
                       <motion.div
                         whileHover={{ scale: 1.05 }}
@@ -1526,7 +1528,7 @@ const Manufacturers = () => {
                           onClick={clearFilters}
                           className="hover:bg-primary hover:text-primary-foreground transition-colors duration-300"
                         >
-                          Clear All Filters
+                          {t('clear-all-filters')}
                         </Button>
                       </motion.div>
                     </>

@@ -30,6 +30,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Separator } from "@/components/ui/separator";
+import { useTranslation } from 'react-i18next';
 
 // Animation variant for smooth transitions
 const fadeInVariant = {
@@ -42,6 +43,7 @@ const fadeInVariant = {
 
 const BrandProfile = () => {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("overview");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [profileCompletion, setProfileCompletion] = useState(85);
@@ -51,16 +53,19 @@ const BrandProfile = () => {
     setIsRefreshing(true);
     setTimeout(() => {
       setIsRefreshing(false);
-      toast({ title: "Data refreshed" });
+      toast({ title: t('brand-profile-data-refreshed') });
     }, 800);
   };
 
   const handleShareProfile = () => {
-    toast({ title: "Profile shared", description: "Link copied to clipboard" });
+    toast({ 
+      title: t('brand-profile-profile-shared'), 
+      description: t('brand-profile-link-copied')
+    });
   };
 
   const handleExportProfile = () => {
-    toast({ title: "Export initiated" });
+    toast({ title: t('brand-profile-export-initiated') });
   };
 
   return (
@@ -94,10 +99,10 @@ const BrandProfile = () => {
                 <TooltipTrigger asChild>
                   <Button variant="outline" size="sm" onClick={handleShareProfile}>
                     <Share2 className="w-4 h-4 mr-2" />
-                    Share
+                    {t('brand-profile-share')}
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Share your profile with partners</TooltipContent>
+                <TooltipContent>{t('brand-profile-share-profile')}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
             
@@ -106,10 +111,10 @@ const BrandProfile = () => {
                 <TooltipTrigger asChild>
                   <Button variant="outline" size="sm" onClick={handleExportProfile}>
                     <FileDown className="w-4 h-4 mr-2" />
-                    Export
+                    {t('brand-profile-export')}
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Export profile as PDF</TooltipContent>
+                <TooltipContent>{t('brand-profile-export-profile')}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
             
@@ -119,7 +124,7 @@ const BrandProfile = () => {
               ) : (
                 <RefreshCw className="w-4 h-4 mr-2" />
               )}
-              Refresh
+              {t('brand-profile-refresh')}
             </Button>
           </div>
         </div>
@@ -128,12 +133,12 @@ const BrandProfile = () => {
           <div className="col-span-2">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium">Profile Completion</h3>
+                <h3 className="text-sm font-medium">{t('brand-profile-profile-completion')}</h3>
                 <span className="text-sm font-medium">{profileCompletion}%</span>
               </div>
               <Progress value={profileCompletion} className="h-2" />
               <p className="text-xs text-muted-foreground">
-                Complete your profile to increase visibility to retailers
+                {t('brand-profile-complete-profile')}
               </p>
             </div>
             
@@ -141,7 +146,7 @@ const BrandProfile = () => {
               <div className="flex items-center gap-2">
                 <ShoppingBag className="w-5 h-5 text-primary" />
                 <div>
-                  <div className="text-sm font-medium">Products</div>
+                  <div className="text-sm font-medium">{t('brand-profile-products')}</div>
                   <div className="text-xl font-bold">28</div>
                 </div>
               </div>
@@ -149,7 +154,7 @@ const BrandProfile = () => {
               <div className="flex items-center gap-2">
                 <Store className="w-5 h-5 text-primary" />
                 <div>
-                  <div className="text-sm font-medium">Retailers</div>
+                  <div className="text-sm font-medium">{t('brand-profile-retailers')}</div>
                   <div className="text-xl font-bold">18</div>
                 </div>
               </div>
@@ -157,7 +162,7 @@ const BrandProfile = () => {
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-primary" />
                 <div>
-                  <div className="text-sm font-medium">Growth</div>
+                  <div className="text-sm font-medium">{t('brand-profile-growth')}</div>
                   <div className="text-xl font-bold">+24%</div>
                 </div>
               </div>
@@ -195,32 +200,29 @@ const BrandProfile = () => {
         variants={fadeInVariant}
         className="bg-background rounded-xl border p-6"
       >
-        <h2 className="text-lg font-semibold mb-2">About EcoHarvest</h2>
+        <h2 className="text-lg font-semibold mb-2">{t('brand-profile-about')}</h2>
         <p className="text-sm text-muted-foreground">
-          EcoHarvest specializes in sustainable food products, focusing on organic ingredients 
-          and eco-friendly packaging. Founded in 2015, we've grown to become a recognized 
-          brand in the health food sector, with our products available in premium grocery 
-          stores across the United States.
+          {t('brand-profile-company-description')}
         </p>
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
           <div className="p-3 bg-muted/20 rounded-lg">
-            <h4 className="text-xs font-medium uppercase text-muted-foreground mb-1">Industry</h4>
-            <p className="text-sm font-medium">Organic Food</p>
+            <h4 className="text-xs font-medium uppercase text-muted-foreground mb-1">{t('brand-profile-industry')}</h4>
+            <p className="text-sm font-medium">{t('brand-profile-organic-food')}</p>
           </div>
           
           <div className="p-3 bg-muted/20 rounded-lg">
-            <h4 className="text-xs font-medium uppercase text-muted-foreground mb-1">Founded</h4>
+            <h4 className="text-xs font-medium uppercase text-muted-foreground mb-1">{t('brand-profile-founded')}</h4>
             <p className="text-sm font-medium">2015</p>
           </div>
           
           <div className="p-3 bg-muted/20 rounded-lg">
-            <h4 className="text-xs font-medium uppercase text-muted-foreground mb-1">Headquarters</h4>
+            <h4 className="text-xs font-medium uppercase text-muted-foreground mb-1">{t('brand-profile-headquarters')}</h4>
             <p className="text-sm font-medium">Portland, OR</p>
           </div>
           
           <div className="p-3 bg-muted/20 rounded-lg">
-            <h4 className="text-xs font-medium uppercase text-muted-foreground mb-1">Employees</h4>
+            <h4 className="text-xs font-medium uppercase text-muted-foreground mb-1">{t('brand-profile-employees')}</h4>
             <p className="text-sm font-medium">75+</p>
           </div>
         </div>
@@ -238,19 +240,19 @@ const BrandProfile = () => {
               value="overview"
               className="data-[state=active]:border-primary data-[state=active]:shadow-none data-[state=active]:bg-transparent border-b-2 border-transparent rounded-none px-4 py-2"
             >
-              Overview
+              {t('brand-profile-overview')}
             </TabsTrigger>
             <TabsTrigger 
               value="products"
               className="data-[state=active]:border-primary data-[state=active]:shadow-none data-[state=active]:bg-transparent border-b-2 border-transparent rounded-none px-4 py-2"
             >
-              Product Portfolio
+              {t('brand-profile-product-portfolio')}
             </TabsTrigger>
             <TabsTrigger 
               value="marketing"
               className="data-[state=active]:border-primary data-[state=active]:shadow-none data-[state=active]:bg-transparent border-b-2 border-transparent rounded-none px-4 py-2"
             >
-              Marketing & Campaigns
+              {t('brand-profile-marketing-campaigns')}
             </TabsTrigger>
           </TabsList>
           
@@ -271,28 +273,28 @@ const BrandProfile = () => {
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-base font-medium flex items-center">
                           <TrendingUp className="w-4 h-4 mr-2 text-primary" />
-                          Market Share
+                          {t('brand-profile-market-share')}
                         </CardTitle>
                         <Badge variant="outline" className="bg-primary/5 text-primary">
-                          {marketShareGrowth}% Growth YoY
+                          {marketShareGrowth}% {t('brand-profile-growth-yoy')}
                         </Badge>
                       </div>
                     </CardHeader>
                     <CardContent className="pt-2">
                       <div className="space-y-4">
                         <div className="flex items-center justify-between text-sm">
-                          <span>Market Penetration</span>
-                          <span className="font-medium">32% of target retailers</span>
+                          <span>{t('brand-profile-market-penetration')}</span>
+                          <span className="font-medium">32% {t('brand-profile-of-target-retailers')}</span>
                         </div>
                         <Progress value={32} className="h-2" />
                         <div className="grid grid-cols-3 gap-3 pt-2">
                           <div className="p-2 bg-muted/20 rounded-lg text-center">
                             <div className="text-lg font-semibold text-primary">12%</div>
-                            <div className="text-xs text-muted-foreground">Market Share</div>
+                            <div className="text-xs text-muted-foreground">{t('brand-profile-market-share')}</div>
                           </div>
                           <div className="p-2 bg-muted/20 rounded-lg text-center">
                             <div className="text-lg font-semibold text-primary">18</div>
-                            <div className="text-xs text-muted-foreground">Retailers</div>
+                            <div className="text-xs text-muted-foreground">{t('brand-profile-retailers')}</div>
                           </div>
                           <div className="p-2 bg-muted/20 rounded-lg text-center">
                             <div className="text-lg font-semibold text-green-500">5</div>
@@ -308,7 +310,7 @@ const BrandProfile = () => {
                     <CardHeader className="pb-2">
                       <CardTitle className="text-base font-medium flex items-center">
                         <ShoppingBag className="w-4 h-4 mr-2 text-primary" />
-                        Top Products
+                        {t('brand-profile-top-products')}
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-2">
@@ -319,11 +321,11 @@ const BrandProfile = () => {
                               <Package className="w-4 h-4 text-primary" />
                             </div>
                             <div>
-                              <div className="font-medium text-sm">Organic Quinoa Mix</div>
-                              <div className="text-xs text-muted-foreground">42% of total sales</div>
+                              <div className="font-medium text-sm">{t('brand-profile-organic-quinoa-mix')}</div>
+                              <div className="text-xs text-muted-foreground">42% {t('brand-profile-of-total-sales')}</div>
                             </div>
                           </div>
-                          <Badge className="bg-green-500/10 text-green-500">Bestseller</Badge>
+                          <Badge className="bg-green-500/10 text-green-500">{t('brand-profile-bestseller')}</Badge>
                         </div>
                         
                         <div className="flex items-center justify-between p-3 border rounded-lg">
@@ -332,15 +334,15 @@ const BrandProfile = () => {
                               <Package className="w-4 h-4 text-primary" />
                             </div>
                             <div>
-                              <div className="font-medium text-sm">Hemp Protein Bars</div>
-                              <div className="text-xs text-muted-foreground">28% of total sales</div>
+                              <div className="font-medium text-sm">{t('brand-profile-hemp-protein-bars')}</div>
+                              <div className="text-xs text-muted-foreground">28% {t('brand-profile-of-total-sales')}</div>
                             </div>
                           </div>
-                          <Badge variant="outline">Popular</Badge>
+                          <Badge variant="outline">{t('brand-profile-popular')}</Badge>
                         </div>
                         
                         <div className="text-xs text-center text-muted-foreground mt-2">
-                          + 26 more products
+                          {t('brand-profile-more-products')}
                         </div>
                       </div>
                     </CardContent>
@@ -351,7 +353,7 @@ const BrandProfile = () => {
                     <CardHeader className="pb-2">
                       <CardTitle className="text-base font-medium flex items-center">
                         <Store className="w-4 h-4 mr-2 text-primary" />
-                        Retailer Partnerships
+                        {t('brand-profile-retailer-partnerships')}
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-2">
@@ -361,8 +363,8 @@ const BrandProfile = () => {
                             <Building className="w-5 h-5 text-primary" />
                           </div>
                           <div className="text-lg font-bold">18</div>
-                          <div className="text-xs text-muted-foreground">Active Retailers</div>
-                          <div className="text-xs text-green-500 mt-1">↑ 5 new this year</div>
+                          <div className="text-xs text-muted-foreground">{t('brand-profile-active-retailers')}</div>
+                          <div className="text-xs text-green-500 mt-1">{t('brand-profile-new-this-year')}</div>
                         </div>
                         
                         <div className="p-4 border rounded-lg text-center">
@@ -370,8 +372,8 @@ const BrandProfile = () => {
                             <Users className="w-5 h-5 text-primary" />
                           </div>
                           <div className="text-lg font-bold">32</div>
-                          <div className="text-xs text-muted-foreground">Shopper Reach (K)</div>
-                          <div className="text-xs text-green-500 mt-1">↑ 12% vs last year</div>
+                          <div className="text-xs text-muted-foreground">{t('brand-profile-shopper-reach')}</div>
+                          <div className="text-xs text-green-500 mt-1">{t('brand-profile-vs-last-year')}</div>
                         </div>
                         
                         <div className="p-4 border rounded-lg text-center">
@@ -379,8 +381,8 @@ const BrandProfile = () => {
                             <CircleDollarSign className="w-5 h-5 text-primary" />
                           </div>
                           <div className="text-lg font-bold">$1.8M</div>
-                          <div className="text-xs text-muted-foreground">Retail Sales</div>
-                          <div className="text-xs text-green-500 mt-1">↑ 28% growth</div>
+                          <div className="text-xs text-muted-foreground">{t('brand-profile-retail-sales')}</div>
+                          <div className="text-xs text-green-500 mt-1">{t('brand-profile-growth-percentage')}</div>
                         </div>
                       </div>
                     </CardContent>
@@ -404,43 +406,43 @@ const BrandProfile = () => {
                   <div className="bg-background rounded-lg border p-6">
                     <h3 className="text-base font-medium mb-4 flex items-center">
                       <ShoppingBag className="w-4 h-4 mr-2 text-primary" />
-                      Product Portfolio
+                      {t('brand-profile-product-portfolio')}
                     </h3>
                     
                     <div className="space-y-6">
                       <div>
-                        <h4 className="text-sm font-medium mb-3">Product Categories</h4>
+                        <h4 className="text-sm font-medium mb-3">{t('brand-profile-product-categories')}</h4>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                           <div className="p-4 border rounded-md text-center">
                             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
                               <Package className="w-5 h-5 text-primary" />
                             </div>
-                            <div className="font-medium">Grains & Seeds</div>
-                            <div className="text-xs text-muted-foreground">12 products</div>
+                            <div className="font-medium">{t('brand-profile-grains-seeds')}</div>
+                            <div className="text-xs text-muted-foreground">{t('brand-profile-product-count', { count: 12 })}</div>
                           </div>
                           
                           <div className="p-4 border rounded-md text-center">
                             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
                               <Package className="w-5 h-5 text-primary" />
                             </div>
-                            <div className="font-medium">Protein Bars</div>
-                            <div className="text-xs text-muted-foreground">8 products</div>
+                            <div className="font-medium">{t('brand-profile-protein-bars')}</div>
+                            <div className="text-xs text-muted-foreground">{t('brand-profile-product-count', { count: 8 })}</div>
                           </div>
                           
                           <div className="p-4 border rounded-md text-center">
                             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
                               <Package className="w-5 h-5 text-primary" />
                             </div>
-                            <div className="font-medium">Dried Fruits</div>
-                            <div className="text-xs text-muted-foreground">6 products</div>
+                            <div className="font-medium">{t('brand-profile-dried-fruits')}</div>
+                            <div className="text-xs text-muted-foreground">{t('brand-profile-product-count', { count: 6 })}</div>
                           </div>
                           
                           <div className="p-4 border rounded-md text-center">
                             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
                               <Package className="w-5 h-5 text-primary" />
                             </div>
-                            <div className="font-medium">Trail Mixes</div>
-                            <div className="text-xs text-muted-foreground">4 products</div>
+                            <div className="font-medium">{t('brand-profile-trail-mixes')}</div>
+                            <div className="text-xs text-muted-foreground">{t('brand-profile-product-count', { count: 4 })}</div>
                           </div>
                         </div>
                       </div>
@@ -448,13 +450,13 @@ const BrandProfile = () => {
                       <Separator />
                       
                       <div>
-                        <h4 className="text-sm font-medium mb-3">Product Features</h4>
+                        <h4 className="text-sm font-medium mb-3">{t('brand-profile-product-features')}</h4>
                         <div className="flex flex-wrap gap-2 mb-4">
-                          <Badge variant="secondary" className="bg-primary/10">Organic Certified</Badge>
-                          <Badge variant="secondary" className="bg-primary/10">Non-GMO</Badge>
-                          <Badge variant="secondary" className="bg-primary/10">Sustainable Packaging</Badge>
-                          <Badge variant="secondary" className="bg-primary/10">Vegan</Badge>
-                          <Badge variant="secondary" className="bg-primary/10">Gluten-Free Options</Badge>
+                          <Badge variant="secondary" className="bg-primary/10">{t('brand-profile-organic-certified')}</Badge>
+                          <Badge variant="secondary" className="bg-primary/10">{t('brand-profile-non-gmo')}</Badge>
+                          <Badge variant="secondary" className="bg-primary/10">{t('brand-profile-sustainable-packaging')}</Badge>
+                          <Badge variant="secondary" className="bg-primary/10">{t('brand-profile-vegan')}</Badge>
+                          <Badge variant="secondary" className="bg-primary/10">{t('brand-profile-gluten-free-options')}</Badge>
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -463,10 +465,10 @@ const BrandProfile = () => {
                               <Package className="w-6 h-6 text-primary" />
                             </div>
                             <div className="flex-1">
-                              <h5 className="font-medium mb-1">Organic Certification</h5>
+                              <h5 className="font-medium mb-1">{t('brand-profile-organic-certification')}</h5>
                               <div className="flex items-center justify-between">
-                                <span className="text-xs text-muted-foreground">USDA Certified</span>
-                                <Badge className="bg-green-500/10 text-green-500">100% of products</Badge>
+                                <span className="text-xs text-muted-foreground">{t('brand-profile-usda-certified')}</span>
+                                <Badge className="bg-green-500/10 text-green-500">100% {t('brand-profile-of-products')}</Badge>
                               </div>
                             </div>
                           </div>
@@ -476,10 +478,10 @@ const BrandProfile = () => {
                               <Package className="w-6 h-6 text-primary" />
                             </div>
                             <div className="flex-1">
-                              <h5 className="font-medium mb-1">Packaging</h5>
+                              <h5 className="font-medium mb-1">{t('brand-profile-packaging')}</h5>
                               <div className="flex items-center justify-between">
-                                <span className="text-xs text-muted-foreground">Biodegradable materials</span>
-                                <Badge variant="outline">85% of products</Badge>
+                                <span className="text-xs text-muted-foreground">{t('brand-profile-biodegradable-materials')}</span>
+                                <Badge variant="outline">85% {t('brand-profile-of-products')}</Badge>
                               </div>
                             </div>
                           </div>
@@ -506,12 +508,12 @@ const BrandProfile = () => {
                   <div className="bg-background rounded-lg border p-6">
                     <h3 className="text-base font-medium mb-4 flex items-center">
                       <Megaphone className="w-4 h-4 mr-2 text-primary" />
-                      Marketing & Campaigns
+                      {t('brand-profile-marketing-campaigns')}
                     </h3>
                     
                     <div className="space-y-6">
                       <div>
-                        <h4 className="text-sm font-medium mb-3">Active Campaigns</h4>
+                        <h4 className="text-sm font-medium mb-3">{t('brand-profile-active-campaigns')}</h4>
                         <div className="space-y-3">
                           <div className="flex items-center justify-between p-3 border rounded-lg">
                             <div className="flex items-center">
@@ -519,11 +521,11 @@ const BrandProfile = () => {
                                 <Megaphone className="w-4 h-4 text-primary" />
                               </div>
                               <div>
-                                <div className="font-medium text-sm">Summer Wellness</div>
-                                <div className="text-xs text-muted-foreground">Ends Aug 31, 2023</div>
+                                <div className="font-medium text-sm">{t('brand-profile-summer-wellness')}</div>
+                                <div className="text-xs text-muted-foreground">{t('brand-profile-ends-date')}</div>
                               </div>
                             </div>
-                            <Badge className="bg-green-500/10 text-green-500">In Progress</Badge>
+                            <Badge className="bg-green-500/10 text-green-500">{t('brand-profile-in-progress')}</Badge>
                           </div>
                           
                           <div className="flex items-center justify-between p-3 border rounded-lg">
@@ -532,11 +534,11 @@ const BrandProfile = () => {
                                 <Megaphone className="w-4 h-4 text-primary" />
                               </div>
                               <div>
-                                <div className="font-medium text-sm">Back to School</div>
-                                <div className="text-xs text-muted-foreground">Starts Sep 1, 2023</div>
+                                <div className="font-medium text-sm">{t('brand-profile-back-to-school')}</div>
+                                <div className="text-xs text-muted-foreground">{t('brand-profile-starts-date')}</div>
                               </div>
                             </div>
-                            <Badge variant="outline">Upcoming</Badge>
+                            <Badge variant="outline">{t('brand-profile-upcoming')}</Badge>
                           </div>
                         </div>
                       </div>
@@ -544,14 +546,14 @@ const BrandProfile = () => {
                       <Separator />
                       
                       <div>
-                        <h4 className="text-sm font-medium mb-3">Marketing Performance</h4>
+                        <h4 className="text-sm font-medium mb-3">{t('brand-profile-marketing-performance')}</h4>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                           <div className="p-4 border rounded-md text-center">
                             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-2">
                               <Users className="w-5 h-5 text-primary" />
                             </div>
                             <div className="text-lg font-bold">28.5K</div>
-                            <div className="text-xs text-muted-foreground">Social Media Followers</div>
+                            <div className="text-xs text-muted-foreground">{t('brand-profile-social-media-followers')}</div>
                           </div>
                           
                           <div className="p-4 border rounded-md text-center">
@@ -559,7 +561,7 @@ const BrandProfile = () => {
                               <BarChart3 className="w-5 h-5 text-primary" />
                             </div>
                             <div className="text-lg font-bold">12.3%</div>
-                            <div className="text-xs text-muted-foreground">Engagement Rate</div>
+                            <div className="text-xs text-muted-foreground">{t('brand-profile-engagement-rate')}</div>
                           </div>
                           
                           <div className="p-4 border rounded-md text-center">
@@ -567,7 +569,7 @@ const BrandProfile = () => {
                               <CircleDollarSign className="w-5 h-5 text-primary" />
                             </div>
                             <div className="text-lg font-bold">$45K</div>
-                            <div className="text-xs text-muted-foreground">Marketing Budget</div>
+                            <div className="text-xs text-muted-foreground">{t('brand-profile-marketing-budget')}</div>
                           </div>
                         </div>
                       </div>
@@ -575,48 +577,48 @@ const BrandProfile = () => {
                       <Separator />
                       
                       <div>
-                        <h4 className="text-sm font-medium mb-3">Retailer Co-Marketing</h4>
+                        <h4 className="text-sm font-medium mb-3">{t('brand-profile-retailer-co-marketing')}</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="p-4 border rounded-lg">
-                            <h5 className="font-medium mb-2">In-Store Promotions</h5>
+                            <h5 className="font-medium mb-2">{t('brand-profile-in-store-promotions')}</h5>
                             <div className="space-y-2">
                               <div className="flex justify-between items-center text-sm">
-                                <span>Premium Retailers</span>
-                                <span className="font-medium">8 locations</span>
+                                <span>{t('brand-profile-premium-retailers')}</span>
+                                <span className="font-medium">{t('brand-profile-locations', { count: 8 })}</span>
                               </div>
                               <Progress value={45} className="h-2" />
                               
                               <div className="flex justify-between items-center text-sm">
-                                <span>Mid-tier Retailers</span>
-                                <span className="font-medium">6 locations</span>
+                                <span>{t('brand-profile-mid-tier-retailers')}</span>
+                                <span className="font-medium">{t('brand-profile-locations', { count: 6 })}</span>
                               </div>
                               <Progress value={34} className="h-2" />
                               
                               <div className="flex justify-between items-center text-sm">
-                                <span>Local Markets</span>
-                                <span className="font-medium">4 locations</span>
+                                <span>{t('brand-profile-local-markets')}</span>
+                                <span className="font-medium">{t('brand-profile-locations', { count: 4 })}</span>
                               </div>
                               <Progress value={21} className="h-2" />
                             </div>
                           </div>
                           
                           <div className="p-4 border rounded-lg">
-                            <h5 className="font-medium mb-2">Campaign Budget Allocation</h5>
+                            <h5 className="font-medium mb-2">{t('brand-profile-campaign-budget-allocation')}</h5>
                             <div className="space-y-2">
                               <div className="flex justify-between items-center text-sm">
-                                <span>Digital Marketing</span>
+                                <span>{t('brand-profile-digital-marketing')}</span>
                                 <span className="font-medium">45%</span>
                               </div>
                               <Progress value={45} className="h-2" />
                               
                               <div className="flex justify-between items-center text-sm">
-                                <span>In-Store Promotions</span>
+                                <span>{t('brand-profile-in-store-promotions')}</span>
                                 <span className="font-medium">30%</span>
                               </div>
                               <Progress value={30} className="h-2" />
                               
                               <div className="flex justify-between items-center text-sm">
-                                <span>Events & Sampling</span>
+                                <span>{t('brand-profile-events-sampling')}</span>
                                 <span className="font-medium">25%</span>
                               </div>
                               <Progress value={25} className="h-2" />

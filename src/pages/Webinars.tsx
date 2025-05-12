@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -203,6 +204,7 @@ const staggerContainer = {
 };
 
 const Webinars = () => {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState("all");
   const [savedWebinars, setSavedWebinars] = useState<number[]>([]);
@@ -325,13 +327,13 @@ const Webinars = () => {
                 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent"
                 variants={fadeInUp}
               >
-                Expert Webinars & Events
+                {t('webinars-title')}
               </motion.h1>
               <motion.p 
                 className="text-xl text-muted-foreground mb-8"
                 variants={fadeInUp}
               >
-                Join industry leaders and experts for insights, strategies, and best practices
+                {t('webinars-subtitle')}
               </motion.p>
               
               <motion.div 
@@ -340,7 +342,7 @@ const Webinars = () => {
               >
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input 
-                  placeholder="Search webinars..." 
+                  placeholder={t('search-webinars')}
                   className="pl-10 pr-24 py-6 rounded-full" 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -365,13 +367,13 @@ const Webinars = () => {
                       <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                           <BookmarkCheck className="h-5 w-5 text-primary" />
-                          Saved Webinars
+                          {t('saved-webinars')}
                           <Badge variant="outline" className="ml-2">
-                            {savedWebinars.length} saved
+                            {savedWebinars.length} {t('webinars-saved')}
                           </Badge>
                         </DialogTitle>
                         <DialogDescription>
-                          Your bookmarked webinars for quick access
+                          {t('bookmarked-webinars')}
                         </DialogDescription>
                       </DialogHeader>
 
@@ -399,7 +401,7 @@ const Webinars = () => {
                                       webinar.status === "upcoming" ? "bg-green-500" : ""
                                     }`}
                                   >
-                                    {webinar.status === "upcoming" ? "Live" : "On-Demand"}
+                                    {webinar.status === "upcoming" ? t('live') : t('on-demand')}
                                   </Badge>
                                 </div>
 
@@ -448,11 +450,11 @@ const Webinars = () => {
                                     <DropdownMenuContent align="start">
                                       <DropdownMenuItem onClick={() => handleShare(webinar)}>
                                         <Share2 className="h-4 w-4 mr-2" />
-                                        Share
+                                        {t('share')}
                                       </DropdownMenuItem>
                                       <DropdownMenuItem onClick={() => handleSaveWebinar(webinar.id)}>
                                         <Bookmark className="h-4 w-4 mr-2" />
-                                        Remove from saved
+                                        {t('remove-saved')}
                                       </DropdownMenuItem>
                                     </DropdownMenuContent>
                                   </DropdownMenu>
@@ -463,7 +465,7 @@ const Webinars = () => {
                                     asChild
                                   >
                                     <Link to={`/webinars/${webinar.id}`}>
-                                      {webinar.status === "upcoming" ? "Register" : "Watch"}
+                                      {webinar.status === "upcoming" ? t('register') : t('watch')}
                                       <ArrowRight className="h-3 w-3" />
                                     </Link>
                                   </Button>
@@ -475,15 +477,15 @@ const Webinars = () => {
                       ) : (
                         <div className="text-center py-8">
                           <Bookmark className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                          <h3 className="text-lg font-medium mb-2">No saved webinars</h3>
+                          <h3 className="text-lg font-medium mb-2">{t('no-saved-webinars')}</h3>
                           <p className="text-muted-foreground mb-4">
-                            Click the bookmark icon on any webinar to save it for later
+                            {t('click-bookmark')}
                           </p>
                           <Button 
                             variant="outline" 
                             onClick={() => setIsBookmarkDialogOpen(false)}
                           >
-                            Browse Webinars
+                            {t('browse-webinars')}
                           </Button>
                         </div>
                       )}
@@ -502,31 +504,31 @@ const Webinars = () => {
                     </SheetTrigger>
                     <SheetContent>
                       <SheetHeader>
-                        <SheetTitle>Filter Webinars</SheetTitle>
+                        <SheetTitle>{t('filter-webinars')}</SheetTitle>
                         <SheetDescription>
-                          Refine your search with these filters
+                          {t('refine-webinars-search')}
                         </SheetDescription>
                       </SheetHeader>
                       <div className="py-4 space-y-4">
                         <div className="space-y-2">
-                          <h4 className="text-sm font-medium">Sort By</h4>
+                          <h4 className="text-sm font-medium">{t('sort-by')}</h4>
                           <Select
                             value={sortBy}
                             onValueChange={setSortBy}
                           >
                             <SelectTrigger>
-                              <SelectValue placeholder="Sort by" />
+                              <SelectValue placeholder={t('sort-by')} />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="date">Latest First</SelectItem>
-                              <SelectItem value="popular">Most Popular</SelectItem>
-                              <SelectItem value="duration">Duration</SelectItem>
+                              <SelectItem value="date">{t('newest-first')}</SelectItem>
+                              <SelectItem value="popular">{t('most-popular')}</SelectItem>
+                              <SelectItem value="duration">{t('duration')}</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                         
                         <div className="space-y-2">
-                          <h4 className="text-sm font-medium">Categories</h4>
+                          <h4 className="text-sm font-medium">{t('categories')}</h4>
                           <div className="flex flex-wrap gap-2">
                             {categories.map((category) => (
                               <Badge
@@ -549,9 +551,9 @@ const Webinars = () => {
                             setSortBy("date");
                           }}
                         >
-                          Reset Filters
+                          {t('reset-filters')}
                         </Button>
-                        <Button>Apply Filters</Button>
+                        <Button>{t('apply-filters')}</Button>
                       </SheetFooter>
                     </SheetContent>
                   </Sheet>
@@ -570,11 +572,11 @@ const Webinars = () => {
                   onClick={() => setFilter("all")}
                         className="rounded-full"
                 >
-                  All Webinars
+                  {t('all-webinars')}
                 </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      View all available webinars
+                      {t('all-webinars')}
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -587,11 +589,11 @@ const Webinars = () => {
                   onClick={() => setFilter("upcoming")}
                         className="rounded-full"
                 >
-                  Upcoming
+                  {t('upcoming')}
                 </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      View upcoming live webinars
+                      {t('view-upcoming-webinars')}
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -604,11 +606,11 @@ const Webinars = () => {
                   onClick={() => setFilter("recorded")}
                         className="rounded-full"
                 >
-                  Recorded
+                  {t('recorded')}
                 </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      Access recorded webinar sessions
+                      {t('access-recorded-webinars')}
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -626,10 +628,10 @@ const Webinars = () => {
             viewport={{ once: true }}
           >
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl font-bold">Featured Webinars</h2>
+              <h2 className="text-2xl font-bold">{t('featured-webinars')}</h2>
               <Button variant="ghost" className="gap-2" asChild>
                 <Link to="/webinars/featured">
-                  View All <ChevronRight className="h-4 w-4" />
+                  {t('view-all')} <ChevronRight className="h-4 w-4" />
                 </Link>
               </Button>
             </div>
@@ -687,7 +689,7 @@ const Webinars = () => {
                               webinar.status === "upcoming" ? "bg-green-500" : ""
                             }`}
                           >
-                      {webinar.status === "upcoming" ? "Live" : "On-Demand"}
+                      {webinar.status === "upcoming" ? t('live') : t('on-demand')}
                     </Badge>
                           <div className="absolute top-4 right-20 flex gap-2">
                             <Button
@@ -732,7 +734,7 @@ const Webinars = () => {
                           <div className="space-y-3">
                             <div className="text-sm font-medium flex items-center gap-2">
                               <Trophy className="h-4 w-4 text-primary" />
-                              Key Topics:
+                              {t('key-topics')}
                     </div>
                       {webinar.speakers.map((speaker, index) => (
                               <motion.div 
@@ -773,7 +775,7 @@ const Webinars = () => {
                           <Button className="gap-2 group" asChild>
                             <Link to={`/webinars/${webinar.id}`}>
                               <span className="group-hover:translate-x-1 transition-transform">
-                                {webinar.status === "upcoming" ? "Register Now" : "Watch Recording"}
+                                {webinar.status === "upcoming" ? t('register-now') : t('watch-recording')}
                               </span>
                               <ArrowRight className="h-4 w-4" />
                             </Link>
@@ -796,8 +798,8 @@ const Webinars = () => {
           >
             <div className="flex justify-between items-center mb-8">
               <div>
-                <h2 className="text-2xl font-bold">All Webinars</h2>
-                <p className="text-muted-foreground">Browse our complete catalog of webinars</p>
+                <h2 className="text-2xl font-bold">{t('all-webinars')}</h2>
+                <p className="text-muted-foreground">{t('browse-all-webinars')}</p>
               </div>
               
               <motion.div 
@@ -808,14 +810,14 @@ const Webinars = () => {
               >
                 <Select value={sortBy} onValueChange={setSortBy}>
                   <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Sort by" />
+                    <SelectValue placeholder={t('sort-by')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectLabel>Sort</SelectLabel>
-                      <SelectItem value="newest">Newest First</SelectItem>
-                      <SelectItem value="oldest">Oldest First</SelectItem>
-                      <SelectItem value="popular">Most Popular</SelectItem>
+                      <SelectLabel>{t('sort-by')}</SelectLabel>
+                      <SelectItem value="newest">{t('newest-first')}</SelectItem>
+                      <SelectItem value="oldest">{t('oldest-first')}</SelectItem>
+                      <SelectItem value="popular">{t('most-popular')}</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
@@ -874,7 +876,7 @@ const Webinars = () => {
                         webinar.status === "upcoming" ? "bg-green-500" : ""
                       }`}
                     >
-                      {webinar.status === "upcoming" ? "Live" : "On-Demand"}
+                      {webinar.status === "upcoming" ? t('live') : t('on-demand')}
                     </Badge>
                   </div>
                   
@@ -894,7 +896,7 @@ const Webinars = () => {
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>
-                                <p>Share</p>
+                                <p>{t('share')}</p>
                               </TooltipContent>
                             </Tooltip>
                             
@@ -914,7 +916,7 @@ const Webinars = () => {
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>
-                                <p>{savedWebinars.includes(webinar.id) ? "Saved" : "Save for later"}</p>
+                                <p>{savedWebinars.includes(webinar.id) ? t('saved') : t('save-for-later')}</p>
                               </TooltipContent>
                             </Tooltip>
                           </div>
@@ -981,7 +983,7 @@ const Webinars = () => {
                           asChild
                         >
                       <Link to={`/webinars/${webinar.id}`}>
-                            {webinar.status === "upcoming" ? "Register" : "Watch"}
+                            {webinar.status === "upcoming" ? t('register') : t('watch')}
                             <ArrowRight className="h-3 w-3" />
                       </Link>
                     </Button>
@@ -993,9 +995,9 @@ const Webinars = () => {
             ) : (
               <div className="text-center py-16">
                 <SearchX className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">No webinars found</h3>
+                <h3 className="text-lg font-medium mb-2">{t('no-webinars-found')}</h3>
                 <p className="text-muted-foreground max-w-md mx-auto mb-4">
-                  We couldn't find any webinars matching your search. Try adjusting your filters or search query.
+                  {t('no-webinars-message')}
                 </p>
                 <Button 
                   variant="outline" 
@@ -1004,7 +1006,7 @@ const Webinars = () => {
                     setSelectedCategory("All");
                   }}
                 >
-                  Reset Filters
+                  {t('reset-filters')}
                 </Button>
             </div>
             )}
@@ -1025,7 +1027,7 @@ const Webinars = () => {
                 whileInView={{ y: 0, opacity: 1 }}
                 viewport={{ once: true }}
               >
-                Never Miss a Webinar
+                {t('never-miss-webinar')}
               </motion.h2>
               <motion.p 
                 className="text-muted-foreground mb-6"
@@ -1034,7 +1036,7 @@ const Webinars = () => {
                 viewport={{ once: true }}
                 transition={{ delay: 0.1 }}
               >
-                Subscribe to our newsletter to get notified about upcoming webinars and receive access to exclusive content
+                {t('subscribe-newsletter')}
               </motion.p>
               
               <motion.div 
@@ -1044,9 +1046,9 @@ const Webinars = () => {
                 viewport={{ once: true }}
                 transition={{ delay: 0.2 }}
               >
-                <Input placeholder="Your email address" className="md:flex-1" />
+                <Input placeholder={t('your-email')} className="md:flex-1" />
                 <Button className="bg-gradient-to-r from-primary to-accent hover:shadow-lg transition-all duration-300">
-                  Subscribe
+                  {t('subscribe')}
                 </Button>
               </motion.div>
               
@@ -1059,15 +1061,15 @@ const Webinars = () => {
               >
                 <div className="flex items-center">
                   <CheckCircle2 className="h-4 w-4 mr-1 text-green-500" />
-                  Weekly updates
+                  {t('weekly-updates')}
                 </div>
                 <div className="flex items-center">
                   <CheckCircle2 className="h-4 w-4 mr-1 text-green-500" />
-                  Exclusive content
+                  {t('exclusive-content')}
                 </div>
                 <div className="flex items-center">
                   <CheckCircle2 className="h-4 w-4 mr-1 text-green-500" />
-                  No spam
+                  {t('no-spam')}
                 </div>
               </motion.div>
             </div>

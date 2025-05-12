@@ -1,4 +1,5 @@
 import { useUser } from "@/contexts/UserContext";
+import { useTranslation } from "react-i18next";
 import { 
   Card, 
   CardContent, 
@@ -86,6 +87,7 @@ interface BrandDashboardProps {
 
 const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
   const { user } = useUser();
+  const { t } = useTranslation();
   
   // Format today's date
   const today = new Date();
@@ -100,11 +102,11 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
   const getStatusBadge = (status: string) => {
     switch(status) {
       case "Processing":
-        return <Badge className="bg-blue-500">Processing</Badge>;
+        return <Badge className="bg-blue-500">{t('brand-dashboard-processing')}</Badge>;
       case "Shipped":
-        return <Badge className="bg-yellow-500">Shipped</Badge>;
+        return <Badge className="bg-yellow-500">{t('brand-dashboard-shipped')}</Badge>;
       case "Delivered":
-        return <Badge className="bg-green-500">Delivered</Badge>;
+        return <Badge className="bg-green-500">{t('brand-dashboard-delivered')}</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -141,20 +143,20 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
               <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-background p-6 rounded-lg border">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                   <div>
-                    <h1 className="text-2xl font-bold">Welcome back, {user?.name?.split(' ')[0] || 'User'}!</h1>
+                    <h1 className="text-2xl font-bold">{t('brand-dashboard-welcome-back', { name: user?.name?.split(' ')[0] || t('brand-dashboard-user') })}</h1>
                     <p className="text-muted-foreground">{formattedDate}</p>
                     <p className="mt-2 text-sm max-w-xl">
-                      Your brand is performing well. You have <span className="font-medium">{retailerStats.pendingRequests} retailer requests</span> and <span className="font-medium">{productStats.inDevelopment} products in development</span> to review.
+                      {t('brand-dashboard-performance-overview')} <span className="font-medium">{t('brand-dashboard-retailer-requests', { count: retailerStats.pendingRequests })}</span> {t('brand-dashboard-and')} <span className="font-medium">{t('brand-dashboard-products-in-development', { count: productStats.inDevelopment })}</span> {t('brand-dashboard-to-review')}.
                     </p>
                   </div>
                   <div className="flex gap-3">
                     <Button>
                       <ShoppingBag className="mr-2 h-4 w-4" />
-                      Product Catalog
+                      {t('brand-dashboard-product-catalog')}
                     </Button>
                     <Button variant="outline">
                       <BarChart3 className="mr-2 h-4 w-4" />
-                      View Analytics
+                      {t('brand-dashboard-view-analytics')}
                     </Button>
                   </div>
                 </div>
@@ -163,15 +165,15 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
             
             {/* Quick actions with header */}
             <div className="mb-8">
-              <h2 className="text-lg font-medium mb-4">Quick Actions</h2>
+              <h2 className="text-lg font-medium mb-4">{t('brand-dashboard-quick-actions')}</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <Card className="cursor-pointer hover:bg-muted/50 transition-colors">
                   <CardContent className="p-6 flex flex-col items-center text-center">
                     <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                       <Package className="h-6 w-6 text-primary" />
                     </div>
-                    <div className="font-medium">New Product</div>
-                    <div className="text-xs text-muted-foreground mt-1">Create a new product listing</div>
+                    <div className="font-medium">{t('brand-dashboard-new-product')}</div>
+                    <div className="text-xs text-muted-foreground mt-1">{t('brand-dashboard-create-product-listing')}</div>
                   </CardContent>
                 </Card>
                 
@@ -180,8 +182,8 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
                     <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                       <Store className="h-6 w-6 text-primary" />
                     </div>
-                    <div className="font-medium">Find Retailers</div>
-                    <div className="text-xs text-muted-foreground mt-1">Connect with new retail partners</div>
+                    <div className="font-medium">{t('brand-dashboard-find-retailers')}</div>
+                    <div className="text-xs text-muted-foreground mt-1">{t('brand-dashboard-connect-retail-partners')}</div>
                   </CardContent>
                 </Card>
                 
@@ -190,8 +192,8 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
                     <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                       <BarChart3 className="h-6 w-6 text-primary" />
                     </div>
-                    <div className="font-medium">Analytics</div>
-                    <div className="text-xs text-muted-foreground mt-1">Check sales performance</div>
+                    <div className="font-medium">{t('brand-dashboard-analytics')}</div>
+                    <div className="text-xs text-muted-foreground mt-1">{t('brand-dashboard-check-sales-performance')}</div>
                   </CardContent>
                 </Card>
                 
@@ -200,8 +202,8 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
                     <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                       <Building className="h-6 w-6 text-primary" />
                     </div>
-                    <div className="font-medium">Manufacturers</div>
-                    <div className="text-xs text-muted-foreground mt-1">Manage production partners</div>
+                    <div className="font-medium">{t('brand-dashboard-manufacturers')}</div>
+                    <div className="text-xs text-muted-foreground mt-1">{t('brand-dashboard-manage-production-partners')}</div>
                   </CardContent>
                 </Card>
               </div>
@@ -212,7 +214,7 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
               <Card>
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-center">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">Total Products</CardTitle>
+                    <CardTitle className="text-sm font-medium text-muted-foreground">{t('brand-dashboard-total-products')}</CardTitle>
                     <Package className="h-4 w-4 text-muted-foreground" />
                   </div>
                 </CardHeader>
@@ -220,8 +222,8 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
                   <div className="text-2xl font-bold">{productStats.totalProducts}</div>
                   <div className="flex items-center mt-1 text-xs">
                     <span className="text-muted-foreground">
-                      <span className="text-green-500 font-medium">{productStats.active}</span> active, 
-                      <span className="text-blue-500 font-medium ml-1">{productStats.inDevelopment}</span> in development
+                      <span className="text-green-500 font-medium">{productStats.active}</span> {t('brand-dashboard-active')}, 
+                      <span className="text-blue-500 font-medium ml-1">{productStats.inDevelopment}</span> {t('brand-dashboard-in-development')}
                     </span>
                   </div>
                 </CardContent>
@@ -230,7 +232,7 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
               <Card>
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-center">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">Retail Partners</CardTitle>
+                    <CardTitle className="text-sm font-medium text-muted-foreground">{t('brand-dashboard-retail-partners')}</CardTitle>
                     <Store className="h-4 w-4 text-muted-foreground" />
                   </div>
                 </CardHeader>
@@ -239,7 +241,7 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
                   <div className="flex items-center mt-1 text-xs">
                     <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
                     <span className="text-green-500 font-medium">+{retailerStats.newThisMonth}</span>
-                    <span className="text-muted-foreground ml-1">new this month</span>
+                    <span className="text-muted-foreground ml-1">{t('brand-dashboard-new-this-month')}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -247,14 +249,14 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
               <Card>
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-center">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">Top Product</CardTitle>
+                    <CardTitle className="text-sm font-medium text-muted-foreground">{t('brand-dashboard-top-product')}</CardTitle>
                     <Activity className="h-4 w-4 text-muted-foreground" />
                   </div>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{productStats.topProduct}</div>
                   <div className="flex items-center mt-1 text-xs">
-                    <span className="text-muted-foreground">Monthly sales: </span>
+                    <span className="text-muted-foreground">{t('brand-dashboard-monthly-sales')}: </span>
                     <span className="text-green-500 font-medium ml-1">{productStats.topProductSales}</span>
                   </div>
                 </CardContent>
@@ -263,15 +265,15 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
               <Card>
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-center">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">Distribution Reach</CardTitle>
+                    <CardTitle className="text-sm font-medium text-muted-foreground">{t('brand-dashboard-distribution-reach')}</CardTitle>
                     <Users className="h-4 w-4 text-muted-foreground" />
                   </div>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{retailerStats.distributionReach}</div>
                   <div className="flex items-center mt-1 text-xs">
-                    <span className="text-muted-foreground">Through </span>
-                    <span className="text-blue-500 font-medium ml-1">{retailerStats.totalPartners} retailers</span>
+                    <span className="text-muted-foreground">{t('brand-dashboard-through')} </span>
+                    <span className="text-blue-500 font-medium ml-1">{retailerStats.totalPartners} {t('brand-dashboard-retailers')}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -283,9 +285,9 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
               <Card>
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">Alerts & Notifications</CardTitle>
+                    <CardTitle className="text-lg">{t('brand-dashboard-alerts-notifications')}</CardTitle>
                     <Button variant="ghost" size="sm" className="h-8 px-2">
-                      View All <ArrowRight className="ml-1 h-4 w-4" />
+                      {t('brand-dashboard-view-all')} <ArrowRight className="ml-1 h-4 w-4" />
                     </Button>
                   </div>
                 </CardHeader>
@@ -295,8 +297,8 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
                       <div key={alert.id} className="flex items-start gap-3 pb-3 border-b last:border-0 last:pb-0">
                         {getAlertIcon(alert.type)}
                         <div className="space-y-1">
-                          <p className="text-sm">{alert.message}</p>
-                          <p className="text-xs text-muted-foreground">{alert.time}</p>
+                          <p className="text-sm">{t(`brand-dashboard-alert-${alert.id}`, {defaultValue: alert.message})}</p>
+                          <p className="text-xs text-muted-foreground">{t(`brand-dashboard-time-${alert.id}`, {defaultValue: alert.time})}</p>
                         </div>
                       </div>
                     ))}
@@ -309,11 +311,11 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div>
-                      <CardTitle>Recent Orders</CardTitle>
-                      <CardDescription>Track your recent product orders from retailers</CardDescription>
+                      <CardTitle>{t('brand-dashboard-recent-orders')}</CardTitle>
+                      <CardDescription>{t('brand-dashboard-track-orders')}</CardDescription>
                     </div>
                     <Button size="sm">
-                      View All Orders
+                      {t('brand-dashboard-view-all-orders')}
                       <ArrowUpRight className="ml-2 h-4 w-4" />
                     </Button>
                   </div>
@@ -329,9 +331,12 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
                           <div>
                             <p className="font-medium text-sm">{order.retailer}</p>
                             <p className="text-muted-foreground text-xs">
-                              {order.quantity} units of {order.product}
+                              {t('brand-dashboard-quantity-of-product', {
+                                quantity: order.quantity,
+                                product: order.product
+                              })}
                             </p>
-                            <p className="text-muted-foreground text-xs mt-1">{order.date}</p>
+                            <p className="text-muted-foreground text-xs mt-1">{t(`brand-dashboard-order-date-${order.id}`, {defaultValue: order.date})}</p>
                           </div>
                         </div>
                         {getStatusBadge(order.status)}
@@ -353,8 +358,8 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
           >
             <Card>
               <CardHeader>
-                <CardTitle>Product Performance</CardTitle>
-                <CardDescription>Monthly sales growth by product</CardDescription>
+                <CardTitle>{t('brand-dashboard-product-performance')}</CardTitle>
+                <CardDescription>{t('brand-dashboard-monthly-growth')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-5">
@@ -374,7 +379,7 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
                       <Progress value={Math.min(100, (product.sales / 5000) * 100)} className="h-2" />
                       <div className="flex justify-between text-xs text-muted-foreground">
                         <span>${product.sales.toLocaleString()}</span>
-                        <span>{product.retailers} retailers</span>
+                        <span>{t('brand-dashboard-retailers-count', { count: product.retailers })}</span>
                       </div>
                     </div>
                   ))}
@@ -382,7 +387,7 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
               </CardContent>
               <CardFooter>
                 <Button variant="outline" size="sm" className="ml-auto">
-                  View All Products
+                  {t('brand-dashboard-view-all-products')}
                   <ArrowUpRight className="ml-2 h-4 w-4" />
                 </Button>
               </CardFooter>
@@ -399,8 +404,8 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
           >
             <Card>
               <CardHeader>
-                <CardTitle>Recent Orders</CardTitle>
-                <CardDescription>Track your recent product orders from retailers</CardDescription>
+                <CardTitle>{t('brand-dashboard-recent-orders')}</CardTitle>
+                <CardDescription>{t('brand-dashboard-track-orders')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
@@ -413,9 +418,12 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
                         <div>
                           <p className="font-medium text-sm">{order.retailer}</p>
                           <p className="text-muted-foreground text-xs">
-                            {order.quantity} units of {order.product}
+                            {t('brand-dashboard-quantity-of-product', {
+                              quantity: order.quantity,
+                              product: order.product
+                            })}
                           </p>
-                          <p className="text-muted-foreground text-xs mt-1">{order.date}</p>
+                          <p className="text-muted-foreground text-xs mt-1">{t(`brand-dashboard-order-date-${order.id}`, {defaultValue: order.date})}</p>
                         </div>
                       </div>
                       {getStatusBadge(order.status)}
@@ -425,7 +433,7 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
               </CardContent>
               <CardFooter>
                 <Button variant="outline" size="sm" className="ml-auto">
-                  View All Orders
+                  {t('brand-dashboard-view-all-orders')}
                   <ArrowUpRight className="ml-2 h-4 w-4" />
                 </Button>
               </CardFooter>
@@ -444,14 +452,14 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
               <CardHeader>
                 <Tabs defaultValue="performance">
                   <div className="flex items-center justify-between">
-                    <CardTitle>Market Insights</CardTitle>
+                    <CardTitle>{t('brand-dashboard-market-insights')}</CardTitle>
                     <TabsList>
-                      <TabsTrigger value="performance">Performance</TabsTrigger>
-                      <TabsTrigger value="retailers">Retailers</TabsTrigger>
-                      <TabsTrigger value="trends">Trends</TabsTrigger>
+                      <TabsTrigger value="performance">{t('brand-dashboard-performance')}</TabsTrigger>
+                      <TabsTrigger value="retailers">{t('brand-dashboard-retailers')}</TabsTrigger>
+                      <TabsTrigger value="trends">{t('brand-dashboard-trends')}</TabsTrigger>
                     </TabsList>
                   </div>
-                  <CardDescription>Insights into your brand's market performance</CardDescription>
+                  <CardDescription>{t('brand-dashboard-insights-description')}</CardDescription>
                 </Tabs>
               </CardHeader>
               <CardContent>
@@ -462,16 +470,16 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
               <CardFooter>
                 <div className="grid grid-cols-3 w-full gap-4 text-center">
                   <div>
-                    <p className="text-xs text-muted-foreground">Market Share</p>
+                    <p className="text-xs text-muted-foreground">{t('brand-dashboard-market-share')}</p>
                     <p className="text-lg font-medium">8.2%</p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Growth</p>
+                    <p className="text-xs text-muted-foreground">{t('brand-dashboard-growth')}</p>
                     <p className="text-lg font-medium text-green-500">+12.5%</p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Forecast</p>
-                    <p className="text-lg font-medium text-blue-500">Growing</p>
+                    <p className="text-xs text-muted-foreground">{t('brand-dashboard-forecast')}</p>
+                    <p className="text-lg font-medium text-blue-500">{t('brand-dashboard-growing')}</p>
                   </div>
                 </div>
               </CardFooter>
@@ -489,8 +497,8 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <Card>
                 <CardHeader>
-                  <CardTitle>Retail Opportunities</CardTitle>
-                  <CardDescription>Potential retailer partnerships</CardDescription>
+                  <CardTitle>{t('brand-dashboard-retail-opportunities')}</CardTitle>
+                  <CardDescription>{t('brand-dashboard-potential-retailers')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -500,10 +508,10 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
                       </div>
                       <div className="flex-1">
                         <p className="font-medium text-sm">Natural Grocers</p>
-                        <p className="text-muted-foreground text-xs">250+ locations nationwide</p>
-                        <p className="text-muted-foreground text-xs mt-1">High match score based on your product category</p>
+                        <p className="text-muted-foreground text-xs">{t('brand-dashboard-locations-nationwide', { count: 250 })}</p>
+                        <p className="text-muted-foreground text-xs mt-1">{t('brand-dashboard-high-match-score')}</p>
                       </div>
-                      <Button size="sm">Connect</Button>
+                      <Button size="sm">{t('brand-dashboard-connect')}</Button>
                     </div>
                     
                     <div className="flex items-start space-x-4 border-b pb-4">
@@ -512,10 +520,10 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
                       </div>
                       <div className="flex-1">
                         <p className="font-medium text-sm">Health Mart Co-op</p>
-                        <p className="text-muted-foreground text-xs">85 locations in Midwest</p>
-                        <p className="text-muted-foreground text-xs mt-1">Looking for products in your category</p>
+                        <p className="text-muted-foreground text-xs">{t('brand-dashboard-locations-midwest', { count: 85 })}</p>
+                        <p className="text-muted-foreground text-xs mt-1">{t('brand-dashboard-looking-for-products')}</p>
                       </div>
-                      <Button size="sm">Connect</Button>
+                      <Button size="sm">{t('brand-dashboard-connect')}</Button>
                     </div>
                     
                     <div className="flex items-start space-x-4">
@@ -524,24 +532,24 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
                       </div>
                       <div className="flex-1">
                         <p className="font-medium text-sm">Wellness Stores</p>
-                        <p className="text-muted-foreground text-xs">120+ locations on West Coast</p>
-                        <p className="text-muted-foreground text-xs mt-1">Expanding organic product selection</p>
+                        <p className="text-muted-foreground text-xs">{t('brand-dashboard-locations-west-coast', { count: 120 })}</p>
+                        <p className="text-muted-foreground text-xs mt-1">{t('brand-dashboard-expanding-organic')}</p>
                       </div>
-                      <Button size="sm">Connect</Button>
+                      <Button size="sm">{t('brand-dashboard-connect')}</Button>
                     </div>
                   </div>
                 </CardContent>
                 <CardFooter>
                   <Button variant="outline" size="sm" className="w-full">
-                    View All Opportunities
+                    {t('brand-dashboard-view-all-opportunities')}
                   </Button>
                 </CardFooter>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Manufacturing Opportunities</CardTitle>
-                  <CardDescription>Potential production partnerships</CardDescription>
+                  <CardTitle>{t('brand-dashboard-manufacturing-opportunities')}</CardTitle>
+                  <CardDescription>{t('brand-dashboard-potential-production')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -551,10 +559,10 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
                       </div>
                       <div className="flex-1">
                         <p className="font-medium text-sm">Organic Foods Manufacturing</p>
-                        <p className="text-muted-foreground text-xs">Specialized in organic cereal production</p>
-                        <p className="text-muted-foreground text-xs mt-1">SQF Level 3 Certified, Organic & Non-GMO</p>
+                        <p className="text-muted-foreground text-xs">{t('brand-dashboard-specialized-organic')}</p>
+                        <p className="text-muted-foreground text-xs mt-1">{t('brand-dashboard-sqf-certified')}</p>
                       </div>
-                      <Button size="sm">Connect</Button>
+                      <Button size="sm">{t('brand-dashboard-connect')}</Button>
                     </div>
                     
                     <div className="flex items-start space-x-4 border-b pb-4">
@@ -563,10 +571,10 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
                       </div>
                       <div className="flex-1">
                         <p className="font-medium text-sm">Sustainable Packaging Co.</p>
-                        <p className="text-muted-foreground text-xs">Eco-friendly packaging solutions</p>
-                        <p className="text-muted-foreground text-xs mt-1">Compostable & recycled materials available</p>
+                        <p className="text-muted-foreground text-xs">{t('brand-dashboard-eco-friendly')}</p>
+                        <p className="text-muted-foreground text-xs mt-1">{t('brand-dashboard-compostable')}</p>
                       </div>
-                      <Button size="sm">Connect</Button>
+                      <Button size="sm">{t('brand-dashboard-connect')}</Button>
                     </div>
                     
                     <div className="flex items-start space-x-4">
@@ -575,16 +583,16 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
                       </div>
                       <div className="flex-1">
                         <p className="font-medium text-sm">Nutritional Supplement Facility</p>
-                        <p className="text-muted-foreground text-xs">FDA registered, GMP certified</p>
-                        <p className="text-muted-foreground text-xs mt-1">Small batch capabilities for new products</p>
+                        <p className="text-muted-foreground text-xs">{t('brand-dashboard-fda-registered')}</p>
+                        <p className="text-muted-foreground text-xs mt-1">{t('brand-dashboard-small-batch')}</p>
                       </div>
-                      <Button size="sm">Connect</Button>
+                      <Button size="sm">{t('brand-dashboard-connect')}</Button>
                     </div>
                   </div>
                 </CardContent>
                 <CardFooter>
                   <Button variant="outline" size="sm" className="w-full">
-                    View All Manufacturers
+                    {t('brand-dashboard-view-all-manufacturers')}
                   </Button>
                 </CardFooter>
               </Card>
@@ -596,7 +604,7 @@ const BrandDashboard = ({ activeTab = "overview" }: BrandDashboardProps) => {
         return (
           <div className="flex items-center justify-center h-64">
             <Loader2 className="h-8 w-8 animate-spin mr-2" />
-            <p>Loading dashboard content...</p>
+            <p>{t('brand-dashboard-loading')}</p>
           </div>
         );
     }

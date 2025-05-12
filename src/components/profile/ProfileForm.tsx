@@ -29,6 +29,7 @@ import {
   Save,
   X
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 // Define form schemas for each role
 const baseProfileSchema = z.object({
@@ -87,6 +88,7 @@ const ProfileForm = ({ onCancel }: ProfileFormProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { t } = useTranslation();
   
   // Create initial values based on role
   const getInitialValues = () => {
@@ -206,8 +208,8 @@ const ProfileForm = ({ onCancel }: ProfileFormProps) => {
       
       // Show success toast
       toast({
-        title: "Profile Updated",
-        description: "Your profile has been updated successfully.",
+        title: t("profile-updated"),
+        description: t("profile-updated-message"),
       });
       
       // Exit edit mode
@@ -215,8 +217,8 @@ const ProfileForm = ({ onCancel }: ProfileFormProps) => {
     } catch (error) {
       console.error("Error updating profile:", error);
       toast({
-        title: "Update Failed",
-        description: "There was an error updating your profile. Please try again.",
+        title: t("update-failed"),
+        description: t("update-failed-message"),
         variant: "destructive",
       });
     } finally {
@@ -228,14 +230,14 @@ const ProfileForm = ({ onCancel }: ProfileFormProps) => {
   const renderBaseFields = () => {
     return (
       <>
-        <h3 className="text-lg font-medium">Basic Information</h3>
+        <h3 className="text-lg font-medium">{t("basic-information")}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Name</FormLabel>
+                <FormLabel>{t("name")}</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -251,7 +253,7 @@ const ProfileForm = ({ onCancel }: ProfileFormProps) => {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>{t("email")}</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -267,7 +269,7 @@ const ProfileForm = ({ onCancel }: ProfileFormProps) => {
             name="companyName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Company Name</FormLabel>
+                <FormLabel>{t("company-name")}</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Building className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -283,7 +285,7 @@ const ProfileForm = ({ onCancel }: ProfileFormProps) => {
             name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Phone</FormLabel>
+                <FormLabel>{t("phone")}</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -302,7 +304,7 @@ const ProfileForm = ({ onCancel }: ProfileFormProps) => {
             name="website"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Website</FormLabel>
+                <FormLabel>{t("website")}</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -318,7 +320,7 @@ const ProfileForm = ({ onCancel }: ProfileFormProps) => {
             name="address"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Address</FormLabel>
+                <FormLabel>{t("address")}</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -336,10 +338,10 @@ const ProfileForm = ({ onCancel }: ProfileFormProps) => {
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Company Description</FormLabel>
+              <FormLabel>{t("company-description")}</FormLabel>
               <FormControl>
                 <Textarea 
-                  placeholder="Tell us about your company..." 
+                  placeholder={t("company-description-placeholder")}
                   className="min-h-[120px]"
                   {...field} 
                 />
@@ -358,14 +360,14 @@ const ProfileForm = ({ onCancel }: ProfileFormProps) => {
       case "manufacturer":
         return (
           <>
-            <h3 className="text-lg font-medium mt-8 mb-4">Manufacturer Details</h3>
+            <h3 className="text-lg font-medium mt-8 mb-4">{t("manufacturer-details")}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FormField
                 control={form.control}
                 name="productionCapacity"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Production Capacity (units/month)</FormLabel>
+                    <FormLabel>{t("production-capacity")}</FormLabel>
                     <FormControl>
                       <Input type="number" {...field} />
                     </FormControl>
@@ -378,7 +380,7 @@ const ProfileForm = ({ onCancel }: ProfileFormProps) => {
                 name="minimumOrderValue"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Minimum Order Value ($)</FormLabel>
+                    <FormLabel>{t("minimum-order-value")}</FormLabel>
                     <FormControl>
                       <Input type="number" {...field} />
                     </FormControl>
@@ -393,16 +395,16 @@ const ProfileForm = ({ onCancel }: ProfileFormProps) => {
                 name="certifications"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Certifications</FormLabel>
+                    <FormLabel>{t("certifications")}</FormLabel>
                     <FormControl>
                       <Textarea 
-                        placeholder="Enter certifications separated by commas (e.g. ISO 9001, Organic, HACCP)" 
+                        placeholder={t("certifications-placeholder")}
                         className="min-h-[100px]"
                         {...field} 
                       />
                     </FormControl>
                     <FormDescription>
-                      Enter all your certifications, separated by commas
+                      {t("certifications-description")}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -414,23 +416,23 @@ const ProfileForm = ({ onCancel }: ProfileFormProps) => {
       case "brand":
         return (
           <>
-            <h3 className="text-lg font-medium mt-8 mb-4">Brand Details</h3>
+            <h3 className="text-lg font-medium mt-8 mb-4">{t("brand-details")}</h3>
             <div className="space-y-4">
               <FormField
                 control={form.control}
                 name="marketSegments"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Market Segments</FormLabel>
+                    <FormLabel>{t("market-segments")}</FormLabel>
                     <FormControl>
                       <Textarea 
-                        placeholder="Enter market segments separated by commas (e.g. Health-conscious, Eco-friendly, Premium)" 
+                        placeholder={t("market-segments-placeholder")}
                         className="min-h-[100px]"
                         {...field} 
                       />
                     </FormControl>
                     <FormDescription>
-                      Enter your target market segments, separated by commas
+                      {t("market-segments-description")}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -441,16 +443,16 @@ const ProfileForm = ({ onCancel }: ProfileFormProps) => {
                 name="brandValues"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Brand Values</FormLabel>
+                    <FormLabel>{t("brand-values")}</FormLabel>
                     <FormControl>
                       <Textarea 
-                        placeholder="Enter brand values separated by commas (e.g. Sustainability, Quality, Innovation)" 
+                        placeholder={t("brand-values-placeholder")}
                         className="min-h-[100px]"
                         {...field} 
                       />
                     </FormControl>
                     <FormDescription>
-                      Enter your core brand values, separated by commas
+                      {t("brand-values-description")}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -461,16 +463,16 @@ const ProfileForm = ({ onCancel }: ProfileFormProps) => {
                 name="targetDemographics"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Target Demographics</FormLabel>
+                    <FormLabel>{t("target-demographics")}</FormLabel>
                     <FormControl>
                       <Textarea 
-                        placeholder="Enter target demographics separated by commas (e.g. Millennials, Gen Z, Health enthusiasts)" 
+                        placeholder={t("target-demographics-placeholder")}
                         className="min-h-[100px]"
                         {...field} 
                       />
                     </FormControl>
                     <FormDescription>
-                      Enter your target demographic groups, separated by commas
+                      {t("target-demographics-description")}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -482,14 +484,14 @@ const ProfileForm = ({ onCancel }: ProfileFormProps) => {
       case "retailer":
         return (
           <>
-            <h3 className="text-lg font-medium mt-8 mb-4">Retailer Details</h3>
+            <h3 className="text-lg font-medium mt-8 mb-4">{t("retailer-details")}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FormField
                 control={form.control}
                 name="storeLocations"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Number of Store Locations</FormLabel>
+                    <FormLabel>{t("store-locations")}</FormLabel>
                     <FormControl>
                       <Input type="number" {...field} />
                     </FormControl>
@@ -502,7 +504,7 @@ const ProfileForm = ({ onCancel }: ProfileFormProps) => {
                 name="averageOrderValue"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Average Order Value ($)</FormLabel>
+                    <FormLabel>{t("average-order-value")}</FormLabel>
                     <FormControl>
                       <Input type="number" {...field} />
                     </FormControl>
@@ -517,16 +519,16 @@ const ProfileForm = ({ onCancel }: ProfileFormProps) => {
                 name="customerBase"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Customer Base</FormLabel>
+                    <FormLabel>{t("customer-base")}</FormLabel>
                     <FormControl>
                       <Textarea 
-                        placeholder="Enter customer segments separated by commas (e.g. Urban professionals, Families, Health enthusiasts)" 
+                        placeholder={t("customer-base-placeholder")}
                         className="min-h-[100px]"
                         {...field} 
                       />
                     </FormControl>
                     <FormDescription>
-                      Describe your main customer segments, separated by commas
+                      {t("customer-base-description")}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -544,9 +546,9 @@ const ProfileForm = ({ onCancel }: ProfileFormProps) => {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle>Edit Profile</CardTitle>
+          <CardTitle>{t("edit-profile")}</CardTitle>
           <CardDescription>
-            Update your personal and business information
+            {t("edit-profile-description")}
           </CardDescription>
         </div>
         <Button 
@@ -571,15 +573,15 @@ const ProfileForm = ({ onCancel }: ProfileFormProps) => {
                 className="mr-4"
                 onClick={onCancel}
               >
-                Cancel
+                {t("cancel")}
               </Button>
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? (
-                  "Saving..."
+                  t("saving")
                 ) : (
                   <>
                     <Save className="w-4 h-4 mr-2" />
-                    Save Changes
+                    {t("save-changes")}
                   </>
                 )}
               </Button>

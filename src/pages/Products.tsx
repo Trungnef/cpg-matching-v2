@@ -57,6 +57,7 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
+import { useTranslation } from "react-i18next";
 
 // Define the Product interface to match the data structure
 interface Product {
@@ -362,6 +363,7 @@ const dialogContentVariants = {
 };
 
 const Products = () => {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState(searchParams.get("q") || "");
   const [products, setProducts] = useState(mockProducts);
@@ -651,7 +653,7 @@ const Products = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            No products found matching your criteria.
+            {t('no-products-found')}
           </motion.p>
           <motion.p 
             className="text-sm text-muted-foreground mb-6"
@@ -659,7 +661,7 @@ const Products = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            Try adjusting your filters or search terms.
+            {t('adjust-filters')}
           </motion.p>
           <motion.div
             whileHover={{ scale: 1.05 }}
@@ -671,7 +673,7 @@ const Products = () => {
               onClick={clearFilters}
               className="hover:bg-primary hover:text-primary-foreground transition-colors duration-300"
             >
-              Clear All Filters
+              {t('clear-all-filters')}
             </Button>
           </motion.div>
         </motion.div>
@@ -825,15 +827,15 @@ const Products = () => {
                       <Badge variant="outline">{product.productType}</Badge>
                     </motion.div>
                     <span className="text-sm text-foreground/70">
-                      Min. Order: {product.minOrderQuantity} units
+                      {t('min-order-units', { quantity: product.minOrderQuantity })}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-foreground/70">
-                      Lead Time: {product.leadTime} {product.leadTimeUnit}
+                      {t('lead-time-weeks', { time: product.leadTime, unit: product.leadTimeUnit })}
                     </span>
                     <span className="text-sm text-foreground/70">
-                      Rating: {product.rating}/5
+                      {t('rating', { value: product.rating })}
                     </span>
                   </div>
                   
@@ -851,7 +853,7 @@ const Products = () => {
                           onClick={() => handleProductDetailsClick(product)}
                           className="transition-all duration-200 hover:bg-muted/80"
                         >
-                          Details
+                          {t('details-button')}
                         </Button>
                       </motion.div>
                       <motion.div
@@ -863,7 +865,7 @@ const Products = () => {
                           size="sm"
                           className="transition-all duration-200"
                         >
-                          Match
+                          {t('match-button')}
                         </Button>
                       </motion.div>
                     </div>
@@ -913,10 +915,10 @@ const Products = () => {
           >
             <motion.div variants={cardVariants}>
               <h1 className="text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary animate-gradient bg-300%">
-                Browse Products
+                {t('browse-products')}
               </h1>
               <p className="text-foreground/70">
-                Discover the perfect products for your CPG business
+                {t('browse-products-description')}
               </p>
             </motion.div>
             
@@ -935,11 +937,11 @@ const Products = () => {
                       className="flex items-center gap-2 transition-all duration-200"
                     >
                       <ArrowUpDown className="h-4 w-4" />
-                      Sort: {sortOptions.find(option => option.value === sortBy)?.label}
+                      {t('sort')}: {t(`sort-${sortBy}`)}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="animate-in slide-in-from-top-5 duration-200">
-                    <DropdownMenuLabel>Sort by</DropdownMenuLabel>
+                    <DropdownMenuLabel>{t('sort-by')}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     {sortOptions.map(option => (
                       <DropdownMenuItem 
@@ -947,7 +949,7 @@ const Products = () => {
                         onClick={() => setSortBy(option.value)}
                         className={sortBy === option.value ? "bg-muted" : ""}
                       >
-                        {option.label}
+                        {t(`sort-${option.value}`)}
                         {sortBy === option.value && (
                           <CheckCircle2 className="h-4 w-4 ml-2" />
                         )}
@@ -968,7 +970,7 @@ const Products = () => {
                   className="flex items-center gap-2 transition-all duration-200"
                 >
                   <Filter className="h-4 w-4" />
-                  Filters
+                  {t('filters')}
                   {(selectedProductTypes.length > 0 || activeCategory !== "All Categories" || sustainableOnly) && (
                     <motion.div
                       initial={{ scale: 0 }}
@@ -996,13 +998,13 @@ const Products = () => {
                       value="grid"
                       className="transition-all duration-200 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                     >
-                      Grid
+                      {t('grid-view')}
                     </TabsTrigger>
                     <TabsTrigger 
                       value="list"
                       className="transition-all duration-200 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                     >
-                      List
+                      {t('list-view')}
                     </TabsTrigger>
                   </TabsList>
                 </Tabs>
@@ -1020,7 +1022,7 @@ const Products = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
                 type="search"
-                placeholder="Search products, manufacturers, or categories..."
+                placeholder={t('search-placeholder')}
                 className="pl-10 pr-24 w-full transition-all duration-300 focus:border-primary"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -1052,7 +1054,7 @@ const Products = () => {
                 )}
               >
                 <SlidersHorizontal className="h-4 w-4 mr-1" />
-                Advanced
+                {t('advanced-search')}
               </Button>
             </div>
           </motion.div>
@@ -1084,7 +1086,7 @@ const Products = () => {
                   <div className="space-y-3">
                     <label className="text-sm font-medium flex items-center gap-2">
                       <ShoppingBag className="h-4 w-4 text-green-500" />
-                      Price Range ($)
+                      {t('price-range')}
                     </label>
                     <div className="pt-2">
                       <div className="flex items-center gap-4">
@@ -1107,7 +1109,7 @@ const Products = () => {
                   <div className="space-y-3">
                     <label className="text-sm font-medium flex items-center gap-2">
                       <Package className="h-4 w-4 text-blue-500" />
-                      Min Order
+                      {t('min-order')}
                     </label>
                     <div className="pt-2">
                       <div className="flex items-center gap-4">
@@ -1130,7 +1132,7 @@ const Products = () => {
                   <div className="space-y-3">
                     <label className="text-sm font-medium flex items-center gap-2">
                       <Star className="h-4 w-4 text-yellow-500" />
-                      Min Rating
+                      {t('min-rating')}
                     </label>
                     <div className="pt-2">
                       <div className="flex items-center gap-4">
@@ -1153,28 +1155,33 @@ const Products = () => {
                   <div className="space-y-3">
                     <label className="text-sm font-medium flex items-center gap-2">
                       <Clock className="h-4 w-4 text-purple-500" />
-                      Lead Time
+                      {t('lead-time')}
                     </label>
                     <div className="flex flex-wrap gap-2">
-                      {["1-2 weeks", "2-4 weeks", "4-8 weeks", "8+ weeks"].map((time) => (
+                      {[
+                        {key: "lead-time-1-2-weeks", value: "1-2 weeks"}, 
+                        {key: "lead-time-2-4-weeks", value: "2-4 weeks"}, 
+                        {key: "lead-time-4-8-weeks", value: "4-8 weeks"}, 
+                        {key: "lead-time-8plus-weeks", value: "8+ weeks"}
+                      ].map((time) => (
                         <Badge
-                          key={time}
-                          variant={selectedLeadTime.includes(time) ? "default" : "outline"}
+                          key={time.key}
+                          variant={selectedLeadTime.includes(time.value) ? "default" : "outline"}
                           className={cn(
                             "cursor-pointer transition-colors",
-                            selectedLeadTime.includes(time)
+                            selectedLeadTime.includes(time.value)
                               ? "bg-purple-500 hover:bg-purple-600"
                               : "hover:bg-purple-100"
                           )}
                           onClick={() => {
                             setSelectedLeadTime(prev =>
-                              prev.includes(time)
-                                ? prev.filter(t => t !== time)
-                                : [...prev, time]
+                              prev.includes(time.value)
+                                ? prev.filter(t => t !== time.value)
+                                : [...prev, time.value]
                             );
                           }}
                         >
-                          {time}
+                          {t(time.key)}
                         </Badge>
                       ))}
                     </div>
@@ -1182,7 +1189,7 @@ const Products = () => {
 
                   {/* Additional options */}
                   <div className="space-y-3">
-                    <label className="text-sm font-medium">Product Options</label>
+                    <label className="text-sm font-medium">{t('product-options')}</label>
                     <div className="space-y-2">
                       <div className="flex items-center space-x-2">
                         <Switch 
@@ -1190,7 +1197,7 @@ const Products = () => {
                           checked={inStockOnly}
                           onCheckedChange={setInStockOnly}
                         />
-                        <label htmlFor="inStock" className="text-sm cursor-pointer">In Stock Only</label>
+                        <label htmlFor="inStock" className="text-sm cursor-pointer">{t('in-stock-only')}</label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <Switch 
@@ -1198,7 +1205,7 @@ const Products = () => {
                           checked={newArrivalsOnly}
                           onCheckedChange={setNewArrivalsOnly}
                         />
-                        <label htmlFor="newArrivals" className="text-sm cursor-pointer">New Arrivals</label>
+                        <label htmlFor="newArrivals" className="text-sm cursor-pointer">{t('new-arrivals-only')}</label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <Switch 
@@ -1206,14 +1213,14 @@ const Products = () => {
                           checked={hasSamples}
                           onCheckedChange={setHasSamples}
                         />
-                        <label htmlFor="samples" className="text-sm cursor-pointer">Has Samples</label>
+                        <label htmlFor="samples" className="text-sm cursor-pointer">{t('has-samples')}</label>
                       </div>
                     </div>
                   </div>
 
                   {/* Customization */}
                   <div className="space-y-3">
-                    <label className="text-sm font-medium">Additional Features</label>
+                    <label className="text-sm font-medium">{t('additional-features')}</label>
                     <div className="space-y-2">
                       <div className="flex items-center space-x-2">
                         <Switch 
@@ -1221,7 +1228,7 @@ const Products = () => {
                           checked={hasCustomization}
                           onCheckedChange={setHasCustomization}
                         />
-                        <label htmlFor="customization" className="text-sm cursor-pointer">Offers Customization</label>
+                        <label htmlFor="customization" className="text-sm cursor-pointer">{t('offers-customization')}</label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <Switch 
@@ -1229,7 +1236,7 @@ const Products = () => {
                           checked={sustainableOnly}
                           onCheckedChange={setSustainableOnly}
                         />
-                        <label htmlFor="sustainable" className="text-sm cursor-pointer">Sustainable Only</label>
+                        <label htmlFor="sustainable" className="text-sm cursor-pointer">{t('sustainable-only')}</label>
                       </div>
                     </div>
                   </div>
@@ -1240,12 +1247,12 @@ const Products = () => {
                     variant="outline"
                     onClick={clearFilters}
                   >
-                    Reset Filters
+                    {t('reset-filters')}
                   </Button>
                   <Button
                     onClick={applyAdvancedFilters}
                   >
-                    Apply Filters
+                    {t('apply-filters')}
                   </Button>
                 </div>
               </motion.div>
@@ -1266,7 +1273,7 @@ const Products = () => {
                   opacity: { duration: 0.2 }
                 }}
               >
-                <span className="text-sm text-foreground/70">Active filters:</span>
+                <span className="text-sm text-foreground/70">{t('active-filters')}</span>
                 
                 {activeCategory !== "All Categories" && (
                   <motion.div
@@ -1318,7 +1325,7 @@ const Products = () => {
                     whileTap={{ scale: 0.95 }}
                   >
                     <Badge variant="secondary" className="flex items-center gap-1 animate-fadeIn bg-green-100 text-green-800 hover:bg-green-200">
-                      Sustainable Only
+                      {t('sustainable-only')}
                       <motion.button 
                         onClick={() => setSustainableOnly(false)}
                         whileTap={{ scale: 0.9 }}
@@ -1334,7 +1341,7 @@ const Products = () => {
                   whileHover={{ scale: 1.05 }}
                 >
                   <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs">
-                    Clear all
+                    {t('clear-all')}
                   </Button>
                 </motion.div>
               </motion.div>
@@ -1371,7 +1378,7 @@ const Products = () => {
                   <div className="flex items-center justify-between">
                     <h3 className="font-semibold flex items-center gap-2">
                       <SlidersHorizontal className="h-4 w-4" />
-                      Filters
+                      {t('filters')}
                     </h3>
                     <motion.div
                       whileHover={{ scale: 1.1 }}
@@ -1403,7 +1410,7 @@ const Products = () => {
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <CheckCircle2 className="h-4 w-4 text-green-600" />
-                      <h4 className="text-sm font-medium">Sustainability</h4>
+                      <h4 className="text-sm font-medium">{t('filters-sustainability')}</h4>
                     </div>
                     <div className="flex items-center space-x-2">
                       <motion.div
@@ -1416,7 +1423,7 @@ const Products = () => {
                           className={`py-1 px-3 h-auto text-xs transition-all duration-200 ${sustainableOnly ? "bg-green-600 text-white hover:bg-green-700" : ""}`}
                           onClick={() => setSustainableOnly(!sustainableOnly)}
                         >
-                          Sustainable Only
+                          {t('sustainable-only')}
                         </Button>
                       </motion.div>
                     </div>
@@ -1435,7 +1442,7 @@ const Products = () => {
                     className="border-t pt-4"
                   >
                     <h4 className="text-sm font-medium mb-2 flex justify-between items-center">
-                      <span>Categories</span>
+                      <span>{t('filters-category')}</span>
                       <ChevronUp className="h-4 w-4 text-muted-foreground" />
                     </h4>
                     <div className="space-y-1 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
@@ -1481,7 +1488,7 @@ const Products = () => {
                     className="border-t pt-4"
                   >
                     <h4 className="text-sm font-medium mb-2 flex justify-between items-center">
-                      <span>Product Types</span>
+                      <span>{t('filters-product-types')}</span>
                       <ChevronUp className="h-4 w-4 text-muted-foreground" />
                     </h4>
                     <div className="flex flex-wrap gap-2">
@@ -1531,7 +1538,7 @@ const Products = () => {
                       className="w-full mt-4 hover:bg-destructive hover:text-destructive-foreground transition-all duration-300"
                       onClick={clearFilters}
                     >
-                      Clear All Filters
+                      {t('clear-all-filters')}
                     </Button>
                   </motion.div>
                 </motion.div>
@@ -1573,7 +1580,7 @@ const Products = () => {
                   <DialogHeader>
                     <DialogTitle className="text-xl">{selectedProduct.name}</DialogTitle>
                     <DialogDescription>
-                      By {selectedProduct.manufacturer}
+                      {t('by-manufacturer', { manufacturer: selectedProduct.manufacturer })}
                     </DialogDescription>
                   </DialogHeader>
                 </motion.div>
@@ -1638,28 +1645,28 @@ const Products = () => {
                         whileHover={{ scale: 1.02 }}
                         transition={{ type: "spring", stiffness: 400, damping: 25 }}
                       >
-                        <p className="text-sm text-foreground/70">Price</p>
+                        <p className="text-sm text-foreground/70">{t('price')}</p>
                         <p className="font-semibold text-lg">{selectedProduct.price}</p>
                       </motion.div>
                       <motion.div 
                         whileHover={{ scale: 1.02 }}
                         transition={{ type: "spring", stiffness: 400, damping: 25 }}
                       >
-                        <p className="text-sm text-foreground/70">Category</p>
+                        <p className="text-sm text-foreground/70">{t('category')}</p>
                         <p className="font-medium">{selectedProduct.category}</p>
                       </motion.div>
                       <motion.div 
                         whileHover={{ scale: 1.02 }}
                         transition={{ type: "spring", stiffness: 400, damping: 25 }}
                       >
-                        <p className="text-sm text-foreground/70">Minimum Order</p>
-                        <p className="font-medium">{selectedProduct.minOrderQuantity} {selectedProduct.unitType || 'units'}</p>
+                        <p className="text-sm text-foreground/70">{t('minimum-order')}</p>
+                        <p className="font-medium">{selectedProduct.minOrderQuantity} {selectedProduct.unitType || t('units')}</p>
                       </motion.div>
                       <motion.div 
                         whileHover={{ scale: 1.02 }}
                         transition={{ type: "spring", stiffness: 400, damping: 25 }}
                       >
-                        <p className="text-sm text-foreground/70">Lead Time</p>
+                        <p className="text-sm text-foreground/70">{t('lead-time')}</p>
                         <p className="font-medium">{selectedProduct.leadTime} {selectedProduct.leadTimeUnit}</p>
                       </motion.div>
                     </motion.div>
@@ -1671,7 +1678,7 @@ const Products = () => {
                       className="grid grid-cols-2 gap-4"
                     >
                       <div>
-                        <p className="text-sm text-foreground/70 mb-1">Product Type</p>
+                        <p className="text-sm text-foreground/70 mb-1">{t('product-type')}</p>
                         <motion.div
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
@@ -1685,7 +1692,7 @@ const Products = () => {
                       
                       {selectedProduct.sku && (
                         <div>
-                          <p className="text-sm text-foreground/70 mb-1">SKU</p>
+                          <p className="text-sm text-foreground/70 mb-1">{t('sku')}</p>
                           <p className="font-medium text-sm">{selectedProduct.sku}</p>
                         </div>
                       )}
@@ -1697,13 +1704,13 @@ const Products = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3, delay: 0.5 }}
                       >
-                        <p className="text-sm text-foreground/70 mb-1">Availability</p>
+                        <p className="text-sm text-foreground/70 mb-1">{t('availability')}</p>
                         <Progress 
                           value={(selectedProduct.currentAvailable / (selectedProduct.minOrderQuantity * 3)) * 100}
                           className="h-2 mb-1"
                         />
                         <p className="text-sm">
-                          {selectedProduct.currentAvailable} {selectedProduct.unitType || 'units'} available
+                          {t('units-available', { quantity: selectedProduct.currentAvailable, unit: selectedProduct.unitType || t('units') })}
                         </p>
                       </motion.div>
                     )}
@@ -1717,7 +1724,7 @@ const Products = () => {
                         whileHover={{ scale: 1.02, x: 2 }}
                       >
                         <CheckCircle2 className="h-5 w-5" />
-                        <span>Sustainable Product</span>
+                        <span>{t('sustainable-product')}</span>
                       </motion.div>
                     )}
                   </motion.div>
@@ -1743,7 +1750,7 @@ const Products = () => {
                         className="h-4 w-4 mr-2" 
                         fill={isFavorite(selectedProduct.id) ? "currentColor" : "none"} 
                       />
-                      {isFavorite(selectedProduct.id) ? "Saved" : "Save"}
+                      {isFavorite(selectedProduct.id) ? t('saved') : t('save')}
                     </Button>
                   </motion.div>
                   
@@ -1758,7 +1765,7 @@ const Products = () => {
                         onClick={() => setShowProductDetails(false)}
                         className="transition-all duration-200"
                       >
-                        Close
+                        {t('close')}
                       </Button>
                     </motion.div>
                     <motion.div
@@ -1767,7 +1774,7 @@ const Products = () => {
                       transition={{ type: "spring", stiffness: 400, damping: 25 }}
                     >
                       <Button className="gap-1 transition-all duration-200">
-                        Find Match
+                        {t('find-match')}
                         <ArrowRight className="h-4 w-4" />
                       </Button>
                     </motion.div>

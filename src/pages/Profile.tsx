@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Navbar from "@/components/Navbar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ import RoleProfileHandler from "@/components/profile/RoleProfileHandler";
 import ProfileForm from "@/components/profile/ProfileForm";
 
 const Profile = () => {
+  const { t } = useTranslation();
   const { user, isAuthenticated, logout, updateUserAvatar } = useUser();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -21,20 +23,20 @@ const Profile = () => {
   
   // Set page title and check authentication
   useEffect(() => {
-    document.title = "My Profile - CPG Matchmaker";
+    document.title = t("profile-title") + " - CPG Matchmaker";
     
     // If not authenticated, redirect to auth page
     if (!isAuthenticated) {
       navigate("/auth?type=signin");
     }
-  }, [navigate, isAuthenticated]);
+  }, [navigate, isAuthenticated, t]);
 
   // Handle logout
   const handleLogout = () => {
     logout();
     toast({
-      title: "Logged out",
-      description: "You have been logged out successfully.",
+      title: t("logout-success"),
+      description: t("logout-success-message"),
     });
     navigate("/");
   };
@@ -60,7 +62,7 @@ const Profile = () => {
                       <Avatar className="h-24 w-24 border-4 border-background">
                         <AvatarImage 
                           src={user?.avatar || ""} 
-                          alt={user?.name || "User"} 
+                          alt={user?.name || t("user")} 
                         />
                         <AvatarFallback className="text-2xl">{user?.name?.charAt(0) || "U"}</AvatarFallback>
                       </Avatar>
@@ -81,8 +83,8 @@ const Profile = () => {
                             if (e.target?.result) {
                               updateUserAvatar(e.target.result as string);
                               toast({
-                                title: "Avatar Updated",
-                                description: "Your profile picture has been updated successfully.",
+                                title: t("profile-avatar-updated"),
+                                description: t("profile-avatar-updated-message"),
                               });
                             }
                           };
@@ -91,11 +93,11 @@ const Profile = () => {
                       }}
                     />
                   </div>
-                  <CardTitle>{user?.name || "Demo User"}</CardTitle>
+                  <CardTitle>{user?.name || t("profile-demo-user")}</CardTitle>
                   <Badge className="mt-2 capitalize font-medium px-3 py-1 text-sm" variant="secondary">
-                    {user?.role === "manufacturer" ? "Manufacturer" : 
-                     user?.role === "brand" ? "Brand" : 
-                     user?.role === "retailer" ? "Retailer" : "Role"}
+                    {user?.role === "manufacturer" ? t("manufacturer") : 
+                     user?.role === "brand" ? t("brand") : 
+                     user?.role === "retailer" ? t("retailer") : t("role")}
                   </Badge>
                   <div className="flex items-center mt-3">
                     <span className={`h-2.5 w-2.5 rounded-full mr-2 
@@ -104,9 +106,9 @@ const Profile = () => {
                         "bg-red-500"}`} 
                     />
                     <span className="text-sm text-muted-foreground">
-                      {user?.status === "online" ? "Online" : 
-                        user?.status === "away" ? "Away" : 
-                        "Busy"}
+                      {user?.status === "online" ? t("online") : 
+                        user?.status === "away" ? t("away") : 
+                        t("manufacturer-busy")}
                     </span>
                   </div>
                 </div>
@@ -115,7 +117,7 @@ const Profile = () => {
                 <div className="space-y-2">
                   <div className="flex items-center text-sm text-muted-foreground">
                     <Building className="w-4 h-4 mr-2" />
-                    {user?.companyName || "Company Name"}
+                    {user?.companyName || t("profile-company-placeholder")}
                   </div>
                   <div className="flex items-center text-sm text-muted-foreground">
                     <Mail className="w-4 h-4 mr-2" />
@@ -123,11 +125,11 @@ const Profile = () => {
                   </div>
                   <div className="flex items-center text-sm text-muted-foreground">
                     <Phone className="w-4 h-4 mr-2" />
-                    {user?.phone || "+1 (555) 123-4567"}
+                    {user?.phone || t("profile-phone-placeholder")}
                   </div>
                   <div className="flex items-center text-sm text-muted-foreground">
                     <MapPin className="w-4 h-4 mr-2" />
-                    {user?.address || "San Francisco, CA"}
+                    {user?.address || t("profile-address-placeholder")}
                   </div>
                 </div>
                 
@@ -138,7 +140,7 @@ const Profile = () => {
                     onClick={() => setIsEditing(true)}
                   >
                     <Edit className="w-4 h-4 mr-2" />
-                    Edit Profile
+                    {t("profile-edit")}
                   </Button>
                   <Button 
                     variant="destructive" 
@@ -146,7 +148,7 @@ const Profile = () => {
                     onClick={handleLogout}
                   >
                     <LogOut className="w-4 h-4 mr-2" />
-                    Log Out
+                    {t("logout")}
                   </Button>
                 </div>
               </CardContent>
@@ -162,9 +164,9 @@ const Profile = () => {
               // Otherwise show normal profile content
               <Tabs defaultValue="overview" className="space-y-6">
                 <TabsList className="grid grid-cols-3 w-full max-w-md">
-                  <TabsTrigger value="overview">Overview</TabsTrigger>
-                  <TabsTrigger value="favorites">Favorites</TabsTrigger>
-                  <TabsTrigger value="projects">Projects</TabsTrigger>
+                  <TabsTrigger value="overview">{t("profile-overview")}</TabsTrigger>
+                  <TabsTrigger value="favorites">{t("favorites")}</TabsTrigger>
+                  <TabsTrigger value="projects">{t("profile-projects")}</TabsTrigger>
                 </TabsList>
                 
                 {/* Overview Tab - Role-specific content */}
@@ -176,21 +178,21 @@ const Profile = () => {
                 <TabsContent value="favorites">
                   <Card>
                     <CardHeader>
-                      <CardTitle>Your Favorites</CardTitle>
+                      <CardTitle>{t("your-favorites")}</CardTitle>
                       <CardDescription>
-                        View and manage your saved products, manufacturers, and retailers.
+                        {t("profile-favorites-description")}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="text-center py-12">
                         <Heart className="w-12 h-12 mx-auto text-muted-foreground opacity-20 mb-4" />
-                        <h3 className="text-lg font-medium mb-2">No favorites yet</h3>
+                        <h3 className="text-lg font-medium mb-2">{t("no-favorites")}</h3>
                         <p className="text-muted-foreground max-w-md mx-auto mb-6">
-                          When you find products or manufacturers you're interested in, save them here for quick access.
+                          {t("profile-favorites-empty-message")}
                         </p>
                         <div className="flex gap-4 justify-center">
-                          <Button variant="outline">Explore Products</Button>
-                          <Button>Find Manufacturers</Button>
+                          <Button variant="outline">{t("profile-explore-products")}</Button>
+                          <Button>{t("profile-find-manufacturers")}</Button>
                         </div>
                       </div>
                     </CardContent>
@@ -201,19 +203,19 @@ const Profile = () => {
                 <TabsContent value="projects">
                   <Card>
                     <CardHeader>
-                      <CardTitle>Your Projects</CardTitle>
+                      <CardTitle>{t("profile-your-projects")}</CardTitle>
                       <CardDescription>
-                        Track and manage your registered projects and product requests.
+                        {t("profile-projects-description")}
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="text-center py-12">
                         <ClipboardList className="w-12 h-12 mx-auto text-muted-foreground opacity-20 mb-4" />
-                        <h3 className="text-lg font-medium mb-2">No projects yet</h3>
+                        <h3 className="text-lg font-medium mb-2">{t("profile-no-projects")}</h3>
                         <p className="text-muted-foreground max-w-md mx-auto mb-6">
-                          Start by creating a new project to find matching manufacturers or suppliers for your product needs.
+                          {t("profile-projects-empty-message")}
                         </p>
-                        <Button>Create New Project</Button>
+                        <Button>{t("profile-create-project")}</Button>
                       </div>
                     </CardContent>
                   </Card>

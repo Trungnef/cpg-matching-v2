@@ -25,6 +25,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BrandLayout from "@/components/layouts/BrandLayout";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 // Mock data for charts
 const salesData = [
@@ -61,11 +62,12 @@ const brandInProduction = [
 ];
 
 const Analytics = () => {
+  const { t } = useTranslation();
   const { isAuthenticated, user, role } = useUser();
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = "Brand Analytics - CPG Matchmaker";
+    document.title = t("brand-analytics-title");
 
     // If not authenticated or not a brand, redirect
     if (!isAuthenticated) {
@@ -73,7 +75,7 @@ const Analytics = () => {
     } else if (role !== "brand") {
       navigate("/dashboard");
     }
-  }, [isAuthenticated, navigate, role]);
+  }, [isAuthenticated, navigate, role, t]);
 
   if (!isAuthenticated || role !== "brand") {
     return null;
@@ -94,21 +96,21 @@ const Analytics = () => {
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                   <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/70 text-transparent bg-clip-text">
-                    Analytics Management
+                    {t("analytics-management")}
                   </h1>
                   <p className="text-muted-foreground">
-                    {user?.companyName} - Performance Metrics
+                    {user?.companyName} - {t("performance-metrics")}
                   </p>
                 </div>
 
                 <div className="flex gap-2">
                   <Button variant="outline">
                     <Calendar className="mr-2 h-4 w-4" />
-                    Last 30 Days
+                    {t("last-30-days")}
                   </Button>
                   <Button variant="outline">
                     <Download className="mr-2 h-4 w-4" />
-                    Export
+                    {t("export")}
                   </Button>
                 </div>
               </div>
@@ -119,7 +121,7 @@ const Analytics = () => {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Monthly Revenue
+                    {t("monthly-revenue")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -127,7 +129,7 @@ const Analytics = () => {
                   <div className="flex items-center text-xs text-muted-foreground mt-1">
                     <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
                     <span className="text-green-500">+10.5%</span>
-                    <span className="ml-1">from last month</span>
+                    <span className="ml-1">{t("from-last-month")}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -135,7 +137,7 @@ const Analytics = () => {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Units Sold
+                    {t("units-sold")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -143,7 +145,7 @@ const Analytics = () => {
                   <div className="flex items-center text-xs text-muted-foreground mt-1">
                     <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
                     <span className="text-green-500">+9.8%</span>
-                    <span className="ml-1">from last month</span>
+                    <span className="ml-1">{t("from-last-month")}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -151,7 +153,7 @@ const Analytics = () => {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Active Products
+                    {t("active-products")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -159,7 +161,7 @@ const Analytics = () => {
                   <div className="flex items-center text-xs text-muted-foreground mt-1">
                     <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
                     <span className="text-green-500">+2</span>
-                    <span className="ml-1">new this month</span>
+                    <span className="ml-1">{t("new-this-month")}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -167,7 +169,7 @@ const Analytics = () => {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Growth Rate (YoY)
+                    {t("growth-rate-yoy")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -175,7 +177,7 @@ const Analytics = () => {
                   <div className="flex items-center text-xs text-muted-foreground mt-1">
                     <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
                     <span className="text-green-500">+2.1%</span>
-                    <span className="ml-1">from last year</span>
+                    <span className="ml-1">{t("from-last-year")}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -184,16 +186,16 @@ const Analytics = () => {
             {/* Rest of the content... */}
             <Tabs defaultValue="revenue" className="space-y-8">
               <TabsList className="grid grid-cols-3 w-full max-w-[400px]">
-                <TabsTrigger value="revenue">Revenue</TabsTrigger>
-                <TabsTrigger value="products">Products</TabsTrigger>
-                <TabsTrigger value="distribution">Distribution</TabsTrigger>
+                <TabsTrigger value="revenue">{t("revenue")}</TabsTrigger>
+                <TabsTrigger value="products">{t("products")}</TabsTrigger>
+                <TabsTrigger value="distribution">{t("distribution")}</TabsTrigger>
               </TabsList>
 
               <TabsContent value="revenue" className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Revenue Trends</CardTitle>
-                    <CardDescription>Monthly revenue and unit sales over time</CardDescription>
+                    <CardTitle>{t("revenue-trends")}</CardTitle>
+                    <CardDescription>{t("monthly-revenue-units-desc")}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="h-[350px]">
@@ -222,7 +224,7 @@ const Analytics = () => {
                             yAxisId="left"
                             type="monotone"
                             dataKey="revenue"
-                            name="Revenue ($)"
+                            name={t("revenue-dollars")}
                             stroke="#8884d8"
                             fillOpacity={1}
                             fill="url(#colorRevenue)"
@@ -231,7 +233,7 @@ const Analytics = () => {
                             yAxisId="right"
                             type="monotone"
                             dataKey="units"
-                            name="Units Sold"
+                            name={t("units-sold")}
                             stroke="#82ca9d"
                             fillOpacity={1}
                             fill="url(#colorUnits)"
@@ -246,8 +248,8 @@ const Analytics = () => {
               <TabsContent value="products" className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Product Performance</CardTitle>
-                    <CardDescription>Sales by product with growth indicators</CardDescription>
+                    <CardTitle>{t("product-performance")}</CardTitle>
+                    <CardDescription>{t("sales-by-product")}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="h-[350px]">
@@ -262,7 +264,7 @@ const Analytics = () => {
                           <YAxis />
                           <Tooltip />
                           <Legend />
-                          <Bar dataKey="sales" name="Sales ($)" fill="#8884d8" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="sales" name={t("sales-dollars")} fill="#8884d8" radius={[4, 4, 0, 0]} />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
@@ -271,8 +273,8 @@ const Analytics = () => {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>Units in Production</CardTitle>
-                    <CardDescription>Current manufacturing volumes by product</CardDescription>
+                    <CardTitle>{t("units-in-production")}</CardTitle>
+                    <CardDescription>{t("manufacturing-volumes")}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="h-[350px]">
@@ -287,7 +289,7 @@ const Analytics = () => {
                           <YAxis />
                           <Tooltip />
                           <Legend />
-                          <Bar dataKey="units" name="Units" fill="#82ca9d" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="units" name={t("units")} fill="#82ca9d" radius={[4, 4, 0, 0]} />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
@@ -298,8 +300,8 @@ const Analytics = () => {
               <TabsContent value="distribution" className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Sales Channels</CardTitle>
-                    <CardDescription>Distribution of sales by channel</CardDescription>
+                    <CardTitle>{t("sales-channels")}</CardTitle>
+                    <CardDescription>{t("distribution-by-channel")}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="h-[350px] flex justify-center">

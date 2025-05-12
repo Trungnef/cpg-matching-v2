@@ -1,4 +1,5 @@
 import { useUser } from "@/contexts/UserContext";
+import { useTranslation } from "react-i18next";
 import { 
   Card, 
   CardContent, 
@@ -84,6 +85,7 @@ interface ManufacturerDashboardProps {
 const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboardProps) => {
   const { user } = useUser();
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const isDark = theme === 'dark';
 
   // Helper function for status badges - simplified
@@ -126,20 +128,20 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
               <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-background p-6 rounded-lg border">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                   <div>
-                    <h1 className="text-2xl font-bold">Welcome back, {user?.name?.split(' ')[0] || 'User'}!</h1>
+                    <h1 className="text-2xl font-bold">{t('manufacturer-welcome-back', { name: user?.name?.split(' ')[0] || 'User' })}</h1>
                     <p className="text-muted-foreground">{today}</p>
                     <p className="mt-2 text-sm max-w-xl">
-                      Your manufacturing operations are running smoothly. You have <span className="font-medium">2 urgent alerts</span> and <span className="font-medium">3 new partnership opportunities</span> to review.
+                      {t('manufacturer-operations-status', { alerts: '2', opportunities: '3' })}
                     </p>
                   </div>
                   <div className="flex gap-3">
                     <Button>
                       <Factory className="mr-2 h-4 w-4" />
-                      Production Status
+                      {t('manufacturer-production-status')}
                     </Button>
                     <Button variant="outline">
                       <BarChart3 className="mr-2 h-4 w-4" />
-                      View Analytics
+                      {t('manufacturer-view-analytics')}
                     </Button>
                   </div>
                 </div>
@@ -148,15 +150,15 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
             
             {/* Quick actions */}
             <div className="mb-8">
-              <h2 className="text-lg font-medium mb-4">Quick Actions</h2>
+              <h2 className="text-lg font-medium mb-4">{t('manufacturer-quick-actions')}</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <Card className="cursor-pointer hover:bg-muted/50 transition-colors">
                   <CardContent className="p-6 flex flex-col items-center text-center">
                     <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                       <Package className="h-6 w-6 text-primary" />
                     </div>
-                    <div className="font-medium">Add New Product</div>
-                    <div className="text-xs text-muted-foreground mt-1">Create product specification</div>
+                    <div className="font-medium">{t('manufacturer-add-product')}</div>
+                    <div className="text-xs text-muted-foreground mt-1">{t('manufacturer-create-spec')}</div>
                   </CardContent>
                 </Card>
                 <Card className="cursor-pointer hover:bg-muted/50 transition-colors">
@@ -164,8 +166,8 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
                     <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                       <Users className="h-6 w-6 text-primary" />
                     </div>
-                    <div className="font-medium">View Matches</div>
-                    <div className="text-xs text-muted-foreground mt-1">Explore brand partnerships</div>
+                    <div className="font-medium">{t('manufacturer-view-matches')}</div>
+                    <div className="text-xs text-muted-foreground mt-1">{t('manufacturer-explore-partners')}</div>
                   </CardContent>
                 </Card>
                 <Card className="cursor-pointer hover:bg-muted/50 transition-colors">
@@ -173,8 +175,8 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
                     <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                       <Activity className="h-6 w-6 text-primary" />
                     </div>
-                    <div className="font-medium">Production Report</div>
-                    <div className="text-xs text-muted-foreground mt-1">View efficiency metrics</div>
+                    <div className="font-medium">{t('manufacturer-production-report')}</div>
+                    <div className="text-xs text-muted-foreground mt-1">{t('manufacturer-view-efficiency')}</div>
                   </CardContent>
                 </Card>
                 <Card className="cursor-pointer hover:bg-muted/50 transition-colors">
@@ -182,8 +184,8 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
                     <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                       <Warehouse className="h-6 w-6 text-primary" />
                     </div>
-                    <div className="font-medium">Manage Inventory</div>
-                    <div className="text-xs text-muted-foreground mt-1">Check stock levels</div>
+                    <div className="font-medium">{t('manufacturer-manage-inventory')}</div>
+                    <div className="text-xs text-muted-foreground mt-1">{t('manufacturer-check-stock')}</div>
               </CardContent>
             </Card>
               </div>
@@ -193,14 +195,14 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <Card>
               <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">Production Lines</CardTitle>
+                    <CardTitle className="text-sm font-medium text-muted-foreground">{t('manufacturer-production-lines')}</CardTitle>
               </CardHeader>
               <CardContent>
                     <div className="text-2xl font-bold">{productionStats.totalLines}</div>
                     <div className="flex items-center mt-1 text-xs">
                       <span className="text-muted-foreground">
-                        <span className="text-green-500 font-medium">{productionStats.operational}</span> operational, 
-                        <span className="text-yellow-500 font-medium ml-1">{productionStats.maintenance}</span> in maintenance
+                        <span className="text-green-500 font-medium">{productionStats.operational}</span> {t('manufacturer-operational')}, 
+                        <span className="text-yellow-500 font-medium ml-1">{productionStats.maintenance}</span> {t('manufacturer-maintenance')}
                       </span>
                     </div>
               </CardContent>
@@ -208,7 +210,7 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
             
             <Card>
               <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">Average Efficiency</CardTitle>
+                    <CardTitle className="text-sm font-medium text-muted-foreground">{t('manufacturer-avg-efficiency')}</CardTitle>
               </CardHeader>
               <CardContent>
                     <div className="text-2xl font-bold">{productionStats.avgEfficiency}%</div>
@@ -220,28 +222,28 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
             
             <Card>
               <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">Total Products</CardTitle>
+                    <CardTitle className="text-sm font-medium text-muted-foreground">{t('manufacturer-total-products')}</CardTitle>
               </CardHeader>
               <CardContent>
                     <div className="text-2xl font-bold">{productionStats.totalProducts}</div>
                     <div className="flex items-center mt-1 text-xs">
                       <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
                       <span className="text-green-500 font-medium">+3</span>
-                      <span className="text-muted-foreground ml-1">since last month</span>
+                      <span className="text-muted-foreground ml-1">{t('manufacturer-since-last-month')}</span>
                 </div>
               </CardContent>
             </Card>
             
             <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">Daily Output</CardTitle>
+                    <CardTitle className="text-sm font-medium text-muted-foreground">{t('manufacturer-daily-output')}</CardTitle>
               </CardHeader>
               <CardContent>
                     <div className="text-2xl font-bold">{productionStats.totalOutput}</div>
                     <div className="flex items-center mt-1 text-xs">
                       <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
                       <span className="text-green-500 font-medium">+8.2%</span>
-                      <span className="text-muted-foreground ml-1">from yesterday</span>
+                      <span className="text-muted-foreground ml-1">{t('manufacturer-from-yesterday')}</span>
                 </div>
               </CardContent>
             </Card>
@@ -255,9 +257,9 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
             <Card>
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg">Alerts & Notifications</CardTitle>
+                      <CardTitle className="text-lg">{t('manufacturer-alerts')}</CardTitle>
                       <Button variant="ghost" size="sm" className="h-8 px-2">
-                        View All <ArrowRight className="ml-1 h-4 w-4" />
+                        {t('manufacturer-view-all')} <ArrowRight className="ml-1 h-4 w-4" />
                       </Button>
                     </div>
                   </CardHeader>
@@ -280,10 +282,10 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
             <Card>
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg">Upcoming Schedule</CardTitle>
+                      <CardTitle className="text-lg">{t('manufacturer-schedule')}</CardTitle>
                       <Button variant="ghost" size="sm" className="h-8 px-2">
                         <Calendar className="mr-1 h-4 w-4" />
-                        Calendar
+                        {t('manufacturer-calendar')}
                       </Button>
                     </div>
               </CardHeader>
@@ -291,11 +293,11 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
                 <div className="space-y-4">
                       <div className="flex items-start gap-3 pb-3 border-b">
                         <div className="flex flex-col items-center">
-                          <div className="text-xs font-medium">Today</div>
+                          <div className="text-xs font-medium">{t('manufacturer-today')}</div>
                           <div className="text-lg font-bold">15</div>
                         </div>
                         <div className="flex-1">
-                          <div className="font-medium text-sm">Production Line C Maintenance</div>
+                          <div className="font-medium text-sm">{t('manufacturer-line-maintenance')}</div>
                           <div className="text-xs text-muted-foreground flex items-center mt-1">
                             <Clock className="h-3 w-3 mr-1" /> 10:00 AM - 2:00 PM
                     </div>
@@ -307,7 +309,7 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
                           <div className="text-lg font-bold">16</div>
                         </div>
                         <div className="flex-1">
-                          <div className="font-medium text-sm">Meeting with Natural Foods Inc</div>
+                          <div className="font-medium text-sm">{t('manufacturer-meeting')}</div>
                           <div className="text-xs text-muted-foreground flex items-center mt-1">
                             <Clock className="h-3 w-3 mr-1" /> 11:30 AM - 12:30 PM
                     </div>
@@ -319,7 +321,7 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
                           <div className="text-lg font-bold">18</div>
                     </div>
                         <div className="flex-1">
-                          <div className="font-medium text-sm">Inventory Audit</div>
+                          <div className="font-medium text-sm">{t('manufacturer-inventory-audit')}</div>
                           <div className="text-xs text-muted-foreground flex items-center mt-1">
                             <Clock className="h-3 w-3 mr-1" /> 9:00 AM - 4:00 PM
                     </div>
@@ -337,21 +339,21 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div>
-                        <CardTitle>Active Production Orders</CardTitle>
-                        <CardDescription>Current manufacturing in progress</CardDescription>
+                        <CardTitle>{t('manufacturer-active-orders')}</CardTitle>
+                        <CardDescription>{t('manufacturer-current-manufacturing')}</CardDescription>
                       </div>
-                      <Button>+ New Order</Button>
+                      <Button>{t('manufacturer-new-order')}</Button>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>Client</TableHead>
-                          <TableHead>Product</TableHead>
-                          <TableHead>Quantity</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Deadline</TableHead>
+                          <TableHead>{t('manufacturer-client')}</TableHead>
+                          <TableHead>{t('manufacturer-product')}</TableHead>
+                          <TableHead>{t('manufacturer-quantity')}</TableHead>
+                          <TableHead>{t('status')}</TableHead>
+                          <TableHead>{t('manufacturer-deadline')}</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -368,15 +370,15 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
                     </Table>
                   </CardContent>
                   <CardFooter>
-                    <Button variant="outline" className="w-full">View All Orders</Button>
+                    <Button variant="outline" className="w-full">{t('manufacturer-view-orders')}</Button>
                   </CardFooter>
                 </Card>
 
                 {/* Brand Opportunities */}
           <Card>
             <CardHeader>
-                      <CardTitle>Brand Opportunities</CardTitle>
-                      <CardDescription>Potential brand partnerships</CardDescription>
+                      <CardTitle>{t('manufacturer-opportunities')}</CardTitle>
+                      <CardDescription>{t('manufacturer-potential-partners')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -386,10 +388,10 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
                         </div>
                         <div className="flex-1">
                             <p className="font-medium text-sm">Natural Foods Inc</p>
-                            <p className="text-muted-foreground text-xs">Looking for organic snack production</p>
-                            <p className="text-muted-foreground text-xs mt-1">95% match with your capabilities</p>
+                            <p className="text-muted-foreground text-xs">{t('manufacturer-looking-organic')}</p>
+                            <p className="text-muted-foreground text-xs mt-1">95% {t('manufacturer-match-capabilities')}</p>
                         </div>
-                          <Button size="sm">Connect</Button>
+                          <Button size="sm">{t('manufacturer-connect')}</Button>
                     </div>
                     
                         <div className="flex items-start space-x-4 border-b pb-4">
@@ -399,9 +401,9 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
                         <div className="flex-1">
                             <p className="font-medium text-sm">Wellness Products Co.</p>
                             <p className="text-muted-foreground text-xs">Seeking vitamin supplement production</p>
-                            <p className="text-muted-foreground text-xs mt-1">88% match with your capabilities</p>
+                            <p className="text-muted-foreground text-xs mt-1">88% {t('manufacturer-match-capabilities')}</p>
                           </div>
-                          <Button size="sm">Connect</Button>
+                          <Button size="sm">{t('manufacturer-connect')}</Button>
                       </div>
                       
                         <div className="flex items-start space-x-4">
@@ -411,15 +413,15 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
                         <div className="flex-1">
                             <p className="font-medium text-sm">Fitness Nutrition</p>
                             <p className="text-muted-foreground text-xs">Looking for protein bar manufacturer</p>
-                            <p className="text-muted-foreground text-xs mt-1">92% match with your capabilities</p>
+                            <p className="text-muted-foreground text-xs mt-1">92% {t('manufacturer-match-capabilities')}</p>
                           </div>
-                          <Button size="sm">Connect</Button>
+                          <Button size="sm">{t('manufacturer-connect')}</Button>
                         </div>
                     </div>
                   </CardContent>
                     <CardFooter>
                       <Button variant="outline" className="w-full">
-                        View All Opportunities
+                        {t('manufacturer-view-opportunities')}
                       </Button>
                     </CardFooter>
                 </Card>
@@ -432,19 +434,19 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
         return (
           <Card>
             <CardHeader>
-              <CardTitle>Production Lines Status</CardTitle>
-              <CardDescription>Current status and efficiency of all production lines</CardDescription>
+              <CardTitle>{t('manufacturer-line-status')}</CardTitle>
+              <CardDescription>{t('manufacturer-current-status')}</CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Line</TableHead>
-                    <TableHead>Current Product</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Efficiency</TableHead>
-                    <TableHead>Daily Output</TableHead>
-                    <TableHead>Next Maintenance</TableHead>
+                    <TableHead>{t('manufacturer-line')}</TableHead>
+                    <TableHead>{t('manufacturer-current-product')}</TableHead>
+                    <TableHead>{t('status')}</TableHead>
+                    <TableHead>{t('manufacturer-efficiency')}</TableHead>
+                    <TableHead>{t('manufacturer-output')}</TableHead>
+                    <TableHead>{t('manufacturer-next-maintenance')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -468,7 +470,7 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
             </CardContent>
             <CardFooter>
               <Button variant="outline" size="sm" className="ml-auto">
-                View Production Details
+                {t('manufacturer-view-details')}
                 <ArrowUpRight className="ml-2 h-4 w-4" />
               </Button>
             </CardFooter>
@@ -479,18 +481,18 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
         return (
           <Card>
             <CardHeader>
-              <CardTitle>Current Orders</CardTitle>
-              <CardDescription>Active production orders and schedules</CardDescription>
+              <CardTitle>{t('manufacturer-orders')}</CardTitle>
+              <CardDescription>{t('manufacturer-order-schedules')}</CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Client</TableHead>
-                    <TableHead>Product</TableHead>
-                    <TableHead>Quantity</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Deadline</TableHead>
+                    <TableHead>{t('manufacturer-client')}</TableHead>
+                    <TableHead>{t('manufacturer-product')}</TableHead>
+                    <TableHead>{t('manufacturer-quantity')}</TableHead>
+                    <TableHead>{t('status')}</TableHead>
+                    <TableHead>{t('manufacturer-deadline')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -508,7 +510,7 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
             </CardContent>
             <CardFooter>
               <Button variant="outline" size="sm" className="ml-auto">
-                View All Orders
+                {t('manufacturer-view-orders')}
                 <ArrowUpRight className="ml-2 h-4 w-4" />
               </Button>
             </CardFooter>
@@ -521,14 +523,14 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
             <CardHeader>
               <Tabs defaultValue="efficiency">
                 <div className="flex items-center justify-between">
-                  <CardTitle>Performance Overview</CardTitle>
+                  <CardTitle>{t('manufacturer-performance')}</CardTitle>
                   <TabsList>
-                    <TabsTrigger value="efficiency">Efficiency</TabsTrigger>
-                    <TabsTrigger value="output">Output</TabsTrigger>
-                    <TabsTrigger value="quality">Quality</TabsTrigger>
+                    <TabsTrigger value="efficiency">{t('manufacturer-efficiency')}</TabsTrigger>
+                    <TabsTrigger value="output">{t('manufacturer-output')}</TabsTrigger>
+                    <TabsTrigger value="quality">{t('manufacturer-quality')}</TabsTrigger>
                   </TabsList>
                 </div>
-                <CardDescription>Production performance metrics over time</CardDescription>
+                <CardDescription>{t('manufacturer-performance-metrics')}</CardDescription>
               </Tabs>
             </CardHeader>
             <CardContent>
@@ -539,15 +541,15 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
             <CardFooter>
               <div className="grid grid-cols-3 w-full gap-4 text-center">
                 <div>
-                  <p className="text-xs text-muted-foreground">Overall Efficiency</p>
+                  <p className="text-xs text-muted-foreground">{t('manufacturer-overall-efficiency')}</p>
                   <p className="text-lg font-medium">86.5%</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Average Output</p>
+                  <p className="text-xs text-muted-foreground">{t('manufacturer-average-output')}</p>
                   <p className="text-lg font-medium">3,072 units/day</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Quality Rating</p>
+                  <p className="text-xs text-muted-foreground">{t('manufacturer-quality-rating')}</p>
                   <p className="text-lg font-medium text-green-500">A+</p>
                 </div>
               </div>
@@ -559,8 +561,8 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
         return (
           <Card>
             <CardHeader>
-              <CardTitle>Supply Chain Insights</CardTitle>
-              <CardDescription>Material status and supplier metrics</CardDescription>
+              <CardTitle>{t('manufacturer-supply-chain')}</CardTitle>
+              <CardDescription>{t('manufacturer-material-status')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -569,14 +571,14 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
                     <Settings className="h-5 w-5 text-primary" />
                       </div>
                   <div className="flex-1">
-                    <p className="font-medium text-sm">Raw Material Inventory</p>
+                    <p className="font-medium text-sm">{t('manufacturer-raw-inventory')}</p>
                     <div className="flex items-center mt-1">
                       <Progress value={72} className="h-2 w-full mr-2" />
                       <span className="text-sm">72%</span>
                     </div>
-                    <p className="text-muted-foreground text-xs mt-1">3 materials below reorder threshold</p>
+                    <p className="text-muted-foreground text-xs mt-1">3 {t('manufacturer-materials-threshold')}</p>
                   </div>
-                  <Button size="sm" variant="outline">View</Button>
+                  <Button size="sm" variant="outline">{t('manufacturer-view')}</Button>
                     </div>
                     
                 <div className="flex items-start space-x-4 border-b pb-4">
@@ -584,23 +586,23 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
                     <Factory className="h-5 w-5 text-primary" />
                       </div>
                   <div className="flex-1">
-                    <p className="font-medium text-sm">Supplier Performance</p>
+                    <p className="font-medium text-sm">{t('manufacturer-supplier-performance')}</p>
                     <div className="grid grid-cols-3 gap-2 mt-1">
                       <div>
-                        <p className="text-xs text-muted-foreground">On-time</p>
+                        <p className="text-xs text-muted-foreground">{t('manufacturer-on-time')}</p>
                         <p className="text-sm font-medium">92%</p>
                       </div>
                       <div>
-                        <p className="text-xs text-muted-foreground">Quality</p>
+                        <p className="text-xs text-muted-foreground">{t('manufacturer-quality')}</p>
                         <p className="text-sm font-medium">96%</p>
                       </div>
                       <div>
-                        <p className="text-xs text-muted-foreground">Cost</p>
+                        <p className="text-xs text-muted-foreground">{t('manufacturer-cost')}</p>
                         <p className="text-sm font-medium text-green-500">-3.5%</p>
                       </div>
                     </div>
                   </div>
-                  <Button size="sm" variant="outline">View</Button>
+                  <Button size="sm" variant="outline">{t('manufacturer-view')}</Button>
               </div>
               
                 <div className="flex items-start space-x-4">
@@ -608,17 +610,17 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
                     <Activity className="h-5 w-5 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-medium text-sm">Logistics Status</p>
-                    <p className="text-muted-foreground text-xs">5 inbound shipments in transit</p>
-                    <p className="text-muted-foreground text-xs mt-1">3 outbound shipments scheduled today</p>
+                    <p className="font-medium text-sm">{t('manufacturer-logistics')}</p>
+                    <p className="text-muted-foreground text-xs">5 {t('manufacturer-inbound')}</p>
+                    <p className="text-muted-foreground text-xs mt-1">3 {t('manufacturer-outbound')}</p>
                   </div>
-                  <Button size="sm" variant="outline">View</Button>
+                  <Button size="sm" variant="outline">{t('manufacturer-view')}</Button>
                 </div>
               </div>
             </CardContent>
             <CardFooter>
               <Button variant="outline" size="sm" className="w-full">
-                Supply Chain Dashboard
+                {t('manufacturer-supply-dashboard')}
               </Button>
             </CardFooter>
           </Card>
@@ -628,7 +630,7 @@ const ManufacturerDashboard = ({ activeTab = "overview" }: ManufacturerDashboard
         return (
           <div className="flex items-center justify-center h-64">
             <Loader2 className="h-8 w-8 animate-spin mr-2" />
-            <span>Loading...</span>
+            <span>{t('manufacturer-loading')}</span>
           </div>
         );
     }

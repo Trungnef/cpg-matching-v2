@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/contexts/UserContext";
+import { useTranslation } from "react-i18next";
 import RetailerLayout from "@/components/layouts/RetailerLayout";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -126,13 +127,14 @@ const ordersData = [
 const Orders = () => {
   const { isAuthenticated, user, role } = useUser();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [activeTab, setActiveTab] = useState("all");
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   
   useEffect(() => {
-    document.title = "Orders - CPG Matchmaker";
+    document.title = t("orders") + " - CPG Matchmaker";
     
     // If not authenticated or not a retailer, redirect
     if (!isAuthenticated) {
@@ -140,7 +142,7 @@ const Orders = () => {
     } else if (role !== "retailer") {
       navigate("/dashboard");
     }
-  }, [isAuthenticated, navigate, role]);
+  }, [isAuthenticated, navigate, role, t]);
 
   if (!isAuthenticated || role !== "retailer") {
     return null;
@@ -172,31 +174,31 @@ const Orders = () => {
       case "completed":
         return (
           <Badge className="bg-green-500 hover:bg-green-600">
-            <CheckCircle className="mr-1 h-3 w-3" /> Completed
+            <CheckCircle className="mr-1 h-3 w-3" /> {t("completed")}
           </Badge>
         );
       case "processing":
         return (
           <Badge className="bg-blue-500 hover:bg-blue-600">
-            <Clock className="mr-1 h-3 w-3" /> Processing
+            <Clock className="mr-1 h-3 w-3" /> {t("processing")}
           </Badge>
         );
       case "shipped":
         return (
           <Badge className="bg-purple-500 hover:bg-purple-600">
-            <Truck className="mr-1 h-3 w-3" /> Shipped
+            <Truck className="mr-1 h-3 w-3" /> {t("shipped")}
           </Badge>
         );
       case "pending":
         return (
           <Badge className="bg-yellow-500 hover:bg-yellow-600">
-            <Clock className="mr-1 h-3 w-3" /> Pending
+            <Clock className="mr-1 h-3 w-3" /> {t("pending")}
           </Badge>
         );
       case "cancelled":
         return (
           <Badge variant="outline" className="text-red-500 border-red-200">
-            <AlertCircle className="mr-1 h-3 w-3" /> Cancelled
+            <AlertCircle className="mr-1 h-3 w-3" /> {t("cancelled")}
           </Badge>
         );
       default:
@@ -224,18 +226,18 @@ const Orders = () => {
         <div className="mb-8 px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">Orders Management</h1>
-              <p className="text-muted-foreground">{user?.companyName} - Manage and track customer orders</p>
+              <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">{t("orders-management")}</h1>
+              <p className="text-muted-foreground">{user?.companyName} - {t("manage-track-customer-orders")}</p>
             </div>
             
             <div className="flex gap-2">
               <Button variant="outline" className="hover:shadow-md transition-shadow">
                 <Download className="mr-2 h-4 w-4" />
-                Export
+                {t("export")}
               </Button>
               <Button className="hover:shadow-md transition-shadow">
                 <Plus className="mr-2 h-4 w-4" />
-                New Order
+                {t("new-order")}
               </Button>
             </div>
           </div>
@@ -246,17 +248,17 @@ const Orders = () => {
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
               <TabsList>
-                <TabsTrigger value="all">All Orders</TabsTrigger>
-                <TabsTrigger value="recent">Recent</TabsTrigger>
-                <TabsTrigger value="processing">Processing</TabsTrigger>
-                <TabsTrigger value="completed">Completed</TabsTrigger>
+                <TabsTrigger value="all">{t("all-orders")}</TabsTrigger>
+                <TabsTrigger value="recent">{t("recent")}</TabsTrigger>
+                <TabsTrigger value="processing">{t("processing")}</TabsTrigger>
+                <TabsTrigger value="completed">{t("completed")}</TabsTrigger>
               </TabsList>
               
               <div className="flex flex-col sm:flex-row gap-2">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                   <Input 
-                    placeholder="Search orders..." 
+                    placeholder={t("search-orders")} 
                     className="pl-10 shadow-sm hover:shadow transition-shadow w-full sm:w-64" 
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -265,17 +267,17 @@ const Orders = () => {
                 
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
                   <SelectTrigger className="w-full sm:w-[180px]">
-                    <SelectValue placeholder="Filter by status" />
+                    <SelectValue placeholder={t("filter-by-status")} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectLabel>Order Status</SelectLabel>
-                      <SelectItem value="all">All Statuses</SelectItem>
-                      <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="processing">Processing</SelectItem>
-                      <SelectItem value="shipped">Shipped</SelectItem>
-                      <SelectItem value="completed">Completed</SelectItem>
-                      <SelectItem value="cancelled">Cancelled</SelectItem>
+                      <SelectLabel>{t("order-status")}</SelectLabel>
+                      <SelectItem value="all">{t("all-statuses")}</SelectItem>
+                      <SelectItem value="pending">{t("pending")}</SelectItem>
+                      <SelectItem value="processing">{t("processing")}</SelectItem>
+                      <SelectItem value="shipped">{t("shipped")}</SelectItem>
+                      <SelectItem value="completed">{t("completed")}</SelectItem>
+                      <SelectItem value="cancelled">{t("cancelled")}</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
@@ -292,9 +294,9 @@ const Orders = () => {
                 <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-4">
                   <ShoppingBag className="h-6 w-6 text-muted-foreground" />
                 </div>
-                <h3 className="font-medium mb-2">No orders found</h3>
+                <h3 className="font-medium mb-2">{t("no-orders-found")}</h3>
                 <p className="text-sm text-muted-foreground text-center">
-                  Try adjusting your filters or search query
+                  {t("adjust-filters-or-search")}
                 </p>
               </CardContent>
             </Card>
@@ -320,7 +322,7 @@ const Orders = () => {
                               {getStatusBadge(order.status)}
                             </div>
                             <p className="text-sm text-muted-foreground">
-                              {format(order.date, "MMMM d, yyyy")} • {order.items} items • ${order.total.toFixed(2)}
+                              {format(order.date, "MMMM d, yyyy")} • {order.items} {t("items")} • ${order.total.toFixed(2)}
                             </p>
                           </div>
                         </div>
@@ -333,7 +335,7 @@ const Orders = () => {
                             onClick={() => handleExpandOrder(order.id)}
                           >
                             <Eye className="h-4 w-4" />
-                            {expandedOrder === order.id ? "Hide Details" : "View Details"}
+                            {expandedOrder === order.id ? t("hide-details") : t("view-details")}
                           </Button>
                           
                           <DropdownMenu>
@@ -343,14 +345,14 @@ const Orders = () => {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem>View Order</DropdownMenuItem>
-                              <DropdownMenuItem>Print Invoice</DropdownMenuItem>
+                              <DropdownMenuItem>{t("view-order")}</DropdownMenuItem>
+                              <DropdownMenuItem>{t("print-invoice")}</DropdownMenuItem>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem>Update Status</DropdownMenuItem>
+                              <DropdownMenuItem>{t("update-status")}</DropdownMenuItem>
                               {order.status !== "cancelled" && (
                                 <>
                                   <DropdownMenuSeparator />
-                                  <DropdownMenuItem className="text-red-500">Cancel Order</DropdownMenuItem>
+                                  <DropdownMenuItem className="text-red-500">{t("cancel-order")}</DropdownMenuItem>
                                 </>
                               )}
                             </DropdownMenuContent>
@@ -371,7 +373,7 @@ const Orders = () => {
                             {/* Left column - Customer Info */}
                             <div className="space-y-4">
                               <div>
-                                <h4 className="text-sm font-medium mb-2 text-muted-foreground">Customer Information</h4>
+                                <h4 className="text-sm font-medium mb-2 text-muted-foreground">{t("customer-information")}</h4>
                                 <div className="flex items-center">
                                   <Avatar className="h-10 w-10 mr-3">
                                     <AvatarFallback>{order.customerName.charAt(0)}</AvatarFallback>
@@ -387,14 +389,14 @@ const Orders = () => {
                                 <div>
                                   <div className="flex items-center text-sm mb-1 text-muted-foreground">
                                     <Truck className="h-3.5 w-3.5 mr-1" />
-                                    Shipping
+                                    {t("shipping")}
                                   </div>
                                   <p className="text-sm font-medium">{order.shipping}</p>
                                 </div>
                                 <div>
                                   <div className="flex items-center text-sm mb-1 text-muted-foreground">
                                     <CreditCard className="h-3.5 w-3.5 mr-1" />
-                                    Payment
+                                    {t("payment")}
                                   </div>
                                   <p className="text-sm font-medium">{order.paymentMethod}</p>
                                 </div>
@@ -403,7 +405,7 @@ const Orders = () => {
                             
                             {/* Right column - Product List */}
                             <div>
-                              <h4 className="text-sm font-medium mb-2 text-muted-foreground">Order Items</h4>
+                              <h4 className="text-sm font-medium mb-2 text-muted-foreground">{t("order-items")}</h4>
                               <div className="space-y-2">
                                 {order.products.map((product, i) => (
                                   <div key={i} className="flex justify-between items-center py-2 border-b border-border last:border-0">
@@ -413,7 +415,7 @@ const Orders = () => {
                                       </div>
                                       <div>
                                         <p className="font-medium text-sm">{product.name}</p>
-                                        <p className="text-xs text-muted-foreground">Qty: {product.quantity}</p>
+                                        <p className="text-xs text-muted-foreground">{t("qty")}: {product.quantity}</p>
                                       </div>
                                     </div>
                                     <p className="font-medium">${product.price.toFixed(2)}</p>
@@ -427,10 +429,10 @@ const Orders = () => {
                         <CardFooter className="bg-muted/30 justify-between py-3">
                           <div className="flex items-center text-sm">
                             <Clock className="h-4 w-4 mr-1 text-muted-foreground" />
-                            <span className="text-muted-foreground">Order placed on {format(order.date, "MMM d, yyyy 'at' h:mm a")}</span>
+                            <span className="text-muted-foreground">{t("order-placed-on")} {format(order.date, "MMM d, yyyy 'at' h:mm a")}</span>
                           </div>
                           <div className="flex items-center">
-                            <span className="text-muted-foreground mr-2">Total:</span>
+                            <span className="text-muted-foreground mr-2">{t("total")}:</span>
                             <span className="font-bold">${order.total.toFixed(2)}</span>
                           </div>
                         </CardFooter>

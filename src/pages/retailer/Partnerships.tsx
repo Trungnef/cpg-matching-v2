@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/contexts/UserContext";
+import { useTranslation } from "react-i18next";
 import RetailerLayout from "@/components/layouts/RetailerLayout";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -128,11 +129,12 @@ const manufacturerPartnerships = [
 const RetailerPartnerships = () => {
   const { isAuthenticated, user, role } = useUser();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("brands");
   
   useEffect(() => {
-    document.title = "Partnerships - CPG Matchmaker";
+    document.title = t("partnerships") + " - CPG Matchmaker";
     
     // If not authenticated or not a retailer, redirect
     if (!isAuthenticated) {
@@ -140,7 +142,7 @@ const RetailerPartnerships = () => {
     } else if (role !== "retailer") {
       navigate("/dashboard");
     }
-  }, [isAuthenticated, navigate, role]);
+  }, [isAuthenticated, navigate, role, t]);
 
   if (!isAuthenticated || role !== "retailer") {
     return null;
@@ -161,11 +163,11 @@ const RetailerPartnerships = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "Active":
-        return <Badge className="bg-green-500">Active</Badge>;
+        return <Badge className="bg-green-500">{t("active")}</Badge>;
       case "Pending":
-        return <Badge className="bg-yellow-500">Pending</Badge>;
+        return <Badge className="bg-yellow-500">{t("pending")}</Badge>;
       case "Inactive":
-        return <Badge variant="outline" className="text-gray-500 border-gray-500">Inactive</Badge>;
+        return <Badge variant="outline" className="text-gray-500 border-gray-500">{t("inactive")}</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -184,70 +186,70 @@ const RetailerPartnerships = () => {
           <div className="mb-8 px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
-                <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">Partnerships Management</h1>
-                <p className="text-muted-foreground">{user?.companyName} - Manage Your Brand & Manufacturer Relationships</p>
+                <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">{t("partnerships-management")}</h1>
+                <p className="text-muted-foreground">{user?.companyName} - {t("manage-brand-manufacturer-relationships")}</p>
               </div>
               
               <Dialog>
                 <DialogTrigger asChild>
                   <Button className="group hover:shadow-md transition-shadow">
                     <PlusCircle className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
-                    New Partnership
+                    {t("new-partnership")}
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-md">
                   <DialogHeader>
-                    <DialogTitle>Create New Partnership</DialogTitle>
+                    <DialogTitle>{t("create-new-partnership")}</DialogTitle>
                     <DialogDescription>
-                      Send a partnership request to a brand or manufacturer to establish a business relationship.
+                      {t("send-partnership-request-description")}
                     </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
                     <div className="grid grid-cols-4 items-center gap-4">
                       <label htmlFor="partnerType" className="text-right text-sm font-medium col-span-1">
-                        Type
+                        {t("type")}
                       </label>
                       <select 
                         id="partnerType" 
                         className="col-span-3 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                       >
-                        <option value="brand">Brand</option>
-                        <option value="manufacturer">Manufacturer</option>
+                        <option value="brand">{t("brand")}</option>
+                        <option value="manufacturer">{t("manufacturer")}</option>
                       </select>
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                       <label htmlFor="partnerName" className="text-right text-sm font-medium col-span-1">
-                        Name
+                        {t("name")}
                       </label>
                       <Input
                         id="partnerName"
-                        placeholder="Partner company name"
+                        placeholder={t("partner-company-name")}
                         className="col-span-3"
                       />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                       <label htmlFor="contactEmail" className="text-right text-sm font-medium col-span-1">
-                        Email
+                        {t("email")}
                       </label>
                       <Input
                         id="contactEmail"
-                        placeholder="Contact email address"
+                        placeholder={t("contact-email-address")}
                         className="col-span-3"
                       />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                       <label htmlFor="message" className="text-right text-sm font-medium col-span-1">
-                        Message
+                        {t("message")}
                       </label>
                       <textarea
                         id="message"
-                        placeholder="Introduce yourself and explain why you'd like to partner"
+                        placeholder={t("partnership-message-placeholder")}
                         className="col-span-3 flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                       />
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button type="submit">Send Request</Button>
+                    <Button type="submit">{t("send-request")}</Button>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
@@ -266,11 +268,11 @@ const RetailerPartnerships = () => {
                 <TabsList className="grid w-full sm:w-[400px] grid-cols-2">
                   <TabsTrigger value="brands" className="flex items-center gap-2">
                     <Building className="h-4 w-4" />
-                    Brand Partners
+                    {t("brand-partners")}
                   </TabsTrigger>
                   <TabsTrigger value="manufacturers" className="flex items-center gap-2">
                     <Factory className="h-4 w-4" />
-                    Manufacturer Partners
+                    {t("manufacturer-partners")}
                   </TabsTrigger>
                 </TabsList>
                 
@@ -278,7 +280,7 @@ const RetailerPartnerships = () => {
                   <div className="relative w-64">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                     <Input 
-                      placeholder="Search partnerships..." 
+                      placeholder={t("search-partnerships")} 
                       className="pl-10 shadow-sm hover:shadow transition-shadow" 
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
@@ -286,7 +288,7 @@ const RetailerPartnerships = () => {
                   </div>
                   <Button variant="outline" className="group hover:shadow-md transition-shadow">
                     <Filter className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
-                    Filter
+                    {t("filter")}
                   </Button>
                 </div>
               </div>
@@ -317,19 +319,19 @@ const RetailerPartnerships = () => {
                         <CardContent className="space-y-3 pb-2">
                           <div className="grid grid-cols-2 gap-2 text-sm">
                             <div>
-                              <span className="text-muted-foreground">Location:</span>
+                              <span className="text-muted-foreground">{t("location")}:</span>
                               <span className="ml-1 font-medium">{partner.location}</span>
                             </div>
                             <div>
-                              <span className="text-muted-foreground">Products:</span>
+                              <span className="text-muted-foreground">{t("products")}:</span>
                               <span className="ml-1 font-medium">{partner.products}</span>
                             </div>
                             <div className="col-span-2">
-                              <span className="text-muted-foreground">Since:</span>
+                              <span className="text-muted-foreground">{t("since")}:</span>
                               <span className="ml-1 font-medium">{partner.dateEstablished}</span>
                             </div>
                             <div className="col-span-2">
-                              <span className="text-muted-foreground">Contact:</span>
+                              <span className="text-muted-foreground">{t("contact")}:</span>
                               <span className="ml-1 font-medium">{partner.contactPerson}</span>
                             </div>
                           </div>
@@ -337,19 +339,19 @@ const RetailerPartnerships = () => {
                           {partner.status === "Active" && (
                             <div className="flex items-center text-xs text-green-500 font-medium">
                               <CheckCircle className="h-3 w-3 mr-1" />
-                              Active Partnership
+                              {t("active-partnership")}
                             </div>
                           )}
                           {partner.status === "Pending" && (
                             <div className="flex items-center text-xs text-yellow-500 font-medium">
                               <Clock className="h-3 w-3 mr-1" />
-                              Awaiting Approval
+                              {t("awaiting-approval")}
                             </div>
                           )}
                           {partner.status === "Inactive" && (
                             <div className="flex items-center text-xs text-gray-500 font-medium">
                               <AlertCircle className="h-3 w-3 mr-1" />
-                              Partnership Inactive
+                              {t("partnership-inactive")}
                             </div>
                           )}
                         </CardContent>
@@ -360,11 +362,11 @@ const RetailerPartnerships = () => {
                             className="group"
                           >
                             {partner.status === "Active" ? (
-                              <>View Products</>
+                              <>{t("view-products")}</>
                             ) : partner.status === "Pending" ? (
-                              <>Review Request</>
+                              <>{t("review-request")}</>
                             ) : (
-                              <>Reactivate</>
+                              <>{t("reactivate")}</>
                             )}
                           </Button>
                           <DropdownMenu>
@@ -374,15 +376,15 @@ const RetailerPartnerships = () => {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem>View Details</DropdownMenuItem>
-                              <DropdownMenuItem>Contact Partner</DropdownMenuItem>
+                              <DropdownMenuItem>{t("view-details")}</DropdownMenuItem>
+                              <DropdownMenuItem>{t("contact-partner")}</DropdownMenuItem>
                               <DropdownMenuSeparator />
                               {partner.status === "Active" ? (
-                                <DropdownMenuItem className="text-red-500">Deactivate</DropdownMenuItem>
+                                <DropdownMenuItem className="text-red-500">{t("deactivate")}</DropdownMenuItem>
                               ) : partner.status === "Inactive" ? (
-                                <DropdownMenuItem>Reactivate</DropdownMenuItem>
+                                <DropdownMenuItem>{t("reactivate")}</DropdownMenuItem>
                               ) : (
-                                <DropdownMenuItem className="text-red-500">Cancel Request</DropdownMenuItem>
+                                <DropdownMenuItem className="text-red-500">{t("cancel-request")}</DropdownMenuItem>
                               )}
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -408,54 +410,54 @@ const RetailerPartnerships = () => {
                             >
                               <Handshake className="h-6 w-6 text-primary" />
                             </motion.div>
-                            <h3 className="font-medium mb-2">New Brand Partnership</h3>
+                            <h3 className="font-medium mb-2">{t("new-brand-partnership")}</h3>
                             <p className="text-sm text-muted-foreground text-center mb-4">
-                              Connect with a brand to offer their products
+                              {t("connect-with-brand-description")}
                             </p>
                           </CardContent>
                         </Card>
                       </DialogTrigger>
                       <DialogContent className="sm:max-w-md">
                         <DialogHeader>
-                          <DialogTitle>Request Brand Partnership</DialogTitle>
+                          <DialogTitle>{t("request-brand-partnership")}</DialogTitle>
                           <DialogDescription>
-                            Send a partnership request to establish a business relationship with a brand.
+                            {t("request-brand-partnership-description")}
                           </DialogDescription>
                         </DialogHeader>
                         <div className="grid gap-4 py-4">
                           <div className="grid grid-cols-4 items-center gap-4">
                             <label htmlFor="brandName" className="text-right text-sm font-medium col-span-1">
-                              Brand Name
+                              {t("brand-name")}
                             </label>
                             <Input
                               id="brandName"
-                              placeholder="Brand company name"
+                              placeholder={t("brand-company-name")}
                               className="col-span-3"
                             />
                           </div>
                           <div className="grid grid-cols-4 items-center gap-4">
                             <label htmlFor="contactEmail" className="text-right text-sm font-medium col-span-1">
-                              Email
+                              {t("email")}
                             </label>
                             <Input
                               id="contactEmail"
-                              placeholder="Contact email address"
+                              placeholder={t("contact-email-address")}
                               className="col-span-3"
                             />
                           </div>
                           <div className="grid grid-cols-4 items-center gap-4">
                             <label htmlFor="message" className="text-right text-sm font-medium col-span-1">
-                              Message
+                              {t("message")}
                             </label>
                             <textarea
                               id="message"
-                              placeholder="Introduce yourself and explain why you'd like to partner"
+                              placeholder={t("partnership-message-placeholder")}
                               className="col-span-3 flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                             />
                           </div>
                         </div>
                         <DialogFooter>
-                          <Button type="submit">Send Request</Button>
+                          <Button type="submit">{t("send-request")}</Button>
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>
@@ -489,19 +491,19 @@ const RetailerPartnerships = () => {
                         <CardContent className="space-y-3 pb-2">
                           <div className="grid grid-cols-2 gap-2 text-sm">
                             <div>
-                              <span className="text-muted-foreground">Location:</span>
+                              <span className="text-muted-foreground">{t("location")}:</span>
                               <span className="ml-1 font-medium">{partner.location}</span>
                             </div>
                             <div>
-                              <span className="text-muted-foreground">Products:</span>
+                              <span className="text-muted-foreground">{t("products")}:</span>
                               <span className="ml-1 font-medium">{partner.products}</span>
                             </div>
                             <div className="col-span-2">
-                              <span className="text-muted-foreground">Since:</span>
+                              <span className="text-muted-foreground">{t("since")}:</span>
                               <span className="ml-1 font-medium">{partner.dateEstablished}</span>
                             </div>
                             <div className="col-span-2">
-                              <span className="text-muted-foreground">Contact:</span>
+                              <span className="text-muted-foreground">{t("contact")}:</span>
                               <span className="ml-1 font-medium">{partner.contactPerson}</span>
                             </div>
                           </div>
@@ -509,13 +511,13 @@ const RetailerPartnerships = () => {
                           {partner.status === "Active" && (
                             <div className="flex items-center text-xs text-green-500 font-medium">
                               <CheckCircle className="h-3 w-3 mr-1" />
-                              Active Partnership
+                              {t("active-partnership")}
                             </div>
                           )}
                           {partner.status === "Pending" && (
                             <div className="flex items-center text-xs text-yellow-500 font-medium">
                               <Clock className="h-3 w-3 mr-1" />
-                              Awaiting Approval
+                              {t("awaiting-approval")}
                             </div>
                           )}
                         </CardContent>
@@ -526,11 +528,11 @@ const RetailerPartnerships = () => {
                             className="group"
                           >
                             {partner.status === "Active" ? (
-                              <>View Production</>
+                              <>{t("view-products")}</>
                             ) : partner.status === "Pending" ? (
-                              <>Review Request</>
+                              <>{t("review-request")}</>
                             ) : (
-                              <>Reactivate</>
+                              <>{t("reactivate")}</>
                             )}
                           </Button>
                           <DropdownMenu>
@@ -540,13 +542,13 @@ const RetailerPartnerships = () => {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem>View Details</DropdownMenuItem>
-                              <DropdownMenuItem>Contact Partner</DropdownMenuItem>
+                              <DropdownMenuItem>{t("view-details")}</DropdownMenuItem>
+                              <DropdownMenuItem>{t("contact-partner")}</DropdownMenuItem>
                               <DropdownMenuSeparator />
                               {partner.status === "Active" ? (
-                                <DropdownMenuItem className="text-red-500">Deactivate</DropdownMenuItem>
+                                <DropdownMenuItem className="text-red-500">{t("deactivate")}</DropdownMenuItem>
                               ) : (
-                                <DropdownMenuItem className="text-red-500">Cancel Request</DropdownMenuItem>
+                                <DropdownMenuItem className="text-red-500">{t("cancel-request")}</DropdownMenuItem>
                               )}
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -572,54 +574,54 @@ const RetailerPartnerships = () => {
                             >
                               <Factory className="h-6 w-6 text-primary" />
                             </motion.div>
-                            <h3 className="font-medium mb-2">New Manufacturer Partnership</h3>
+                            <h3 className="font-medium mb-2">{t("new-manufacturer-partnership")}</h3>
                             <p className="text-sm text-muted-foreground text-center mb-4">
-                              Connect with a manufacturer for production
+                              {t("connect-with-manufacturer-description")}
                             </p>
                           </CardContent>
                         </Card>
                       </DialogTrigger>
                       <DialogContent className="sm:max-w-md">
                         <DialogHeader>
-                          <DialogTitle>Request Manufacturer Partnership</DialogTitle>
+                          <DialogTitle>{t("request-manufacturer-partnership")}</DialogTitle>
                           <DialogDescription>
-                            Send a partnership request to establish a business relationship with a manufacturer.
+                            {t("request-manufacturer-partnership-description")}
                           </DialogDescription>
                         </DialogHeader>
                         <div className="grid gap-4 py-4">
                           <div className="grid grid-cols-4 items-center gap-4">
                             <label htmlFor="manufacturerName" className="text-right text-sm font-medium col-span-1">
-                              Name
+                              {t("name")}
                             </label>
                             <Input
                               id="manufacturerName"
-                              placeholder="Manufacturer company name"
+                              placeholder={t("manufacturer-company-name")}
                               className="col-span-3"
                             />
                           </div>
                           <div className="grid grid-cols-4 items-center gap-4">
                             <label htmlFor="contactEmail" className="text-right text-sm font-medium col-span-1">
-                              Email
+                              {t("email")}
                             </label>
                             <Input
                               id="contactEmail"
-                              placeholder="Contact email address"
+                              placeholder={t("contact-email-address")}
                               className="col-span-3"
                             />
                           </div>
                           <div className="grid grid-cols-4 items-center gap-4">
                             <label htmlFor="message" className="text-right text-sm font-medium col-span-1">
-                              Message
+                              {t("message")}
                             </label>
                             <textarea
                               id="message"
-                              placeholder="Introduce yourself and explain your production needs"
+                              placeholder={t("manufacturer-message-placeholder")}
                               className="col-span-3 flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                             />
                           </div>
                         </div>
                         <DialogFooter>
-                          <Button type="submit">Send Request</Button>
+                          <Button type="submit">{t("send-request")}</Button>
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>

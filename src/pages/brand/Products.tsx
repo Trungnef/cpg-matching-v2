@@ -301,7 +301,7 @@ const BrandProducts = () => {
   });
   
   useEffect(() => {
-    document.title = "Products Management - CPG Matchmaker";
+    document.title = t("products") + " - CPG Matchmaker";
     
     // If not authenticated or not a brand, redirect
     if (!isAuthenticated) {
@@ -309,7 +309,7 @@ const BrandProducts = () => {
     } else if (role !== "brand") {
       navigate("/dashboard");
     }
-  }, [isAuthenticated, navigate, role]);
+  }, [isAuthenticated, navigate, role, t]);
 
   if (!isAuthenticated || role !== "brand") {
     return null;
@@ -412,8 +412,8 @@ const BrandProducts = () => {
     
     setProducts(prev => [...prev, newProduct]);
     toast({
-      title: "Product Added",
-      description: `${newProduct.name} has been added successfully.`
+      title: t("production-product-created"),
+      description: t("production-product-added", {name: newProduct.name})
     });
     setIsAddProductOpen(false);
     resetFormData();
@@ -442,8 +442,8 @@ const BrandProducts = () => {
     
     setIsEditProductOpen(false);
     toast({
-      title: "Product Updated",
-      description: `${updatedProduct.name} has been updated successfully.`
+      title: t("production-product-updated"),
+      description: t("production-product-updated-successfully", {name: updatedProduct.name})
     });
   };
 
@@ -455,8 +455,8 @@ const BrandProducts = () => {
     setProducts(updatedProducts);
     
     toast({
-      title: "Product Deleted",
-      description: `${selectedProduct.name} has been deleted successfully.`
+      title: t("production-product-deleted"),
+      description: t("production-product-removed", {name: selectedProduct.name})
     });
     setIsDeleteConfirmOpen(false);
   };
@@ -471,8 +471,11 @@ const BrandProducts = () => {
     
     setProducts(updatedProducts);
     toast({
-      title: "Status Updated",
-      description: `${product.name} status changed to ${newStatus}.`
+      title: t("production-line-status-changed"),
+      description: t("production-line-status-changed-description", { 
+        line: product.name, 
+        status: t(newStatus === "Active" ? "production-active" : newStatus === "Development" ? "production-status-in-progress" : "production-status-paused")
+      })
     });
   };
 
@@ -564,7 +567,7 @@ const BrandProducts = () => {
     return (
       <div className="space-y-2">
         <Label htmlFor={name} className="text-base font-medium">
-          Product Image
+          {t("production-product-image")}
         </Label>
         <div className={cn(
           "border-2 border-dashed rounded-lg p-4",
@@ -589,7 +592,7 @@ const BrandProducts = () => {
                 <>
                   <img 
                     src={uploadedImageUrl || imageValue as string} 
-                    alt="Product preview" 
+                    alt={t("production-product-preview")} 
                     className="w-full h-full object-contain" 
                   />
                   <div className={cn(
@@ -605,7 +608,7 @@ const BrandProducts = () => {
                     "h-12 w-12 mb-2",
                     isDark ? "text-muted-foreground" : "text-slate-400"
                   )} />
-                  <p className="text-sm text-muted-foreground">No image selected</p>
+                  <p className="text-sm text-muted-foreground">{t("gallery-no-image")}</p>
                 </div>
               )}
               
@@ -616,7 +619,7 @@ const BrandProducts = () => {
                     className="w-3/4 h-2" 
                   />
                   <p className="text-xs mt-2 text-muted-foreground">
-                    {uploadProgress === 100 ? "Processing..." : `Uploading: ${uploadProgress}%`}
+                    {uploadProgress === 100 ? t("gallery-processing") : t("gallery-uploading", {progress: uploadProgress})}
                   </p>
                 </div>
               ) : null}
@@ -659,7 +662,7 @@ const BrandProducts = () => {
                 }}
               >
                 <UploadCloud className="h-4 w-4 mr-2" />
-                Upload Image
+                {t("production-upload-photo")}
               </Button>
               <Button 
                 type="button" 
@@ -668,7 +671,7 @@ const BrandProducts = () => {
                 onClick={() => setIsImageGalleryOpen(true)}
               >
                 <ImageIcon className="h-4 w-4 mr-2" />
-                Choose from Gallery
+                {t("gallery-choose-from")}
               </Button>
               
               {(uploadedImageUrl || (imageValue as string) !== "/placeholder.svg") && (
@@ -682,7 +685,7 @@ const BrandProducts = () => {
                   }}
                 >
                   <XCircle className="h-4 w-4 mr-2" />
-                  Remove
+                  {t("remove")}
                 </Button>
               )}
             </div>
@@ -777,7 +780,7 @@ const BrandProducts = () => {
                   transition={{ duration: 0.5, delay: 0.1 }}
                 >
                 <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/70 text-transparent bg-clip-text">
-                  Product Management
+                  {t("production-title")}
                 </h1>
                 </motion.h1>
                 <motion.p 
@@ -786,7 +789,7 @@ const BrandProducts = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
                 >
-                  {user?.companyName} - Manage Your Product Catalog
+                  {user?.companyName} - {t("production-subtitle")}
                 </motion.p>
               </div>
               
@@ -803,7 +806,7 @@ const BrandProducts = () => {
                   }}
                 >
                 <PlusCircle className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
-                Add New Product
+                {t("production-add-line")}
               </Button>
               </motion.div>
             </div>
@@ -820,7 +823,7 @@ const BrandProducts = () => {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input 
-                  placeholder="Search products by name, category, or SKU..." 
+                  placeholder={t("search-products-placeholder")} 
                   className="pl-10" 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -833,27 +836,27 @@ const BrandProducts = () => {
                 <Button variant="outline" className="group w-full justify-between">
                   <div className="flex items-center">
               <Filter className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
-                    <span>Filter Products</span>
+                    <span>{t("filter-products")}</span>
                   </div>
                   <span className="text-xs">
                     {filterCategory || filterStatus ? (
-                      <Badge variant="secondary" className="ml-2">Active</Badge>
+                      <Badge variant="secondary" className="ml-2">{t("active-filters")}</Badge>
                     ) : null}
                   </span>
             </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <div className="p-2">
-                  <p className="text-sm font-medium mb-2">Category</p>
+                  <p className="text-sm font-medium mb-2">{t("category")}</p>
                   <Select
                     value={filterCategory || ""}
                     onValueChange={(value) => setFilterCategory(value === "" ? null : value)}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="All Categories" />
+                      <SelectValue placeholder={t("all-categories")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Categories</SelectItem>
+                      <SelectItem value="">{t("all-categories")}</SelectItem>
                       {productCategories.map(category => (
                         <SelectItem key={category} value={category}>{category}</SelectItem>
                       ))}
@@ -862,19 +865,19 @@ const BrandProducts = () => {
           </div>
                 <DropdownMenuSeparator />
                 <div className="p-2">
-                  <p className="text-sm font-medium mb-2">Status</p>
+                  <p className="text-sm font-medium mb-2">{t("status")}</p>
                   <Select
                     value={filterStatus || ""}
                     onValueChange={(value) => setFilterStatus(value === "" ? null : value)}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="All Statuses" />
+                      <SelectValue placeholder={t("production-all-statuses")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Statuses</SelectItem>
-                      <SelectItem value="Active">Active</SelectItem>
-                      <SelectItem value="Development">Development</SelectItem>
-                      <SelectItem value="Inactive">Inactive</SelectItem>
+                      <SelectItem value="">{t("production-all-statuses")}</SelectItem>
+                      <SelectItem value="Active">{t("production-active")}</SelectItem>
+                      <SelectItem value="Development">{t("production-status-in-progress")}</SelectItem>
+                      <SelectItem value="Inactive">{t("production-status-paused")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -883,7 +886,7 @@ const BrandProducts = () => {
                   className="justify-center text-center cursor-pointer"
                   onClick={resetFilters}
                 >
-                  Reset Filters
+                  {t("reset-filters")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -947,7 +950,7 @@ const BrandProducts = () => {
                             
                             <div className="flex items-center">
                               <Package className="h-3 w-3 mr-1" />
-                              <span>{product.inventoryCount || 0} in stock</span>
+                              <span>{t("inventory-product-stock")}: {product.inventoryCount || 0}</span>
                             </div>
                           </div>
                           
@@ -972,7 +975,7 @@ const BrandProducts = () => {
                             }}
                           >
                             <Eye className="h-3.5 w-3.5 mr-1.5" />
-                            View
+                            {t("inventory-action-view")}
                           </Button>
                           <Button 
                             variant="outline" 
@@ -984,7 +987,7 @@ const BrandProducts = () => {
                             }}
                           >
                             <PencilLine className="h-3.5 w-3.5 mr-1.5" />
-                    Edit
+                    {t("inventory-action-edit")}
                   </Button>
                           <Button
                             variant="outline"
@@ -1012,11 +1015,11 @@ const BrandProducts = () => {
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                     <Package className="h-6 w-6 text-muted-foreground" />
                   </div>
-                  <h3 className="mt-4 text-lg font-medium">No products found</h3>
+                  <h3 className="mt-4 text-lg font-medium">{t("production-no-products-found")}</h3>
                   <p className="mt-2 text-sm text-muted-foreground">
                     {searchQuery || filterCategory || filterStatus 
-                      ? "Try adjusting your search or filter criteria." 
-                      : "Get started by adding your first product."}
+                      ? t("production-adjust-search") 
+                      : t("production-start-create")}
                   </p>
                   <Button 
                     className="mt-4"
@@ -1026,7 +1029,7 @@ const BrandProducts = () => {
                     }}
                   >
                     <PlusCircle className="mr-2 h-4 w-4" />
-                    Add Product
+                    {t("production-add-product")}
                   </Button>
                 </div>
               </div>
@@ -1042,9 +1045,9 @@ const BrandProducts = () => {
       >
         <DialogContent className="sm:max-w-[600px] z-[100]">
           <DialogHeader>
-            <DialogTitle>Choose an Image</DialogTitle>
+            <DialogTitle>{t("gallery-choose-image")}</DialogTitle>
             <DialogDescription>
-              Select an image from the gallery for your product.
+              {t("gallery-select-description")}
             </DialogDescription>
           </DialogHeader>
           
@@ -1071,7 +1074,7 @@ const BrandProducts = () => {
               >
                 <img 
                   src={imageUrl} 
-                  alt={`Gallery image ${index + 1}`} 
+                  alt={`${t("gallery-image")} ${index + 1}`} 
                   className="w-full h-full object-cover"
                 />
                 </div>
@@ -1080,7 +1083,7 @@ const BrandProducts = () => {
           
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsImageGalleryOpen(false)}>
-              Cancel
+              {t("cancel")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1096,9 +1099,9 @@ const BrandProducts = () => {
       >
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-auto z-[100]">
           <DialogHeader>
-            <DialogTitle>Add New Product</DialogTitle>
+            <DialogTitle>{t("production-create-new-product")}</DialogTitle>
             <DialogDescription>
-              Fill in the details to add a new product to your catalog.
+              {t("production-add-new-product")}
             </DialogDescription>
           </DialogHeader>
           
@@ -1113,11 +1116,11 @@ const BrandProducts = () => {
                   render={({ field }) => (
                     <div className="space-y-2">
                       <Label htmlFor="name" className="text-right">
-                        Name <span className="text-destructive">*</span>
+                        {t("production-product-name")} <span className="text-destructive">*</span>
                       </Label>
                       <Input
                         {...field}
-                        placeholder="Product name"
+                        placeholder={t("production-enter-product-name")}
                         className={!field.value ? "border-destructive" : ""}
                       />
                     </div>
@@ -1130,18 +1133,18 @@ const BrandProducts = () => {
                   render={({ field }) => (
                     <div className="space-y-2">
                       <Label htmlFor="category" className="text-right">
-                        Category <span className="text-destructive">*</span>
+                        {t("production-category")} <span className="text-destructive">*</span>
                       </Label>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
                         <SelectTrigger id="category" className={!field.value ? "border-destructive" : ""}>
-                          <SelectValue placeholder="Select category" />
+                          <SelectValue placeholder={t("production-select-category")} />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup>
-                            <SelectLabel>Categories</SelectLabel>
+                            <SelectLabel>{t("categories")}</SelectLabel>
                             {productCategories.map(category => (
                               <SelectItem key={category} value={category}>{category}</SelectItem>
                             ))}
@@ -1158,10 +1161,10 @@ const BrandProducts = () => {
                 name="description"
                 render={({ field }) => (
                   <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
+                    <Label htmlFor="description">{t("production-description")}</Label>
                     <Textarea
                       {...field}
-                      placeholder="Product description"
+                      placeholder={t("production-enter-description")}
                       className="min-h-24"
                     />
                   </div>
@@ -1174,7 +1177,7 @@ const BrandProducts = () => {
                   name="price"
                   render={({ field }) => (
                     <div className="space-y-2">
-                      <Label htmlFor="price">Price</Label>
+                      <Label htmlFor="price">{t("price")}</Label>
                       <Input
                         {...field}
                         placeholder="0.00"
@@ -1188,7 +1191,7 @@ const BrandProducts = () => {
                   name="sku"
                   render={({ field }) => (
                     <div className="space-y-2">
-                      <Label htmlFor="sku">SKU</Label>
+                      <Label htmlFor="sku">{t("sku")}</Label>
                       <Input
                         {...field}
                         placeholder="SKU-123"
@@ -1204,7 +1207,7 @@ const BrandProducts = () => {
                   name="inventoryCount"
                   render={({ field }) => (
                     <div className="space-y-2">
-                      <Label htmlFor="inventoryCount">Inventory Count</Label>
+                      <Label htmlFor="inventoryCount">{t("inventory-product-stock")}</Label>
                       <Input
                         {...field}
                         type="number"
@@ -1219,18 +1222,18 @@ const BrandProducts = () => {
                   name="status"
                   render={({ field }) => (
                     <div className="space-y-2">
-                      <Label htmlFor="status">Status</Label>
+                      <Label htmlFor="status">{t("status")}</Label>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
                         <SelectTrigger id="status">
-                          <SelectValue placeholder="Select status" />
+                          <SelectValue placeholder={t("production-select-status")} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Active">Active</SelectItem>
-                          <SelectItem value="Development">Development</SelectItem>
-                          <SelectItem value="Inactive">Inactive</SelectItem>
+                          <SelectItem value="Active">{t("production-active")}</SelectItem>
+                          <SelectItem value="Development">{t("production-status-in-progress")}</SelectItem>
+                          <SelectItem value="Inactive">{t("production-status-paused")}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -1243,7 +1246,7 @@ const BrandProducts = () => {
                 name="launchDate"
                 render={({ field }) => (
                   <div className="space-y-2">
-                    <Label htmlFor="launchDate">Launch Date</Label>
+                    <Label htmlFor="launchDate">{t("production-operational-since")}</Label>
                     <Input
                       {...field}
                       type="date"
@@ -1258,10 +1261,10 @@ const BrandProducts = () => {
                   variant="outline" 
                   onClick={() => setIsAddProductOpen(false)}
                 >
-                  Cancel
+                  {t("cancel")}
                 </Button>
                 <Button type="submit">
-                  Add Product
+                  {t("production-create-product")}
                 </Button>
               </DialogFooter>
             </form>
@@ -1282,9 +1285,9 @@ const BrandProducts = () => {
       >
         <DialogContent className="sm:max-w-[625px] max-h-[90vh] overflow-auto z-[100]">
           <DialogHeader>
-            <DialogTitle>Edit Product</DialogTitle>
+            <DialogTitle>{t("production-edit-product")}</DialogTitle>
             <DialogDescription>
-              Update your product information below.
+              {t("production-update-details")}
             </DialogDescription>
           </DialogHeader>
           
@@ -1299,12 +1302,12 @@ const BrandProducts = () => {
                   render={({ field }) => (
                     <div className="space-y-2">
                       <Label htmlFor="edit-name" className="text-right">
-                        Name <span className="text-destructive">*</span>
+                        {t("production-product-name")} <span className="text-destructive">*</span>
                       </Label>
                       <Input
                         {...field}
                         id="edit-name"
-                        placeholder="Product name"
+                        placeholder={t("production-enter-product-name")}
                         className={!field.value ? "border-destructive" : ""}
                       />
                     </div>
@@ -1317,18 +1320,18 @@ const BrandProducts = () => {
                   render={({ field }) => (
                     <div className="space-y-2">
                       <Label htmlFor="edit-category" className="text-right">
-                        Category <span className="text-destructive">*</span>
+                        {t("production-category")} <span className="text-destructive">*</span>
                       </Label>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
                         <SelectTrigger id="edit-category" className={!field.value ? "border-destructive" : ""}>
-                          <SelectValue placeholder="Select category" />
+                          <SelectValue placeholder={t("production-select-category")} />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup>
-                            <SelectLabel>Categories</SelectLabel>
+                            <SelectLabel>{t("categories")}</SelectLabel>
                             {productCategories.map(category => (
                               <SelectItem key={category} value={category}>{category}</SelectItem>
                             ))}
@@ -1345,11 +1348,11 @@ const BrandProducts = () => {
                 name="description"
                 render={({ field }) => (
                   <div className="space-y-2">
-                    <Label htmlFor="edit-description">Description</Label>
+                    <Label htmlFor="edit-description">{t("production-description")}</Label>
                     <Textarea
                       {...field}
                       id="edit-description"
-                      placeholder="Product description"
+                      placeholder={t("production-enter-description")}
                       className="min-h-24"
                     />
                   </div>
@@ -1362,7 +1365,7 @@ const BrandProducts = () => {
                   name="price"
                   render={({ field }) => (
                     <div className="space-y-2">
-                      <Label htmlFor="edit-price">Price</Label>
+                      <Label htmlFor="edit-price">{t("price")}</Label>
                       <Input
                         {...field}
                         id="edit-price"
@@ -1377,7 +1380,7 @@ const BrandProducts = () => {
                   name="sku"
                   render={({ field }) => (
                     <div className="space-y-2">
-                      <Label htmlFor="edit-sku">SKU</Label>
+                      <Label htmlFor="edit-sku">{t("sku")}</Label>
                       <Input
                         {...field}
                         id="edit-sku"
@@ -1394,7 +1397,7 @@ const BrandProducts = () => {
                   name="inventoryCount"
                   render={({ field }) => (
                     <div className="space-y-2">
-                      <Label htmlFor="edit-inventory">Inventory Count</Label>
+                      <Label htmlFor="edit-inventory">{t("inventory-product-stock")}</Label>
                       <Input
                         {...field}
                         id="edit-inventory"
@@ -1410,18 +1413,18 @@ const BrandProducts = () => {
                   name="status"
                   render={({ field }) => (
                     <div className="space-y-2">
-                      <Label htmlFor="edit-status">Status</Label>
+                      <Label htmlFor="edit-status">{t("status")}</Label>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
                         <SelectTrigger id="edit-status">
-                          <SelectValue placeholder="Select status" />
+                          <SelectValue placeholder={t("production-select-status")} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Active">Active</SelectItem>
-                          <SelectItem value="Development">Development</SelectItem>
-                          <SelectItem value="Inactive">Inactive</SelectItem>
+                          <SelectItem value="Active">{t("production-active")}</SelectItem>
+                          <SelectItem value="Development">{t("production-status-in-progress")}</SelectItem>
+                          <SelectItem value="Inactive">{t("production-status-paused")}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -1434,7 +1437,7 @@ const BrandProducts = () => {
                 name="launchDate"
                 render={({ field }) => (
                   <div className="space-y-2">
-                    <Label htmlFor="edit-launch-date">Launch Date</Label>
+                    <Label htmlFor="edit-launch-date">{t("production-operational-since")}</Label>
                     <Input
                       {...field}
                       id="edit-launch-date"
@@ -1450,10 +1453,10 @@ const BrandProducts = () => {
                   variant="outline"
                   onClick={() => setIsEditProductOpen(false)}
                 >
-                  Cancel
+                  {t("cancel")}
                 </Button>
                 <Button type="submit">
-                  Save Changes
+                  {t("production-update-product")}
                 </Button>
               </DialogFooter>
             </form>
@@ -1472,7 +1475,7 @@ const BrandProducts = () => {
                   {getStatusBadge(selectedProduct.status)}
                 </div>
                 <DialogDescription>
-                  {selectedProduct.category} • SKU: {selectedProduct.sku || "N/A"}
+                  {selectedProduct.category} • {t("sku")}: {selectedProduct.sku || t("suppliers-not-specified")}
                 </DialogDescription>
               </DialogHeader>
               
@@ -1489,9 +1492,9 @@ const BrandProducts = () => {
               
               <Tabs defaultValue="details" className="w-full">
                 <TabsList className="w-full">
-                  <TabsTrigger value="details" className="flex-1">Details</TabsTrigger>
-                  <TabsTrigger value="sales" className="flex-1">Sales</TabsTrigger>
-                  <TabsTrigger value="retailers" className="flex-1">Retailers</TabsTrigger>
+                  <TabsTrigger value="details" className="flex-1">{t("details")}</TabsTrigger>
+                  <TabsTrigger value="sales" className="flex-1">{t("analytics-sales-performance")}</TabsTrigger>
+                  <TabsTrigger value="retailers" className="flex-1">{t("retailers-title")}</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="details" className="space-y-4 mt-4">
@@ -1501,31 +1504,31 @@ const BrandProducts = () => {
                   )}>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <h4 className="text-sm font-medium text-muted-foreground mb-1">Price</h4>
-                        <p className="text-base font-medium">{selectedProduct.price || "Not set"}</p>
+                        <h4 className="text-sm font-medium text-muted-foreground mb-1">{t("price")}</h4>
+                        <p className="text-base font-medium">{selectedProduct.price || t("suppliers-not-specified")}</p>
                       </div>
                       <div>
-                        <h4 className="text-sm font-medium text-muted-foreground mb-1">Inventory</h4>
-                        <p className="text-base font-medium">{selectedProduct.inventoryCount || 0} units</p>
+                        <h4 className="text-sm font-medium text-muted-foreground mb-1">{t("inventory-product-stock")}</h4>
+                        <p className="text-base font-medium">{selectedProduct.inventoryCount || 0} {t("production-units")}</p>
                       </div>
                     </div>
                     
                     <div>
-                      <h4 className="text-sm font-medium text-muted-foreground mb-1">Description</h4>
-                      <p className="text-sm">{selectedProduct.description || "No description provided."}</p>
+                      <h4 className="text-sm font-medium text-muted-foreground mb-1">{t("production-description")}</h4>
+                      <p className="text-sm">{selectedProduct.description || t("suppliers-not-specified")}</p>
                     </div>
                     
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <h4 className="text-sm font-medium text-muted-foreground mb-1">Launch Date</h4>
+                        <h4 className="text-sm font-medium text-muted-foreground mb-1">{t("production-operational-since")}</h4>
                         <p className="text-sm">
                           {selectedProduct.launchDate 
                             ? new Date(selectedProduct.launchDate).toLocaleDateString() 
-                            : "Not specified"}
+                            : t("suppliers-not-specified")}
                         </p>
           </div>
                       <div>
-                        <h4 className="text-sm font-medium text-muted-foreground mb-1">Status</h4>
+                        <h4 className="text-sm font-medium text-muted-foreground mb-1">{t("status")}</h4>
                         <div className="flex items-center gap-2">
                           {getStatusBadge(selectedProduct.status)}
                           <Button 
@@ -1538,7 +1541,7 @@ const BrandProducts = () => {
                               handleStatusChange(selectedProduct, newStatus);
                             }}
                           >
-                            {selectedProduct.status === "Active" ? "Deactivate" : "Activate"}
+                            {selectedProduct.status === "Active" ? t("production-status-paused") : t("production-active")}
                           </Button>
         </div>
                       </div>
@@ -1553,11 +1556,11 @@ const BrandProducts = () => {
                   )}>
                     <h4 className="text-sm font-medium mb-4 flex items-center">
                       <BarChart3 className="h-4 w-4 mr-2 text-primary" />
-                      Sales Performance
+                      {t("analytics-sales-performance")}
                     </h4>
                     <div className="space-y-3">
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">Last Month</span>
+                        <span className="text-sm text-muted-foreground">{t("analytics-last-month")}</span>
                         <span className="font-medium">{selectedProduct.salesLastMonth}</span>
                       </div>
                       <div className={cn(
@@ -1573,14 +1576,14 @@ const BrandProducts = () => {
                         isDark ? "bg-slate-700" : "bg-slate-200"
                       )} />
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">Total 2023</span>
+                        <span className="text-sm text-muted-foreground">{t("analytics-this-year")}</span>
                         <span className="font-medium">$345,000</span>
                       </div>
                     </div>
                   </div>
                   <Button variant="outline" size="sm" className="w-full mt-2">
                     <BarChart3 className="h-4 w-4 mr-2" />
-                    View Full Analytics
+                    {t("analytics-view-detailed-metrics")}
                   </Button>
                 </TabsContent>
                 
@@ -1592,7 +1595,7 @@ const BrandProducts = () => {
                         isDark ? "bg-card" : "bg-slate-50"
                       )}>
                         <p className="text-sm mb-3">
-                          This product is carried by {selectedProduct.retailPartners} retail partners.
+                          {t("retailers-product-carries", {retailPartners: selectedProduct.retailPartners})}
                         </p>
                         <ul className="space-y-3">
                           <li className={cn(
@@ -1614,7 +1617,7 @@ const BrandProducts = () => {
                                 <p className="text-xs text-muted-foreground">12 stores</p>
                               </div>
                             </div>
-                            <Badge variant="outline">Top Seller</Badge>
+                            <Badge variant="outline">{t("retailers-top-seller")}</Badge>
                           </li>
                           <li className={cn(
                             "flex justify-between items-center p-3 rounded-md",
@@ -1635,13 +1638,13 @@ const BrandProducts = () => {
                                 <p className="text-xs text-muted-foreground">8 stores</p>
                               </div>
                             </div>
-                            <Badge variant="outline">Active</Badge>
+                            <Badge variant="outline">{t("production-active")}</Badge>
                           </li>
                         </ul>
                       </div>
                       <Button variant="outline" size="sm" className="w-full">
                         <Store className="h-4 w-4 mr-2" />
-                        View All Partners
+                        {t("retailers-view-all")}
                       </Button>
                     </div>
                   ) : (
@@ -1655,11 +1658,11 @@ const BrandProducts = () => {
                       )}>
                         <Store className="h-6 w-6 text-muted-foreground" />
                       </div>
-                      <h4 className="font-medium mb-2">No Retail Partners Yet</h4>
+                      <h4 className="font-medium mb-2">{t("retailers-no-partners")}</h4>
                       <p className="text-sm text-muted-foreground mb-4">
-                        This product is not carried by any retailers yet.
+                        {t("retailers-not-carried")}
                       </p>
-                      <Button size="sm" variant="outline">Find Retailers</Button>
+                      <Button size="sm" variant="outline">{t("retailers-find")}</Button>
                     </div>
                   )}
                 </TabsContent>
@@ -1670,7 +1673,7 @@ const BrandProducts = () => {
                   variant="outline"
                   onClick={() => setIsViewProductOpen(false)}
                 >
-                  Close
+                  {t("close")}
                 </Button>
                 <div className="flex gap-2">
                   <TooltipProvider>
@@ -1688,7 +1691,7 @@ const BrandProducts = () => {
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent side="top">
-                        <p>Delete Product</p>
+                        <p>{t("production-delete-product")}</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
@@ -1701,7 +1704,7 @@ const BrandProducts = () => {
                     }}
                   >
                     <Pencil className="h-4 w-4 mr-2" />
-                    Edit Product
+                    {t("production-edit-product")}
                   </Button>
                 </div>
               </DialogFooter>
@@ -1716,10 +1719,10 @@ const BrandProducts = () => {
           <DialogHeader>
             <DialogTitle className="flex items-center text-destructive">
               <AlertCircle className="h-5 w-5 mr-2" />
-              Delete Product
+              {t("production-delete-product")}
             </DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete <span className="font-medium">{selectedProduct?.name}</span>? This action cannot be undone.
+              {t("production-delete-confirmation-part1")} <span className="font-medium">{selectedProduct?.name}</span>? {t("production-delete-confirmation-part2")}
             </DialogDescription>
           </DialogHeader>
           
@@ -1742,10 +1745,10 @@ const BrandProducts = () => {
                   "font-medium mb-1",
                   isDark ? "text-red-400" : "text-destructive"
                 )}>
-                  Warning
+                  {t("warning")}
                 </p>
                 <p className="text-muted-foreground">
-                  Deleting this product will remove all associated data, including sales history and retailer relationships.
+                  {t("delete-product-warning")}
                 </p>
               </div>
             </div>
@@ -1753,11 +1756,11 @@ const BrandProducts = () => {
           
           <div className="flex justify-between pt-2">
             <Button variant="outline" onClick={() => setIsDeleteConfirmOpen(false)}>
-              Cancel
+              {t("cancel")}
             </Button>
             <Button variant="destructive" onClick={handleDeleteProduct}>
               <Trash2 className="h-4 w-4 mr-2" />
-              Delete Product
+              {t("production-delete-product")}
             </Button>
           </div>
         </DialogContent>

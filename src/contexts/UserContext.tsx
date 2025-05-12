@@ -67,7 +67,7 @@ interface UserContextType {
   updateProfile: (profileData: any) => Promise<void>;
 }
 
-const UserContext = createContext<UserContextType | undefined>(undefined);
+export const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);

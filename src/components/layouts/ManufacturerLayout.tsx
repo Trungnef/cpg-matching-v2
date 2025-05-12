@@ -30,7 +30,8 @@ import {
   User,
   Handshake,
   Plus,
-  ArrowRight
+  ArrowRight,
+  Globe
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
@@ -109,8 +110,8 @@ const ManufacturerLayout: FC<ManufacturerLayoutProps> = ({ children }) => {
     logout();
     navigate('/auth?type=signin');
     toast({
-      title: 'Logged out',
-      description: 'You have been successfully logged out.',
+      title: t('manufacturer-layout-logged-out'),
+      description: t('manufacturer-layout-logout-success'),
     });
   };
 
@@ -194,44 +195,44 @@ const ManufacturerLayout: FC<ManufacturerLayoutProps> = ({ children }) => {
 
   // Languages available
   const languages = [
-    { code: 'en', name: 'English', flag: '🇺🇸' },
-    { code: 'ja', name: '日本語', flag: '🇯🇵' },
+    { code: 'en', name: t('english'), flag: '🇺🇸' },
+    { code: 'ja', name: t('japanese'), flag: '🇯🇵' },
   ];
 
   // Navigation items for manufacturer
   const navigationItems = [
     {
-      name: 'Home',
+      name: t('manufacturer-layout-home'),
       path: '/',
       icon: <Home className="h-5 w-5" />,
     },
     {
-      name: 'Dashboard',
+      name: t('manufacturer-layout-dashboard'),
       path: '/dashboard',
       icon: <LayoutDashboard className="h-5 w-5" />,
     },
     {
-      name: 'Production',
+      name: t('manufacturer-layout-production'),
       path: '/manufacturer/production',
       icon: <Factory className="h-5 w-5" />,
     },
     {
-      name: 'Inventory',
+      name: t('manufacturer-layout-inventory'),
       path: '/manufacturer/inventory',
       icon: <Warehouse className="h-5 w-5" />,
     },
     {
-      name: 'Suppliers',
+      name: t('manufacturer-layout-suppliers'),
       path: '/manufacturer/suppliers',
       icon: <Truck className="h-5 w-5" />,
     },
     {
-      name: 'Matches',
+      name: t('manufacturer-layout-matches'),
       path: '/manufacturer/matches',
       icon: <Handshake className="h-5 w-5" />,
     },
     {
-      name: 'Analytics',
+      name: t('manufacturer-layout-analytics'),
       path: '/manufacturer/analytics',
       icon: <BarChart3 className="h-5 w-5" />,
     },
@@ -431,7 +432,7 @@ const ManufacturerLayout: FC<ManufacturerLayoutProps> = ({ children }) => {
             >
               <Settings className="h-5 w-5" />
               {!sidebarCollapsed && (
-                <span className="ml-3">Settings</span>
+                <span className="ml-3">{t('manufacturer-layout-settings')}</span>
               )}
             </Link>
           </div>
@@ -639,7 +640,7 @@ const ManufacturerLayout: FC<ManufacturerLayoutProps> = ({ children }) => {
                           <>
                             {searchResults.pages.length > 0 && (
                               <div className="px-2 pt-2">
-                                <div className="text-xs font-medium text-muted-foreground px-2 py-1.5">Pages</div>
+                                <div className="text-xs font-medium text-muted-foreground px-2 py-1.5">{t('manufacturer-layout-pages')}</div>
                                 {searchResults.pages.map((page, i) => (
                                   <motion.div 
                                     key={page.path}
@@ -676,7 +677,7 @@ const ManufacturerLayout: FC<ManufacturerLayoutProps> = ({ children }) => {
                             
                             {searchResults.products.length > 0 && (
                               <div className="px-2 pt-2 mt-1">
-                                <div className="text-xs font-medium text-muted-foreground px-2 py-1.5">Products</div>
+                                <div className="text-xs font-medium text-muted-foreground px-2 py-1.5">{t('manufacturer-layout-products-section')}</div>
                                 {searchResults.products.map((product, i) => (
                                   <motion.div 
                                     key={product.id}
@@ -700,7 +701,7 @@ const ManufacturerLayout: FC<ManufacturerLayoutProps> = ({ children }) => {
                                         <p className="text-xs text-muted-foreground truncate">{product.category}</p>
                                       </div>
                                       <Badge variant="outline" className="shrink-0 text-xs h-5">
-                                        Product
+                                        {t('manufacturer-layout-products')}
                                       </Badge>
                                     </div>
                                   </motion.div>
@@ -710,7 +711,7 @@ const ManufacturerLayout: FC<ManufacturerLayoutProps> = ({ children }) => {
                             
                             {searchResults.reports.length > 0 && (
                               <div className="px-2 pt-2 pb-2 mt-1">
-                                <div className="text-xs font-medium text-muted-foreground px-2 py-1.5">Reports & Analytics</div>
+                                <div className="text-xs font-medium text-muted-foreground px-2 py-1.5">{t('manufacturer-layout-reports')}</div>
                                 {searchResults.reports.map((report, i) => (
                                   <motion.div 
                                     key={report.id}
@@ -748,7 +749,7 @@ const ManufacturerLayout: FC<ManufacturerLayoutProps> = ({ children }) => {
                             
                             <div className="p-2 bg-muted/30 mt-1">
                               <div className="flex justify-center items-center text-xs text-muted-foreground">
-                                <span>Press <kbd className="rounded border px-1 py-0.5 bg-background text-[10px]">Esc</kbd> to close</span>
+                                <span>{t('manufacturer-layout-press-esc')}</span>
                               </div>
                             </div>
                           </>
@@ -765,7 +766,7 @@ const ManufacturerLayout: FC<ManufacturerLayoutProps> = ({ children }) => {
                     onClick={() => setSearchOpen(true)}
                   >
                     <Search className="h-4 w-4 mr-2" />
-                    <span>Search...</span> 
+                    <span>{t('manufacturer-layout-search')}</span> 
                     <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
                       <span className="text-xs">⌘</span>K
                     </kbd>
@@ -809,7 +810,7 @@ const ManufacturerLayout: FC<ManufacturerLayoutProps> = ({ children }) => {
                     initial={{ opacity: 0, y: -5 }}
                     whileHover={{ opacity: 1, y: 0 }}
                   >
-                    Help Center
+                    {t('manufacturer-layout-help-center')}
                   </motion.span>
                 </Button>
               </motion.div>
@@ -836,7 +837,7 @@ const ManufacturerLayout: FC<ManufacturerLayoutProps> = ({ children }) => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-80">
                     <div className="flex items-center justify-between p-2">
-                      <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+                      <DropdownMenuLabel>{t('manufacturer-layout-notifications')}</DropdownMenuLabel>
                       <Badge variant="secondary" className="ml-auto">New 3</Badge>
                     </div>
                     <DropdownMenuSeparator />
@@ -850,9 +851,9 @@ const ManufacturerLayout: FC<ManufacturerLayoutProps> = ({ children }) => {
                             <Users className="h-4 w-4 text-primary" />
                           </div>
                           <div>
-                            <p className="font-medium">New match opportunity</p>
-                            <p className="text-sm text-muted-foreground">Green Foods Inc wants to connect</p>
-                            <p className="text-xs text-muted-foreground mt-1">2 hours ago</p>
+                            <p className="font-medium">{t('manufacturer-layout-new-match')}</p>
+                            <p className="text-sm text-muted-foreground">Green Foods Inc {t('manufacturer-layout-connect-request')}</p>
+                            <p className="text-xs text-muted-foreground mt-1">2 {t('manufacturer-layout-hours-ago')}</p>
                           </div>
                         </div>
                       </motion.div>
@@ -865,16 +866,16 @@ const ManufacturerLayout: FC<ManufacturerLayoutProps> = ({ children }) => {
                             <Warehouse className="h-4 w-4 text-amber-600 dark:text-amber-300" />
                           </div>
                           <div>
-                            <p className="font-medium">Inventory alert</p>
-                            <p className="text-sm text-muted-foreground">Raw material "Organic Oats" low stock</p>
-                            <p className="text-xs text-muted-foreground mt-1">Yesterday</p>
+                            <p className="font-medium">{t('manufacturer-layout-inventory-alert')}</p>
+                            <p className="text-sm text-muted-foreground">Raw material "Organic Oats" {t('manufacturer-layout-low-stock')}</p>
+                            <p className="text-xs text-muted-foreground mt-1">{t('manufacturer-layout-yesterday')}</p>
                           </div>
                         </div>
                       </motion.div>
                     </div>
                     <DropdownMenuSeparator />
                     <Button variant="ghost" className="w-full justify-center" size="sm">
-                      View all notifications
+                      {t('manufacturer-layout-view-all-notifications')}
                     </Button>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -900,8 +901,8 @@ const ManufacturerLayout: FC<ManufacturerLayoutProps> = ({ children }) => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-80">
                     <div className="flex items-center justify-between p-2">
-                      <DropdownMenuLabel>Messages</DropdownMenuLabel>
-                      <Badge variant="secondary" className="ml-auto">2 unread</Badge>
+                      <DropdownMenuLabel>{t('manufacturer-layout-messages')}</DropdownMenuLabel>
+                      <Badge variant="secondary" className="ml-auto">2 {t('manufacturer-layout-unread')}</Badge>
                     </div>
                     <DropdownMenuSeparator />
                     <div className="max-h-80 overflow-y-auto no-scrollbar">
@@ -927,7 +928,7 @@ const ManufacturerLayout: FC<ManufacturerLayoutProps> = ({ children }) => {
                     </div>
                     <DropdownMenuSeparator />
                     <Button variant="ghost" className="w-full justify-center" size="sm">
-                      View all messages
+                      {t('manufacturer-layout-view-all-messages')}
                     </Button>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -964,6 +965,7 @@ const UserMenu = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   // Close the dropdown when clicking outside
   useEffect(() => {
@@ -1069,10 +1071,10 @@ const UserMenu = () => {
                               }`}
                             />
                             {user?.status === "online"
-                              ? "Online"
+                              ? t('manufacturer-layout-online')
                               : user?.status === "away"
-                              ? "Away"
-                              : "Busy"}
+                              ? t('manufacturer-layout-away')
+                              : t('manufacturer-layout-busy')}
                             <ChevronDown className="h-3.5 w-3.5 ml-1" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -1080,7 +1082,7 @@ const UserMenu = () => {
                           <DropdownMenuItem onClick={() => handleStatusChange("online")}>
                             <div className="flex items-center">
                               <span className="h-2 w-2 rounded-full bg-green-500 mr-2" />
-                              <span>Online</span>
+                              <span>{t('manufacturer-layout-online')}</span>
                             </div>
                           </DropdownMenuItem>
                           <DropdownMenuItem
@@ -1088,7 +1090,7 @@ const UserMenu = () => {
                           >
                             <div className="flex items-center">
                               <span className="h-2 w-2 rounded-full bg-yellow-500 mr-2" />
-                              <span>Away</span>
+                              <span>{t('manufacturer-layout-away')}</span>
                             </div>
                           </DropdownMenuItem>
                           <DropdownMenuItem
@@ -1096,7 +1098,7 @@ const UserMenu = () => {
                           >
                             <div className="flex items-center">
                               <span className="h-2 w-2 rounded-full bg-red-500 mr-2" />
-                              <span>Busy</span>
+                              <span>{t('manufacturer-layout-busy')}</span>
                             </div>
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -1105,7 +1107,7 @@ const UserMenu = () => {
                         variant="secondary"
                         className="text-xs px-2 py-0 h-5"
                       >
-                        Manufacturer
+                        {t('manufacturer-layout-manufacturer')}
                       </Badge>
                     </div>
                   </div>
@@ -1115,15 +1117,15 @@ const UserMenu = () => {
                 <div className="grid grid-cols-3 gap-2 mt-4 text-center">
                   <div className="bg-background/60 rounded-lg p-2">
                     <p className="text-lg font-semibold">{user?.manufacturerSettings?.productionCapacity?.toLocaleString() || "0"}</p>
-                    <p className="text-xs text-muted-foreground">Capacity</p>
+                    <p className="text-xs text-muted-foreground">{t('manufacturer-layout-capacity')}</p>
                   </div>
                   <div className="bg-background/60 rounded-lg p-2">
                     <p className="text-lg font-semibold">{user?.manufacturerSettings?.preferredCategories?.length || "0"}</p>
-                    <p className="text-xs text-muted-foreground">Products</p>
+                    <p className="text-xs text-muted-foreground">{t('manufacturer-layout-products')}</p>
                   </div>
                   <div className="bg-muted rounded-lg p-2">
                     <p className="text-lg font-semibold">15</p>
-                    <p className="text-xs text-muted-foreground">Partners</p>
+                    <p className="text-xs text-muted-foreground">{t('manufacturer-layout-partners')}</p>
                   </div>
                 </div>
               </div>
@@ -1138,8 +1140,8 @@ const UserMenu = () => {
                   >
                     <LayoutDashboard className="h-4 w-4" />
                     <div className="flex-1 text-left">
-                      <p>Dashboard</p>
-                      <p className="text-xs text-muted-foreground">Manufacturer overview</p>
+                      <p>{t('manufacturer-layout-dashboard')}</p>
+                      <p className="text-xs text-muted-foreground">{t('manufacturer-layout-manufacturer-overview')}</p>
                     </div>
                   </motion.button>
 
@@ -1149,8 +1151,8 @@ const UserMenu = () => {
                   >
                     <User className="h-4 w-4" />
                     <div className="flex-1 text-left">
-                      <p>Profile</p>
-                      <p className="text-xs text-muted-foreground">Manage your information</p>
+                      <p>{t('manufacturer-layout-profile')}</p>
+                      <p className="text-xs text-muted-foreground">{t('manufacturer-layout-manage-information')}</p>
                     </div>
                   </button>
 
@@ -1163,8 +1165,8 @@ const UserMenu = () => {
                       <Settings className="h-4 w-4" />
                     </div>
                     <div className="flex-1 text-left">
-                      <p>Settings</p>
-                      <p className="text-xs text-muted-foreground">Account preferences</p>
+                      <p>{t('manufacturer-layout-settings')}</p>
+                      <p className="text-xs text-muted-foreground">{t('manufacturer-layout-account-preferences')}</p>
                     </div>
                   </motion.button>
                 </div>
@@ -1181,8 +1183,8 @@ const UserMenu = () => {
                     <LogOut className="h-4 w-4" />
                   </div>
                   <div className="flex-1 text-left">
-                    <p className="font-bold text-destructive/90 dark:text-destructive">Log out</p>
-                    <p className="text-xs text-muted-foreground">Sign out of your account</p>
+                    <p className="font-bold text-destructive/90 dark:text-destructive">{t('manufacturer-layout-logout')}</p>
+                    <p className="text-xs text-muted-foreground">{t('manufacturer-layout-sign-out')}</p>
                   </div>
                 </motion.button>
               </div>
@@ -1195,88 +1197,79 @@ const UserMenu = () => {
 };
 
 // Enhanced Language Switcher Component
-const EnhancedLanguageSwitcher = () => {
+export const EnhancedLanguageSwitcher = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { i18n, t } = useTranslation();
+  const { i18n } = useTranslation();
+  const { t } = useTranslation();
 
-  // Close dropdown when clicking outside
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang);
+    setIsOpen(false);
+  };
+
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setIsOpen(false);
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", handleOutsideClick);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("mousedown", handleOutsideClick);
     };
   }, []);
 
-  // Languages available
-  const languages = [
-    { code: 'en', name: 'English', flag: '🇺🇸' },
-    { code: 'ja', name: '日本語', flag: '🇯🇵' },
-  ];
-
-  // Handle language change
-  const changeLanguage = (code: string) => {
-    i18n.changeLanguage(code);
-    setIsOpen(false);
-  };
-
-  // Get current language
-  const currentLang = languages.find(lang => lang.code === i18n.language) || languages[0];
-
   return (
     <div className="relative" ref={dropdownRef}>
-      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="relative hover:bg-primary/5 transition-colors"
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          <span className="text-base">{currentLang.flag}</span>
-        </Button>
-      </motion.div>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setIsOpen(!isOpen)}
+        className="gap-1 px-2"
+      >
+        <Globe className="h-4 w-4" />
+        <ChevronDown className="h-3 w-3 opacity-50" />
+      </Button>
 
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 5, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 5, scale: 0.95 }}
-            transition={{ duration: 0.15, ease: "easeOut" }}
-            className="absolute right-0 mt-2 z-50 min-w-[180px] overflow-hidden rounded-xl border border-border bg-popover text-popover-foreground shadow-lg"
-          >
-            <div className="p-1">
-              {languages.map((lang) => (
-                <motion.button
-                  key={lang.code}
-                  className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-primary/10 ${
-                    lang.code === i18n.language ? "bg-primary/5" : ""
-                  }`}
-                  onClick={() => changeLanguage(lang.code)}
-                  whileHover={{ x: 3 }}
-                >
-                  <span className="text-lg">{lang.flag}</span>
-                  <span>{lang.name}</span>
-                  {lang.code === i18n.language && (
-                    <motion.div 
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: "spring", stiffness: 500, damping: 20 }}
-                      className="ml-auto h-2 w-2 rounded-full bg-primary"
-                    />
-                  )}
-                </motion.button>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {isOpen && (
+        <div className="absolute right-0 top-full mt-2 w-40 rounded-md border bg-popover shadow-md z-10">
+          <div className="p-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`w-full justify-start gap-2 ${
+                i18n.language === "en" ? "bg-muted" : ""
+              }`}
+              onClick={() => changeLanguage("en")}
+            >
+              <img
+                src="/flags/us.svg"
+                alt="English"
+                className="h-4 w-4 rounded-sm"
+              />
+              {t('english')}
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`w-full justify-start gap-2 ${
+                i18n.language === "ja" ? "bg-muted" : ""
+              }`}
+              onClick={() => changeLanguage("ja")}
+            >
+              <img
+                src="/flags/jp.svg"
+                alt="Japanese"
+                className="h-4 w-4 rounded-sm"
+              />
+              {t('japanese')}
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

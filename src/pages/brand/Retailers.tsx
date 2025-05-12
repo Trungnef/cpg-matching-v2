@@ -53,6 +53,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 // Retailer interface type
 interface Retailer {
@@ -160,6 +161,7 @@ const Retailers = () => {
   const isDark = theme === "dark";
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   
   // State for search and filters
   const [searchQuery, setSearchQuery] = useState("");
@@ -181,7 +183,7 @@ const Retailers = () => {
   });
   
   useEffect(() => {
-    document.title = "Retail Partners - CPG Matchmaker";
+    document.title = t("retailers-title") + " - CPG Matchmaker";
     
     // If not authenticated or not a brand, redirect
     if (!isAuthenticated) {
@@ -189,7 +191,7 @@ const Retailers = () => {
     } else if (role !== "brand") {
       navigate("/dashboard");
     }
-  }, [isAuthenticated, navigate, role]);
+  }, [isAuthenticated, navigate, role, t]);
 
   if (!isAuthenticated || role !== "brand") {
     return null;
@@ -247,21 +249,21 @@ const Retailers = () => {
     setIsFindRetailerOpen(false);
     
     toast({
-      title: "Search initiated",
-      description: `We're looking for retailers that match your distribution requirements. You'll be notified when we find potential partners.`,
+      title: t("search-initiated"),
+      description: t("retailers-search-description"),
     });
   };
 
   const getStatusBadge = (status: string) => {
     switch(status) {
       case "Active Partner":
-        return <Badge className="bg-green-500 hover:bg-green-600">Active Partner</Badge>;
+        return <Badge className="bg-green-500 hover:bg-green-600">{t("active-partner")}</Badge>;
       case "Negotiating":
-        return <Badge variant="outline" className="text-blue-500 border-blue-500 hover:bg-blue-50 dark:hover:bg-transparent">Negotiating</Badge>;
+        return <Badge variant="outline" className="text-blue-500 border-blue-500 hover:bg-blue-50 dark:hover:bg-transparent">{t("negotiating")}</Badge>;
       case "Onboarding":
-        return <Badge variant="outline" className="text-yellow-500 border-yellow-500 hover:bg-yellow-50 dark:hover:bg-transparent">Onboarding</Badge>;
+        return <Badge variant="outline" className="text-yellow-500 border-yellow-500 hover:bg-yellow-50 dark:hover:bg-transparent">{t("onboarding")}</Badge>;
       case "Potential Match":
-        return <Badge variant="outline" className="text-purple-500 border-purple-500 hover:bg-purple-50 dark:hover:bg-transparent">Potential Match</Badge>;
+        return <Badge variant="outline" className="text-purple-500 border-purple-500 hover:bg-purple-50 dark:hover:bg-transparent">{t("potential-match")}</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -275,7 +277,7 @@ const Retailers = () => {
     return (
       <div className="flex items-center">
         <div className={`h-2.5 w-2.5 rounded-full ${colorClass} mr-1.5`}></div>
-        <span className="text-sm font-medium">{score}% Match</span>
+        <span className="text-sm font-medium">{score}% {t("match")}</span>
       </div>
     );
   };
@@ -300,7 +302,7 @@ const Retailers = () => {
                   transition={{ duration: 0.5, delay: 0.1 }}
                 >
                 <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/70 text-transparent bg-clip-text">
-                  Retailers Management
+                  {t("retailers-management")}
                 </h1>
                 </motion.h1>
                 <motion.p 
@@ -309,7 +311,7 @@ const Retailers = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
                 >
-                  {user?.companyName} - Find and manage retailer partnerships to expand your distribution
+                  {user?.companyName} - {t("retailers-find-manage")}
                 </motion.p>
               </div>
               
@@ -323,13 +325,13 @@ const Retailers = () => {
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" className="group">
                       <Filter className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
-                      Filter
+                      {t("filter")}
                       <ChevronDown className="ml-2 h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
                     <div className="p-2">
-                      <p className="text-sm font-medium mb-2">Category</p>
+                      <p className="text-sm font-medium mb-2">{t("category")}</p>
                       <div className="space-y-1">
                         {retailerCategories.map(category => (
                           <div 
@@ -344,14 +346,14 @@ const Retailers = () => {
                               filterCategory === category ? null : category
                             )}
                           >
-                            {category}
+                            {t(category.toLowerCase().replace(/\s+/g, '-'))}
                           </div>
                         ))}
                       </div>
                     </div>
                     <DropdownMenuSeparator />
                     <div className="p-2">
-                      <p className="text-sm font-medium mb-2">Status</p>
+                      <p className="text-sm font-medium mb-2">{t("status")}</p>
                       <div className="space-y-1">
                         {["Active Partner", "Negotiating", "Onboarding", "Potential Match"].map(status => (
                           <div 
@@ -366,7 +368,7 @@ const Retailers = () => {
                               filterStatus === status ? null : status
                             )}
                           >
-                            {status}
+                            {t(status.toLowerCase().replace(/\s+/g, '-'))}
                           </div>
                         ))}
                       </div>
@@ -376,13 +378,13 @@ const Retailers = () => {
                       className="justify-center text-center cursor-pointer"
                       onClick={resetFilters}
                     >
-                      Reset Filters
+                      {t("reset-filters")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
                 <Button className="group" onClick={openFindRetailerModal}>
                   <Plus className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
-                  Find Retailers
+                  {t("find-retailers")}
                 </Button>
               </motion.div>
             </div>
@@ -398,7 +400,7 @@ const Retailers = () => {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input 
-                placeholder="Search retailers, categories, or locations..." 
+                placeholder={t("retailers-search-placeholder")} 
                 className="pl-10" 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -458,14 +460,14 @@ const Retailers = () => {
                         
                         <div className="grid grid-cols-2 gap-2 mt-2">
                           <div className="flex flex-col">
-                            <div className="text-xs text-muted-foreground mb-1">Store Count</div>
+                            <div className="text-xs text-muted-foreground mb-1">{t("store-count")}</div>
                             <Badge variant="outline" className="w-fit">{retailer.storeCount}</Badge>
                           </div>
                           <div className="flex flex-col">
-                            <div className="text-xs text-muted-foreground mb-1">Distribution</div>
+                            <div className="text-xs text-muted-foreground mb-1">{t("distribution")}</div>
                             <div className="flex flex-wrap gap-1">
                               {retailer.distribution.slice(0, 2).map((type, idx) => (
-                                <Badge key={idx} variant="secondary" className="text-xs">{type}</Badge>
+                                <Badge key={idx} variant="secondary" className="text-xs">{t(type.toLowerCase().replace(/\s+/g, '-'))}</Badge>
                               ))}
                               {retailer.distribution.length > 2 && (
                                 <Badge variant="outline" className="text-xs">+{retailer.distribution.length - 2}</Badge>
@@ -486,7 +488,7 @@ const Retailers = () => {
                         className="gap-1 w-full justify-center hover:bg-background"
                         onClick={() => openRetailerDetails(retailer)}
                       >
-                        View Details <ArrowRight className="h-4 w-4 ml-1" />
+                        {t("view-details")} <ArrowRight className="h-4 w-4 ml-1" />
                       </Button>
                     </CardFooter>
                   </Card>
@@ -515,16 +517,16 @@ const Retailers = () => {
                     )}>
                       <Plus className="h-6 w-6 text-primary" />
                     </div>
-                    <h3 className="font-medium mb-2">Find Retail Partners</h3>
+                    <h3 className="font-medium mb-2">{t("find-retail-partners")}</h3>
                     <p className="text-sm text-muted-foreground text-center mb-4">
-                      Discover retail outlets to expand your product distribution
+                      {t("discover-retail-outlets")}
                     </p>
                     <Button variant="outline" size="sm" className="mt-2" onClick={(e) => {
                       e.stopPropagation(); // Prevent card click from triggering twice
                       openFindRetailerModal();
                     }}>
                       <Plus className="h-4 w-4 mr-2" />
-                      Start Search
+                      {t("start-search")}
                     </Button>
                   </CardContent>
                 </Card>
@@ -541,11 +543,11 @@ const Retailers = () => {
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                     <Store className="h-6 w-6 text-muted-foreground" />
                   </div>
-                  <h3 className="mt-4 text-lg font-medium">No retail partners found</h3>
+                  <h3 className="mt-4 text-lg font-medium">{t("no-retail-partners-found")}</h3>
                   <p className="mt-2 text-sm text-muted-foreground">
                     {searchQuery || filterCategory || filterStatus 
-                      ? "Try adjusting your search or filter criteria." 
-                      : "Get started by finding new retail partners for your products."}
+                      ? t("try-adjusting-search") 
+                      : t("get-started-retail")}
                   </p>
                   <div className="flex justify-center gap-3 mt-4">
                     <Button 
@@ -553,11 +555,11 @@ const Retailers = () => {
                       onClick={resetFilters}
                     >
                       <Filter className="mr-2 h-4 w-4" />
-                      Reset Filters
+                      {t("reset-filters")}
                     </Button>
                     <Button onClick={openFindRetailerModal}>
                       <Plus className="mr-2 h-4 w-4" />
-                      Find Retailers
+                      {t("find-retailers")}
                     </Button>
                   </div>
                 </div>
@@ -595,9 +597,9 @@ const Retailers = () => {
                     <Star className="h-5 w-5 text-yellow-500" />
                   </div>
                   <div>
-                    <h3 className="font-medium">Partnership Match Score</h3>
+                    <h3 className="font-medium">{t("partnership-match-score")}</h3>
                     <p className="text-sm text-muted-foreground">
-                      How well this retailer matches your distribution goals
+                      {t("how-well-retailer-matches")}
                     </p>
                   </div>
                 </div>
@@ -617,7 +619,7 @@ const Retailers = () => {
               
               {/* Description */}
               <div className="space-y-2">
-                <h3 className="text-base font-medium">About</h3>
+                <h3 className="text-base font-medium">{t("about")}</h3>
                 <p className="text-sm text-muted-foreground">
                   {selectedRetailer.description}
                 </p>
@@ -625,7 +627,7 @@ const Retailers = () => {
               
               {/* Retailer Stats */}
               <div className="space-y-2">
-                <h3 className="text-base font-medium">Retailer Profile</h3>
+                <h3 className="text-base font-medium">{t("retailer-profile")}</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div className={cn(
                     "p-4 rounded-lg border",
@@ -636,16 +638,16 @@ const Retailers = () => {
                         <Store className="h-4 w-4 text-blue-500" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium">Store Locations</p>
+                        <p className="text-sm font-medium">{t("store-locations")}</p>
                         <p className="text-xl font-bold">{selectedRetailer.storeCount}</p>
                       </div>
                     </div>
                     <p className="text-xs text-muted-foreground">
                       {selectedRetailer.storeCount > 50 
-                        ? "Large retail network with national presence" 
+                        ? t("large-retail-network")
                         : selectedRetailer.storeCount > 20
-                        ? "Mid-sized regional retailer"
-                        : "Specialty retailer with curated locations"}
+                        ? t("mid-sized-retailer")
+                        : t("specialty-retailer")}
                     </p>
                   </div>
                   
@@ -658,7 +660,7 @@ const Retailers = () => {
                         <Users className="h-4 w-4 text-green-500" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium">Consumer Base</p>
+                        <p className="text-sm font-medium">{t("consumer-base")}</p>
                       </div>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
@@ -670,19 +672,19 @@ const Retailers = () => {
               
               {/* Distribution Channels */}
               <div className="space-y-2">
-                <h3 className="text-base font-medium">Distribution Channels</h3>
+                <h3 className="text-base font-medium">{t("distribution-channels")}</h3>
                 <div className="flex flex-wrap gap-2">
                   {selectedRetailer.distribution.map((channel, idx) => (
                     <Badge key={idx} className="bg-primary/10 text-primary border-none">
                       <Globe className="h-3.5 w-3.5 mr-1.5" />
-                      {channel}
+                      {t(channel.toLowerCase().replace(/\s+/g, '-'))}
                     </Badge>
                   ))}
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
                   {selectedRetailer.status === "Active Partner" 
-                    ? "Your products are currently distributed through these channels" 
-                    : "Potential distribution channels for your products"}
+                    ? t("products-currently-distributed")
+                    : t("potential-distribution-channels")}
                 </p>
               </div>
             </div>
@@ -693,10 +695,10 @@ const Retailers = () => {
                 onClick={() => setIsDetailsOpen(false)}
                 className="mr-2"
               >
-                Close
+                {t("close")}
               </Button>
               <Button>
-                {selectedRetailer.status === "Active Partner" ? "Manage Partnership" : "Initiate Contact"}
+                {selectedRetailer.status === "Active Partner" ? t("manage-partnership") : t("initiate-contact")}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -713,159 +715,86 @@ const Retailers = () => {
       >
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-auto">
           <DialogHeader>
-            <DialogTitle>Find Retail Partners</DialogTitle>
+            <DialogTitle>{t("find-retail-partners")}</DialogTitle>
             <DialogDescription>
-              Specify your distribution requirements to find retailers that match your brand's needs
+              {t("specify-retail-requirements")}
             </DialogDescription>
           </DialogHeader>
           
-          <div className="space-y-6 py-2">
-            {/* Category */}
-            <div className="space-y-2">
-              <Label htmlFor="category" className="text-base font-medium">
-                Retailer Category <span className="text-destructive">*</span>
-              </Label>
-              <Select
-                value={searchCriteria.category}
-                onValueChange={(value) => setSearchCriteria({...searchCriteria, category: value})}
-              >
-                <SelectTrigger id="category" className={!searchCriteria.category ? "text-muted-foreground" : ""}>
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Categories</SelectLabel>
-                    {retailerCategories.map(category => (
-                      <SelectItem key={category} value={category}>{category}</SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            {/* Regions */}
-            <div className="space-y-2">
-              <Label className="text-base font-medium">Target Regions</Label>
-              <div className="grid grid-cols-2 gap-3 pt-1">
-                {["Northeast US", "Southeast US", "Midwest US", "Southwest US", "West Coast US", "Canada", "International"].map(region => (
-                  <div 
-                    key={region}
-                    className="flex items-center space-x-2"
+          <div className="space-y-6 py-4">
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 gap-4">
+                <div className="space-y-2">
+                  <Label>{t("product-category")}</Label>
+                  <Select
+                    value={searchCriteria.category}
+                    onValueChange={(value) => setSearchCriteria({...searchCriteria, category: value})}
                   >
-                    <Checkbox 
-                      id={`region-${region}`}
-                      checked={searchCriteria.regions.includes(region)}
-                      onCheckedChange={(checked) => {
-                        const updatedRegions = checked 
-                          ? [...searchCriteria.regions, region] 
-                          : searchCriteria.regions.filter(r => r !== region);
-                        setSearchCriteria({...searchCriteria, regions: updatedRegions});
-                      }}
-                    />
-                    <Label htmlFor={`region-${region}`} className="text-sm font-normal">
-                      {region}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-              
-              {searchCriteria.regions.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex flex-wrap gap-1 pt-2"
-                >
-                  {searchCriteria.regions.map(region => (
-                    <Badge key={region} variant="secondary" className="flex items-center gap-1">
-                      <MapPin className="h-3 w-3" />
-                      {region}
-                      <button 
-                        className="ml-1 rounded-full hover:bg-secondary/80"
-                        onClick={() => {
-                          setSearchCriteria({
-                            ...searchCriteria, 
-                            regions: searchCriteria.regions.filter(r => r !== region)
-                          });
-                        }}
+                    <SelectTrigger>
+                      <SelectValue placeholder={t("select-category")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {retailerCategories.map(category => (
+                        <SelectItem key={category} value={category}>
+                          {t(category.toLowerCase().replace(/\s+/g, '-'))}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>{t("preferred-location")}</Label>
+                  <Input type="text" placeholder={t("enter-city-region")} />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>{t("minimum-store-count")}</Label>
+                  <Input type="number" placeholder={t("enter-minimum-stores")} />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>{t("distribution-types")}</Label>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {["Online", "Physical Stores", "Hybrid"].map(type => (
+                      <Badge 
+                        key={type} 
+                        variant="outline" 
+                        className="cursor-pointer hover:bg-accent"
                       >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </Badge>
-                  ))}
-                </motion.div>
-              )}
-            </div>
-            
-            {/* Minimum Store Count */}
-            <div className="space-y-2">
-              <Label htmlFor="minStores" className="text-base font-medium">
-                Minimum Store Count
-              </Label>
-              <Input 
-                id="minStores" 
-                type="number"
-                placeholder="Enter minimum number of stores"
-                value={searchCriteria.minStores || ''}
-                onChange={(e) => setSearchCriteria({...searchCriteria, minStores: parseInt(e.target.value) || 0})}
-              />
-            </div>
-            
-            {/* Distribution Channels */}
-            <div className="space-y-2">
-              <Label className="text-base font-medium">Desired Distribution Channels</Label>
-              <div className="grid grid-cols-2 gap-3 pt-1">
-                {["In-store", "Online", "Marketplace", "Subscription", "Mobile App", "International"].map(channel => (
-                  <div 
-                    key={channel}
-                    className="flex items-center space-x-2"
-                  >
-                    <Checkbox 
-                      id={`channel-${channel}`}
-                      checked={searchCriteria.distribution.includes(channel)}
-                      onCheckedChange={(checked) => {
-                        const updatedChannels = checked 
-                          ? [...searchCriteria.distribution, channel] 
-                          : searchCriteria.distribution.filter(c => c !== channel);
-                        setSearchCriteria({...searchCriteria, distribution: updatedChannels});
-                      }}
-                    />
-                    <Label htmlFor={`channel-${channel}`} className="text-sm font-normal">
-                      {channel}
-                    </Label>
+                        {t(type.toLowerCase().replace(/\s+/g, '-'))}
+                      </Badge>
+                    ))}
                   </div>
-                ))}
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>{t("additional-requirements")}</Label>
+                  <Textarea 
+                    placeholder={t("describe-specific-requirements")} 
+                    className="min-h-[80px]"
+                  />
+                </div>
               </div>
-            </div>
-            
-            {/* Additional Notes */}
-            <div className="space-y-2">
-              <Label htmlFor="notes" className="text-base font-medium">
-                Partnership Goals
-              </Label>
-              <Textarea 
-                id="notes" 
-                placeholder="Describe your retail partnership goals and any specific requirements"
-                rows={4}
-                value={searchCriteria.notes}
-                onChange={(e) => setSearchCriteria({...searchCriteria, notes: e.target.value})}
-              />
             </div>
           </div>
           
-          <DialogFooter className="mt-6">
+          <DialogFooter>
             <Button 
-              variant="outline"
+              variant="outline" 
               onClick={() => setIsFindRetailerOpen(false)}
               className="mr-2"
             >
-              Cancel
+              {t("cancel")}
             </Button>
-            <Button 
-              onClick={handleFindRetailer}
-              disabled={!searchCriteria.category}
-            >
-              <Search className="h-4 w-4 mr-2" />
-              Find Retail Partners
+            <Button onClick={() => {
+              toast({
+                title: t("search-initiated"),
+                description: t("looking-for-matching-retailers"),
+              });
+              setIsFindRetailerOpen(false);
+            }}>
+              {t("find-matches")}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import ManufacturerLayout from "@/components/layouts/ManufacturerLayout";
+import { useTranslation } from "react-i18next";
 import {
   RefreshCw, Filter, Plus, Star, Users, Clock, PackageCheck, Mail, 
   Phone, MapPin, Truck, Calendar, X, ExternalLink, Check, Search,
@@ -26,6 +27,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { t } from "i18next";
 
 // Enhanced custom hooks to replace the missing libraries
 const useInView = (ref: React.RefObject<HTMLElement>, options = { once: false }) => {
@@ -110,6 +112,7 @@ interface Material {
 }
 
 const Suppliers = () => {
+  const { t } = useTranslation();
   const { isAuthenticated, user, role } = useUser();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("suppliers");
@@ -171,7 +174,7 @@ const Suppliers = () => {
   };
   
   useEffect(() => {
-    document.title = "Suppliers - CPG Matchmaker";
+    document.title = t("suppliers-title") + " - CPG Matchmaker";
     
     // If not authenticated or not a manufacturer, redirect
     if (!isAuthenticated) {
@@ -190,7 +193,7 @@ const Suppliers = () => {
     };
     
     loadData();
-  }, [isAuthenticated, navigate, role]);
+  }, [isAuthenticated, navigate, role, t]);
 
   if (!isAuthenticated || role !== "manufacturer") {
     return null;
@@ -215,8 +218,8 @@ const Suppliers = () => {
     setSuppliers(mockSuppliers);
     setIsLoading(false);
     toast({
-      title: "Suppliers refreshed",
-      description: "The suppliers list has been updated.",
+      title: t("suppliers-suppliers-refreshed"),
+      description: t("suppliers-suppliers-list-updated"),
       variant: "default"
     });
   };
@@ -233,15 +236,15 @@ const Suppliers = () => {
       logoUrl: "",
       yearEstablished: Math.floor(Math.random() * 30) + 1990,
       contractEndDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toLocaleDateString(),
-      termsAndConditions: "Standard terms apply",
+      termsAndConditions: t("suppliers-standard-terms"),
       notes: ""
     };
     
     setSuppliers([...suppliers, newSupplier]);
     setIsAddSupplierOpen(false);
     toast({
-      title: "Supplier added",
-      description: "The new supplier has been added successfully.",
+      title: t("suppliers-supplier-added"),
+      description: t("suppliers-supplier-added-desc"),
       variant: "default"
     });
   };
@@ -252,13 +255,13 @@ const Suppliers = () => {
     ));
     
     const statusMessages = {
-      active: "Supplier approved successfully",
-      inactive: "Supplier deactivated",
-      pending: "Supplier set to pending review"
+      active: t("suppliers-approved-success"),
+      inactive: t("suppliers-deactivated"),
+      pending: t("suppliers-pending-review")
     };
     
     toast({
-      title: "Status updated",
+      title: t("suppliers-status-updated"),
       description: statusMessages[status],
       variant: status === "active" ? "default" : "destructive"
     });
@@ -267,8 +270,8 @@ const Suppliers = () => {
   const placeOrder = (supplierId: string, materials: Material[]) => {
     // In a real app, this would call an API to place the order
     toast({
-      title: "Order placed",
-      description: `Your order with ${materials.length} items has been submitted.`,
+      title: t("suppliers-order-placed"),
+      description: t("suppliers-order-submitted", { count: materials.length }),
       variant: "default"
     });
     setIsPlaceOrderOpen(false);
@@ -276,7 +279,7 @@ const Suppliers = () => {
     // Update the supplier's last order date
     setSuppliers(suppliers.map(supplier => 
       supplier.id === supplierId ? 
-        { ...supplier, lastOrder: "Just now", nextDelivery: "2 weeks from now" } : 
+        { ...supplier, lastOrder: t("suppliers-just-now"), nextDelivery: t("suppliers-weeks-from-now") } : 
         supplier
     ));
   };
@@ -554,9 +557,9 @@ const Suppliers = () => {
               transition={getTransition(0.05)} // Reduced from 0.1
             >
               <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-primary/90 to-primary/70 bg-clip-text text-transparent">
-                Supplier Management
+                {t("suppliers-title")}
               </h1>
-              <p className="text-slate-600 dark:text-slate-300 mt-1">Manage your material suppliers and business relationships</p>
+              <p className="text-slate-600 dark:text-slate-300 mt-1">{t("suppliers-subtitle")}</p>
             </motion.div>
             
             <motion.div 
@@ -573,7 +576,7 @@ const Suppliers = () => {
                 className="flex items-center gap-1 bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200"
               >
                 <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-                <span>Refresh</span>
+                <span>{t("suppliers-refresh")}</span>
               </Button>
               <Button 
                 variant="outline" 
@@ -581,7 +584,7 @@ const Suppliers = () => {
                 className="flex items-center gap-1 bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200"
               >
                 <Filter className="h-4 w-4" />
-                <span>Advanced Filter</span>
+                <span>{t("suppliers-advanced-filter")}</span>
               </Button>
               <Dialog open={isAddSupplierOpen} onOpenChange={setIsAddSupplierOpen}>
                 <DialogTrigger asChild>
@@ -590,7 +593,7 @@ const Suppliers = () => {
                     size="sm"
                   >
                     <Plus className="h-4 w-4" />
-                    <span>Add Supplier</span>
+                    <span>{t("suppliers-add-supplier")}</span>
                   </Button>
                 </DialogTrigger>
                 <AddSupplierDialog onAdd={addSupplier} />
@@ -611,7 +614,7 @@ const Suppliers = () => {
               className="h-full"
             >
               <StatCard 
-                title="Active Suppliers" 
+                title={t("suppliers-active-suppliers")} 
                 value={activeCount}
                 icon={<Users className="h-4 w-4 text-teal-600" />}
                 isLoading={isLoading}
@@ -627,7 +630,7 @@ const Suppliers = () => {
               className="h-full"
             >
               <StatCard 
-                title="Pending Approvals" 
+                title={t("suppliers-pending-approvals")} 
                 value={pendingCount}
                 icon={<Clock className="h-4 w-4 text-amber-600" />}
                 isLoading={isLoading}
@@ -643,7 +646,7 @@ const Suppliers = () => {
               className="h-full"
             >
               <StatCard 
-                title="Categories" 
+                title={t("suppliers-categories")} 
                 value={categoryCount}
                 icon={<PackageCheck className="h-4 w-4 text-sky-600" />}
                 isLoading={isLoading}
@@ -659,7 +662,7 @@ const Suppliers = () => {
               className="h-full"
             >
               <StatCard 
-                title="Avg. Reliability" 
+                title={t("suppliers-avg-reliability")} 
                 value={`${avgReliability}%`}
                 icon={<Star className="h-4 w-4 text-rose-600" />}
                 isLoading={isLoading}
@@ -679,7 +682,7 @@ const Suppliers = () => {
               <div className="relative w-full md:w-72">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input 
-                  placeholder="Search suppliers..." 
+                  placeholder={t("suppliers-search-placeholder")} 
                   className="pl-8 border-input focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary shadow-sm transition-shadow duration-300"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -689,12 +692,12 @@ const Suppliers = () => {
               <div className="flex gap-2 items-center w-full md:w-auto">
                 <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                   <SelectTrigger className="w-full md:w-52 border-input shadow-sm transition-colors duration-300">
-                    <SelectValue placeholder="Filter by category" />
+                    <SelectValue placeholder={t("suppliers-filter-by-category")} />
                   </SelectTrigger>
                   <SelectContent className="bg-popover border-border transition-colors duration-300">
                     {categories.map((category) => (
                       <SelectItem key={category} value={category}>
-                        {category === "all" ? "All Categories" : category}
+                        {category === "all" ? t("suppliers-all-categories") : category}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -709,7 +712,7 @@ const Suppliers = () => {
                   value="all" 
                   className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md data-[state=active]:font-semibold data-[state=active]:border-b-2 data-[state=active]:border-primary-foreground/20 transition-all duration-300 py-2.5"
                 >
-                  All Suppliers
+                  {t("suppliers-all-suppliers")}
                   <Badge variant="outline" className="ml-2 bg-background/90 text-foreground shadow-sm border-border/80 font-medium transition-colors duration-300">
                     {suppliers.length}
                   </Badge>
@@ -718,7 +721,7 @@ const Suppliers = () => {
                   value="active" 
                   className="data-[state=active]:bg-emerald-500 dark:data-[state=active]:bg-emerald-600 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:font-semibold data-[state=active]:border-b-2 data-[state=active]:border-white/20 transition-all duration-300 py-2.5"
                 >
-                  Active
+                  {t("suppliers-active")}
                   <Badge variant="outline" className="ml-2 bg-background/90 text-foreground shadow-sm border-border/80 font-medium transition-colors duration-300">
                     {activeCount}
                   </Badge>
@@ -727,7 +730,7 @@ const Suppliers = () => {
                   value="pending" 
                   className="data-[state=active]:bg-amber-500 dark:data-[state=active]:bg-amber-600 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:font-semibold data-[state=active]:border-b-2 data-[state=active]:border-white/20 transition-all duration-300 py-2.5"
                 >
-                  Pending
+                  {t("suppliers-pending")}
                   <Badge variant="outline" className="ml-2 bg-background/90 text-foreground shadow-sm border-border/80 font-medium transition-colors duration-300">
                     {pendingCount}
                   </Badge>
@@ -759,7 +762,7 @@ const Suppliers = () => {
                 transition={{ duration: 0.3, delay: 0.2 }}
                 className="text-xl font-medium mb-3 text-foreground"
               >
-                No suppliers found
+                {t("suppliers-no-suppliers-found")}
               </motion.h3>
               <motion.p 
                 initial={{ y: 10, opacity: 0 }}
@@ -768,8 +771,8 @@ const Suppliers = () => {
                 className="text-muted-foreground mb-6 max-w-md mx-auto"
               >
                 {searchQuery ? 
-                  "Try adjusting your search or filters" : 
-                  "There are no suppliers in this category yet"}
+                  t("suppliers-try-adjusting") : 
+                  t("suppliers-no-suppliers-category")}
               </motion.p>
               <motion.div
                 initial={{ y: 10, opacity: 0 }}
@@ -786,7 +789,7 @@ const Suppliers = () => {
                   }}
                   className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all hover:shadow-md px-6 py-2"
                 >
-                  Show all suppliers
+                  {t("suppliers-show-all")}
                 </Button>
               </motion.div>
             </motion.div>
@@ -866,9 +869,9 @@ const Suppliers = () => {
         <Dialog open={isViewDetailsOpen} onOpenChange={setIsViewDetailsOpen}>
           <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto no-scrollbar bg-background border-border shadow-md transition-colors duration-300">
             <DialogHeader>
-              <DialogTitle className="text-xl text-foreground transition-colors duration-300">Supplier Details</DialogTitle>
+              <DialogTitle className="text-xl text-foreground transition-colors duration-300">{t("suppliers-supplier-details")}</DialogTitle>
               <DialogDescription className="text-muted-foreground transition-colors duration-300">
-                View detailed information about this supplier
+                {t("suppliers-view-detailed")}
               </DialogDescription>
             </DialogHeader>
             
@@ -894,7 +897,7 @@ const Suppliers = () => {
                     <StatusBadge status={selectedSupplier.status} />
                     <div className="rounded-full bg-blue-100 dark:bg-blue-900/40 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:text-blue-300 flex items-center gap-1 border border-blue-200 dark:border-blue-700/50 shadow-sm transition-colors duration-300">
                       <Star className="h-3 w-3 text-blue-500 dark:text-blue-300 drop-shadow-sm" />
-                      <span>{selectedSupplier.reliability}% Reliability</span>
+                      <span>{selectedSupplier.reliability}% {t("suppliers-reliability")}</span>
                     </div>
                   </div>
                 </div>
@@ -906,7 +909,7 @@ const Suppliers = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2, delay: 0.1 }} // Reduced from 0.3, 0.1
               >
-                <p className="font-medium mb-1 text-foreground transition-colors duration-300">Description</p>
+                <p className="font-medium mb-1 text-foreground transition-colors duration-300">{t("suppliers-description")}</p>
                 <p className="text-muted-foreground transition-colors duration-300">{selectedSupplier.description}</p>
               </motion.div>
               
@@ -917,28 +920,28 @@ const Suppliers = () => {
                 transition={{ duration: 0.2, delay: 0.2 }} // Reduced from 0.3, 0.2
               >
                 <div className="p-3 bg-card border border-border rounded-lg shadow-sm transition-colors duration-300">
-                  <p className="font-medium mb-1 text-primary/90 transition-colors duration-300">Contact Person</p>
-                  <p className="text-muted-foreground transition-colors duration-300">{selectedSupplier.contactPerson || "Not specified"}</p>
+                  <p className="font-medium mb-1 text-primary/90 transition-colors duration-300">{t("suppliers-contact-person")}</p>
+                  <p className="text-muted-foreground transition-colors duration-300">{selectedSupplier.contactPerson || t("suppliers-not-specified")}</p>
                 </div>
                 <div className="p-3 bg-card border border-border rounded-lg shadow-sm transition-colors duration-300">
-                  <p className="font-medium mb-1 text-primary/90 transition-colors duration-300">Email</p>
+                  <p className="font-medium mb-1 text-primary/90 transition-colors duration-300">{t("suppliers-email")}</p>
                   <div className="flex items-center gap-1.5 text-muted-foreground transition-colors duration-300">
                     <Mail className="h-3.5 w-3.5" />
-                    <span>{selectedSupplier.email || "Not specified"}</span>
+                    <span>{selectedSupplier.email || t("suppliers-not-specified")}</span>
                   </div>
                 </div>
                 <div className="p-3 bg-card border border-border rounded-lg shadow-sm transition-colors duration-300">
-                  <p className="font-medium mb-1 text-primary/90 transition-colors duration-300">Phone</p>
+                  <p className="font-medium mb-1 text-primary/90 transition-colors duration-300">{t("suppliers-phone")}</p>
                   <div className="flex items-center gap-1.5 text-muted-foreground transition-colors duration-300">
                     <Phone className="h-3.5 w-3.5" />
-                    <span>{selectedSupplier.phone || "Not specified"}</span>
+                    <span>{selectedSupplier.phone || t("suppliers-not-specified")}</span>
                   </div>
                 </div>
                 <div className="p-3 bg-card border border-border rounded-lg shadow-sm transition-colors duration-300">
-                  <p className="font-medium mb-1 text-primary/90 transition-colors duration-300">Address</p>
+                  <p className="font-medium mb-1 text-primary/90 transition-colors duration-300">{t("suppliers-address")}</p>
                   <div className="flex items-center gap-1.5 text-muted-foreground transition-colors duration-300">
                     <MapPin className="h-3.5 w-3.5" />
-                    <span>{selectedSupplier.address || "Not specified"}</span>
+                    <span>{selectedSupplier.address || t("suppliers-not-specified")}</span>
                   </div>
                 </div>
               </motion.div>
@@ -949,7 +952,7 @@ const Suppliers = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2, delay: 0.3 }} // Reduced from 0.3, 0.3
               >
-                <p className="font-medium mb-2 text-primary/90 transition-colors duration-300">Available Materials</p>
+                <p className="font-medium mb-2 text-primary/90 transition-colors duration-300">{t("suppliers-available-materials-full")}</p>
                 {selectedSupplier.materials && selectedSupplier.materials.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {selectedSupplier.materials.slice(0, 3).map((material, i) => (
@@ -970,12 +973,12 @@ const Suppliers = () => {
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.2, delay: 0.1 + 3 * 0.03 }} // Reduced from 0.3, 0.3, 0.05
                       >
-                        +{selectedSupplier.materials.length - 3} more
+                        +{selectedSupplier.materials.length - 3} {t("suppliers-more")}
                       </motion.span>
                     )}
                   </div>
                 ) : (
-                  <p className="text-muted-foreground transition-colors duration-300">No materials listed</p>
+                  <p className="text-muted-foreground transition-colors duration-300">{t("suppliers-no-materials")}</p>
                 )}
               </motion.div>
               
@@ -987,7 +990,7 @@ const Suppliers = () => {
                 onClick={() => setIsViewDetailsOpen(false)}
                 className="border-border hover:bg-muted transition-colors duration-300"
               >
-                Close
+                {t("suppliers-close")}
               </Button>
               
               {selectedSupplier.status === "active" && (
@@ -1001,11 +1004,11 @@ const Suppliers = () => {
                     className="flex items-center gap-1 text-green-600 border-green-200 hover:border-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors duration-300"
                   >
                     <ShoppingCart className="h-4 w-4" />
-                    <span>Place Order</span>
+                    <span>{t("suppliers-place-order")}</span>
                   </Button>
                   <Button className="flex items-center gap-1 bg-primary hover:bg-primary/90 text-primary-foreground transition-colors duration-300">
                     <Mail className="h-4 w-4" />
-                    <span>Contact</span>
+                    <span>{t("suppliers-contact")}</span>
                   </Button>
                 </div>
               )}
@@ -1019,9 +1022,9 @@ const Suppliers = () => {
         <Dialog open={isPlaceOrderOpen} onOpenChange={setIsPlaceOrderOpen}>
           <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto no-scrollbar bg-background border-border shadow-md transition-colors duration-300">
             <DialogHeader>
-              <DialogTitle className="text-xl text-foreground transition-colors duration-300">Place Order</DialogTitle>
+              <DialogTitle className="text-xl text-foreground transition-colors duration-300">{t("suppliers-place-order-dialog")}</DialogTitle>
               <DialogDescription className="text-muted-foreground transition-colors duration-300">
-                Order materials from {selectedSupplier.name}
+                {t("suppliers-order-from", { name: selectedSupplier.name })}
               </DialogDescription>
             </DialogHeader>
             
@@ -1051,7 +1054,7 @@ const Suppliers = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2, delay: 0.1 }} // Reduced from 0.3, 0.1
               >
-                <Label className="mb-2 block font-medium text-foreground transition-colors duration-300">Order Materials</Label>
+                <Label className="mb-2 block font-medium text-foreground transition-colors duration-300">{t("suppliers-order-materials")}</Label>
                 <AnimatePresence>
                   {orderMaterials.map((material, index) => (
                     <motion.div 
@@ -1070,7 +1073,7 @@ const Suppliers = () => {
                           setOrderMaterials(updatedMaterials);
                         }}
                         className="flex-1 border-input shadow-sm focus-visible:ring-primary focus-visible:border-primary transition-colors duration-300"
-                        placeholder="Material name"
+                        placeholder={t("suppliers-material-name")}
                       />
                       <Input 
                         type="number"
@@ -1092,7 +1095,7 @@ const Suppliers = () => {
                         }}
                       >
                         <SelectTrigger className="w-20 border-input shadow-sm transition-colors duration-300">
-                          <SelectValue placeholder="Unit" />
+                          <SelectValue placeholder={t("suppliers-units")} />
                         </SelectTrigger>
                         <SelectContent className="bg-popover border-border transition-colors duration-300">
                           <SelectItem value="kg">kg</SelectItem>
@@ -1140,7 +1143,7 @@ const Suppliers = () => {
                     }}
                   >
                     <Plus className="h-4 w-4" />
-                    <span>Add Material</span>
+                    <span>{t("suppliers-add-material")}</span>
                   </Button>
                 </motion.div>
               </motion.div>
@@ -1150,10 +1153,10 @@ const Suppliers = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2, delay: 0.2 }} // Reduced from 0.3, 0.2
               >
-                <Label htmlFor="order-notes" className="mb-2 block font-medium text-foreground transition-colors duration-300">Order Notes</Label>
+                <Label htmlFor="order-notes" className="mb-2 block font-medium text-foreground transition-colors duration-300">{t("suppliers-order-notes")}</Label>
                 <Textarea 
                   id="order-notes" 
-                  placeholder="Any special instructions for this order..."
+                  placeholder={t("suppliers-order-notes-placeholder")}
                   className="min-h-[100px] resize-none border-input shadow-sm focus-visible:ring-primary focus-visible:border-primary transition-colors duration-300"
                 />
               </motion.div>
@@ -1165,15 +1168,15 @@ const Suppliers = () => {
                 transition={{ duration: 0.3, delay: 0.3 }} // Reduced from 0.5, 0.3
               >
                 <div className="flex justify-between mb-2">
-                  <span className="text-muted-foreground transition-colors duration-300">Materials:</span>
-                  <span className="font-medium text-foreground transition-colors duration-300">{orderMaterials.length} items</span>
+                  <span className="text-muted-foreground transition-colors duration-300">{t("suppliers-materials")}:</span>
+                  <span className="font-medium text-foreground transition-colors duration-300">{orderMaterials.length} {t("suppliers-items")}</span>
                 </div>
                 <div className="flex justify-between mb-2">
-                  <span className="text-muted-foreground transition-colors duration-300">Total Quantity:</span>
-                  <span className="font-medium text-foreground transition-colors duration-300">{orderMaterials.reduce((sum, m) => sum + m.quantity, 0)} units</span>
+                  <span className="text-muted-foreground transition-colors duration-300">{t("suppliers-total-quantity")}:</span>
+                  <span className="font-medium text-foreground transition-colors duration-300">{orderMaterials.reduce((sum, m) => sum + m.quantity, 0)} {t("suppliers-units")}</span>
                 </div>
                 <div className="flex justify-between font-medium pt-2 border-t border-border transition-colors duration-300">
-                  <span className="text-foreground transition-colors duration-300">Estimated Total:</span>
+                  <span className="text-foreground transition-colors duration-300">{t("suppliers-estimated-total")}:</span>
                   <span className="text-primary text-lg transition-colors duration-300">
                     ${orderMaterials.reduce((sum, m) => sum + (m.price * m.quantity), 0).toFixed(2)}
                   </span>
@@ -1187,14 +1190,14 @@ const Suppliers = () => {
                 onClick={() => setIsPlaceOrderOpen(false)}
                 className="border-border hover:bg-muted transition-colors duration-300"
               >
-                Cancel
+                {t("suppliers-cancel")}
               </Button>
               <Button 
                 onClick={() => placeOrder(selectedSupplier.id, orderMaterials)}
                 disabled={orderMaterials.length === 0 || orderMaterials.some(m => !m.name)}
                 className="bg-green-600 hover:bg-green-700 text-white transition-colors duration-300"
               >
-                Place Order
+                {t("suppliers-order")}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -1392,7 +1395,7 @@ const SupplierCard = ({
       </CardContent>
       <CardFooter className="pt-2 pb-3 border-t border-border/30 flex justify-between items-center w-full">
         <div className="text-xs text-muted-foreground">
-          <span>Lead time: <span className="font-medium text-foreground">{supplier.leadTime}</span></span>
+          <span>{t("suppliers-lead-time")}: <span className="font-medium text-foreground">{supplier.leadTime}</span></span>
         </div>
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
           <Button 
@@ -1401,7 +1404,7 @@ const SupplierCard = ({
             className="border-border hover:bg-primary/10 hover:text-primary hover:border-primary text-foreground font-medium"
             onClick={onViewDetails}
           >
-            View Details
+            {t("suppliers-view-details")}
           </Button>
         </motion.div>
       </CardFooter>
@@ -1466,6 +1469,7 @@ interface AddSupplierProps {
 }
 
 const AddSupplierDialog = ({ onAdd }: AddSupplierProps) => {
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [contactPerson, setContactPerson] = useState("");
   const [email, setEmail] = useState("");
@@ -1483,11 +1487,11 @@ const AddSupplierDialog = ({ onAdd }: AddSupplierProps) => {
     
     // Validate
     const newErrors: Record<string, string> = {};
-    if (!name) newErrors.name = "Name is required";
-    if (!contactPerson) newErrors.contactPerson = "Contact person is required";
-    if (!email) newErrors.email = "Email is required";
-    if (!phone) newErrors.phone = "Phone is required";
-    if (!location) newErrors.location = "Location is required";
+    if (!name) newErrors.name = t("suppliers-name-required");
+    if (!contactPerson) newErrors.contactPerson = t("suppliers-contact-required");
+    if (!email) newErrors.email = t("suppliers-email-required");
+    if (!phone) newErrors.phone = t("suppliers-phone-required");
+    if (!location) newErrors.location = t("suppliers-location-required");
     
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -1518,7 +1522,7 @@ const AddSupplierDialog = ({ onAdd }: AddSupplierProps) => {
       logoUrl: "",
       yearEstablished: Math.floor(Math.random() * 30) + 1990,
       contractEndDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toLocaleDateString(),
-      termsAndConditions: "Standard terms apply",
+      termsAndConditions: t("suppliers-standard-terms"),
       notes: ""
     };
     
@@ -1535,9 +1539,9 @@ const AddSupplierDialog = ({ onAdd }: AddSupplierProps) => {
   return (
     <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto no-scrollbar bg-background border-border shadow-lg">
       <DialogHeader>
-        <DialogTitle className="text-xl font-semibold text-foreground">Add New Supplier</DialogTitle>
+        <DialogTitle className="text-xl font-semibold text-foreground">{t("suppliers-add-new-supplier")}</DialogTitle>
         <DialogDescription className="text-muted-foreground">
-          Fill in the details to add a new supplier to your network
+          {t("suppliers-add-details")}
         </DialogDescription>
       </DialogHeader>
       
@@ -1551,13 +1555,13 @@ const AddSupplierDialog = ({ onAdd }: AddSupplierProps) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="name" className="font-medium text-foreground transition-colors duration-300">
-                Supplier Name <span className="text-red-500 dark:text-red-400 transition-colors duration-300">*</span>
+                {t("suppliers-supplier-name")} <span className="text-red-500 dark:text-red-400 transition-colors duration-300">*</span>
               </Label>
               <Input
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Enter supplier name"
+                placeholder={t("suppliers-supplier-name")}
                 className={cn(
                   "bg-background border-input shadow-sm focus-visible:ring-primary/30 focus-visible:border-primary/30 transition-colors duration-300",
                   errors.name ? "border-red-500 focus-visible:ring-red-500" : "border-input"
@@ -1567,10 +1571,10 @@ const AddSupplierDialog = ({ onAdd }: AddSupplierProps) => {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="category" className="font-medium text-foreground transition-colors duration-300">Category</Label>
+              <Label htmlFor="category" className="font-medium text-foreground transition-colors duration-300">{t("suppliers-category")}</Label>
               <Select value={category} onValueChange={setCategory}>
                 <SelectTrigger id="category" className="bg-background border-input shadow-sm transition-colors duration-300">
-                  <SelectValue placeholder="Select category" />
+                  <SelectValue placeholder={t("suppliers-select-category")} />
                 </SelectTrigger>
                 <SelectContent className="bg-popover border-border transition-colors duration-300">
                   <SelectItem value="Grains & Cereals">Grains & Cereals</SelectItem>
@@ -1595,13 +1599,13 @@ const AddSupplierDialog = ({ onAdd }: AddSupplierProps) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="contactPerson" className="font-medium text-foreground transition-colors duration-300">
-                Contact Person <span className="text-red-500 dark:text-red-400 transition-colors duration-300">*</span>
+                {t("suppliers-contact-person")} <span className="text-red-500 dark:text-red-400 transition-colors duration-300">*</span>
               </Label>
               <Input
                 id="contactPerson"
                 value={contactPerson}
                 onChange={(e) => setContactPerson(e.target.value)}
-                placeholder="Enter contact person name"
+                placeholder={t("suppliers-contact-person")}
                 className={cn(
                   "bg-background border-input shadow-sm focus-visible:ring-primary/30 focus-visible:border-primary/30 transition-colors duration-300",
                   errors.contactPerson ? "border-red-500 focus-visible:ring-red-500" : "border-input"
@@ -1612,13 +1616,13 @@ const AddSupplierDialog = ({ onAdd }: AddSupplierProps) => {
             
             <div className="space-y-2">
               <Label htmlFor="location" className="font-medium text-foreground transition-colors duration-300">
-                Location <span className="text-red-500 dark:text-red-400 transition-colors duration-300">*</span>
+                {t("suppliers-location")} <span className="text-red-500 dark:text-red-400 transition-colors duration-300">*</span>
               </Label>
               <Input
                 id="location"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                placeholder="City, Country"
+                placeholder={t("suppliers-city-country")}
                 className={cn(
                   "bg-background border-input shadow-sm focus-visible:ring-primary/30 focus-visible:border-primary/30 transition-colors duration-300",
                   errors.location ? "border-red-500 focus-visible:ring-red-500" : "border-input"
@@ -1637,14 +1641,14 @@ const AddSupplierDialog = ({ onAdd }: AddSupplierProps) => {
         >
           <div className="space-y-2">
             <Label htmlFor="email" className="font-medium text-foreground transition-colors duration-300">
-              Email <span className="text-red-500 dark:text-red-400 transition-colors duration-300">*</span>
+              {t("suppliers-email")} <span className="text-red-500 dark:text-red-400 transition-colors duration-300">*</span>
             </Label>
             <Input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter email address"
+              placeholder={t("suppliers-email")}
               className={cn(
                 "bg-background border-input shadow-sm focus-visible:ring-primary/30 focus-visible:border-primary/30 transition-colors duration-300",
                 errors.email ? "border-red-500 focus-visible:ring-red-500" : "border-input"
@@ -1655,13 +1659,13 @@ const AddSupplierDialog = ({ onAdd }: AddSupplierProps) => {
           
           <div className="space-y-2">
             <Label htmlFor="phone" className="font-medium text-foreground transition-colors duration-300">
-              Phone <span className="text-red-500 dark:text-red-400 transition-colors duration-300">*</span>
+              {t("suppliers-phone")} <span className="text-red-500 dark:text-red-400 transition-colors duration-300">*</span>
             </Label>
             <Input
               id="phone"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              placeholder="Enter phone number"
+              placeholder={t("suppliers-phone")}
               className={cn(
                 "bg-background border-input shadow-sm focus-visible:ring-primary/30 focus-visible:border-primary/30 transition-colors duration-300",
                 errors.phone ? "border-red-500 focus-visible:ring-red-500" : "border-input"
@@ -1677,12 +1681,12 @@ const AddSupplierDialog = ({ onAdd }: AddSupplierProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={getTransition(0.3)}
         >
-          <Label htmlFor="address" className="font-medium text-foreground transition-colors duration-300">Address</Label>
+          <Label htmlFor="address" className="font-medium text-foreground transition-colors duration-300">{t("suppliers-address")}</Label>
           <Input
             id="address"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
-            placeholder="Enter complete address"
+            placeholder={t("suppliers-address")}
             className="bg-background border-input shadow-sm focus-visible:ring-primary/30 focus-visible:border-primary/30 transition-colors duration-300"
           />
         </motion.div>
@@ -1693,15 +1697,15 @@ const AddSupplierDialog = ({ onAdd }: AddSupplierProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={getTransition(0.4)}
         >
-          <Label htmlFor="materialsInput" className="font-medium text-foreground transition-colors duration-300">Materials Provided</Label>
+          <Label htmlFor="materialsInput" className="font-medium text-foreground transition-colors duration-300">{t("suppliers-materials-provided")}</Label>
           <Input
             id="materialsInput"
             value={materialsInput}
             onChange={(e) => setMaterialsInput(e.target.value)}
-            placeholder="Enter materials separated by commas"
+            placeholder={t("suppliers-materials-comma")}
             className="bg-background border-input shadow-sm focus-visible:ring-primary/30 focus-visible:border-primary/30 transition-colors duration-300"
           />
-          <p className="text-xs text-muted-foreground mt-1 transition-colors duration-300">Separate materials with commas (e.g., Cotton, Polyester, Nylon)</p>
+          <p className="text-xs text-muted-foreground mt-1 transition-colors duration-300">{t("suppliers-materials-comma")}</p>
         </motion.div>
         
         <motion.div 
@@ -1710,12 +1714,12 @@ const AddSupplierDialog = ({ onAdd }: AddSupplierProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.5 }} // Reduced from 0.5, 0.3
         >
-          <Label htmlFor="description" className="font-medium text-foreground transition-colors duration-300">Description</Label>
+          <Label htmlFor="description" className="font-medium text-foreground transition-colors duration-300">{t("suppliers-description")}</Label>
           <Textarea
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Enter a brief description of the supplier"
+            placeholder={t("suppliers-description")}
             className="min-h-[100px] resize-none bg-background border-input shadow-sm focus-visible:ring-primary/30 focus-visible:border-primary/30 transition-colors duration-300"
           />
         </motion.div>
@@ -1727,14 +1731,14 @@ const AddSupplierDialog = ({ onAdd }: AddSupplierProps) => {
               variant="outline"
               className="bg-background border-border hover:bg-muted transition-all duration-300 hover:shadow-sm"
             >
-              Cancel
+              {t("suppliers-cancel")}
             </Button>
           </DialogClose>
           <Button 
             type="submit"
             className="bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:shadow-md"
           >
-            Add Supplier
+            {t("suppliers-add-supplier")}
           </Button>
         </DialogFooter>
       </form>

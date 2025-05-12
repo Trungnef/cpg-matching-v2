@@ -122,6 +122,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
 import { UploadCloud } from "lucide-react";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { useTranslation } from "react-i18next";
 
 // Global style to hide scrollbars
 const styles = `
@@ -827,6 +828,7 @@ export const Production = () => {
   const { isAuthenticated, user, role } = useUser();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   // States for product management
   const [products, setProducts] = useState<Product[]>(initialProducts);
@@ -945,8 +947,8 @@ export const Production = () => {
 
     setProducts([...products, productToAdd]);
     toast({
-      title: "Product created",
-      description: `${productToAdd.name} has been added to your product list.`,
+      title: t('production-product-created', "Product created"),
+      description: t('production-product-added', "{{name}} has been added to your product list.", { name: productToAdd.name }),
     });
     setIsEditDialogOpen(false);
   };
@@ -964,8 +966,8 @@ export const Production = () => {
       setIsEditDialogOpen(false);
 
       toast({
-        title: "Product updated",
-        description: `${updatedProduct.name} has been updated successfully.`,
+        title: t('production-product-updated', "Product updated"),
+        description: t('production-product-updated-successfully', "{{name}} has been updated successfully.", { name: updatedProduct.name }),
         variant: "default",
       });
     }, 600);
@@ -983,8 +985,8 @@ export const Production = () => {
       setIsDeleteDialogOpen(false);
 
       toast({
-        title: "Product deleted",
-        description: `${productName} has been removed.`,
+        title: t('production-product-deleted', "Product deleted"),
+        description: t('production-product-removed', "{{name}} has been removed.", { name: productName }),
         variant: "default",
       });
     }, 600);
@@ -1098,12 +1100,8 @@ export const Production = () => {
       setIsLoading(false);
 
       toast({
-        title: `Line ${line.name} ${
-          newStatus === "Active" ? "Started" : "Stopped"
-        }`,
-        description: `Production line has been ${
-          newStatus === "Active" ? "activated" : "deactivated"
-        } successfully.`,
+        title: t('production-line-status-changed', "Line status changed"),
+        description: t('production-line-status-changed-description', "{{line}} has been {{status}}.", { line: line.name, status: newStatus }),
         variant: "default",
       });
     }, 600);
@@ -1131,15 +1129,15 @@ export const Production = () => {
       setIsRefreshingLines(false);
 
       toast({
-        title: "Data refreshed",
-        description: "Production line information has been updated.",
+        title: t('production-data-refreshed', "Data refreshed"),
+        description: t('production-line-info-updated', "Production line information has been updated."),
         variant: "default",
       });
     }, 800);
   };
 
   // Filter production lines based on status and type
-  const filteredProductionLines = productionLines.filter((line) => {
+  const filteredLines = productionLines.filter((line) => {
     const matchesStatus =
       lineStatusFilter === "all" || line.status === lineStatusFilter;
     const matchesType =
@@ -1171,8 +1169,8 @@ export const Production = () => {
   ) => {
     if (line.status !== "Active") {
       toast({
-        title: "Cannot start batch",
-        description: "Production line must be active to start a new batch",
+        title: t('production-cannot-start-batch', "Cannot start batch"),
+        description: t('production-line-must-be-active', "Production line must be active to start a new batch"),
         variant: "destructive",
       });
       return;
@@ -1212,8 +1210,8 @@ export const Production = () => {
     }));
 
     toast({
-      title: "Batch started",
-      description: `New batch ${newBatch.id} started on ${line.name}`,
+      title: t('production-batch-started', "Batch started"),
+      description: t('production-new-batch-started', "New batch {{id}} started on {{line}}", { id: newBatch.id, line: line.name }),
       variant: "default",
     });
   };
@@ -1256,8 +1254,9 @@ export const Production = () => {
     });
 
     toast({
-      title: "Batch completed",
-      description: `Batch ${batch.id} completed successfully on Line ${line.name}`,
+      title: t('production-batch-completed', "Batch completed"),
+      description: t('production-batch-completed-successfully', "Batch {{id}} completed successfully on Line {{line}}", 
+        { id: batch.id, line: line.name }),
       variant: "default",
     });
   };
@@ -1350,9 +1349,8 @@ export const Production = () => {
     setIsRealTimeMonitoring(true);
 
     toast({
-      title: "Real-time monitoring started",
-      description:
-        "Production lines will be monitored with live updates every 5 seconds",
+      title: t('production-real-time-monitoring-started', "Real-time monitoring started"),
+      description: t('production-live-updates', "Production lines will be monitored with live updates every 5 seconds"),
       variant: "default",
     });
   };
@@ -1364,8 +1362,8 @@ export const Production = () => {
       setIsRealTimeMonitoring(false);
 
       toast({
-        title: "Real-time monitoring stopped",
-        description: "Production line monitoring has been paused",
+        title: t('production-real-time-monitoring-stopped', "Real-time monitoring stopped"),
+        description: t('production-monitoring-paused', "Production line monitoring has been paused"),
         variant: "default",
       });
     }
@@ -1401,11 +1399,10 @@ export const Production = () => {
                 transition={{ duration: 0.5, delay: 0.1 }}
               >
                 <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/70 text-transparent bg-clip-text">
-                  Product Management
+                  {t('production-title', 'Product Management')}
                 </h1>
                 <p className="text-muted-foreground mt-1">
-                  Manage your products, production lines and manufacturing
-                  operations
+                  {t('production-subtitle', 'Manage your products, production lines and manufacturing operations')}
                 </p>
               </motion.div>
 
@@ -1426,11 +1423,11 @@ export const Production = () => {
                           className="hover-scale-subtle"
                         >
                           <PauseCircle className="h-4 w-4 mr-2" />
-                          Stop Monitoring
+                          {t('production-stop-monitoring', 'Stop Monitoring')}
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Stop real-time monitoring of production lines</p>
+                        <p>{t('production-stop-real-time', 'Stop real-time monitoring of production lines')}</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
@@ -1445,11 +1442,11 @@ export const Production = () => {
                           className="text-green-600 border-green-200 hover:bg-green-50 hover:text-green-700 hover-scale-subtle"
                         >
                           <Play className="h-4 w-4 mr-2" />
-                          Start Monitoring
+                          {t('production-start-monitoring', 'Start Monitoring')}
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Begin real-time monitoring of production lines</p>
+                        <p>{t('production-real-time-monitoring', 'Begin real-time monitoring of production lines')}</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
@@ -1473,12 +1470,12 @@ export const Production = () => {
                         {activeTab === "production" ? (
                           <>
                             <Package className="h-4 w-4 mr-2" />
-                            View Products
+                            {t("production-products")}
                           </>
                         ) : (
                           <>
                             <Factory className="h-4 w-4 mr-2" />
-                            View Production Lines
+                            {t("production-production-lines")}
                           </>
                         )}
                       </Button>
@@ -1503,14 +1500,14 @@ export const Production = () => {
                   className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground hover-scale-subtle"
                 >
                   <Factory className="h-4 w-4 mr-2" />
-                  Production Lines
+                  {t("production-production-lines")}
                 </TabsTrigger>
                 <TabsTrigger
                   value="products"
                   className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground hover-scale-subtle"
                 >
                   <Package className="h-4 w-4 mr-2" />
-                  Products
+                  {t("production-products")}
                 </TabsTrigger>
               </TabsList>
 
@@ -1605,12 +1602,12 @@ export const Production = () => {
                   </div>
                   <div>
                     <DialogTitle className="text-xl">
-                      {selectedProduct ? "Edit Product" : "Create New Product"}
+                      {selectedProduct ? t('production-edit-product', "Edit Product") : t('production-create-new-product', "Create New Product")}
                     </DialogTitle>
                     <DialogDescription className="text-sm">
                       {selectedProduct
-                        ? "Update the details of your existing product."
-                        : "Add a new product to your manufacturing catalog."}
+                        ? t('production-update-details', "Update the details of your existing product.")
+                        : t('production-add-new-product', "Add a new product to your manufacturing catalog.")}
                     </DialogDescription>
                   </div>
                 </motion.div>
@@ -1650,11 +1647,12 @@ export const Production = () => {
                   <div className="h-8 w-8 rounded-full bg-destructive/10 flex items-center justify-center">
                     <AlertTriangle className="h-4 w-4" />
                   </div>
-                  <DialogTitle className="text-xl">Delete Product</DialogTitle>
+                  <DialogTitle className="text-xl">
+                    {t('production-delete-product', "Delete Product")}
+                  </DialogTitle>
                 </motion.div>
                 <DialogDescription className="text-base mt-2">
-                  Are you sure you want to delete this product? This action
-                  cannot be undone.
+                  {t('production-delete-confirmation', "Are you sure you want to delete this product? This action cannot be undone.")}
                 </DialogDescription>
               </DialogHeader>
 
@@ -1685,7 +1683,7 @@ export const Production = () => {
                       onClick={() => setIsDeleteDialogOpen(false)}
                       className="flex-1 hover:bg-background hover-scale-subtle"
                     >
-                      Cancel
+                      {t('production-cancel', 'Cancel')}
                     </Button>
                     <Button
                       variant="destructive"
@@ -1696,12 +1694,12 @@ export const Production = () => {
                       {isLoading ? (
                         <>
                           <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Deleting...
+                          {t('production-deleting', 'Deleting...')}
                         </>
                       ) : (
                         <>
                           <Trash2 className="h-4 w-4 mr-2" />
-                          Delete Product
+                          {t('production-delete-product', 'Delete Product')}
                         </>
                       )}
                     </Button>
@@ -1735,10 +1733,10 @@ export const Production = () => {
                   </div>
                   <div>
                     <DialogTitle className="text-xl">
-                      Product Details
+                      {t('production-product-details', "Product Details")}
                     </DialogTitle>
                     <DialogDescription className="text-sm">
-                      Detailed information about this product.
+                      {t('production-product-details-description', "Detailed information about this product.")}
                     </DialogDescription>
                   </div>
                 </motion.div>
@@ -1786,10 +1784,10 @@ export const Production = () => {
                   </div>
                   <div>
                     <DialogTitle className="text-xl">
-                      Production Line Details
+                      {t('production-line-details', "Production Line Details")}
                     </DialogTitle>
                     <DialogDescription className="text-sm">
-                      View and manage details for this production line.
+                      {t('production-line-details-description', "View and manage details for this production line.")}
                     </DialogDescription>
                   </div>
                 </motion.div>
@@ -1928,12 +1926,12 @@ export const Production = () => {
                   </div>
                   <div>
                     <DialogTitle className="text-xl">
-                      Schedule Maintenance
+                      {t('production-schedule-maintenance', "Schedule Maintenance")}
                     </DialogTitle>
                     <DialogDescription className="text-sm">
                       {selectedProductionLine
-                        ? `Schedule maintenance for ${selectedProductionLine.name}`
-                        : "Schedule maintenance for production line"}
+                        ? t('production-schedule-maintenance-for', "Schedule maintenance for {{line}}", { line: selectedProductionLine.name })
+                        : t('production-schedule-maintenance-generic', "Schedule maintenance for production line")}
                     </DialogDescription>
                   </div>
                 </motion.div>
@@ -1942,7 +1940,7 @@ export const Production = () => {
               <div className="px-6 py-6">
                 {selectedProductionLine && (
                   <ScheduleMaintenanceForm
-                    productionLine={selectedProductionLine}
+                    line={selectedProductionLine}
                     onSubmit={(maintenanceData) => {
                       setIsLoading(true);
 
@@ -1997,12 +1995,14 @@ export const Production = () => {
                         setIsScheduleMaintenanceOpen(false);
 
                         toast({
-                          title: "Maintenance scheduled",
-                          description: `Maintenance for ${selectedProductionLine.name} has been scheduled for ${maintenanceData.date}.`,
+                          title: t('production-maintenance-scheduled', "Maintenance scheduled"),
+                          description: t('production-maintenance-scheduled-description', "Maintenance for {{line}} has been scheduled for {{date}}.", 
+                            { line: selectedProductionLine.name, date: maintenanceData.date }),
                           variant: "default",
                         });
                       }, 600);
                     }}
+                    onCancel={() => setIsScheduleMaintenanceOpen(false)}
                     isLoading={isLoading}
                   />
                 )}
@@ -2034,12 +2034,12 @@ export const Production = () => {
                   </div>
                   <div>
                     <DialogTitle className="text-xl">
-                      Assign Product
+                      {t('production-assign-product', "Assign Product")}
                     </DialogTitle>
                     <DialogDescription className="text-sm">
                       {selectedProductionLine
-                        ? `Assign a product to ${selectedProductionLine.name}`
-                        : "Assign a product to production line"}
+                        ? t('production-assign-product-to', "Assign a product to {{line}}", { line: selectedProductionLine.name })
+                        : t('production-assign-product-generic', "Assign a product to production line")}
                     </DialogDescription>
                   </div>
                 </motion.div>
@@ -2077,12 +2077,9 @@ export const Production = () => {
                         setIsAssignProductOpen(false);
 
                         toast({
-                          title: "Product assigned",
-                          description: `${
-                            selectedProduct?.name || "Product"
-                          } has been assigned to ${
-                            selectedProductionLine.name
-                          }.`,
+                          title: t('production-product-assigned', "Product assigned"),
+                          description: t('production-product-assigned-description', "{{product}} has been assigned to {{line}}.", 
+                            { product: selectedProduct?.name || t('production-generic-product', "Product"), line: selectedProductionLine.name }),
                           variant: "default",
                         });
                       }, 600);
@@ -2132,6 +2129,7 @@ const ProductsTab: React.FC<ProductsTabProps> = ({
   viewProductDetails,
   getProductTypeBadge,
 }) => {
+  const { t } = useTranslation();
   const [animateCards, setAnimateCards] = useState(false);
 
   // Trigger animation when component mounts or products change
@@ -2168,7 +2166,7 @@ const ProductsTab: React.FC<ProductsTabProps> = ({
             <SelectContent>
               {categories.map((category) => (
                 <SelectItem key={category} value={category}>
-                  {category === "all" ? "All Categories" : category}
+                  {category === "all" ? t('production-all-categories', "All Categories") : category}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -2179,11 +2177,12 @@ const ProductsTab: React.FC<ProductsTabProps> = ({
               <SelectValue placeholder="Select status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="Active">Active</SelectItem>
-              <SelectItem value="Low Stock">Low Stock</SelectItem>
-              <SelectItem value="Out of Stock">Out of Stock</SelectItem>
-              <SelectItem value="Discontinued">Discontinued</SelectItem>
+              <SelectItem value="all">{t('production-all-statuses', "All Statuses")}</SelectItem>
+              <SelectItem value="Active">{t('production-active', 'Active')}</SelectItem>
+              <SelectItem value="Maintenance">{t('production-maintenance', 'Maintenance')}</SelectItem>
+              <SelectItem value="Idle">{t('production-idle', 'Idle')}</SelectItem>
+              <SelectItem value="Setup">{t('production-setup', 'Setup')}</SelectItem>
+              <SelectItem value="Offline">{t('production-offline', 'Offline')}</SelectItem>
             </SelectContent>
           </Select>
 
@@ -2225,7 +2224,7 @@ const ProductsTab: React.FC<ProductsTabProps> = ({
           >
             <PlusCircle className="h-4 w-4" />
           </motion.div>
-          <span>Create New Product</span>
+          <span>{t('production-create-new-product', "Create New Product")}</span>
         </Button>
       </motion.div>
 
@@ -2252,13 +2251,13 @@ const ProductsTab: React.FC<ProductsTabProps> = ({
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.3, delay: 0.3 }}
             >
-              <h3 className="text-xl font-medium mb-2">No products found</h3>
+              <h3 className="text-xl font-medium mb-2">{t('production-no-products-found', "No products found")}</h3>
               <p className="text-muted-foreground max-w-md">
                 {searchQuery ||
                 categoryFilter !== "all" ||
                 statusFilter !== "all"
-                  ? "Try adjusting your search criteria or filters to find what you're looking for."
-                  : "Start by creating your first product using the button above."}
+                  ? t('production-adjust-search', "Try adjusting your search criteria or filters to find what you're looking for.")
+                  : t('production-start-create', "Start by creating your first product using the button above.")}
               </p>
             </motion.div>
 
@@ -2509,12 +2508,14 @@ const ProductionTab: React.FC<ProductionTabProps> = ({
   handleCompleteBatch,
   handleStartNewBatch,
 }) => {
+  const { t } = useTranslation();
+  
   // Filter production lines based on filters
   const filteredLines = productionLines.filter((line) => {
     const matchesStatus =
       lineStatusFilter === "all" || line.status === lineStatusFilter;
     const matchesType =
-      lineTypeFilter === "all" || line.line_type === lineTypeFilter;
+      lineTypeFilter === "all" || line.line_type.includes(lineTypeFilter);
     return matchesStatus && matchesType;
   });
 
@@ -2539,12 +2540,12 @@ const ProductionTab: React.FC<ProductionTabProps> = ({
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="Active">Active</SelectItem>
-              <SelectItem value="Maintenance">Maintenance</SelectItem>
-              <SelectItem value="Idle">Idle</SelectItem>
-              <SelectItem value="Setup">Setup</SelectItem>
-              <SelectItem value="Offline">Offline</SelectItem>
+              <SelectItem value="all">{t('production-all-statuses', "All Statuses")}</SelectItem>
+              <SelectItem value="Active">{t('production-active', 'Active')}</SelectItem>
+              <SelectItem value="Maintenance">{t('production-maintenance', 'Maintenance')}</SelectItem>
+              <SelectItem value="Idle">{t('production-idle', 'Idle')}</SelectItem>
+              <SelectItem value="Setup">{t('production-setup', 'Setup')}</SelectItem>
+              <SelectItem value="Offline">{t('production-offline', 'Offline')}</SelectItem>
             </SelectContent>
           </Select>
 
@@ -2555,7 +2556,7 @@ const ProductionTab: React.FC<ProductionTabProps> = ({
             <SelectContent>
               {lineTypes.map((type) => (
                 <SelectItem key={type} value={type}>
-                  {type === "all" ? "All Types" : type}
+                  {type === "all" ? t('production-all-types', "All Types") : type}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -2573,7 +2574,7 @@ const ProductionTab: React.FC<ProductionTabProps> = ({
                 isRefreshingLines ? "animate-spin" : ""
               }`}
             />
-            Refresh
+            {t('production-refresh', 'Refresh')}
           </Button>
         </div>
 
@@ -2583,7 +2584,7 @@ const ProductionTab: React.FC<ProductionTabProps> = ({
             className="flex items-center hover-scale-medium submit-button-hover"
           >
             <PlusCircle className="h-4 w-4 mr-2" />
-            Add Production Line
+            {t('production-add-line', 'Add Production Line')}
           </Button>
         </div>
       </motion.div>
@@ -2599,7 +2600,7 @@ const ProductionTab: React.FC<ProductionTabProps> = ({
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center">
               <Factory className="h-4 w-4 mr-2 text-primary/70" />
-              Active Lines
+              {t('production-active-lines', 'Active Lines')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -2615,7 +2616,7 @@ const ProductionTab: React.FC<ProductionTabProps> = ({
                   productionLines.length) *
                   100
               )}
-              % lines operational
+              % {t('production-lines-operational', 'lines operational')}
             </p>
           </CardContent>
         </Card>
@@ -2624,7 +2625,7 @@ const ProductionTab: React.FC<ProductionTabProps> = ({
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center">
               <Settings className="h-4 w-4 mr-2 text-amber-500/70" />
-              Maintenance
+              {t('production-maintenance', 'Maintenance')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -2634,8 +2635,8 @@ const ProductionTab: React.FC<ProductionTabProps> = ({
             <p className="text-xs text-muted-foreground mt-1">
               {productionLines.filter((l) => l.status === "Maintenance")
                 .length > 0
-                ? "Lines currently under maintenance"
-                : "No lines in maintenance"}
+                ? t('production-lines-in-maintenance', 'Lines currently under maintenance')
+                : t('production-no-maintenance', 'No lines in maintenance')}
             </p>
           </CardContent>
         </Card>
@@ -2644,7 +2645,7 @@ const ProductionTab: React.FC<ProductionTabProps> = ({
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center">
               <Activity className="h-4 w-4 mr-2 text-blue-500/70" />
-              Avg. Efficiency
+              {t('production-avg-efficiency', 'Avg. Efficiency')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -2661,7 +2662,7 @@ const ProductionTab: React.FC<ProductionTabProps> = ({
               %
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Average efficiency across active lines
+              {t('production-average-across-lines', 'Average efficiency across active lines')}
             </p>
           </CardContent>
         </Card>
@@ -2670,7 +2671,7 @@ const ProductionTab: React.FC<ProductionTabProps> = ({
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center">
               <BarChart className="h-4 w-4 mr-2 text-green-500/70" />
-              Active Batches
+              {t('production-active-batches', 'Active Batches')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -2682,7 +2683,7 @@ const ProductionTab: React.FC<ProductionTabProps> = ({
               }
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Batches currently in production
+              {t('production-batches-in-production', 'Batches currently in production')}
             </p>
           </CardContent>
         </Card>
@@ -2712,12 +2713,12 @@ const ProductionTab: React.FC<ProductionTabProps> = ({
               transition={{ duration: 0.3, delay: 0.3 }}
             >
               <h3 className="text-xl font-medium mb-2">
-                No production lines found
+                {t('production-no-lines-found', 'No production lines found')}
               </h3>
               <p className="text-muted-foreground max-w-md">
                 {lineStatusFilter !== "all" || lineTypeFilter !== "all"
-                  ? "Try adjusting your filters to see more production lines."
-                  : "Start by adding your first production line."}
+                  ? t('production-try-adjusting-filters', 'Try adjusting your filters to see more production lines.')
+                  : t('production-start-adding', 'Start by adding your first production line.')}
               </p>
             </motion.div>
 
@@ -2736,7 +2737,7 @@ const ProductionTab: React.FC<ProductionTabProps> = ({
                   }}
                   className="mt-2 hover-scale-subtle"
                 >
-                  Clear Filters
+                  {t('production-clear-filters', 'Clear Filters')}
                 </Button>
               </motion.div>
             )}
@@ -2753,15 +2754,13 @@ const ProductionTab: React.FC<ProductionTabProps> = ({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[200px]">Line Name</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Product</TableHead>
-                    <TableHead className="text-right">Efficiency</TableHead>
-                    <TableHead className="text-right">Daily Capacity</TableHead>
-                    <TableHead className="text-right">
-                      Next Maintenance
-                    </TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead className="w-[200px]">{t('production-line-name', 'Line Name')}</TableHead>
+                    <TableHead>{t('production-status', 'Status')}</TableHead>
+                    <TableHead>{t('production-current-product', 'Product')}</TableHead>
+                    <TableHead className="text-right">{t('production-efficiency', 'Efficiency')}</TableHead>
+                    <TableHead className="text-right">{t('production-daily-capacity', 'Daily Capacity')}</TableHead>
+                    <TableHead className="text-right">{t('production-next-maintenance', 'Next Maintenance')}</TableHead>
+                    <TableHead className="text-right">{t('production-actions', 'Actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -2905,7 +2904,7 @@ const ProductionTab: React.FC<ProductionTabProps> = ({
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuLabel>{t('production-actions', 'Actions')}</DropdownMenuLabel>
                                 <DropdownMenuItem
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -2914,7 +2913,7 @@ const ProductionTab: React.FC<ProductionTabProps> = ({
                                   className="flex items-center cursor-pointer"
                                 >
                                   <Wrench className="h-4 w-4 mr-2" />
-                                  Schedule Maintenance
+                                  {t('production-schedule-maintenance', 'Schedule Maintenance')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                   onClick={(e) => {
@@ -2924,7 +2923,7 @@ const ProductionTab: React.FC<ProductionTabProps> = ({
                                   className="flex items-center cursor-pointer"
                                 >
                                   <Package className="h-4 w-4 mr-2" />
-                                  Assign Product
+                                  {t('production-assign-product', 'Assign Product')}
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -2975,6 +2974,8 @@ const LineDetailsContent: React.FC<LineDetailsContentProps> = ({
   handleStartNewBatch,
   handleCompleteBatch,
 }) => {
+  const { t } = useTranslation();
+  
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -3058,13 +3059,13 @@ const LineDetailsContent: React.FC<LineDetailsContentProps> = ({
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center">
               <Package className="h-4 w-4 mr-2 text-primary/70" />
-              Current Product
+              {t('production-current-product', 'Current Product')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="font-bold">
               {line.product === "N/A" ? (
-                <span className="text-muted-foreground">None assigned</span>
+                <span className="text-muted-foreground">{t('production-no-product-assigned', 'None assigned')}</span>
               ) : (
                 line.product
               )}
@@ -3076,7 +3077,7 @@ const LineDetailsContent: React.FC<LineDetailsContentProps> = ({
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center">
               <BarChart className="h-4 w-4 mr-2 text-primary/70" />
-              Efficiency
+              {t('production-efficiency', 'Efficiency')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -3114,13 +3115,13 @@ const LineDetailsContent: React.FC<LineDetailsContentProps> = ({
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center">
               <Calendar className="h-4 w-4 mr-2 text-primary/70" />
-              Next Maintenance
+              {t('production-next-maintenance', 'Next Maintenance')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="font-bold">{line.next_maintenance}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              Last: {line.last_maintenance}
+              {t('production-last-maintenance', 'Last')}: {line.last_maintenance}
             </p>
           </CardContent>
         </Card>
@@ -3129,7 +3130,7 @@ const LineDetailsContent: React.FC<LineDetailsContentProps> = ({
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center">
               <Factory className="h-4 w-4 mr-2 text-primary/70" />
-              Daily Capacity
+              {t('production-daily-capacity', 'Daily Capacity')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -3152,53 +3153,46 @@ const LineDetailsContent: React.FC<LineDetailsContentProps> = ({
             <CardHeader>
               <CardTitle className="text-sm font-medium flex items-center">
                 <Activity className="h-4 w-4 mr-2 text-primary/70" />
-                Current Batch
+                {t('production-current-batch', 'Current Batch')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Batch ID:</span>
+                  <span className="text-muted-foreground">{t('production-batch-id', 'Batch ID')}:</span>
                   <span className="font-medium">{line.current_batch.id}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Status:</span>
+                  <span className="text-muted-foreground">{t('production-batch-status', 'Status')}:</span>
                   <Badge
                     variant="outline"
                     className="bg-green-500/10 text-green-600"
                   >
                     {line.current_batch.status === "in_progress"
-                      ? "In Progress"
+                      ? t('production-status-in-progress', "In Progress")
                       : line.current_batch.status === "completed"
-                      ? "Completed"
+                      ? t('production-status-completed', "Completed")
                       : line.current_batch.status === "paused"
-                      ? "Paused"
-                      : "Cancelled"}
+                      ? t('production-status-paused', "Paused")
+                      : t('production-status-cancelled', "Cancelled")}
                   </Badge>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Target:</span>
+                  <span className="text-muted-foreground">{t('production-target-quantity', 'Target')}:</span>
                   <span className="font-medium">
-                    {line.current_batch.target_quantity} units
+                    {line.current_batch.target_quantity} {t('production-units', 'units')}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Produced:</span>
+                  <span className="text-muted-foreground">{t('production-produced-quantity', 'Produced')}:</span>
                   <span className="font-medium">
-                    {line.current_batch.produced_quantity} units
+                    {line.current_batch.produced_quantity} {t('production-units', 'units')}
                   </span>
                 </div>
                 <div className="space-y-1">
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Progress</span>
-                    <span className="font-medium">
-                      {Math.round(
-                        (line.current_batch.produced_quantity /
-                          line.current_batch.target_quantity) *
-                          100
-                      )}
-                      %
-                    </span>
+                    <span className="text-muted-foreground">{t('production-progress', 'Progress')}:</span>
+                    <span className="font-medium">{Math.round((line.current_batch.produced_quantity / line.current_batch.target_quantity) * 100)}%</span>
                   </div>
                   <Progress
                     value={
@@ -3212,13 +3206,11 @@ const LineDetailsContent: React.FC<LineDetailsContentProps> = ({
 
                 {line.current_batch.status === "in_progress" && (
                   <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full hover-scale-subtle"
                     onClick={() => handleCompleteBatch(line.id)}
+                    variant="default"
+                    className="mt-2"
                   >
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    Complete Batch
+                    {t('production-complete-batch', 'Complete Batch')}
                   </Button>
                 )}
               </div>
@@ -3254,6 +3246,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   onSubmit,
   isLoading,
 }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<Partial<Product>>(
     product
       ? { ...product }
@@ -3431,14 +3424,14 @@ const ProductForm: React.FC<ProductFormProps> = ({
       >
         <div className="space-y-2">
           <Label htmlFor="name" className="text-base">
-            Product Name
+            {t('production-product-name', 'Product Name')}
           </Label>
           <Input
             id="name"
             name="name"
             value={formData.name}
             onChange={handleChange}
-            placeholder="Enter product name"
+            placeholder={t('production-enter-product-name', "Enter product name")}
             className={cn(
               "enhanced-input form-field-animation",
               errors.name && "error"
@@ -3451,7 +3444,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
         <div className="space-y-2">
           <Label htmlFor="category" className="text-base">
-            Category
+            {t('production-category', 'Category')}
           </Label>
           <Select
             name="category"
@@ -3466,15 +3459,15 @@ const ProductForm: React.FC<ProductFormProps> = ({
                 errors.category && "error"
               )}
             >
-              <SelectValue placeholder="Select a category" />
+              <SelectValue placeholder={t('production-select-category', "Select a category")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Food">Food</SelectItem>
-              <SelectItem value="Beverage">Beverage</SelectItem>
-              <SelectItem value="Health">Health</SelectItem>
-              <SelectItem value="Packaging">Packaging</SelectItem>
-              <SelectItem value="Ingredients">Ingredients</SelectItem>
-              <SelectItem value="Other">Other</SelectItem>
+              <SelectItem value="Food">{t('production-food', "Food")}</SelectItem>
+              <SelectItem value="Beverage">{t('production-beverage', "Beverage")}</SelectItem>
+              <SelectItem value="Health">{t('production-health', "Health")}</SelectItem>
+              <SelectItem value="Packaging">{t('production-packaging', "Packaging")}</SelectItem>
+              <SelectItem value="Ingredients">{t('production-ingredients', "Ingredients")}</SelectItem>
+              <SelectItem value="Other">{t('production-other', "Other")}</SelectItem>
             </SelectContent>
           </Select>
           {errors.category && (
@@ -3491,7 +3484,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
       >
         <div className="space-y-2">
           <Label htmlFor="minOrderQuantity" className="text-base">
-            Minimum Order Quantity
+            {t('production-minimum-order', 'Minimum Order Quantity')}
           </Label>
           <Input
             id="minOrderQuantity"
@@ -3513,7 +3506,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
         <div className="space-y-2">
           <Label htmlFor="dailyCapacity" className="text-base">
-            Daily Capacity
+            {t('production-daily-capacity', 'Daily Capacity')}
           </Label>
           <Input
             id="dailyCapacity"
@@ -3533,7 +3526,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
         <div className="space-y-2">
           <Label htmlFor="unitType" className="text-base">
-            Unit Type
+            {t('production-unit-type', 'Unit Type')}
           </Label>
           <Select
             name="unitType"
@@ -3548,17 +3541,17 @@ const ProductForm: React.FC<ProductFormProps> = ({
                 errors.unitType && "error"
               )}
             >
-              <SelectValue placeholder="Select unit type" />
+              <SelectValue placeholder={t('production-select-unit-type', 'Select unit type')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="units">Units</SelectItem>
-              <SelectItem value="boxes">Boxes</SelectItem>
-              <SelectItem value="bottles">Bottles</SelectItem>
-              <SelectItem value="kg">Kilograms</SelectItem>
-              <SelectItem value="liters">Liters</SelectItem>
-              <SelectItem value="sachets">Sachets</SelectItem>
-              <SelectItem value="pairs">Pairs</SelectItem>
-              <SelectItem value="cases">Cases</SelectItem>
+              <SelectItem value="units">{t('production-units', 'units')}</SelectItem>
+              <SelectItem value="boxes">{t('production-boxes', 'Boxes')}</SelectItem>
+              <SelectItem value="bottles">{t('production-bottles', 'Bottles')}</SelectItem>
+              <SelectItem value="kg">{t('production-kilograms', 'Kilograms')}</SelectItem>
+              <SelectItem value="liters">{t('production-liters', 'Liters')}</SelectItem>
+              <SelectItem value="sachets">{t('production-sachets', 'Sachets')}</SelectItem>
+              <SelectItem value="pairs">{t('production-pairs', 'Pairs')}</SelectItem>
+              <SelectItem value="cases">{t('production-cases', 'Cases')}</SelectItem>
             </SelectContent>
           </Select>
           {errors.unitType && (
@@ -3575,7 +3568,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
       >
         <div className="space-y-2">
           <Label htmlFor="currentAvailable" className="text-base">
-            Current Available
+            {t('production-current-available', 'Current Available')}
           </Label>
           <Input
             id="currentAvailable"
@@ -3589,7 +3582,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
         <div className="space-y-2">
           <Label htmlFor="pricePerUnit" className="text-base">
-            Price Per Unit ($)
+            {t('production-price-per-unit', 'Price Per Unit ($)')}
           </Label>
           <Input
             id="pricePerUnit"
@@ -3610,7 +3603,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
         <div className="space-y-2">
           <Label htmlFor="productType" className="text-base">
-            Product Type
+            {t('production-product-type', 'Product Type')}
           </Label>
           <Select
             name="productType"
@@ -3620,19 +3613,15 @@ const ProductForm: React.FC<ProductFormProps> = ({
             }
           >
             <SelectTrigger className="enhanced-input form-field-animation">
-              <SelectValue placeholder="Select product type" />
+              <SelectValue placeholder={t('production-select-product-type', 'Select product type')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Finished Good">Finished Good</SelectItem>
-              <SelectItem value="Raw Material">Raw Material</SelectItem>
-              <SelectItem value="Component">Component</SelectItem>
-              <SelectItem value="Packaging Material">
-                Packaging Material
-              </SelectItem>
-              <SelectItem value="Semi-finished Good">
-                Semi-finished Good
-              </SelectItem>
-              <SelectItem value="Bulk Product">Bulk Product</SelectItem>
+              <SelectItem value="Finished Good">{t('production-finished-good', 'Finished Good')}</SelectItem>
+              <SelectItem value="Raw Material">{t('production-raw-material', 'Raw Material')}</SelectItem>
+              <SelectItem value="Component">{t('production-component', 'Component')}</SelectItem>
+              <SelectItem value="Packaging Material">{t('production-packaging-material', 'Packaging Material')}</SelectItem>
+              <SelectItem value="Semi-finished Good">{t('production-semi-finished', 'Semi-finished Good')}</SelectItem>
+              <SelectItem value="Bulk Product">{t('production-bulk-product', 'Bulk Product')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -3840,6 +3829,7 @@ const AddProductionLineForm: React.FC<AddProductionLineFormProps> = ({
   onSubmit,
   isLoading,
 }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<
     Omit<
       ProductionLine,
@@ -3939,14 +3929,14 @@ const AddProductionLineForm: React.FC<AddProductionLineFormProps> = ({
             className="text-sm font-medium flex items-center"
           >
             <Tag className="h-4 w-4 mr-2 text-muted-foreground" />
-            Production Line Name*
+            {t('production-line-name', 'Production Line Name*')}
           </Label>
           <Input
             id="name"
             name="name"
             value={formData.name}
             onChange={handleChange}
-            placeholder="e.g., Assembly Line 1"
+            placeholder={t('production-line-name-example', "e.g., Assembly Line 1")}
             className={`w-full ${errors.name ? "border-red-500" : ""}`}
           />
           {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
@@ -3958,7 +3948,7 @@ const AddProductionLineForm: React.FC<AddProductionLineFormProps> = ({
             className="text-sm font-medium flex items-center"
           >
             <Factory className="h-4 w-4 mr-2 text-muted-foreground" />
-            Line Type*
+            {t('production-line-type', 'Line Type')}*
           </Label>
           <Select
             name="line_type"
@@ -3977,18 +3967,18 @@ const AddProductionLineForm: React.FC<AddProductionLineFormProps> = ({
             }}
           >
             <SelectTrigger className={errors.line_type ? "border-red-500" : ""}>
-              <SelectValue placeholder="Select line type" />
+              <SelectValue placeholder={t('production-select-line-type', 'Select line type')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Assembly">Assembly</SelectItem>
-              <SelectItem value="Packaging">Packaging</SelectItem>
-              <SelectItem value="Filling">Filling</SelectItem>
-              <SelectItem value="Processing">Processing</SelectItem>
+              <SelectItem value="Assembly">{t('production-line-type-assembly', 'Assembly')}</SelectItem>
+              <SelectItem value="Packaging">{t('production-line-type-packaging', 'Packaging')}</SelectItem>
+              <SelectItem value="Filling">{t('production-line-type-filling', 'Filling')}</SelectItem>
+              <SelectItem value="Processing">{t('production-line-type-processing', 'Processing')}</SelectItem>
               <SelectItem value="Assembly & Packaging">
-                Assembly & Packaging
+                {t('production-line-type-assembly-packaging', 'Assembly & Packaging')}
               </SelectItem>
               <SelectItem value="Processing & Filling">
-                Processing & Filling
+                {t('production-line-type-processing-filling', 'Processing & Filling')}
               </SelectItem>
             </SelectContent>
           </Select>
@@ -4003,7 +3993,7 @@ const AddProductionLineForm: React.FC<AddProductionLineFormProps> = ({
             className="text-sm font-medium flex items-center"
           >
             <Activity className="h-4 w-4 mr-2 text-muted-foreground" />
-            Initial Status
+            {t('production-initial-status', 'Initial Status')}
           </Label>
           <Select
             name="status"
@@ -4021,14 +4011,14 @@ const AddProductionLineForm: React.FC<AddProductionLineFormProps> = ({
             }}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select status" />
+              <SelectValue placeholder={t('production-select-status', 'Select status')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Active">Active</SelectItem>
-              <SelectItem value="Idle">Idle</SelectItem>
-              <SelectItem value="Setup">Setup</SelectItem>
-              <SelectItem value="Maintenance">Maintenance</SelectItem>
-              <SelectItem value="Offline">Offline</SelectItem>
+              <SelectItem value="Active">{t('production-status-active', 'Active')}</SelectItem>
+              <SelectItem value="Idle">{t('production-status-idle', 'Idle')}</SelectItem>
+              <SelectItem value="Setup">{t('production-status-setup', 'Setup')}</SelectItem>
+              <SelectItem value="Maintenance">{t('production-status-maintenance', 'Maintenance')}</SelectItem>
+              <SelectItem value="Offline">{t('production-status-offline', 'Offline')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -4039,14 +4029,14 @@ const AddProductionLineForm: React.FC<AddProductionLineFormProps> = ({
             className="text-sm font-medium flex items-center"
           >
             <User className="h-4 w-4 mr-2 text-muted-foreground" />
-            Operator Assigned*
+            {t('production-operator-assigned', 'Operator Assigned')}*
           </Label>
           <Input
             id="operator_assigned"
             name="operator_assigned"
             value={formData.operator_assigned}
             onChange={handleChange}
-            placeholder="e.g., John Smith"
+            placeholder={t('production-operator-assigned-example', "e.g., John Smith")}
             className={`w-full ${
               errors.operator_assigned ? "border-red-500" : ""
             }`}
@@ -4062,7 +4052,7 @@ const AddProductionLineForm: React.FC<AddProductionLineFormProps> = ({
             className="text-sm font-medium flex items-center"
           >
             <BarChart className="h-4 w-4 mr-2 text-muted-foreground" />
-            Target Efficiency (%)
+            {t('production-target-efficiency', 'Target Efficiency (%)')}
           </Label>
           <Input
             id="efficiency"
@@ -4083,7 +4073,7 @@ const AddProductionLineForm: React.FC<AddProductionLineFormProps> = ({
             className="text-sm font-medium flex items-center"
           >
             <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
-            Next Maintenance Date*
+            {t('production-next-maintenance-date', 'Next Maintenance Date')}*
           </Label>
           <Input
             id="next_maintenance"
@@ -4106,7 +4096,7 @@ const AddProductionLineForm: React.FC<AddProductionLineFormProps> = ({
             className="text-sm font-medium flex items-center"
           >
             <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
-            Operational Since
+            {t('production-operational-since', 'Operational Since')}
           </Label>
           <Input
             id="operational_since"
@@ -4124,7 +4114,7 @@ const AddProductionLineForm: React.FC<AddProductionLineFormProps> = ({
             className="text-sm font-medium flex items-center"
           >
             <Zap className="h-4 w-4 mr-2 text-muted-foreground" />
-            Energy Consumption (kWh)
+            {t('production-energy-consumption', 'Energy Consumption (kWh)')}
           </Label>
           <Input
             id="energy_consumption"
@@ -4148,12 +4138,12 @@ const AddProductionLineForm: React.FC<AddProductionLineFormProps> = ({
           {isLoading ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Adding Line...
+              {t('production-adding-line', 'Adding Line...')}
             </>
           ) : (
             <>
               <PlusCircle className="h-4 w-4 mr-2" />
-              Add Production Line
+              {t('production-add-production-line', 'Add Production Line')}
             </>
           )}
         </Button>
@@ -4164,7 +4154,7 @@ const AddProductionLineForm: React.FC<AddProductionLineFormProps> = ({
 
 // ScheduleMaintenanceForm Component
 interface ScheduleMaintenanceFormProps {
-  productionLine: ProductionLine;
+  line: ProductionLine;
   onSubmit: (maintenanceData: {
     date: string;
     type: "Routine" | "Emergency" | "Upgrade";
@@ -4173,14 +4163,18 @@ interface ScheduleMaintenanceFormProps {
     notes: string;
     startNow: boolean;
   }) => void;
+  onCancel: () => void;
   isLoading: boolean;
 }
 
 const ScheduleMaintenanceForm: React.FC<ScheduleMaintenanceFormProps> = ({
-  productionLine,
+  line,
   onSubmit,
+  onCancel,
   isLoading,
 }) => {
+  const { t } = useTranslation();
+  
   const [formData, setFormData] = useState({
     date: new Date(new Date().setDate(new Date().getDate() + 7))
       .toISOString()
@@ -4256,7 +4250,7 @@ const ScheduleMaintenanceForm: React.FC<ScheduleMaintenanceFormProps> = ({
       <div className="space-y-2">
         <Label htmlFor="date" className="text-sm font-medium flex items-center">
           <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
-          Maintenance Date*
+          {t('production-maintenance-date', 'Maintenance Date*')}
         </Label>
         <Input
           id="date"
@@ -4272,7 +4266,7 @@ const ScheduleMaintenanceForm: React.FC<ScheduleMaintenanceFormProps> = ({
       <div className="space-y-2">
         <Label htmlFor="type" className="text-sm font-medium flex items-center">
           <Wrench className="h-4 w-4 mr-2 text-muted-foreground" />
-          Maintenance Type
+          {t('production-maintenance-type', 'Maintenance Type')}
         </Label>
         <Select
           name="type"
@@ -4285,12 +4279,12 @@ const ScheduleMaintenanceForm: React.FC<ScheduleMaintenanceFormProps> = ({
           }}
         >
           <SelectTrigger>
-            <SelectValue placeholder="Select type" />
+            <SelectValue placeholder={t('production-select-maintenance-type', 'Select type')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="Routine">Routine</SelectItem>
-            <SelectItem value="Emergency">Emergency</SelectItem>
-            <SelectItem value="Upgrade">Upgrade</SelectItem>
+            <SelectItem value="Routine">{t('production-maintenance-routine', 'Routine')}</SelectItem>
+            <SelectItem value="Emergency">{t('production-maintenance-emergency', 'Emergency')}</SelectItem>
+            <SelectItem value="Upgrade">{t('production-maintenance-upgrade', 'Upgrade')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -4301,14 +4295,14 @@ const ScheduleMaintenanceForm: React.FC<ScheduleMaintenanceFormProps> = ({
           className="text-sm font-medium flex items-center"
         >
           <User className="h-4 w-4 mr-2 text-muted-foreground" />
-          Assigned Technician*
+          {t('production-assigned-technician', 'Assigned Technician')}*
         </Label>
         <Input
           id="technician"
           name="technician"
           value={formData.technician}
           onChange={handleChange}
-          placeholder="Enter technician name"
+          placeholder={t('production-enter-technician', 'Enter technician name')}
           className={`w-full ${errors.technician ? "border-red-500" : ""}`}
         />
         {errors.technician && (
@@ -4322,14 +4316,14 @@ const ScheduleMaintenanceForm: React.FC<ScheduleMaintenanceFormProps> = ({
           className="text-sm font-medium flex items-center"
         >
           <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
-          Expected Duration*
+          {t('production-expected-duration', 'Expected Duration')}*
         </Label>
         <Input
           id="duration"
           name="duration"
           value={formData.duration}
           onChange={handleChange}
-          placeholder="e.g., 2 hours"
+          placeholder={t('production-duration-example', 'e.g., 2 hours')}
           className={`w-full ${errors.duration ? "border-red-500" : ""}`}
         />
         {errors.duration && (
@@ -4368,7 +4362,7 @@ const ScheduleMaintenanceForm: React.FC<ScheduleMaintenanceFormProps> = ({
           }}
         />
         <Label htmlFor="startNow" className="text-sm cursor-pointer">
-          Put line in maintenance mode immediately
+          {t('production-start-maintenance-now', 'Put line in maintenance mode immediately')}
         </Label>
       </div>
 

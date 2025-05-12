@@ -29,6 +29,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Separator } from "@/components/ui/separator";
+import { useTranslation } from "react-i18next";
 
 // Simplified animation variants for better performance
 const fadeInVariant = {
@@ -40,6 +41,7 @@ const fadeInVariant = {
 };
 
 const ManufacturerProfile = () => {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("overview");
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -50,16 +52,19 @@ const ManufacturerProfile = () => {
     setIsRefreshing(true);
     setTimeout(() => {
       setIsRefreshing(false);
-      toast({ title: "Data refreshed" });
+      toast({ title: t("manufacturer-profile-data-refreshed", "Data refreshed") });
     }, 800);
   };
 
   const handleShareProfile = () => {
-    toast({ title: "Profile shared", description: "Link copied to clipboard" });
+    toast({ 
+      title: t("manufacturer-profile-shared", "Profile shared"), 
+      description: t("manufacturer-profile-link-copied", "Link copied to clipboard") 
+    });
   };
 
   const handleExportProfile = () => {
-    toast({ title: "Export initiated" });
+    toast({ title: t("manufacturer-profile-export-initiated", "Export initiated") });
   };
 
   return (
@@ -74,15 +79,15 @@ const ManufacturerProfile = () => {
         <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between relative z-10">
           <div className="flex gap-4 items-center">
             <Avatar className="w-16 h-16 border-2 border-primary/20">
-              <AvatarImage src="/placeholders/manufacturer-logo.svg" alt="Alpha Manufacturing" />
+              <AvatarImage src="/placeholders/manufacturer-logo.svg" alt={t("manufacturer-profile-alt-logo", "Alpha Manufacturing")} />
               <AvatarFallback className="bg-primary/10 text-primary text-lg font-bold">AM</AvatarFallback>
             </Avatar>
             
             <div>
-              <h1 className="text-2xl font-bold">Alpha Manufacturing Inc.</h1>
+              <h1 className="text-2xl font-bold">{t("manufacturer-profile-company-name", "Alpha Manufacturing Inc.")}</h1>
               <p className="text-muted-foreground flex items-center mt-1">
                 <Factory className="w-4 h-4 mr-1" />
-                Premium Manufacturing Partner
+                {t("manufacturer-profile-partner-status", "Premium Manufacturing Partner")}
               </p>
             </div>
           </div>
@@ -93,10 +98,10 @@ const ManufacturerProfile = () => {
                 <TooltipTrigger asChild>
                   <Button variant="outline" size="sm" onClick={handleShareProfile}>
                     <Share2 className="w-4 h-4 mr-2" />
-                    Share
+                    {t("manufacturer-profile-share", "Share")}
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Share your profile with partners</TooltipContent>
+                <TooltipContent>{t("manufacturer-profile-share-tooltip", "Share your profile with partners")}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
             
@@ -105,10 +110,10 @@ const ManufacturerProfile = () => {
                 <TooltipTrigger asChild>
                   <Button variant="outline" size="sm" onClick={handleExportProfile}>
                     <FileDown className="w-4 h-4 mr-2" />
-                    Export
+                    {t("manufacturer-profile-export", "Export")}
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Export profile as PDF</TooltipContent>
+                <TooltipContent>{t("manufacturer-profile-export-tooltip", "Export profile as PDF")}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
             
@@ -118,7 +123,7 @@ const ManufacturerProfile = () => {
               ) : (
                 <RefreshCw className="w-4 h-4 mr-2" />
               )}
-              Refresh
+              {t("manufacturer-profile-refresh", "Refresh")}
             </Button>
             
             {/* <Button size="sm">
@@ -132,12 +137,12 @@ const ManufacturerProfile = () => {
           <div className="col-span-2">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium">Profile Completion</h3>
+                <h3 className="text-sm font-medium">{t("manufacturer-profile-completion", "Profile Completion")}</h3>
                 <span className="text-sm font-medium">{profileCompletion}%</span>
               </div>
               <Progress value={profileCompletion} className="h-2" />
               <p className="text-xs text-muted-foreground">
-                Complete your profile to increase visibility to potential partners
+                {t("manufacturer-profile-completion-help", "Complete your profile to increase visibility to potential partners")}
               </p>
             </div>
             
@@ -145,7 +150,7 @@ const ManufacturerProfile = () => {
               <div className="flex items-center gap-2">
                 <Package className="w-5 h-5 text-primary" />
                 <div>
-                  <div className="text-sm font-medium">Products</div>
+                  <div className="text-sm font-medium">{t("manufacturer-profile-products", "Products")}</div>
                   <div className="text-xl font-bold">28</div>
                 </div>
               </div>
@@ -153,7 +158,7 @@ const ManufacturerProfile = () => {
               <div className="flex items-center gap-2">
                 <Users className="w-5 h-5 text-primary" />
                 <div>
-                  <div className="text-sm font-medium">Team Size</div>
+                  <div className="text-sm font-medium">{t("manufacturer-profile-team-size", "Team Size")}</div>
                   <div className="text-xl font-bold">120</div>
                 </div>
               </div>
@@ -161,7 +166,7 @@ const ManufacturerProfile = () => {
               <div className="flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-primary" />
                 <div>
-                  <div className="text-sm font-medium">Years Active</div>
+                  <div className="text-sm font-medium">{t("manufacturer-profile-years-active", "Years Active")}</div>
                   <div className="text-xl font-bold">15</div>
                 </div>
               </div>
@@ -199,32 +204,30 @@ const ManufacturerProfile = () => {
         variants={fadeInVariant}
         className="bg-background rounded-xl border p-6"
       >
-        <h2 className="text-lg font-semibold mb-2">About Alpha Manufacturing</h2>
+        <h2 className="text-lg font-semibold mb-2">{t("manufacturer-profile-about", "About Alpha Manufacturing")}</h2>
         <p className="text-sm text-muted-foreground">
-          Alpha Manufacturing Inc. is a premium manufacturing partner specializing in consumer packaged goods 
-          production with over 15 years of industry experience. Our state-of-the-art facilities and 
-          quality-focused processes ensure consistent delivery of high-quality products.
+          {t("manufacturer-profile-description", "Alpha Manufacturing Inc. is a premium manufacturing partner specializing in consumer packaged goods production with over 15 years of industry experience. Our state-of-the-art facilities and quality-focused processes ensure consistent delivery of high-quality products.")}
         </p>
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
           <div className="p-3 bg-muted/20 rounded-lg">
-            <h4 className="text-xs font-medium uppercase text-muted-foreground mb-1">Industry</h4>
-            <p className="text-sm font-medium">Food & Beverage</p>
+            <h4 className="text-xs font-medium uppercase text-muted-foreground mb-1">{t("manufacturer-profile-industry", "Industry")}</h4>
+            <p className="text-sm font-medium">{t("manufacturer-profile-industry-value", "Food & Beverage")}</p>
           </div>
           
           <div className="p-3 bg-muted/20 rounded-lg">
-            <h4 className="text-xs font-medium uppercase text-muted-foreground mb-1">Founded</h4>
+            <h4 className="text-xs font-medium uppercase text-muted-foreground mb-1">{t("manufacturer-profile-founded", "Founded")}</h4>
             <p className="text-sm font-medium">2008</p>
           </div>
           
           <div className="p-3 bg-muted/20 rounded-lg">
-            <h4 className="text-xs font-medium uppercase text-muted-foreground mb-1">Company Size</h4>
-            <p className="text-sm font-medium">101-250 employees</p>
+            <h4 className="text-xs font-medium uppercase text-muted-foreground mb-1">{t("manufacturer-profile-company-size", "Company Size")}</h4>
+            <p className="text-sm font-medium">{t("manufacturer-profile-employees", "101-250 employees")}</p>
           </div>
           
           <div className="p-3 bg-muted/20 rounded-lg">
-            <h4 className="text-xs font-medium uppercase text-muted-foreground mb-1">Specialization</h4>
-            <p className="text-sm font-medium">Organic Food Processing</p>
+            <h4 className="text-xs font-medium uppercase text-muted-foreground mb-1">{t("manufacturer-profile-specialization", "Specialization")}</h4>
+            <p className="text-sm font-medium">{t("manufacturer-profile-specialization-value", "Organic Food Processing")}</p>
           </div>
         </div>
       </motion.div>
@@ -241,19 +244,19 @@ const ManufacturerProfile = () => {
               value="overview"
               className="data-[state=active]:border-primary data-[state=active]:shadow-none data-[state=active]:bg-transparent border-b-2 border-transparent rounded-none px-4 py-2"
             >
-              Overview
+              {t("manufacturer-profile-tab-overview", "Overview")}
             </TabsTrigger>
             <TabsTrigger 
               value="capabilities"
               className="data-[state=active]:border-primary data-[state=active]:shadow-none data-[state=active]:bg-transparent border-b-2 border-transparent rounded-none px-4 py-2"
             >
-              Capabilities
+              {t("manufacturer-profile-tab-capabilities", "Capabilities")}
             </TabsTrigger>
             <TabsTrigger 
               value="certifications"
               className="data-[state=active]:border-primary data-[state=active]:shadow-none data-[state=active]:bg-transparent border-b-2 border-transparent rounded-none px-4 py-2"
             >
-              Certifications
+              {t("manufacturer-profile-tab-certifications", "Certifications")}
             </TabsTrigger>
           </TabsList>
           
@@ -274,32 +277,32 @@ const ManufacturerProfile = () => {
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-base font-medium flex items-center">
                           <BarChart className="w-4 h-4 mr-2 text-primary" />
-                          Production Capacity
+                          {t("manufacturer-profile-production-capacity", "Production Capacity")}
                         </CardTitle>
                         <Badge variant="outline" className="bg-primary/5 text-primary">
-                          {100 - capacityUtilization}% Available
+                          {100 - capacityUtilization}% {t("manufacturer-profile-available", "Available")}
                         </Badge>
                       </div>
                     </CardHeader>
                     <CardContent className="pt-2">
                       <div className="space-y-4">
                         <div className="flex items-center justify-between text-sm">
-                          <span>Current Utilization</span>
+                          <span>{t("manufacturer-profile-current-utilization", "Current Utilization")}</span>
                           <span className="font-medium">{capacityUtilization}%</span>
                         </div>
                         <Progress value={capacityUtilization} className="h-2" />
                         <div className="grid grid-cols-3 gap-3 pt-2">
                           <div className="p-2 bg-muted/20 rounded-lg text-center">
                             <div className="text-lg font-semibold text-primary">25K</div>
-                            <div className="text-xs text-muted-foreground">Units/Day</div>
+                            <div className="text-xs text-muted-foreground">{t("manufacturer-profile-units-day", "Units/Day")}</div>
                           </div>
                           <div className="p-2 bg-muted/20 rounded-lg text-center">
                             <div className="text-lg font-semibold text-primary">5</div>
-                            <div className="text-xs text-muted-foreground">Production Lines</div>
+                            <div className="text-xs text-muted-foreground">{t("manufacturer-profile-production-lines", "Production Lines")}</div>
                           </div>
                           <div className="p-2 bg-muted/20 rounded-lg text-center">
                             <div className="text-lg font-semibold text-green-500">98%</div>
-                            <div className="text-xs text-muted-foreground">Efficiency</div>
+                            <div className="text-xs text-muted-foreground">{t("manufacturer-profile-efficiency", "Efficiency")}</div>
                           </div>
                         </div>
                       </div>
@@ -311,27 +314,27 @@ const ManufacturerProfile = () => {
                     <CardHeader className="pb-2">
                       <CardTitle className="text-base font-medium flex items-center">
                         <CheckCircle2 className="w-4 h-4 mr-2 text-primary" />
-                        Key Certifications
+                        {t("manufacturer-profile-key-certifications", "Key Certifications")}
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-2">
                       <div className="space-y-3">
                         {[
-                          { name: "ISO 9001:2015", expires: "Dec 15, 2024", status: "Valid" },
-                          { name: "Food Safety Certification", expires: "Nov 30, 2023", status: "Valid" },
-                          { name: "Organic Certification", expires: "Oct 15, 2023", status: "Expiring Soon" }
+                          { name: "ISO 9001:2015", expires: "Dec 15, 2024", status: t("manufacturer-profile-status-valid", "Valid") },
+                          { name: t("manufacturer-profile-food-safety", "Food Safety Certification"), expires: "Nov 30, 2023", status: t("manufacturer-profile-status-valid", "Valid") },
+                          { name: t("manufacturer-profile-organic-cert", "Organic Certification"), expires: "Oct 15, 2023", status: t("manufacturer-profile-status-expiring", "Expiring Soon") }
                         ].map((cert, index) => (
                           <div 
                             key={index}
                             className={`flex items-center justify-between p-3 rounded-lg ${
-                              cert.status === "Valid" ? "bg-green-500/5" : "bg-yellow-500/5"
+                              cert.status === t("manufacturer-profile-status-valid", "Valid") ? "bg-green-500/5" : "bg-yellow-500/5"
                             }`}
                           >
                             <div className="flex items-center">
                               <Badge 
                                 variant="outline" 
                                 className={`mr-3 ${
-                                  cert.status === "Valid" 
+                                  cert.status === t("manufacturer-profile-status-valid", "Valid")
                                     ? "bg-green-500/10 text-green-500" 
                                     : "bg-yellow-500/10 text-yellow-500"
                                 }`}
@@ -343,7 +346,7 @@ const ManufacturerProfile = () => {
                               </div>
                             </div>
                             <div className="text-xs text-muted-foreground">
-                              Expires: {cert.expires}
+                              {t("manufacturer-profile-expires", "Expires")}: {cert.expires}
                             </div>
                           </div>
                         ))}
@@ -356,15 +359,15 @@ const ManufacturerProfile = () => {
                     <CardHeader className="pb-2">
                       <CardTitle className="text-base font-medium flex items-center">
                         <Factory className="w-4 h-4 mr-2 text-primary" />
-                        Production Equipment
+                        {t("manufacturer-profile-production-equipment", "Production Equipment")}
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-2">
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                         {[
-                          { name: "Processing Line A", capacity: "10,000 units/day", status: "Active" },
-                          { name: "Packaging Line B", capacity: "5,000 units/day", status: "Active" },
-                          { name: "Quality Control Lab", capacity: "15,000 tests/day", status: "Active" },
+                          { name: t("manufacturer-profile-processing-line-a", "Processing Line A"), capacity: "10,000 units/day", status: t("manufacturer-profile-status-active", "Active") },
+                          { name: t("manufacturer-profile-packaging-line-b", "Packaging Line B"), capacity: "5,000 units/day", status: t("manufacturer-profile-status-active", "Active") },
+                          { name: t("manufacturer-profile-quality-control-lab", "Quality Control Lab"), capacity: "15,000 tests/day", status: t("manufacturer-profile-status-active", "Active") },
                         ].map((item, index) => (
                           <div 
                             key={index}
@@ -401,14 +404,20 @@ const ManufacturerProfile = () => {
                   <div className="bg-background rounded-lg border p-6">
                     <h3 className="text-base font-medium mb-4 flex items-center">
                       <Settings className="w-4 h-4 mr-2 text-primary" />
-                      Manufacturing Capabilities
+                      {t("manufacturer-profile-manufacturing-capabilities", "Manufacturing Capabilities")}
                     </h3>
                     
                     <div className="space-y-6">
                       <div>
-                        <h4 className="text-sm font-medium mb-3">Production Types</h4>
+                        <h4 className="text-sm font-medium mb-3">{t("manufacturer-profile-production-types", "Production Types")}</h4>
                         <div className="flex flex-wrap gap-2 mb-2">
-                          {["Food Processing", "Bottling", "Packaging", "Quality Control", "Cold Storage"].map(type => (
+                          {[
+                            t("manufacturer-profile-food-processing", "Food Processing"), 
+                            t("manufacturer-profile-bottling", "Bottling"), 
+                            t("manufacturer-profile-packaging", "Packaging"), 
+                            t("manufacturer-profile-quality-control", "Quality Control"), 
+                            t("manufacturer-profile-cold-storage", "Cold Storage")
+                          ].map(type => (
                             <Badge 
                               key={type}
                               variant="secondary" 
@@ -423,13 +432,13 @@ const ManufacturerProfile = () => {
                       <Separator />
                       
                       <div>
-                        <h4 className="text-sm font-medium mb-3">Production Metrics</h4>
+                        <h4 className="text-sm font-medium mb-3">{t("manufacturer-profile-production-metrics", "Production Metrics")}</h4>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                           {[
-                            { value: "25K", label: "Units/Day" },
-                            { value: "5", label: "Production Lines" },
-                            { value: "15K", label: "Sq. Ft. Facility" },
-                            { value: "98%", label: "Quality Rate" }
+                            { value: "25K", label: t("manufacturer-profile-units-day", "Units/Day") },
+                            { value: "5", label: t("manufacturer-profile-production-lines", "Production Lines") },
+                            { value: "15K", label: t("manufacturer-profile-sq-ft-facility", "Sq. Ft. Facility") },
+                            { value: "98%", label: t("manufacturer-profile-quality-rate", "Quality Rate") }
                           ].map((metric, index) => (
                             <div 
                               key={index}
@@ -445,25 +454,25 @@ const ManufacturerProfile = () => {
                       <Separator />
                       
                       <div>
-                        <h4 className="text-sm font-medium mb-3">Production Facilities</h4>
+                        <h4 className="text-sm font-medium mb-3">{t("manufacturer-profile-production-facilities", "Production Facilities")}</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="p-4 border rounded-lg">
-                            <h5 className="font-medium mb-2">Boston Manufacturing Center</h5>
+                            <h5 className="font-medium mb-2">{t("manufacturer-profile-boston-manufacturing", "Boston Manufacturing Center")}</h5>
                             <div className="text-sm text-muted-foreground space-y-1">
-                              <p>• 15,000 sq. ft. main facility</p>
-                              <p>• 5 dedicated production lines</p>
-                              <p>• Quality control laboratory</p>
-                              <p>• Cold storage capacity: 5,000 units</p>
+                              <p>{t("manufacturer-profile-main-facility", "• 15,000 sq. ft. main facility")}</p>
+                              <p>{t("manufacturer-profile-dedicated-lines", "• 5 dedicated production lines")}</p>
+                              <p>{t("manufacturer-profile-quality-lab", "• Quality control laboratory")}</p>
+                              <p>{t("manufacturer-profile-cold-storage-capacity", "• Cold storage capacity: 5,000 units")}</p>
                             </div>
                           </div>
                           
                           <div className="p-4 border rounded-lg">
-                            <h5 className="font-medium mb-2">Quality & Processing</h5>
+                            <h5 className="font-medium mb-2">{t("manufacturer-profile-quality-processing", "Quality & Processing")}</h5>
                             <div className="text-sm text-muted-foreground space-y-1">
-                              <p>• FDA-compliant processing systems</p>
-                              <p>• Automated quality inspection</p>
-                              <p>• Organic certified production lines</p>
-                              <p>• Advanced packaging solutions</p>
+                              <p>{t("manufacturer-profile-fda-compliant", "• FDA-compliant processing systems")}</p>
+                              <p>{t("manufacturer-profile-automated-inspection", "• Automated quality inspection")}</p>
+                              <p>{t("manufacturer-profile-organic-lines", "• Organic certified production lines")}</p>
+                              <p>{t("manufacturer-profile-packaging-solutions", "• Advanced packaging solutions")}</p>
                             </div>
                           </div>
                         </div>
@@ -489,46 +498,46 @@ const ManufacturerProfile = () => {
                   <div className="bg-background rounded-lg border p-6">
                     <h3 className="text-base font-medium mb-4 flex items-center">
                       <ShieldCheck className="w-4 h-4 mr-2 text-primary" />
-                      Certifications & Compliance
+                      {t("manufacturer-profile-certifications-compliance", "Certifications & Compliance")}
                     </h3>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                       {[
                         { 
                           title: "ISO 9001:2015", 
-                          description: "International quality management system standard", 
+                          description: t("manufacturer-profile-iso-description", "International quality management system standard"), 
                           expires: "Dec 15, 2024",
-                          status: "Valid"
+                          status: t("manufacturer-profile-status-valid", "Valid")
                         },
                         { 
-                          title: "Food Safety Certification", 
-                          description: "Compliance with food safety management standards", 
+                          title: t("manufacturer-profile-food-safety", "Food Safety Certification"), 
+                          description: t("manufacturer-profile-food-safety-description", "Compliance with food safety management standards"), 
                           expires: "Nov 30, 2023",
-                          status: "Valid"
+                          status: t("manufacturer-profile-status-valid", "Valid")
                         },
                         { 
-                          title: "Organic Certification", 
-                          description: "Certified for organic food processing and handling", 
+                          title: t("manufacturer-profile-organic-cert", "Organic Certification"), 
+                          description: t("manufacturer-profile-organic-description", "Certified for organic food processing and handling"), 
                           expires: "Oct 15, 2023",
-                          status: "Expiring Soon"
+                          status: t("manufacturer-profile-status-expiring", "Expiring Soon")
                         },
                         { 
-                          title: "FDA Compliance", 
-                          description: "Compliant with FDA regulations for food manufacturing", 
+                          title: t("manufacturer-profile-fda-compliance", "FDA Compliance"), 
+                          description: t("manufacturer-profile-fda-description", "Compliant with FDA regulations for food manufacturing"), 
                           expires: "Aug 15, 2024",
-                          status: "Valid"
+                          status: t("manufacturer-profile-status-valid", "Valid")
                         },
                       ].map((item, index) => (
                         <div
                           key={index}
                           className={`p-4 rounded-lg border ${
-                            item.status === "Valid" ? "bg-green-500/5" : "bg-yellow-500/5"
+                            item.status === t("manufacturer-profile-status-valid", "Valid") ? "bg-green-500/5" : "bg-yellow-500/5"
                           }`}
                         >
                           <div className="flex items-center justify-between mb-2">
                             <h4 className="font-medium">{item.title}</h4>
                             <Badge variant="outline" className={
-                              item.status === "Valid" 
+                              item.status === t("manufacturer-profile-status-valid", "Valid")
                                 ? "bg-green-500/10 text-green-500" 
                                 : "bg-yellow-500/10 text-yellow-500"
                             }>
@@ -538,11 +547,11 @@ const ManufacturerProfile = () => {
                           <p className="text-sm text-muted-foreground mb-2">{item.description}</p>
                           <div className="flex items-center justify-between">
                             <div className="text-xs text-muted-foreground">
-                              Expires: {item.expires}
+                              {t("manufacturer-profile-expires", "Expires")}: {item.expires}
                             </div>
                             <Button size="sm" variant="ghost" className="h-8">
                               <Download className="w-3.5 h-3.5 mr-1" />
-                              Certificate
+                              {t("manufacturer-profile-certificate", "Certificate")}
                             </Button>
                           </div>
                         </div>
@@ -552,10 +561,13 @@ const ManufacturerProfile = () => {
                     <Separator className="my-6" />
                     
                     <div>
-                      <h4 className="text-sm font-medium mb-3">Compliance Standards</h4>
+                      <h4 className="text-sm font-medium mb-3">{t("manufacturer-profile-compliance-standards", "Compliance Standards")}</h4>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                         {[
-                          "HACCP System", "EU Food Standards", "Environmental Compliance", "GMP Practices"
+                          t("manufacturer-profile-haccp", "HACCP System"), 
+                          t("manufacturer-profile-eu-standards", "EU Food Standards"), 
+                          t("manufacturer-profile-environmental", "Environmental Compliance"), 
+                          t("manufacturer-profile-gmp", "GMP Practices")
                         ].map((standard, index) => (
                           <div 
                             key={index}

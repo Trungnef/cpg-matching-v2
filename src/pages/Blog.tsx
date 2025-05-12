@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -174,6 +175,7 @@ const staggerContainer = {
 };
 
 const Blog = () => {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -299,14 +301,13 @@ const Blog = () => {
                 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent"
                 variants={fadeInUp}
               >
-                CPG Matchmaker Blog
+                {t('blog-title')}
               </motion.h1>
               <motion.p
                 className="text-xl text-muted-foreground mb-8"
                 variants={fadeInUp}
               >
-                Insights, trends, and strategies for the CPG manufacturing
-                industry
+                {t('blog-subtitle')}
               </motion.p>
 
               <motion.div
@@ -315,7 +316,7 @@ const Blog = () => {
               >
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
-                  placeholder="Search articles..."
+                  placeholder={t('search-articles')}
                   className="pl-10 pr-4 py-6 rounded-full"
                   value={searchQuery}
                   onChange={handleSearch}
@@ -332,30 +333,30 @@ const Blog = () => {
                   </SheetTrigger>
                   <SheetContent>
                     <SheetHeader>
-                      <SheetTitle>Filter Articles</SheetTitle>
+                      <SheetTitle>{t('filter-articles')}</SheetTitle>
                       <SheetDescription>
-                        Refine your search with these filters
+                        {t('refine-search')}
                       </SheetDescription>
                     </SheetHeader>
                     <div className="py-4 space-y-4">
                       <div className="space-y-2">
-                        <h4 className="text-sm font-medium">Sort By</h4>
+                        <h4 className="text-sm font-medium">{t('blog-sort-by')}</h4>
                         <Select value={sortBy} onValueChange={setSortBy}>
                           <SelectTrigger>
-                            <SelectValue placeholder="Sort by" />
+                            <SelectValue placeholder={t('blog-sort-by')} />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="latest">Latest First</SelectItem>
+                            <SelectItem value="latest">{t('sort-latest')}</SelectItem>
                             <SelectItem value="popular">
-                              Most Popular
+                              {t('sort-popular')}
                             </SelectItem>
-                            <SelectItem value="trending">Trending</SelectItem>
+                            <SelectItem value="trending">{t('sort-trending')}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
 
                       <div className="space-y-2">
-                        <h4 className="text-sm font-medium">Categories</h4>
+                        <h4 className="text-sm font-medium">{t('blog-categories')}</h4>
                         <div className="flex flex-wrap gap-2">
                           {categories.map((category) => (
                             <Badge
@@ -368,14 +369,16 @@ const Blog = () => {
                               className="cursor-pointer"
                               onClick={() => setSelectedCategory(category)}
                             >
-                              {category}
+                              {t(category === "All" 
+                                ? "blog-category-all" 
+                                : `blog-category-${category.toLowerCase().replace(" ", "-")}`)}
                             </Badge>
                           ))}
                         </div>
                       </div>
 
                       <div className="space-y-2">
-                        <h4 className="text-sm font-medium">Tags</h4>
+                        <h4 className="text-sm font-medium">{t('blog-tags')}</h4>
                         <div className="flex flex-wrap gap-2">
                           {popularTags.map((tag) => (
                             <Badge
@@ -389,7 +392,7 @@ const Blog = () => {
                               onClick={() => handleTagSelect(tag)}
                             >
                               <Tag className="h-3 w-3 mr-1" />
-                              {tag}
+                              {t(`blog-tag-${tag.toLowerCase().replace(" ", "-")}`)}
                             </Badge>
                           ))}
                         </div>
@@ -404,10 +407,10 @@ const Blog = () => {
                           setSortBy("latest");
                         }}
                       >
-                        Reset Filters
+                        {t('blog-reset-filters')}
                       </Button>
                       <Button onClick={() => setIsFiltersOpen(false)}>
-                        Apply Filters
+                        {t('blog-apply-filters')}
                       </Button>
                     </SheetFooter>
                   </SheetContent>
@@ -426,10 +429,10 @@ const Blog = () => {
             viewport={{ once: true }}
           >
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl font-bold">Featured Articles</h2>
+              <h2 className="text-2xl font-bold">{t('featured-articles')}</h2>
               <Button variant="ghost" className="gap-2" asChild>
                 <Link to="/blog/featured">
-                  View All <ChevronRight className="h-4 w-4" />
+                  {t('view-all')} <ChevronRight className="h-4 w-4" />
                 </Link>
               </Button>
             </div>
@@ -479,7 +482,9 @@ const Blog = () => {
                     </div>
                     <CardHeader>
                       <div className="flex items-center gap-2 mb-2">
-                        <Badge variant="secondary">{post.category}</Badge>
+                        <Badge variant="secondary">
+                          {t(`blog-category-${post.category.toLowerCase().replace(" ", "-")}`)}
+                        </Badge>
                         <span className="text-sm text-muted-foreground flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
                           {post.date}
@@ -500,12 +505,12 @@ const Blog = () => {
                       <div className="flex items-center">
                         <Clock className="h-4 w-4 mr-1 text-muted-foreground" />
                         <span className="text-sm text-muted-foreground">
-                          {post.readTime} read
+                          {t('read-time', { time: post.readTime })}
                         </span>
                       </div>
                       <Button variant="ghost" className="gap-1" asChild>
                         <Link to={`/blog/${post.id}`}>
-                          Read Article <ArrowRight className="h-4 w-4" />
+                          {t('read-article')} <ArrowRight className="h-4 w-4" />
                         </Link>
                       </Button>
                     </CardFooter>
@@ -520,7 +525,7 @@ const Blog = () => {
             <div className="col-span-1 lg:col-span-2">
               <Tabs defaultValue="All" className="mb-8">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-2xl font-bold">Latest Articles</h2>
+                  <h2 className="text-2xl font-bold">{t('latest-articles')}</h2>
                   <TabsList>
                     {categories.slice(0, 4).map((category) => (
                       <TabsTrigger
@@ -528,7 +533,9 @@ const Blog = () => {
                         value={category}
                         onClick={() => setSelectedCategory(category)}
                       >
-                        {category}
+                        {t(category === "All" 
+                          ? "blog-category-all" 
+                          : `blog-category-${category.toLowerCase().replace(" ", "-")}`)}
                       </TabsTrigger>
                     ))}
                   </TabsList>
@@ -552,7 +559,9 @@ const Blog = () => {
                           <Card className="overflow-hidden hover:shadow-lg transition-all group">
                             <CardHeader>
                               <div className="flex items-center gap-2 mb-2">
-                                <Badge variant="outline">{post.category}</Badge>
+                                <Badge variant="outline">
+                                  {t(`blog-category-${post.category.toLowerCase().replace(" ", "-")}`)}
+                                </Badge>
                                 <span className="text-sm text-muted-foreground flex items-center gap-1">
                                   <Calendar className="h-3 w-3" />
                                   {post.date}
@@ -572,7 +581,7 @@ const Blog = () => {
                                     className="text-xs"
                                     onClick={() => handleTagSelect(tag)}
                                   >
-                                    {tag}
+                                    {t(`blog-tag-${tag.toLowerCase().replace(" ", "-")}`)}
                                   </Badge>
                                 ))}
                               </div>
@@ -581,7 +590,7 @@ const Blog = () => {
                               <div className="flex items-center gap-4">
                                 <span className="flex items-center text-sm text-muted-foreground">
                                   <Clock className="h-4 w-4 mr-1" />
-                                  {post.readTime} read
+                                  {t('read-time', { time: post.readTime })}
                                 </span>
                                 <Button
                                   variant="ghost"
@@ -603,7 +612,7 @@ const Blog = () => {
                                 asChild
                               >
                                 <Link to={`/blog/${post.id}`}>
-                                  Read <ArrowRight className="h-3 w-3" />
+                                  {t('read')} <ArrowRight className="h-3 w-3" />
                                 </Link>
                               </Button>
                             </CardFooter>
@@ -617,7 +626,7 @@ const Blog = () => {
 
               {recentPosts.length > 0 && (
                 <div className="flex justify-center mt-8">
-                  <Button variant="outline">Load More Articles</Button>
+                  <Button variant="outline">{t('load-more')}</Button>
                 </div>
               )}
             </div>
@@ -631,7 +640,7 @@ const Blog = () => {
             >
               <Card>
                 <CardHeader>
-                  <CardTitle>Categories</CardTitle>
+                  <CardTitle>{t('blog-categories')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
@@ -644,7 +653,9 @@ const Blog = () => {
                         className="justify-between w-full"
                         onClick={() => setSelectedCategory(category)}
                       >
-                        {category}
+                        {t(category === "All" 
+                          ? "blog-category-all" 
+                          : `blog-category-${category.toLowerCase().replace(" ", "-")}`)}
                         <Badge variant="secondary" className="ml-2">
                           {
                             blogPosts.filter((post) =>
@@ -662,7 +673,7 @@ const Blog = () => {
 
               <Card className="mt-6">
                 <CardHeader>
-                  <CardTitle>Popular Tags</CardTitle>
+                  <CardTitle>{t('blog-tags')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
@@ -676,7 +687,7 @@ const Blog = () => {
                         onClick={() => handleTagSelect(tag)}
                       >
                         <Tag className="h-3 w-3 mr-1" />
-                        {tag}
+                        {t(`blog-tag-${tag.toLowerCase().replace(" ", "-")}`)}
                       </Badge>
                     ))}
                   </div>
@@ -685,10 +696,9 @@ const Blog = () => {
 
               <Card className="mt-6">
                 <CardHeader>
-                  <CardTitle>Subscribe to Updates</CardTitle>
+                  <CardTitle>{t('subscribe-updates')}</CardTitle>
                   <CardDescription>
-                    Get the latest articles and insights delivered to your
-                    inbox.
+                    {t('subscribe-description')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -696,24 +706,24 @@ const Blog = () => {
                     className="space-y-4"
                     onSubmit={(e) => e.preventDefault()}
                   >
-                    <Input placeholder="Your email address" type="email" />
-                    <Button className="w-full">Subscribe</Button>
+                    <Input placeholder={t('your-email')} type="email" />
+                    <Button className="w-full">{t('blog-subscribe')}</Button>
                   </form>
                 </CardContent>
               </Card>
 
               <Card className="mt-6">
                 <CardHeader>
-                  <CardTitle>Saved Articles</CardTitle>
+                  <CardTitle>{t('saved-articles')}</CardTitle>
                   <CardDescription>
-                    Articles you've bookmarked for later
+                    {t('saved-description')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     {savedPosts.length === 0 ? (
                       <p className="text-sm text-muted-foreground text-center py-4">
-                        No saved articles yet
+                        {t('no-saved')}
                       </p>
                     ) : (
                       blogPosts
@@ -735,7 +745,7 @@ const Blog = () => {
                                   {post.date}
                                 </span>
                                 <span className="text-xs text-muted-foreground">
-                                  {post.readTime} read
+                                  {t('read-time', { time: post.readTime })}
                                 </span>
                               </div>
                             </div>

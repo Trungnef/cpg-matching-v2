@@ -89,12 +89,12 @@ const RetailerLayout: FC<RetailerLayoutProps> = ({ children }) => {
   // Define navigation items for retailer early to avoid reference before declaration
   const navigationItems = [
     {
-      name: t('Home'),
+      name: t('retailer-layout-home'),
       path: '/',
       icon: <Home className="h-5 w-5" />
     },
     {
-      name: 'Dashboard',
+      name: t('retailer-layout-dashboard'),
       path: '/dashboard',
       icon: <LayoutDashboard className="h-5 w-5" />,
     },
@@ -104,22 +104,22 @@ const RetailerLayout: FC<RetailerLayoutProps> = ({ children }) => {
     //   icon: <Building className="h-5 w-5" />
     // },
     {
-      name: t('Inventory'),
+      name: t('retailer-layout-inventory'),
       path: '/retailer/inventory',
       icon: <Warehouse className="h-5 w-5" />
     },
     {
-      name: t('Partnerships'),
+      name: t('retailer-layout-partnerships'),
       path: '/retailer/partnerships',
       icon: <Handshake className="h-5 w-5" />
     },
     {
-      name: t('Orders'),
+      name: t('retailer-layout-orders'),
       path: '/retailer/orders',
       icon: <ShoppingBag className="h-5 w-5" />
     },
     {
-      name: t('Analytics'),
+      name: t('retailer-layout-analytics'),
       path: '/retailer/analytics',
       icon: <BarChart3 className="h-5 w-5" />
     },
@@ -159,8 +159,8 @@ const RetailerLayout: FC<RetailerLayoutProps> = ({ children }) => {
     logout();
     navigate('/auth?type=signin');
     toast({
-      title: 'Logged out',
-      description: 'You have been successfully logged out.',
+      title: t('retailer-layout-logged-out'),
+      description: t('retailer-layout-logout-success'),
     });
   };
 
@@ -434,7 +434,7 @@ const RetailerLayout: FC<RetailerLayoutProps> = ({ children }) => {
             >
               <Settings className="h-5 w-5" />
               {!sidebarCollapsed && (
-                <span className="ml-3">Settings</span>
+                <span className="ml-3">{t('retailer-layout-settings')}</span>
               )}
             </Link>
           </div>
@@ -527,7 +527,7 @@ const RetailerLayout: FC<RetailerLayoutProps> = ({ children }) => {
                         onClick={handleLogout}
                       >
                         <LogOut className="h-5 w-5" />
-                        <span className="ml-3">Log Out</span>
+                        <span className="ml-3">{t('retailer-layout-logout')}</span>
                       </Button>
                     </motion.div>
                   </AnimatePresence>
@@ -587,7 +587,7 @@ const RetailerLayout: FC<RetailerLayoutProps> = ({ children }) => {
                     </motion.div>
                     <Input 
                       type="text" 
-                      placeholder="Search inventory, suppliers, orders..." 
+                      placeholder={t('retailer-layout-search-inventory')}
                       className="w-full pl-10 pr-4 py-2 bg-background border-input focus:border-ring focus:ring-1 focus:ring-ring transition-colors shadow-sm"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
@@ -632,9 +632,9 @@ const RetailerLayout: FC<RetailerLayoutProps> = ({ children }) => {
                             >
                               <Search className="h-6 w-6 text-muted-foreground" />
                             </motion.div>
-                            <p className="text-sm font-medium">No results found</p>
+                            <p className="text-sm font-medium">{t('retailer-layout-no-results')}</p>
                             <p className="text-xs text-muted-foreground mt-1">
-                              Try different keywords or browse categories
+                              {t('retailer-layout-different-keywords')}
                             </p>
                           </div>
                           
@@ -642,7 +642,7 @@ const RetailerLayout: FC<RetailerLayoutProps> = ({ children }) => {
                           <>
                             {searchResults.pages.length > 0 && (
                               <div className="px-2 pt-2">
-                                <div className="text-xs font-medium text-muted-foreground px-2 py-1.5">Pages</div>
+                                <div className="text-xs font-medium text-muted-foreground px-2 py-1.5">{t('retailer-layout-pages')}</div>
                                 {searchResults.pages.map((page, i) => (
                                   <motion.div 
                                     key={page.path}
@@ -679,7 +679,7 @@ const RetailerLayout: FC<RetailerLayoutProps> = ({ children }) => {
                             
                             {searchResults.products.length > 0 && (
                               <div className="px-2 pt-2 mt-1">
-                                <div className="text-xs font-medium text-muted-foreground px-2 py-1.5">Inventory Items</div>
+                                <div className="text-xs font-medium text-muted-foreground px-2 py-1.5">{t('retailer-layout-inventory-items')}</div>
                                 {searchResults.products.map((product, i) => (
                                   <motion.div 
                                     key={product.id}
@@ -703,7 +703,7 @@ const RetailerLayout: FC<RetailerLayoutProps> = ({ children }) => {
                                         <p className="text-xs text-muted-foreground truncate">{product.category}</p>
                                       </div>
                                       <Badge variant="outline" className="shrink-0 text-xs h-5">
-                                        Item
+                                        {t('retailer-layout-item')}
                                       </Badge>
                                     </div>
                                   </motion.div>
@@ -713,7 +713,7 @@ const RetailerLayout: FC<RetailerLayoutProps> = ({ children }) => {
                             
                             {searchResults.suppliers.length > 0 && (
                               <div className="px-2 pt-2 pb-2 mt-1">
-                                <div className="text-xs font-medium text-muted-foreground px-2 py-1.5">Suppliers</div>
+                                <div className="text-xs font-medium text-muted-foreground px-2 py-1.5">{t('retailer-layout-suppliers')}</div>
                                 {searchResults.suppliers.map((supplier, i) => (
                                   <motion.div 
                                     key={supplier.id}
@@ -741,7 +741,7 @@ const RetailerLayout: FC<RetailerLayoutProps> = ({ children }) => {
                                         <p className="text-xs text-muted-foreground truncate">{supplier.type}</p>
                                       </div>
                                       <Badge variant="outline" className="shrink-0 text-xs h-5">
-                                        Supplier
+                                        {t('retailer-layout-supplier')}
                                       </Badge>
                                     </div>
                                   </motion.div>
@@ -751,7 +751,7 @@ const RetailerLayout: FC<RetailerLayoutProps> = ({ children }) => {
                             
                             <div className="p-2 bg-muted/30 mt-1">
                               <div className="flex justify-center items-center text-xs text-muted-foreground">
-                                <span>Press <kbd className="rounded border px-1 py-0.5 bg-background text-[10px]">Esc</kbd> to close</span>
+                                <span>{t('retailer-layout-press-esc')}</span>
                               </div>
                             </div>
                           </>
@@ -768,7 +768,7 @@ const RetailerLayout: FC<RetailerLayoutProps> = ({ children }) => {
                     onClick={() => setSearchOpen(true)}
                   >
                     <Search className="h-4 w-4 mr-2" />
-                    <span>Search...</span> 
+                    <span>{t('retailer-layout-search')}</span> 
                     <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
                       <span className="text-xs">⌘</span>K
                     </kbd>
@@ -812,7 +812,7 @@ const RetailerLayout: FC<RetailerLayoutProps> = ({ children }) => {
                     initial={{ opacity: 0, y: -5 }}
                     whileHover={{ opacity: 1, y: 0 }}
                   >
-                    Help Center
+                    {t('retailer-layout-help-center')}
                   </motion.span>
                 </Button>
               </motion.div>
@@ -835,8 +835,8 @@ const RetailerLayout: FC<RetailerLayoutProps> = ({ children }) => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-80">
                     <div className="flex items-center justify-between p-2">
-                      <DropdownMenuLabel>Notifications</DropdownMenuLabel>
-                      <Badge variant="secondary" className="ml-auto">New 2</Badge>
+                      <DropdownMenuLabel>{t('retailer-layout-notifications')}</DropdownMenuLabel>
+                      <Badge variant="secondary" className="ml-auto">{t('retailer-layout-new')} 2</Badge>
                     </div>
                     <DropdownMenuSeparator />
                     <div className="max-h-80 overflow-y-auto no-scrollbar">
@@ -844,22 +844,22 @@ const RetailerLayout: FC<RetailerLayoutProps> = ({ children }) => {
                         className="p-3 hover:bg-muted rounded-md cursor-pointer transition-colors"
                         whileHover={{ x: 2, backgroundColor: "rgba(var(--muted), 0.5)" }}
                       >
-                        <p className="font-medium">New brand partnership</p>
-                        <p className="text-sm text-muted-foreground">Health Essentials wants to feature products in your store</p>
-                        <p className="text-xs text-muted-foreground mt-1">5 minutes ago</p>
+                        <p className="font-medium">{t('retailer-layout-new-brand-partnership')}</p>
+                        <p className="text-sm text-muted-foreground">{t('retailer-layout-feature-products')}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{t('retailer-layout-minutes-ago')}</p>
                       </motion.div>
                       <motion.div 
                         className="p-3 hover:bg-muted rounded-md cursor-pointer transition-colors"
                         whileHover={{ x: 2, backgroundColor: "rgba(var(--muted), 0.5)" }}
                       >
-                        <p className="font-medium">Inventory alert</p>
-                        <p className="text-sm text-muted-foreground">Protein Bars are running low on stock</p>
-                        <p className="text-xs text-muted-foreground mt-1">3 hours ago</p>
+                        <p className="font-medium">{t('retailer-layout-inventory-alert')}</p>
+                        <p className="text-sm text-muted-foreground">{t('retailer-layout-low-stock')}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{t('retailer-layout-hours-ago')}</p>
                       </motion.div>
                     </div>
                     <DropdownMenuSeparator />
                     <Button variant="ghost" className="w-full justify-center" size="sm">
-                      View all notifications
+                      {t('retailer-layout-view-all-notifications')}
                     </Button>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -884,7 +884,7 @@ const RetailerLayout: FC<RetailerLayoutProps> = ({ children }) => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-80">
-                    <DropdownMenuLabel>Messages</DropdownMenuLabel>
+                    <DropdownMenuLabel>{t('retailer-layout-messages')}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <div className="max-h-80 overflow-y-auto no-scrollbar">
                       <motion.div 
@@ -897,9 +897,9 @@ const RetailerLayout: FC<RetailerLayoutProps> = ({ children }) => {
                             <AvatarFallback>VB</AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-medium">Vital Brands Co.</p>
-                            <p className="text-sm line-clamp-1 text-muted-foreground">We'd like to discuss our new product lineup for your stores...</p>
-                            <p className="text-xs text-muted-foreground mt-1">20 minutes ago</p>
+                            <p className="font-medium">{t('retailer-layout-vital-brands')}</p>
+                            <p className="text-sm line-clamp-1 text-muted-foreground">{t('retailer-layout-discuss-lineup')}</p>
+                            <p className="text-xs text-muted-foreground mt-1">{t('retailer-layout-minutes-ago-msg')}</p>
                           </div>
                         </div>
                       </motion.div>
@@ -913,16 +913,16 @@ const RetailerLayout: FC<RetailerLayoutProps> = ({ children }) => {
                             <AvatarFallback>OE</AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-medium">Organic Essentials</p>
-                            <p className="text-sm line-clamp-1 text-muted-foreground">Your order shipment is ready for delivery...</p>
-                            <p className="text-xs text-muted-foreground mt-1">Yesterday</p>
+                            <p className="font-medium">{t('retailer-layout-organic-essentials')}</p>
+                            <p className="text-sm line-clamp-1 text-muted-foreground">{t('retailer-layout-order-shipment')}</p>
+                            <p className="text-xs text-muted-foreground mt-1">{t('retailer-layout-yesterday')}</p>
                           </div>
                         </div>
                       </motion.div>
                     </div>
                     <DropdownMenuSeparator />
                     <Button variant="ghost" className="w-full justify-center" size="sm">
-                      View all messages
+                      {t('retailer-layout-view-all-messages')}
                     </Button>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -940,7 +940,7 @@ const RetailerLayout: FC<RetailerLayoutProps> = ({ children }) => {
         </header>
         
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto w-full">
+        <main className="flex-1 overflow-y-auto w-full no-scrollbar">
           {children}
         </main>
       </div>
@@ -954,6 +954,7 @@ const UserMenu = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   // Close the dropdown when clicking outside
   useEffect(() => {
@@ -1035,8 +1036,8 @@ const UserMenu = () => {
                               user?.status === "online" ? "bg-green-500" : 
                               user?.status === "away" ? "bg-yellow-500" : "bg-red-500"
                             }`} />
-                            {user?.status === "online" ? "Online" : 
-                              user?.status === "away" ? "Away" : "Busy"}
+                            {user?.status === "online" ? t('retailer-layout-online') : 
+                              user?.status === "away" ? t('retailer-layout-away') : t('retailer-layout-busy')}
                             <ChevronDown className="h-3.5 w-3.5 ml-1" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -1044,25 +1045,25 @@ const UserMenu = () => {
                           <DropdownMenuItem onClick={() => handleStatusChange("online")}>
                             <div className="flex items-center">
                               <span className="h-2 w-2 rounded-full bg-green-500 mr-2" />
-                              <span>Online</span>
+                              <span>{t('retailer-layout-online')}</span>
                             </div>
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleStatusChange("away")}>
                             <div className="flex items-center">
                               <span className="h-2 w-2 rounded-full bg-yellow-500 mr-2" />
-                              <span>Away</span>
+                              <span>{t('retailer-layout-away')}</span>
                             </div>
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleStatusChange("busy")}>
                             <div className="flex items-center">
                               <span className="h-2 w-2 rounded-full bg-red-500 mr-2" />
-                              <span>Busy</span>
+                              <span>{t('retailer-layout-busy')}</span>
                             </div>
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                       <Badge variant="secondary" className="text-xs px-2 py-0 h-5">
-                        Retailer
+                        {t('retailer-layout-retailer')}
                       </Badge>
                     </div>
                   </div>
@@ -1072,20 +1073,19 @@ const UserMenu = () => {
                 <div className="grid grid-cols-3 gap-2 mt-4 text-center">
                   <div className="bg-background/60 rounded-lg p-2">
                     <p className="text-lg font-semibold">{user?.retailerSettings?.storeLocations || "0"}</p>
-                    <p className="text-xs text-muted-foreground">Stores</p>
+                    <p className="text-xs text-muted-foreground">{t('retailer-layout-stores')}</p>
                   </div>
                   <div className="bg-background/60 rounded-lg p-2">
                     <p className="text-lg font-semibold">18</p>
-                    <p className="text-xs text-muted-foreground">Brands</p>
+                    <p className="text-xs text-muted-foreground">{t('retailer-layout-brands')}</p>
                   </div>
                   <div className="bg-background/60 rounded-lg p-2">
                     <p className="text-lg font-semibold">${user?.retailerSettings?.averageOrderValue || "0"}</p>
-                    <p className="text-xs text-muted-foreground">Avg Order</p>
+                    <p className="text-xs text-muted-foreground">{t('retailer-layout-avg-order')}</p>
                   </div>
                 </div>
               </div>
 
-              {/* Menu items */}
               {/* Menu items */}
               <div className="p-2">
                 <div className="grid grid-cols-1 gap-1">
@@ -1096,8 +1096,8 @@ const UserMenu = () => {
                   >
                     <LayoutDashboard className="h-4 w-4" />
                     <div className="flex-1 text-left">
-                      <p>Dashboard</p>
-                      <p className="text-xs text-muted-foreground">Retailers overview</p>
+                      <p>{t('retailer-layout-dashboard')}</p>
+                      <p className="text-xs text-muted-foreground">{t('retailer-layout-retailers-overview')}</p>
                     </div>
                   </motion.button>
 
@@ -1107,8 +1107,8 @@ const UserMenu = () => {
                   >
                     <User className="h-4 w-4" />
                     <div className="flex-1 text-left">
-                      <p>Profile</p>
-                      <p className="text-xs text-muted-foreground">Manage your information</p>
+                      <p>{t('retailer-layout-profile')}</p>
+                      <p className="text-xs text-muted-foreground">{t('retailer-layout-manage-information')}</p>
                     </div>
                   </button>
 
@@ -1121,8 +1121,8 @@ const UserMenu = () => {
                       <Settings className="h-4 w-4" />
                     </div>
                     <div className="flex-1 text-left">
-                      <p>Settings</p>
-                      <p className="text-xs text-muted-foreground">Account preferences</p>
+                      <p>{t('retailer-layout-settings')}</p>
+                      <p className="text-xs text-muted-foreground">{t('retailer-layout-account-preferences')}</p>
                     </div>
                   </motion.button>
                 </div>
@@ -1140,8 +1140,8 @@ const UserMenu = () => {
                     <LogOut className="h-4 w-4" />
                   </div>
                   <div className="flex-1 text-left">
-                    <p className="font-bold text-destructive dark:text-red-400">Log out</p>
-                    <p className="text-xs text-muted-foreground">Sign out of your account</p>
+                    <p className="font-bold text-destructive dark:text-red-400">{t('retailer-layout-logout')}</p>
+                    <p className="text-xs text-muted-foreground">{t('retailer-layout-sign-out')}</p>
                   </div>
                 </motion.button>
               </div>

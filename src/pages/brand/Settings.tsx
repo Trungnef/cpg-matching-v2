@@ -40,6 +40,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import BrandLayout from "@/components/layouts/BrandLayout";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { useTranslation } from "react-i18next";
 
 // Enhanced animation variants
 const fadeIn = {
@@ -86,6 +87,7 @@ const Settings = () => {
   const { isAuthenticated, user, role } = useUser();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   
   // Form states
   const [companyName, setCompanyName] = useState(user?.companyName || "Eco Foods");
@@ -143,7 +145,7 @@ const Settings = () => {
   const [autoSave, setAutoSave] = useState(true);
   
   useEffect(() => {
-    document.title = "Settings - CPG Matchmaker";
+    document.title = t("settings-title");
     
     // If not authenticated or not a brand, redirect
     if (!isAuthenticated) {
@@ -151,7 +153,7 @@ const Settings = () => {
     } else if (role !== "brand") {
       navigate("/dashboard");
     }
-  }, [isAuthenticated, navigate, role]);
+  }, [isAuthenticated, navigate, role, t]);
 
   const handleAddTag = (e) => {
     e.preventDefault();
@@ -160,7 +162,7 @@ const Settings = () => {
       setNewTag("");
       
       // Log activity
-      addToActivityLog("Added new tag: " + newTag.trim());
+      addToActivityLog(t("added-new-tag") + ": " + newTag.trim());
     }
   };
   
@@ -168,7 +170,7 @@ const Settings = () => {
     setTags(tags.filter(tag => tag !== tagToRemove));
     
     // Log activity
-    addToActivityLog("Removed tag: " + tagToRemove);
+    addToActivityLog(t("removed-tag") + ": " + tagToRemove);
   };
   
   const handleAddCategory = (e) => {
@@ -178,7 +180,7 @@ const Settings = () => {
       setNewCategory("");
       
       // Log activity
-      addToActivityLog("Added new product category: " + newCategory.trim());
+      addToActivityLog(t("added-new-product-category") + ": " + newCategory.trim());
     }
   };
   
@@ -186,7 +188,7 @@ const Settings = () => {
     setProductCategories(productCategories.filter(category => category !== categoryToRemove));
     
     // Log activity
-    addToActivityLog("Removed product category: " + categoryToRemove);
+    addToActivityLog(t("removed-product-category") + ": " + categoryToRemove);
   };
   
   const addToActivityLog = (action) => {
@@ -202,12 +204,12 @@ const Settings = () => {
     setTimeout(() => {
       setIsLoading(false);
       toast({
-        title: "Settings updated",
-        description: "Your company settings have been saved successfully.",
+        title: t("settings-updated"),
+        description: t("company-settings-saved"),
       });
       
       // Log activity
-      addToActivityLog("Updated general settings");
+      addToActivityLog(t("updated-general-settings"));
     }, 1000);
   };
 
@@ -217,12 +219,12 @@ const Settings = () => {
     setTimeout(() => {
       setIsLoading(false);
       toast({
-        title: "Brand details updated",
-        description: "Your brand information has been saved successfully.",
+        title: t("brand-details-updated"),
+        description: t("brand-info-saved"),
       });
       
       // Log activity
-      addToActivityLog("Updated brand details");
+      addToActivityLog(t("updated-brand-details"));
     }, 1000);
   };
 
@@ -232,8 +234,8 @@ const Settings = () => {
     setTimeout(() => {
       setIsLoading(false);
       toast({
-        title: "Notification preferences updated",
-        description: "Your notification settings have been saved.",
+        title: t("notification-preferences-updated"),
+        description: t("notification-settings-saved"),
       });
     }, 1000);
   };
@@ -244,8 +246,8 @@ const Settings = () => {
     if (newPassword && newPassword !== confirmPassword) {
       setIsLoading(false);
       toast({
-        title: "Passwords don't match",
-        description: "Please ensure your passwords match and try again.",
+        title: t("passwords-dont-match"),
+        description: t("ensure-passwords-match"),
         variant: "destructive"
       });
       return;
@@ -255,8 +257,8 @@ const Settings = () => {
     setTimeout(() => {
       setIsLoading(false);
       toast({
-        title: "Security settings saved",
-        description: "Your security preferences have been updated successfully."
+        title: t("security-settings-saved"),
+        description: t("security-preferences-updated")
       });
     }, 1000);
   };
@@ -267,8 +269,8 @@ const Settings = () => {
     setTimeout(() => {
       setIsLoading(false);
       toast({
-        title: "Brand settings updated",
-        description: "Your brand details have been saved.",
+        title: t("brand-settings-updated"),
+        description: t("brand-details-saved"),
       });
     }, 1000);
   };
@@ -292,9 +294,9 @@ const Settings = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
-              <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+              <h1 className="text-3xl font-bold tracking-tight">{t("settings")}</h1>
               <p className="text-muted-foreground">
-                Manage your account preferences and brand information
+                {t("manage-account-preferences")}
               </p>
             </motion.div>
             <motion.div 
@@ -304,12 +306,12 @@ const Settings = () => {
               transition={{ duration: 0.5, delay: 0.2 }}
             >
               <Badge variant="outline" className="text-xs px-2 py-1">
-                <span className="text-primary font-medium">Brand</span>
+                <span className="text-primary font-medium">{t("brand")}</span>
               </Badge>
               {autoSave && (
                 <Badge variant="secondary" className="text-xs px-2 py-1 flex items-center gap-1">
                   <Save className="h-3 w-3" />
-                  <span>Auto-save on</span>
+                  <span>{t("auto-save-on")}</span>
                 </Badge>
               )}
             </motion.div>
@@ -330,27 +332,27 @@ const Settings = () => {
               <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-1">
                 <TabsTrigger value="general" className="flex items-center gap-1.5">
                   <Building className="h-4 w-4" />
-                  <span>General</span>
+                  <span>{t("general")}</span>
                 </TabsTrigger>
                 <TabsTrigger value="brand" className="flex items-center gap-1.5">
                   <ShoppingBag className="h-4 w-4" />
-                  <span>Brand</span>
+                  <span>{t("brand")}</span>
                 </TabsTrigger>
                 <TabsTrigger value="notification" className="flex items-center gap-1.5">
                   <Bell className="h-4 w-4" />
-                  <span>Notifications</span>
+                  <span>{t("notifications")}</span>
                 </TabsTrigger>
                 <TabsTrigger value="security" className="flex items-center gap-1.5">
                   <Shield className="h-4 w-4" />
-                  <span>Security</span>
+                  <span>{t("security")}</span>
                 </TabsTrigger>
                 <TabsTrigger value="preferences" className="flex items-center gap-1.5">
                   <SettingsIcon className="h-4 w-4" />
-                  <span>Preferences</span>
+                  <span>{t("preferences")}</span>
                 </TabsTrigger>
                 <TabsTrigger value="activity" className="flex items-center gap-1.5">
                   <UserCog className="h-4 w-4" />
-                  <span>Activity</span>
+                  <span>{t("activity")}</span>
                 </TabsTrigger>
               </TabsList>
             </motion.div>
@@ -370,16 +372,16 @@ const Settings = () => {
                       <Card>
                         <CardHeader>
                           <motion.div variants={itemAnimation}>
-                            <CardTitle>Company Information</CardTitle>
+                            <CardTitle>{t("company-information")}</CardTitle>
                             <CardDescription>
-                              Update your company details and contact information
+                              {t("update-company-details")}
                             </CardDescription>
                           </motion.div>
                         </CardHeader>
                         <CardContent className="space-y-6">
                           <motion.div variants={itemAnimation} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                              <Label htmlFor="companyName">Company Name</Label>
+                              <Label htmlFor="companyName">{t("company-name")}</Label>
                               <div className="relative">
                                 <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                                 <Input
@@ -392,7 +394,7 @@ const Settings = () => {
                             </div>
                             
                             <div className="space-y-2">
-                              <Label htmlFor="email">Email Address</Label>
+                              <Label htmlFor="email">{t("email-address")}</Label>
                               <div className="relative">
                                 <AtSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                                 <Input
@@ -406,7 +408,7 @@ const Settings = () => {
                             </div>
                             
                             <div className="space-y-2">
-                              <Label htmlFor="phone">Phone Number</Label>
+                              <Label htmlFor="phone">{t("phone-number")}</Label>
                               <div className="relative">
                                 <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                                 <Input
@@ -419,7 +421,7 @@ const Settings = () => {
                             </div>
                             
                             <div className="space-y-2">
-                              <Label htmlFor="website">Website</Label>
+                              <Label htmlFor="website">{t("website")}</Label>
                               <div className="relative">
                                 <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                                 <Input
@@ -432,7 +434,7 @@ const Settings = () => {
                             </div>
 
                             <div className="space-y-2 md:col-span-2">
-                              <Label htmlFor="address">Address</Label>
+                              <Label htmlFor="address">{t("address")}</Label>
                               <Input
                                 id="address"
                                 value={address}
@@ -441,7 +443,7 @@ const Settings = () => {
                             </div>
                             
                             <div className="space-y-2">
-                              <Label htmlFor="city">City</Label>
+                              <Label htmlFor="city">{t("city")}</Label>
                               <Input
                                 id="city"
                                 value={city}
@@ -451,7 +453,7 @@ const Settings = () => {
                             
                             <div className="grid grid-cols-2 gap-4">
                               <div className="space-y-2">
-                                <Label htmlFor="state">State</Label>
+                                <Label htmlFor="state">{t("state")}</Label>
                                 <Input
                                   id="state"
                                   value={state}
@@ -460,7 +462,7 @@ const Settings = () => {
                               </div>
                               
                               <div className="space-y-2">
-                                <Label htmlFor="zipCode">Zip Code</Label>
+                                <Label htmlFor="zipCode">{t("zip-code")}</Label>
                                 <Input
                                   id="zipCode"
                                   value={zipCode}
@@ -470,7 +472,7 @@ const Settings = () => {
                             </div>
                             
                             <div className="space-y-2 md:col-span-2">
-                              <Label htmlFor="description">Company Description</Label>
+                              <Label htmlFor="description">{t("company-description")}</Label>
                               <Textarea
                                 id="description"
                                 value={description}
@@ -481,7 +483,7 @@ const Settings = () => {
                           </motion.div>
                           
                           <motion.div variants={itemAnimation} className="space-y-4">
-                            <Label>Company Tags</Label>
+                            <Label>{t("company-tags")}</Label>
                             <div className="flex flex-wrap gap-2 mb-4">
                               {tags.map((tag, index) => (
                                 <motion.div
@@ -504,12 +506,12 @@ const Settings = () => {
                             
                             <form onSubmit={handleAddTag} className="flex gap-2">
                               <Input 
-                                placeholder="Add a tag..." 
+                                placeholder={t("add-a-tag")}
                                 value={newTag}
                                 onChange={(e) => setNewTag(e.target.value)}
                                 className="max-w-xs"
                               />
-                              <Button type="submit" size="sm">Add</Button>
+                              <Button type="submit" size="sm">{t("add")}</Button>
                             </form>
                           </motion.div>
                           
@@ -524,7 +526,7 @@ const Settings = () => {
                               ) : (
                                 <Save className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
                               )}
-                              Save Changes
+                              {t("save-changes")}
                             </Button>
                           </motion.div>
                         </CardContent>
@@ -548,16 +550,16 @@ const Settings = () => {
                       <Card>
                         <CardHeader>
                           <motion.div variants={itemAnimation}>
-                            <CardTitle>Brand Information</CardTitle>
+                            <CardTitle>{t("brand-information")}</CardTitle>
                             <CardDescription>
-                              Manage your brand details and product categories
+                              {t("manage-brand-details")}
                             </CardDescription>
                           </motion.div>
                         </CardHeader>
                         <CardContent className="space-y-6">
                           <motion.div variants={itemAnimation} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                              <Label htmlFor="targetMarket">Target Market</Label>
+                              <Label htmlFor="targetMarket">{t("target-market")}</Label>
                               <div className="relative">
                                 <Target className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                                 <Textarea
@@ -570,7 +572,7 @@ const Settings = () => {
                             </div>
                             
                             <div className="space-y-2">
-                              <Label htmlFor="brandValues">Brand Values</Label>
+                              <Label htmlFor="brandValues">{t("brand-values")}</Label>
                               <div className="relative">
                                 <Heart className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                                 <Textarea
@@ -583,7 +585,7 @@ const Settings = () => {
                             </div>
                             
                             <div className="space-y-2 md:col-span-2">
-                              <Label htmlFor="usp">Unique Selling Proposition</Label>
+                              <Label htmlFor="usp">{t("unique-selling-proposition")}</Label>
                               <div className="relative">
                                 <Tag className="absolute left-3 top-3 text-muted-foreground h-4 w-4" />
                                 <Textarea
@@ -591,7 +593,7 @@ const Settings = () => {
                                   value={usp}
                                   onChange={(e) => setUSP(e.target.value)}
                                   className="pl-10"
-                                  placeholder="What makes your brand unique?"
+                                  placeholder={t("what-makes-brand-unique")}
                                   rows={3}
                                 />
                               </div>
@@ -599,7 +601,7 @@ const Settings = () => {
                           </motion.div>
                           
                           <motion.div variants={itemAnimation} className="space-y-4">
-                            <Label>Product Categories</Label>
+                            <Label>{t("product-categories")}</Label>
                             <div className="flex flex-wrap gap-2 mb-4">
                               {productCategories.map((category, index) => (
                                 <motion.div
@@ -622,36 +624,36 @@ const Settings = () => {
                             
                             <form onSubmit={handleAddCategory} className="flex gap-2">
                               <Input 
-                                placeholder="Add a product category..." 
+                                placeholder={t("add-product-category")}
                                 value={newCategory}
                                 onChange={(e) => setNewCategory(e.target.value)}
                                 className="max-w-xs"
                               />
-                              <Button type="submit" size="sm">Add</Button>
+                              <Button type="submit" size="sm">{t("add")}</Button>
                             </form>
                           </motion.div>
                           
                           <motion.div variants={itemAnimation} className="border rounded-md p-4 bg-muted/30">
                             <h3 className="font-medium mb-2 flex items-center gap-2">
                               <ShoppingBag className="h-4 w-4" />
-                              Brand Highlights
+                              {t("brand-highlights")}
                             </h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                               <div className="flex items-center space-x-2">
                                 <Switch id="highlight-sustainable" defaultChecked />
-                                <Label htmlFor="highlight-sustainable">Sustainable</Label>
+                                <Label htmlFor="highlight-sustainable">{t("sustainable")}</Label>
                               </div>
                               <div className="flex items-center space-x-2">
                                 <Switch id="highlight-organic" defaultChecked />
-                                <Label htmlFor="highlight-organic">Organic</Label>
+                                <Label htmlFor="highlight-organic">{t("organic")}</Label>
                               </div>
                               <div className="flex items-center space-x-2">
                                 <Switch id="highlight-vegan" />
-                                <Label htmlFor="highlight-vegan">Vegan</Label>
+                                <Label htmlFor="highlight-vegan">{t("vegan")}</Label>
                               </div>
                               <div className="flex items-center space-x-2">
                                 <Switch id="highlight-glutenfree" />
-                                <Label htmlFor="highlight-glutenfree">Gluten-Free</Label>
+                                <Label htmlFor="highlight-glutenfree">{t("gluten-free")}</Label>
                               </div>
                             </div>
                           </motion.div>
@@ -667,7 +669,7 @@ const Settings = () => {
                               ) : (
                                 <Save className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
                               )}
-                              Save Brand Details
+                              {t("save-brand-details")}
                             </Button>
                           </motion.div>
                         </CardContent>
@@ -691,9 +693,9 @@ const Settings = () => {
                       <Card>
                         <CardHeader>
                           <motion.div variants={itemAnimation}>
-                            <CardTitle>Notification Preferences</CardTitle>
+                            <CardTitle>{t("notification-preferences")}</CardTitle>
                             <CardDescription>
-                              Choose how you want to receive notifications and updates
+                              {t("choose-notification-updates")}
                             </CardDescription>
                           </motion.div>
                         </CardHeader>
@@ -703,10 +705,10 @@ const Settings = () => {
                               <div className="space-y-0.5">
                                 <Label htmlFor="emailNotifications" className="flex items-center gap-2">
                                   <AtSign className="h-4 w-4 text-primary" />
-                                  Email Notifications
+                                  {t("email-notifications")}
                                 </Label>
                                 <p className="text-sm text-muted-foreground">
-                                  Receive important updates via email
+                                  {t("receive-important-updates")}
                                 </p>
                               </div>
                               <Switch
@@ -722,10 +724,10 @@ const Settings = () => {
                               <div className="space-y-0.5">
                                 <Label htmlFor="messageNotifications" className="flex items-center gap-2">
                                   <Bell className="h-4 w-4 text-primary" />
-                                  Message Notifications
+                                  {t("message-notifications")}
                                 </Label>
                                 <p className="text-sm text-muted-foreground">
-                                  Get notified when you receive new messages
+                                  {t("notified-new-messages")}
                                 </p>
                               </div>
                               <Switch
@@ -741,10 +743,10 @@ const Settings = () => {
                               <div className="space-y-0.5">
                                 <Label htmlFor="partnershipNotifications" className="flex items-center gap-2">
                                   <Handshake className="h-4 w-4 text-primary" />
-                                  Partnership Notifications
+                                  {t("partnership-notifications")}
                                 </Label>
                                 <p className="text-sm text-muted-foreground">
-                                  Get notified about new partnership opportunities
+                                  {t("notified-partnership-opportunities")}
                                 </p>
                               </div>
                               <Switch
@@ -760,10 +762,10 @@ const Settings = () => {
                               <div className="space-y-0.5">
                                 <Label htmlFor="marketingNotifications" className="flex items-center gap-2">
                                   <Megaphone className="h-4 w-4 text-primary" />
-                                  Marketing Emails
+                                  {t("marketing-emails")}
                                 </Label>
                                 <p className="text-sm text-muted-foreground">
-                                  Receive tips, product updates and offers
+                                  {t("receive-tips-updates")}
                                 </p>
                               </div>
                               <Switch
@@ -785,7 +787,7 @@ const Settings = () => {
                               ) : (
                                 <Save className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
                               )}
-                              Save Notification Settings
+                              {t("save-notification-settings")}
                             </Button>
                           </motion.div>
                         </CardContent>
@@ -807,15 +809,15 @@ const Settings = () => {
                   <TabsContent value="security" className="space-y-6">
                     <Card>
                       <CardHeader>
-                        <CardTitle>Password & Security</CardTitle>
+                        <CardTitle>{t("password-security")}</CardTitle>
                         <CardDescription>
-                          Manage your password and security preferences
+                          {t("manage-password-security")}
                         </CardDescription>
                       </CardHeader>
                       <CardContent className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="space-y-2">
-                            <Label htmlFor="currentPassword">Current Password</Label>
+                            <Label htmlFor="currentPassword">{t("current-password")}</Label>
                             <div className="relative">
                               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                               <Input
@@ -830,7 +832,7 @@ const Settings = () => {
                           
                           <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                              <Label htmlFor="newPassword">New Password</Label>
+                              <Label htmlFor="newPassword">{t("new-password")}</Label>
                               <div className="relative">
                                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                                 <Input
@@ -844,7 +846,7 @@ const Settings = () => {
                             </div>
                             
                             <div className="space-y-2">
-                              <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                              <Label htmlFor="confirmPassword">{t("confirm-new-password")}</Label>
                               <div className="relative">
                                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                                 <Input
@@ -865,9 +867,9 @@ const Settings = () => {
                           <div className="md:col-span-2">
                             <div className="flex items-center justify-between">
                               <div className="space-y-0.5">
-                                <Label htmlFor="twoFactorEnabled">Two-Factor Authentication</Label>
+                                <Label htmlFor="twoFactorEnabled">{t("two-factor-authentication")}</Label>
                                 <p className="text-sm text-muted-foreground">
-                                  Add an extra layer of security to your account
+                                  {t("add-extra-security")}
                                 </p>
                               </div>
                               <Switch
@@ -882,7 +884,7 @@ const Settings = () => {
                         <div className="flex justify-end">
                           <Button onClick={handleSaveSecurity} disabled={isLoading}>
                             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Update Security Settings
+                            {t("update-security-settings")}
                           </Button>
                         </div>
                       </CardContent>
@@ -903,21 +905,21 @@ const Settings = () => {
                   <TabsContent value="preferences" className="space-y-6">
                     <Card>
                       <CardHeader>
-                        <CardTitle>Application Preferences</CardTitle>
+                        <CardTitle>{t("application-preferences")}</CardTitle>
                         <CardDescription>
-                          Customize your application experience
+                          {t("customize-application-experience")}
                         </CardDescription>
                       </CardHeader>
                       <CardContent className="space-y-6">
                         <div className="space-y-4">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                              <Label htmlFor="language">Language</Label>
+                              <Label htmlFor="language">{t("language")}</Label>
                               <Select value={language} onValueChange={setLanguage}>
                                 <SelectTrigger id="language" className="w-full">
                                   <div className="flex items-center gap-2">
                                     <Languages className="h-4 w-4 text-muted-foreground" />
-                                    <SelectValue placeholder="Select language" />
+                                    <SelectValue placeholder={t("select-language")} />
                                   </div>
                                 </SelectTrigger>
                                 <SelectContent>
@@ -930,15 +932,15 @@ const Settings = () => {
                             </div>
                             
                             <div className="space-y-2">
-                              <Label htmlFor="theme">Theme</Label>
+                              <Label htmlFor="theme">{t("theme")}</Label>
                               <Select value={theme} onValueChange={setTheme}>
                                 <SelectTrigger id="theme" className="w-full">
-                                  <SelectValue placeholder="Select theme" />
+                                  <SelectValue placeholder={t("select-theme")} />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="light">Light</SelectItem>
-                                  <SelectItem value="dark">Dark</SelectItem>
-                                  <SelectItem value="system">System</SelectItem>
+                                  <SelectItem value="light">{t("light")}</SelectItem>
+                                  <SelectItem value="dark">{t("dark")}</SelectItem>
+                                  <SelectItem value="system">{t("system")}</SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
@@ -948,9 +950,9 @@ const Settings = () => {
                           
                           <div className="flex items-center justify-between">
                             <div className="space-y-0.5">
-                              <Label htmlFor="compact-sidebar">Compact Sidebar</Label>
+                              <Label htmlFor="compact-sidebar">{t("compact-sidebar")}</Label>
                               <p className="text-sm text-muted-foreground">
-                                Use a more compact sidebar layout
+                                {t("use-compact-sidebar")}
                               </p>
                             </div>
                             <Switch
@@ -963,7 +965,7 @@ const Settings = () => {
                         <div className="flex justify-end">
                           <Button disabled={isLoading}>
                             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Save Preferences
+                            {t("save-preferences")}
                           </Button>
                         </div>
                       </CardContent>
@@ -971,21 +973,21 @@ const Settings = () => {
                     
                     <Card>
                       <CardHeader>
-                        <CardTitle>Help & Support</CardTitle>
+                        <CardTitle>{t("help-support")}</CardTitle>
                         <CardDescription>
-                          Get help with using the platform
+                          {t("get-help-platform")}
                         </CardDescription>
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <div className="flex items-center gap-4">
                           <LifeBuoy className="h-8 w-8 text-primary" />
                           <div>
-                            <h3 className="text-lg font-medium">Need assistance?</h3>
+                            <h3 className="text-lg font-medium">{t("need-assistance")}</h3>
                             <p className="text-sm text-muted-foreground">
-                              Our support team is here to help you with any questions you may have.
+                              {t("support-team-help")}
                             </p>
                             <Button variant="outline" className="mt-2">
-                              Contact Support
+                              {t("contact-support")}
                             </Button>
                           </div>
                         </div>
@@ -1007,9 +1009,9 @@ const Settings = () => {
                   <TabsContent value="activity" className="space-y-6">
                     <Card>
                       <CardHeader>
-                        <CardTitle>Account Activity</CardTitle>
+                        <CardTitle>{t("account-activity")}</CardTitle>
                         <CardDescription>
-                          Recent changes and activity on your account
+                          {t("recent-changes-activity")}
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
@@ -1041,9 +1043,9 @@ const Settings = () => {
                     
                     <Card>
                       <CardHeader>
-                        <CardTitle>Documentation & Guides</CardTitle>
+                        <CardTitle>{t("documentation-guides")}</CardTitle>
                         <CardDescription>
-                          Resources to help you use the platform effectively
+                          {t("resources-help-platform")}
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
@@ -1058,9 +1060,9 @@ const Settings = () => {
                                 <BookOpen className="h-5 w-5 text-primary" />
                               </div>
                               <div>
-                                <h3 className="font-medium">Brand Settings Guide</h3>
+                                <h3 className="font-medium">{t("brand-settings-guide")}</h3>
                                 <p className="text-sm text-muted-foreground">
-                                  Learn how to configure your brand settings effectively
+                                  {t("learn-configure-settings")}
                                 </p>
                               </div>
                             </div>
@@ -1076,9 +1078,9 @@ const Settings = () => {
                                 <ShieldAlert className="h-5 w-5 text-primary" />
                               </div>
                               <div>
-                                <h3 className="font-medium">Security Best Practices</h3>
+                                <h3 className="font-medium">{t("security-best-practices")}</h3>
                                 <p className="text-sm text-muted-foreground">
-                                  Tips to keep your account secure
+                                  {t("tips-secure-account")}
                                 </p>
                               </div>
                             </div>

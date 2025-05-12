@@ -50,6 +50,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 // Manufacturer interface type
 interface Manufacturer {
@@ -149,6 +150,7 @@ const Manufacturers = () => {
   const isDark = theme === "dark";
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   
   // State for search and filters
   const [searchQuery, setSearchQuery] = useState("");
@@ -171,7 +173,7 @@ const Manufacturers = () => {
   });
   
   useEffect(() => {
-    document.title = "Manufacturer Partners - CPG Matchmaker";
+    document.title = t("manufacturers-title") + " - CPG Matchmaker";
     
     // If not authenticated or not a brand, redirect
     if (!isAuthenticated) {
@@ -179,7 +181,7 @@ const Manufacturers = () => {
     } else if (role !== "brand") {
       navigate("/dashboard");
     }
-  }, [isAuthenticated, navigate, role]);
+  }, [isAuthenticated, navigate, role, t]);
 
   if (!isAuthenticated || role !== "brand") {
     return null;
@@ -237,17 +239,17 @@ const Manufacturers = () => {
     setIsFindManufacturerOpen(false);
     
     toast({
-      title: "Search initiated",
-      description: `We're looking for manufacturers that match your requirements. You'll be notified when we find potential partners.`,
+      title: t("manufacturers-search-initiated"),
+      description: t("manufacturers-search-description"),
     });
   };
 
   const getStatusBadge = (status: string) => {
     switch(status) {
       case "Active Partner":
-        return <Badge className="bg-green-500 hover:bg-green-600">Active Partner</Badge>;
+        return <Badge className="bg-green-500 hover:bg-green-600">{t("manufacturers-active-partner")}</Badge>;
       case "Potential Match":
-        return <Badge variant="outline" className="text-blue-500 border-blue-500 hover:bg-blue-50 dark:hover:bg-transparent">Potential Match</Badge>;
+        return <Badge variant="outline" className="text-blue-500 border-blue-500 hover:bg-blue-50 dark:hover:bg-transparent">{t("manufacturers-potential-match")}</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -261,7 +263,7 @@ const Manufacturers = () => {
     return (
       <div className="flex items-center">
         <div className={`h-2.5 w-2.5 rounded-full ${colorClass} mr-1.5`}></div>
-        <span className="text-sm font-medium">{score}% Match</span>
+        <span className="text-sm font-medium">{score}% {t("manufacturers-match")}</span>
       </div>
     );
   };
@@ -286,7 +288,7 @@ const Manufacturers = () => {
                   transition={{ duration: 0.5, delay: 0.1 }}
                 >
                 <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/70 text-transparent bg-clip-text">
-                  Manufacturing Management
+                  {t("manufacturers-management")}
                 </h1>
                 </motion.h1>
                 <motion.p 
@@ -295,7 +297,7 @@ const Manufacturers = () => {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
                 >
-                  {user?.companyName} - Find and manage manufacturing partnerships
+                  {user?.companyName} - {t("manufacturers-find-manage")}
                 </motion.p>
               </div>
               
@@ -309,13 +311,13 @@ const Manufacturers = () => {
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" className="group">
                       <Filter className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
-                      Filter
+                      {t("filter")}
                       <ChevronDown className="ml-2 h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
                     <div className="p-2">
-                      <p className="text-sm font-medium mb-2">Category</p>
+                      <p className="text-sm font-medium mb-2">{t("category")}</p>
                       <div className="space-y-1">
                         {manufacturerCategories.map(category => (
                           <div 
@@ -337,7 +339,7 @@ const Manufacturers = () => {
                     </div>
                     <DropdownMenuSeparator />
                     <div className="p-2">
-                      <p className="text-sm font-medium mb-2">Status</p>
+                      <p className="text-sm font-medium mb-2">{t("status")}</p>
                       <div className="space-y-1">
                         {["Active Partner", "Potential Match"].map(status => (
                           <div 
@@ -352,7 +354,7 @@ const Manufacturers = () => {
                               filterStatus === status ? null : status
                             )}
                           >
-                            {status}
+                            {status === "Active Partner" ? t("manufacturers-active-partner") : t("manufacturers-potential-match")}
                           </div>
                         ))}
                       </div>
@@ -362,13 +364,13 @@ const Manufacturers = () => {
                       className="justify-center text-center cursor-pointer"
                       onClick={resetFilters}
                     >
-                      Reset Filters
+                      {t("reset-filters")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
                 <Button className="group" onClick={openFindManufacturerModal}>
                   <Plus className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
-                  Find Manufacturers
+                  {t("manufacturers-find")}
                 </Button>
               </motion.div>
             </div>
@@ -384,7 +386,7 @@ const Manufacturers = () => {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input 
-                placeholder="Search manufacturers, categories, or locations..." 
+                placeholder={t("manufacturers-search-placeholder")} 
                 className="pl-10" 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -460,7 +462,7 @@ const Manufacturers = () => {
                       <div className="flex w-full justify-between items-center">
                         <div className="flex items-center">
                           <Badge variant="outline" className="bg-background">
-                            {manufacturer.products} {manufacturer.products === 1 ? 'Product' : 'Products'}
+                            {manufacturer.products} {manufacturer.products === 1 ? t("manufacturers-product") : t("manufacturers-products")}
                           </Badge>
                         </div>
                         <Button 
@@ -469,7 +471,7 @@ const Manufacturers = () => {
                           className="gap-1 transition-colors hover:bg-background"
                           onClick={() => openManufacturerDetails(manufacturer)}
                         >
-                          View Details <ArrowRight className="h-4 w-4 ml-1" />
+                          {t("manufacturers-view-details")} <ArrowRight className="h-4 w-4 ml-1" />
                         </Button>
                       </div>
                     </CardFooter>
@@ -499,16 +501,16 @@ const Manufacturers = () => {
                     )}>
                       <Plus className="h-6 w-6 text-primary" />
                     </div>
-                    <h3 className="font-medium mb-2">Find New Manufacturers</h3>
+                    <h3 className="font-medium mb-2">{t("manufacturers-find-new")}</h3>
                     <p className="text-sm text-muted-foreground text-center mb-4">
-                      Discover production partners that match your brand's needs
+                      {t("manufacturers-discover-partners")}
                     </p>
                     <Button variant="outline" size="sm" className="mt-2" onClick={(e) => {
                       e.stopPropagation(); // Prevent card click from triggering twice
                       openFindManufacturerModal();
                     }}>
                       <Plus className="h-4 w-4 mr-2" />
-                      Start Search
+                      {t("manufacturers-start-search")}
                     </Button>
                   </CardContent>
                 </Card>
@@ -525,18 +527,18 @@ const Manufacturers = () => {
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                     <Factory className="h-6 w-6 text-muted-foreground" />
                   </div>
-                  <h3 className="mt-4 text-lg font-medium">No manufacturers found</h3>
+                  <h3 className="mt-4 text-lg font-medium">{t("manufacturers-none-found")}</h3>
                   <p className="mt-2 text-sm text-muted-foreground">
                     {searchQuery || filterCategory || filterStatus 
-                      ? "Try adjusting your search or filter criteria." 
-                      : "Get started by finding new manufacturing partners."}
+                      ? t("manufacturers-adjust-filters") 
+                      : t("manufacturers-get-started")}
                   </p>
                   <Button 
                     className="mt-4"
                     onClick={resetFilters}
                   >
                     <Filter className="mr-2 h-4 w-4" />
-                    Reset Filters
+                    {t("reset-filters")}
                   </Button>
                 </div>
               </div>
@@ -573,9 +575,9 @@ const Manufacturers = () => {
                     <Star className="h-5 w-5 text-yellow-500" />
                   </div>
                   <div>
-                    <h3 className="font-medium">Match Score</h3>
+                    <h3 className="font-medium">{t("manufacturers-match-score")}</h3>
                     <p className="text-sm text-muted-foreground">
-                      How well this manufacturer matches your brand
+                      {t("manufacturers-match-description")}
                     </p>
                   </div>
                 </div>
@@ -595,7 +597,7 @@ const Manufacturers = () => {
               
               {/* Description */}
               <div className="space-y-2">
-                <h3 className="text-base font-medium">About</h3>
+                <h3 className="text-base font-medium">{t("manufacturers-about")}</h3>
                 <p className="text-sm text-muted-foreground">
                   {selectedManufacturer.description}
                 </p>
@@ -603,7 +605,7 @@ const Manufacturers = () => {
               
               {/* Certifications */}
               <div className="space-y-2">
-                <h3 className="text-base font-medium">Certifications</h3>
+                <h3 className="text-base font-medium">{t("manufacturers-certifications")}</h3>
                 <div className="flex flex-wrap gap-2">
                   {selectedManufacturer.certifications.map((cert, idx) => (
                     <Badge key={idx} className="bg-primary/10 text-primary border-none">
@@ -616,18 +618,20 @@ const Manufacturers = () => {
               
               {/* Products */}
               <div className="space-y-2">
-                <h3 className="text-base font-medium">Products</h3>
+                <h3 className="text-base font-medium">{t("products")}</h3>
                 {selectedManufacturer.products > 0 ? (
                   <div className={cn(
                     "p-4 rounded-lg border",
                     isDark ? "bg-card" : "bg-slate-50"
                   )}>
                     <p className="text-sm">
-                      You have {selectedManufacturer.products} product{selectedManufacturer.products !== 1 ? 's' : ''} 
-                      manufactured by {selectedManufacturer.name}.
+                      {t("manufacturers-have-products", {
+                        count: selectedManufacturer.products,
+                        name: selectedManufacturer.name
+                      })}
                     </p>
                     <Button variant="outline" size="sm" className="mt-3">
-                      View Products
+                      {t("manufacturers-view-products")}
                     </Button>
                   </div>
                 ) : (
@@ -636,10 +640,10 @@ const Manufacturers = () => {
                     isDark ? "bg-card" : "bg-slate-50"
                   )}>
                     <p className="text-sm text-muted-foreground">
-                      You don't have any products manufactured by this partner yet.
+                      {t("manufacturers-no-products")}
                     </p>
                     <Button variant="outline" size="sm" className="mt-3">
-                      Explore Collaboration
+                      {t("manufacturers-explore-collaboration")}
                     </Button>
                   </div>
                 )}
@@ -652,10 +656,10 @@ const Manufacturers = () => {
                 onClick={() => setIsDetailsOpen(false)}
                 className="mr-2"
               >
-                Close
+                {t("close")}
               </Button>
               <Button>
-                Contact Manufacturer
+                {t("manufacturers-contact")}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -672,9 +676,9 @@ const Manufacturers = () => {
       >
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-auto z-[100]">
           <DialogHeader>
-            <DialogTitle>Find Manufacturing Partners</DialogTitle>
+            <DialogTitle>{t("manufacturers-find-partners")}</DialogTitle>
             <DialogDescription>
-              Specify your manufacturing requirements to find perfect matches for your brand
+              {t("manufacturers-specify-requirements")}
             </DialogDescription>
           </DialogHeader>
           
@@ -682,18 +686,18 @@ const Manufacturers = () => {
             {/* Category */}
             <div className="space-y-2">
               <Label htmlFor="category" className="text-base font-medium">
-                Product Category <span className="text-destructive">*</span>
+                {t("manufacturers-product-category")} <span className="text-destructive">*</span>
               </Label>
               <Select
                 value={searchCriteria.category}
                 onValueChange={(value) => setSearchCriteria({...searchCriteria, category: value})}
               >
                 <SelectTrigger id="category" className={!searchCriteria.category ? "text-muted-foreground" : ""}>
-                  <SelectValue placeholder="Select a category" />
+                  <SelectValue placeholder={t("manufacturers-select-category")} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectLabel>Categories</SelectLabel>
+                    <SelectLabel>{t("categories")}</SelectLabel>
                     {manufacturerCategories.map(category => (
                       <SelectItem key={category} value={category}>{category}</SelectItem>
                     ))}
@@ -704,7 +708,7 @@ const Manufacturers = () => {
             
             {/* Certifications */}
             <div className="space-y-2">
-              <Label className="text-base font-medium">Required Certifications</Label>
+              <Label className="text-base font-medium">{t("manufacturers-required-certifications")}</Label>
               <div className="grid grid-cols-2 gap-3 pt-1">
                 {["Organic", "Kosher", "Vegan", "Non-GMO", "Fair Trade", "B Corp", "Sustainable"].map(cert => (
                   <div 
@@ -758,11 +762,11 @@ const Manufacturers = () => {
             {/* Location */}
             <div className="space-y-2">
               <Label htmlFor="location" className="text-base font-medium">
-                Preferred Location
+                {t("manufacturers-preferred-location")}
               </Label>
               <Input 
                 id="location" 
-                placeholder="City, State or region"
+                placeholder={t("manufacturers-location-placeholder")}
                 value={searchCriteria.location}
                 onChange={(e) => setSearchCriteria({...searchCriteria, location: e.target.value})}
               />
@@ -770,24 +774,24 @@ const Manufacturers = () => {
             
             {/* Capacity Range */}
             <div className="space-y-2">
-              <Label className="text-base font-medium">Production Capacity (units/month)</Label>
+              <Label className="text-base font-medium">{t("manufacturers-production-capacity")}</Label>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <Label htmlFor="minCapacity" className="text-xs text-muted-foreground">Minimum</Label>
+                  <Label htmlFor="minCapacity" className="text-xs text-muted-foreground">{t("manufacturers-minimum")}</Label>
                   <Input 
                     type="number"
                     id="minCapacity" 
-                    placeholder="Min units"
+                    placeholder={t("manufacturers-min-units")}
                     value={searchCriteria.minCapacity || ''}
                     onChange={(e) => setSearchCriteria({...searchCriteria, minCapacity: parseInt(e.target.value) || 0})}
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label htmlFor="maxCapacity" className="text-xs text-muted-foreground">Maximum</Label>
+                  <Label htmlFor="maxCapacity" className="text-xs text-muted-foreground">{t("manufacturers-maximum")}</Label>
                   <Input 
                     type="number"
                     id="maxCapacity" 
-                    placeholder="Max units"
+                    placeholder={t("manufacturers-max-units")}
                     value={searchCriteria.maxCapacity || ''}
                     onChange={(e) => setSearchCriteria({...searchCriteria, maxCapacity: parseInt(e.target.value) || 0})}
                   />
@@ -798,11 +802,11 @@ const Manufacturers = () => {
             {/* Additional Notes */}
             <div className="space-y-2">
               <Label htmlFor="notes" className="text-base font-medium">
-                Additional Requirements
+                {t("manufacturers-additional-requirements")}
               </Label>
               <Textarea 
                 id="notes" 
-                placeholder="Describe any specific manufacturing requirements or preferences"
+                placeholder={t("manufacturers-requirements-placeholder")}
                 rows={4}
                 value={searchCriteria.notes}
                 onChange={(e) => setSearchCriteria({...searchCriteria, notes: e.target.value})}
@@ -817,14 +821,14 @@ const Manufacturers = () => {
               onClick={() => setIsFindManufacturerOpen(false)}
               className="mr-2"
             >
-              Cancel
+              {t("cancel")}
             </Button>
             <Button 
               onClick={handleFindManufacturer}
               disabled={!searchCriteria.category}
             >
               <Search className="h-4 w-4 mr-2" />
-              Find Matches
+              {t("manufacturers-find-matches")}
             </Button>
           </DialogFooter>
         </DialogContent>

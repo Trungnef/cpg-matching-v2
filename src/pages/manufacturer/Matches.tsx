@@ -98,7 +98,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
-import { StatusBadge, StatusType } from "@/components/ui/status-badge";
+import { useTranslation } from "react-i18next";
 
 // Helper functions for match styling
 const getStatusBadge = (status: string) => {
@@ -442,6 +442,7 @@ const Matches = () => {
     type: "Initial Meeting",
     notes: "",
   });
+  const { t } = useTranslation();
 
   // Advanced filters state
   const [filters, setFilters] = useState({
@@ -469,7 +470,7 @@ const Matches = () => {
   );
 
   useEffect(() => {
-    document.title = "Matches - CPG Matchmaker";
+    document.title = t("matches-title") + " - CPG Matchmaker";
 
     // If not authenticated or not a manufacturer, redirect
     if (!isAuthenticated) {
@@ -484,7 +485,7 @@ const Matches = () => {
     }, 800);
 
     return () => clearTimeout(timer);
-  }, [isAuthenticated, navigate, role]);
+  }, [isAuthenticated, navigate, role, t]);
 
   if (!isAuthenticated || role !== "manufacturer") {
     return null;
@@ -783,11 +784,11 @@ const Matches = () => {
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-primary/90 to-primary/70 bg-clip-text text-transparent">
-                  Brand Matches
+                  {t("matches-title")}
                 </h1>
               </div>
               <p className="text-muted-foreground mt-1">
-                Discover and manage potential manufacturing partnerships
+                {t("matches-subtitle")}
               </p>
             </div>
 
@@ -805,7 +806,7 @@ const Matches = () => {
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>{showStats ? "Hide" : "Show"} match statistics</p>
+                    <p>{showStats ? t("hide") : t("show")} {t("matches-match-details").toLowerCase()}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -828,7 +829,7 @@ const Matches = () => {
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Toggle view mode</p>
+                    <p>{t("toggle-view-mode")}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -837,7 +838,7 @@ const Matches = () => {
                 <SheetTrigger asChild>
                   <Button variant="outline" size="sm" className="gap-1">
                     <Filter className="h-4 w-4" />
-                    <span>Filters</span>
+                    <span>{t("filters")}</span>
                     {(selectedCategory !== "all" ||
                       filters.minMatchScore > 70 ||
                       filters.showVerifiedOnly) && (
@@ -853,16 +854,16 @@ const Matches = () => {
                   <div className="h-full overflow-y-auto">
                     <SheetHeader className="pb-6">
                       <SheetTitle className="text-xl">
-                        Filter Matches
+                        {t("matches-filter-title")}
                       </SheetTitle>
                       <SheetDescription className="text-muted-foreground">
-                        Apply filters to find the perfect manufacturing partners
+                        {t("apply-filters-to-find-perfect-manufacturing-partners")}
                       </SheetDescription>
                     </SheetHeader>
                     <div className="py-4 space-y-6">
                       <div className="space-y-2">
                         <h3 className="text-sm font-medium">
-                          Product Categories
+                          {t("matches-filter-category")}
                         </h3>
                         <div className="grid grid-cols-2 gap-2">
                           {productCategories.map(
@@ -910,11 +911,13 @@ const Matches = () => {
                       </div>
 
                       <div className="space-y-2">
-                        <h3 className="text-sm font-medium">Match Score</h3>
+                        <h3 className="text-sm font-medium">
+                          {t("matches-filter-match-score")}
+                        </h3>
                         <div className="space-y-4">
                           <div className="flex items-center justify-between">
                             <span className="text-sm">
-                              Minimum score: {filters.minMatchScore}%
+                              {t("matches-min-score")}: {filters.minMatchScore}%
                             </span>
                           </div>
                           <Slider
@@ -934,7 +937,7 @@ const Matches = () => {
 
                       <div className="space-y-2">
                         <h3 className="text-sm font-medium">
-                          Additional Options
+                          {t("additional-options")}
                         </h3>
                         <div className="space-y-3">
                           <div className="flex items-center justify-between">
@@ -942,7 +945,7 @@ const Matches = () => {
                               htmlFor="verified-only"
                               className="cursor-pointer"
                             >
-                              Verified companies only
+                              {t("verified-companies-only")}
                             </Label>
                             <Switch
                               id="verified-only"
@@ -956,7 +959,7 @@ const Matches = () => {
                             />
                           </div>
                           <div>
-                            <h4 className="text-sm mb-2">Availability</h4>
+                            <h4 className="text-sm mb-2">{t("availability")}</h4>
                             <div className="grid grid-cols-3 gap-2">
                               <Button
                                 variant={
@@ -972,7 +975,7 @@ const Matches = () => {
                                   })
                                 }
                               >
-                                All
+                                {t("all")}
                               </Button>
                               <Button
                                 variant={
@@ -988,7 +991,7 @@ const Matches = () => {
                                   })
                                 }
                               >
-                                Immediate
+                                {t("immediate")}
                               </Button>
                               <Button
                                 variant={
@@ -1004,7 +1007,7 @@ const Matches = () => {
                                   })
                                 }
                               >
-                                Future
+                                {t("future")}
                               </Button>
                             </div>
                           </div>
@@ -1013,10 +1016,10 @@ const Matches = () => {
                     </div>
                     <SheetFooter className="flex-row justify-between gap-3 sm:justify-between">
                       <Button variant="outline" onClick={resetFilters}>
-                        Reset All
+                        {t("matches-filter-reset")}
                       </Button>
                       <SheetClose asChild>
-                        <Button>Apply Filters</Button>
+                        <Button>{t("matches-filter-apply")}</Button>
                       </SheetClose>
                     </SheetFooter>
                   </div>
@@ -1026,7 +1029,7 @@ const Matches = () => {
               <form onSubmit={handleSearch} className="relative">
                 <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search matches..."
+                  placeholder={t("matches-search-placeholder")}
                   ref={searchInputRef}
                   defaultValue={searchQuery}
                   className="pl-8 max-w-xs"
@@ -1038,24 +1041,23 @@ const Matches = () => {
                 <DialogTrigger asChild>
                   <Button className="flex-nowrap gap-1 hover:shadow-md transition-all duration-300 hover:translate-y-[-1px]">
                     <Sparkles className="h-4 w-4" />
-                    <span>Find Matches</span>
+                    <span>{t("find-matches")}</span>
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-md">
                   <DialogHeader>
-                    <DialogTitle>Find New Brand Matches</DialogTitle>
+                    <DialogTitle>{t("find-new-brand-matches")}</DialogTitle>
                     <DialogDescription>
-                      Optimize your profile to find the best manufacturing
-                      partnerships
+                      {t("optimize-profile-to-find-best-partnerships")}
                     </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
                     <div className="space-y-2">
                       <h3 className="text-sm font-medium">
-                        Matching Priorities
+                        {t("matching-priorities")}
                       </h3>
                       <p className="text-sm text-muted-foreground">
-                        Choose what's most important in your brand matches
+                        {t("choose-whats-important-in-brand-matches")}
                       </p>
                       <div className="grid gap-2">
                         <div className="flex items-center space-x-2">
@@ -1064,7 +1066,7 @@ const Matches = () => {
                             htmlFor="priority-location"
                             className="text-sm font-medium"
                           >
-                            Location proximity
+                            {t("location-proximity")}
                           </label>
                         </div>
                         <div className="flex items-center space-x-2">
@@ -1073,7 +1075,7 @@ const Matches = () => {
                             htmlFor="priority-size"
                             className="text-sm font-medium"
                           >
-                            Company size
+                            {t("company-size")}
                           </label>
                         </div>
                         <div className="flex items-center space-x-2">
@@ -1082,7 +1084,7 @@ const Matches = () => {
                             htmlFor="priority-specialty"
                             className="text-sm font-medium"
                           >
-                            Product specialty
+                            {t("product-specialty")}
                           </label>
                         </div>
                         <div className="flex items-center space-x-2">
@@ -1091,7 +1093,7 @@ const Matches = () => {
                             htmlFor="priority-certifications"
                             className="text-sm font-medium"
                           >
-                            Certifications
+                            {t("certifications")}
                           </label>
                         </div>
                       </div>
@@ -1100,7 +1102,7 @@ const Matches = () => {
                   <DialogFooter>
                     <Button variant="outline" className="gap-1">
                       <Share2 className="h-4 w-4" />
-                      Update Profile
+                      {t("update-profile")}
                     </Button>
                     <Button
                       type="submit"
@@ -1108,7 +1110,7 @@ const Matches = () => {
                       onClick={refreshMatches}
                     >
                       <RefreshCw className="h-4 w-4" />
-                      Find Matches
+                      {t("find-matches")}
                     </Button>
                   </DialogFooter>
                 </DialogContent>
@@ -1213,7 +1215,7 @@ const Matches = () => {
                   className="relative overflow-hidden group data-[state=active]:bg-primary/90 data-[state=active]:text-primary-foreground data-[state=active]:shadow-md data-[state=active]:font-semibold transition-all duration-300 py-2.5"
                 >
                   <span className="relative z-10">
-                    All Matches ({matchesData.length})
+                    {t("matches-tab-all")} ({matchesData.length})
                   </span>
                   <motion.div
                     className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
@@ -1227,7 +1229,7 @@ const Matches = () => {
                   className="relative overflow-hidden group data-[state=active]:bg-amber-500 dark:data-[state=active]:bg-amber-600 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:font-semibold transition-all duration-300 py-2.5"
                 >
                   <div className="flex items-center gap-1.5 relative z-10">
-                    <span>Pending</span>
+                    <span>{t("matches-tab-pending")}</span>
                     <AnimatePresence>
                       {matchesData.filter((m) => m.status === "pending")
                         .length > 0 && (
@@ -1264,7 +1266,7 @@ const Matches = () => {
                   className="relative overflow-hidden group data-[state=active]:bg-emerald-500 dark:data-[state=active]:bg-emerald-600 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:font-semibold transition-all duration-300 py-2.5"
                 >
                   <span className="relative z-10">
-                    Accepted (
+                    {t("matches-tab-connected")} (
                     {matchesData.filter((m) => m.status === "accepted").length})
                   </span>
                   <motion.div
@@ -1279,7 +1281,7 @@ const Matches = () => {
                   className="relative overflow-hidden group data-[state=active]:bg-rose-500 dark:data-[state=active]:bg-rose-600 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:font-semibold transition-all duration-300 py-2.5"
                 >
                   <span className="relative z-10">
-                    Declined (
+                    {t("matches-tab-declined")} (
                     {matchesData.filter((m) => m.status === "declined").length})
                   </span>
                   <motion.div
@@ -1593,7 +1595,7 @@ const Matches = () => {
                                             viewMatchDetails(match)
                                           }
                                         >
-                                          View Profile
+                                          {t("matches-view-details")}
                                           <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
                                         </Button>
 
@@ -1625,7 +1627,7 @@ const Matches = () => {
                                               ) : (
                                                 <X className="h-4 w-4 mr-1" />
                                               )}
-                                              Decline
+                                              {t("matches-decline")}
                                             </Button>
                                             <Button
                                               size="sm"
@@ -1652,7 +1654,7 @@ const Matches = () => {
                                               ) : (
                                                 <Check className="h-4 w-4 mr-1" />
                                               )}
-                                              Accept
+                                              {t("accept")}
                                             </Button>
                                           </>
                                         )}
@@ -1669,7 +1671,7 @@ const Matches = () => {
                                             disabled={isLoading}
                                           >
                                             <Calendar className="h-4 w-4" />
-                                            Schedule Meeting
+                                            {t("matches-schedule-meeting")}
                                           </Button>
                                         )}
                                       </div>
@@ -1699,7 +1701,7 @@ const Matches = () => {
                               }
                             >
                               <RefreshCw className="h-4 w-4" />
-                              Load More Matches
+                              {t("load-more-matches")}
                             </Button>
                           </motion.div>
                         </div>
@@ -1738,12 +1740,12 @@ const Matches = () => {
                         : "bg-yellow-100 text-yellow-600 border-yellow-300"
                       }
                     >
-                      Premium Match
+                      {t("matches-perfect-match")}
                     </Badge>
                   )}
                 </DialogTitle>
                 <DialogDescription className="text-lg">
-                  Match score:{" "}
+                  {t("matches-match-score")}:{" "}
                   <span className="font-semibold">
                     {selectedMatch.matchScore}%
                   </span>
@@ -1755,7 +1757,7 @@ const Matches = () => {
                   <div className="space-y-4">
                     <div>
                       <h3 className="text-sm font-medium mb-1">
-                        Company Profile
+                        {t("matches-company-details")}
                       </h3>
                       <Card className="p-4">
                         <p className="text-sm text-muted-foreground mb-4">
@@ -1765,7 +1767,7 @@ const Matches = () => {
                           <div className="flex items-center gap-2">
                             <Building className="h-4 w-4 text-muted-foreground" />
                             <span className="text-muted-foreground">
-                              Location:
+                              {t("matches-location")}:
                             </span>
                             <span className="font-medium">
                               {selectedMatch.location}
@@ -1773,22 +1775,22 @@ const Matches = () => {
                           </div>
                           <div className="flex items-center gap-2">
                             <Users className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-muted-foreground">Size:</span>
-                            <span className="font-medium">Medium</span>
+                            <span className="text-muted-foreground">{t("size")}:</span>
+                            <span className="font-medium">{t("medium")}</span>
                           </div>
                           <div className="flex items-center gap-2">
                             <Calendar className="h-4 w-4 text-muted-foreground" />
                             <span className="text-muted-foreground">
-                              Established:
+                              {t("established")}:
                             </span>
                             <span className="font-medium">2019</span>
                           </div>
                           <div className="flex items-center gap-2">
                             <MessageSquare className="h-4 w-4 text-muted-foreground" />
                             <span className="text-muted-foreground">
-                              Communication:
+                              {t("communication")}:
                             </span>
-                            <span className="font-medium">English</span>
+                            <span className="font-medium">{t("english")}</span>
                           </div>
                         </div>
                       </Card>
@@ -1796,13 +1798,13 @@ const Matches = () => {
 
                     <div>
                       <h3 className="text-sm font-medium mb-1">
-                        Product Requirements
+                        {t("product-requirements")}
                       </h3>
                       <Card className="p-4">
                         <div className="space-y-3">
                           <div>
                             <h4 className="text-sm font-medium mb-1">
-                              Product Category
+                              {t("product-category")}
                             </h4>
                             <div className="flex flex-wrap gap-2">
                               {getCategoryBadge(selectedMatch.productCategory, isDark)}
@@ -1810,15 +1812,15 @@ const Matches = () => {
                           </div>
                           <div>
                             <h4 className="text-sm font-medium mb-1">
-                              Production Volume
+                              {t("production-volume")}
                             </h4>
                             <p className="text-sm text-muted-foreground">
-                              Medium-scale (5,000-10,000 units/month)
+                              {t("medium-scale")} (5,000-10,000 {t("units-month")})
                             </p>
                           </div>
                           <div>
                             <h4 className="text-sm font-medium mb-1">
-                              Required Certifications
+                              {t("required-certifications")}
                             </h4>
                             <div className="flex flex-wrap gap-2">
                               <Badge 
@@ -1830,7 +1832,7 @@ const Matches = () => {
                                     : "bg-slate-100 text-slate-700 border-slate-200"
                                 )}
                               >
-                                Organic
+                                {t("organic")}
                               </Badge>
                               <Badge 
                                 variant="outline" 
@@ -1841,7 +1843,7 @@ const Matches = () => {
                                     : "bg-slate-100 text-slate-700 border-slate-200"
                                 )}
                               >
-                                Non-GMO
+                                {t("non-gmo")}
                               </Badge>
                               <Badge 
                                 variant="outline" 
@@ -2295,6 +2297,7 @@ const EnhancedMatchCard = ({
   const [isLoading, setIsLoading] = useState(false);
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+  const { t } = useTranslation();
 
   // Animation variants for expandable details - optimized for speed
   const detailsVariants = {
@@ -2400,10 +2403,10 @@ const EnhancedMatchCard = ({
                   className="bg-card/95 backdrop-blur-sm border border-border/50 shadow-md dark:shadow-black/20 animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 duration-200"
                 >
                   <p className="font-medium">
-                    Match score: {match.matchScore}%
+                    {t("matches-match-score")}: {match.matchScore}%
                   </p>
                   <div className="text-xs text-muted-foreground">
-                    Based on your manufacturing capabilities
+                    {t("based-on-your-manufacturing-capabilities")}
                   </div>
                 </TooltipContent>
               </Tooltip>
@@ -2458,7 +2461,7 @@ const EnhancedMatchCard = ({
             className="text-sm px-0 hover:bg-transparent hover:underline"
             onClick={() => setShowDetails(!showDetails)}
           >
-            {showDetails ? "Hide details" : "Show details"}
+            {showDetails ? t("hide-details") : t("show-details")}
           </Button>
           <Button
             variant="outline"
@@ -2466,7 +2469,7 @@ const EnhancedMatchCard = ({
             className="gap-1.5 transition-all duration-300 hover:bg-primary/10 hover:border-primary/30 shadow-sm hover:shadow group"
             onClick={onViewDetails}
           >
-            View Profile
+            {t("matches-view-details")}
             <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
           </Button>
         </div>

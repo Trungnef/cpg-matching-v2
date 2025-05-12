@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,6 +32,7 @@ const staggerContainer = {
 const Solutions = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
+  const { t } = useTranslation();
 
   useEffect(() => {
     document.title = "Solutions - CPG Matchmaker";
@@ -112,7 +114,7 @@ const Solutions = () => {
                 }
               }}
             >
-              AI-Powered Solutions for the CPG Industry
+              {t('solutions-title')}
             </motion.h1>
             <motion.p 
               className="text-xl text-foreground/70 mb-8"
@@ -120,7 +122,7 @@ const Solutions = () => {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
             >
-              Discover how our platform solves critical challenges in the Consumer Packaged Goods industry through innovative technology.
+              {t('solutions-subtitle')}
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -133,7 +135,7 @@ const Solutions = () => {
                 className="rounded-full px-8 bg-gradient-to-r from-primary to-accent hover:shadow-lg transition-all duration-300"
                 onClick={handleBookDemo}
               >
-                Book a Demo
+                {t('book-demo')}
               </Button>
               <Button 
                 size="lg" 
@@ -141,7 +143,7 @@ const Solutions = () => {
                 className="rounded-full px-8 hover:bg-primary/5 transition-all duration-300"
                 onClick={() => handleLearnMore("/features")}
               >
-                Learn More
+                {t('solutions-learn-more')}
               </Button>
             </motion.div>
           </motion.div>
@@ -158,9 +160,9 @@ const Solutions = () => {
               transition={{ duration: 0.5 }}
             >
             <TabsList className="grid grid-cols-3 w-full mb-8">
-                <TabsTrigger value="manufacturers" className="data-[state=active]:bg-primary/20 transition-all duration-300">For Manufacturers</TabsTrigger>
-                <TabsTrigger value="brands" className="data-[state=active]:bg-primary/20 transition-all duration-300">For Brands</TabsTrigger>
-                <TabsTrigger value="retailers" className="data-[state=active]:bg-primary/20 transition-all duration-300">For Retailers</TabsTrigger>
+                <TabsTrigger value="manufacturers" className="data-[state=active]:bg-primary/20 transition-all duration-300">{t('solutions-for-manufacturers')}</TabsTrigger>
+                <TabsTrigger value="brands" className="data-[state=active]:bg-primary/20 transition-all duration-300">{t('solutions-for-brands')}</TabsTrigger>
+                <TabsTrigger value="retailers" className="data-[state=active]:bg-primary/20 transition-all duration-300">{t('solutions-for-retailers')}</TabsTrigger>
             </TabsList>
             </motion.div>
             
@@ -173,15 +175,15 @@ const Solutions = () => {
                 animate="visible"
               >
                 <motion.div variants={fadeInUp}>
-                  <h2 className="text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">Expand Your Network</h2>
+                  <h2 className="text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">{t('expand-network')}</h2>
                   <p className="text-foreground/70 mb-6">
-                    Connect with brands looking for exactly what you manufacture. Our AI matching system identifies perfect partnerships based on capabilities, capacity, and certifications.
+                    {t('manufacturers-connect')}
                   </p>
                   <motion.ul className="space-y-3" variants={staggerContainer}>
                     {[
-                      { icon: <Layers className="h-5 w-5" />, text: "Showcase your manufacturing capabilities to relevant brands" },
-                      { icon: <BrainCircuit className="h-5 w-5" />, text: "AI-driven matches based on equipment capabilities and certification" },
-                      { icon: <Network className="h-5 w-5" />, text: "Expand your network with qualified leads" }
+                      { icon: <Layers className="h-5 w-5" />, text: t('showcase-capabilities') },
+                      { icon: <BrainCircuit className="h-5 w-5" />, text: t('ai-driven-matches') },
+                      { icon: <Network className="h-5 w-5" />, text: t('expand-qualified-leads') }
                     ].map((item, index) => (
                       <motion.li 
                         key={index}
@@ -203,7 +205,7 @@ const Solutions = () => {
                       onClick={() => handleLearnMore("/manufacturers")}
                       className="rounded-full px-6 hover:shadow-lg transition-all duration-300"
                     >
-                      Learn More About Manufacturing
+                      {t('solutions-learn-more')}
                     </Button>
                   </motion.div>
                 </motion.div>
@@ -238,9 +240,9 @@ const Solutions = () => {
                         }}
                       />
                     </motion.div>
-                    <h3 className="text-2xl font-bold mb-2 text-foreground">Intelligent Matching</h3>
+                    <h3 className="text-2xl font-bold mb-2 text-foreground">{t('intelligent-matching')}</h3>
                     <p className="text-foreground/70">
-                      Our AI analyzes 50+ data points to match you with the right partners.
+                      {t('ai-analyzes')}
                     </p>
                   </div>
                 </motion.div>
@@ -253,7 +255,7 @@ const Solutions = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
               >
-                <h3 className="text-2xl font-bold mb-6">Success Stories</h3>
+                <h3 className="text-2xl font-bold mb-6">{t('solutions-success-stories')}</h3>
                 <div className="grid md:grid-cols-2 gap-6">
                   <motion.div 
                     whileHover={{ scale: 1.02 }} 
@@ -263,12 +265,12 @@ const Solutions = () => {
                   >
                     <Card className="hover:shadow-lg transition-all duration-300 border-primary/10 dark:border-primary/20">
                     <CardHeader>
-                        <CardTitle className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">NaturePack Co.</CardTitle>
-                      <CardDescription>Sustainable Packaging Manufacturer</CardDescription>
+                        <CardTitle className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">{t('nature-pack')}</CardTitle>
+                      <CardDescription>{t('sustainable-packaging')}</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <p className="text-foreground/70">
-                        "We increased our client base by 35% within six months of joining the platform. The AI matching system connected us with brands that perfectly aligned with our sustainable packaging capabilities."
+                        {t('nature-pack-story')}
                       </p>
                     </CardContent>
                   </Card>
@@ -281,12 +283,12 @@ const Solutions = () => {
                   >
                     <Card className="hover:shadow-lg transition-all duration-300 border-primary/10 dark:border-primary/20">
                     <CardHeader>
-                        <CardTitle className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">PureFoods Manufacturing</CardTitle>
-                      <CardDescription>Organic Food Producer</CardDescription>
+                        <CardTitle className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">{t('pure-foods')}</CardTitle>
+                      <CardDescription>{t('organic-food')}</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <p className="text-foreground/70">
-                        "The platform helped us identify brands looking specifically for our organic certification and production capabilities, resulting in three major contracts within our first quarter."
+                        {t('pure-foods-story')}
                       </p>
                     </CardContent>
                   </Card>
@@ -304,15 +306,15 @@ const Solutions = () => {
                 animate="visible"
               >
                 <motion.div variants={fadeInUp}>
-                  <h2 className="text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">Find Perfect Manufacturing Partners</h2>
+                  <h2 className="text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">{t('find-manufacturing')}</h2>
                   <p className="text-foreground/70 mb-6">
-                    Discover manufacturers that meet your exact specifications for product type, volume, certifications, and more. Save time on sourcing and focus on growing your brand.
+                    {t('discover-manufacturers')}
                   </p>
                   <motion.ul className="space-y-3" variants={staggerContainer}>
                     {[
-                      { icon: <BarChart3 className="h-5 w-5" />, text: "Compare manufacturers across key metrics" },
-                      { icon: <Lock className="h-5 w-5" />, text: "Verify certifications and capabilities" },
-                      { icon: <Sparkles className="h-5 w-5" />, text: "Get intelligent recommendations based on your needs" }
+                      { icon: <BarChart3 className="h-5 w-5" />, text: t('compare-metrics') },
+                      { icon: <Lock className="h-5 w-5" />, text: t('verify-certifications') },
+                      { icon: <Sparkles className="h-5 w-5" />, text: t('intelligent-recommendations') }
                     ].map((item, index) => (
                       <motion.li 
                         key={index}
@@ -358,9 +360,9 @@ const Solutions = () => {
                         }}
                       />
                     </motion.div>
-                    <h3 className="text-2xl font-bold mb-2 text-foreground">Smart Discovery</h3>
+                    <h3 className="text-2xl font-bold mb-2 text-foreground">{t('smart-discovery')}</h3>
                     <p className="text-foreground/70">
-                      Filter through thousands of manufacturers to find your perfect match.
+                      {t('filter-manufacturers')}
                     </p>
                   </div>
                 </motion.div>
@@ -373,7 +375,7 @@ const Solutions = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
               >
-                <h3 className="text-2xl font-bold mb-6">Success Stories</h3>
+                <h3 className="text-2xl font-bold mb-6">{t('solutions-success-stories')}</h3>
                 <div className="grid md:grid-cols-2 gap-6">
                   <motion.div 
                     whileHover={{ scale: 1.02 }} 
@@ -382,12 +384,12 @@ const Solutions = () => {
                   >
                     <Card className="hover:shadow-lg transition-all duration-300 border-accent/10 dark:border-accent/20">
                       <CardHeader>
-                        <CardTitle className="bg-clip-text text-transparent bg-gradient-to-r from-accent to-primary">GreenLife Foods</CardTitle>
-                        <CardDescription>Plant-based snack brand</CardDescription>
+                        <CardTitle className="bg-clip-text text-transparent bg-gradient-to-r from-accent to-primary">{t('green-life')}</CardTitle>
+                        <CardDescription>{t('plant-based')}</CardDescription>
                       </CardHeader>
                       <CardContent>
                         <p className="text-foreground/70">
-                          "We had a specific list of requirements for our manufacturing partner. The platform helped us find three qualified manufacturers in just days, rather than the months it would have taken through traditional networking."
+                          {t('green-life-story')}
                         </p>
                       </CardContent>
                     </Card>
@@ -399,12 +401,12 @@ const Solutions = () => {
                   >
                     <Card className="hover:shadow-lg transition-all duration-300 border-accent/10 dark:border-accent/20">
                       <CardHeader>
-                        <CardTitle className="bg-clip-text text-transparent bg-gradient-to-r from-accent to-primary">Refresh Beverages</CardTitle>
-                        <CardDescription>Functional drink startup</CardDescription>
+                        <CardTitle className="bg-clip-text text-transparent bg-gradient-to-r from-accent to-primary">{t('refresh-beverages')}</CardTitle>
+                        <CardDescription>{t('functional-drink')}</CardDescription>
                       </CardHeader>
                       <CardContent>
                         <p className="text-foreground/70">
-                          "As a startup, we didn't have the network to find the right manufacturer. This platform made it possible to connect with established manufacturers who were willing to work with our volumes and specifications."
+                          {t('refresh-beverages-story')}
                         </p>
                       </CardContent>
                     </Card>
@@ -422,15 +424,15 @@ const Solutions = () => {
                 animate="visible"
               >
                 <motion.div variants={fadeInUp}>
-                  <h2 className="text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-accent to-primary">Discover Innovative Products</h2>
+                  <h2 className="text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-accent to-primary">{t('discover-products')}</h2>
                   <p className="text-foreground/70 mb-6">
-                    Find new and unique products to fill your shelves. Connect directly with brands and manufacturers to bring innovative offerings to your customers.
+                    {t('find-products')}
                   </p>
                   <motion.ul className="space-y-3" variants={staggerContainer}>
                     {[
-                      { icon: <Layers className="h-5 w-5" />, text: "Browse thousands of products with detailed specifications" },
-                      { icon: <Network className="h-5 w-5" />, text: "Connect directly with brands for special retail arrangements" },
-                      { icon: <BarChart3 className="h-5 w-5" />, text: "Track market trends and emerging product categories" }
+                      { icon: <Layers className="h-5 w-5" />, text: t('browse-product-specs') },
+                      { icon: <Network className="h-5 w-5" />, text: t('connect-brands-retail') },
+                      { icon: <BarChart3 className="h-5 w-5" />, text: t('track-trends') }
                     ].map((item, index) => (
                       <motion.li 
                         key={index}
@@ -476,9 +478,9 @@ const Solutions = () => {
                         }}
                       />
                     </motion.div>
-                    <h3 className="text-2xl font-bold mb-2 text-foreground">Product Discovery</h3>
+                    <h3 className="text-2xl font-bold mb-2 text-foreground">{t('product-discovery')}</h3>
                     <p className="text-foreground/70">
-                      Stay ahead of trends with our curated product recommendations.
+                      {t('stay-ahead')}
                     </p>
                   </div>
                 </motion.div>
@@ -491,7 +493,7 @@ const Solutions = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
               >
-                <h3 className="text-2xl font-bold mb-6">Success Stories</h3>
+                <h3 className="text-2xl font-bold mb-6">{t('solutions-success-stories')}</h3>
                 <div className="grid md:grid-cols-2 gap-6">
                   <motion.div 
                     whileHover={{ scale: 1.02 }} 
@@ -500,12 +502,12 @@ const Solutions = () => {
                   >
                     <Card className="hover:shadow-lg transition-all duration-300 border-primary/10 dark:border-primary/20">
                       <CardHeader>
-                        <CardTitle className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">Natural Market</CardTitle>
-                        <CardDescription>Health food store chain</CardDescription>
+                        <CardTitle className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">{t('natural-market')}</CardTitle>
+                        <CardDescription>{t('health-food')}</CardDescription>
                       </CardHeader>
                       <CardContent>
                         <p className="text-foreground/70">
-                          "We've been able to identify and stock innovative products ahead of our competitors. The platform gives us a direct line to brands that align with our store's ethos."
+                          {t('natural-market-story')}
                         </p>
                       </CardContent>
                     </Card>
@@ -517,12 +519,12 @@ const Solutions = () => {
                   >
                     <Card className="hover:shadow-lg transition-all duration-300 border-primary/10 dark:border-primary/20">
                       <CardHeader>
-                        <CardTitle className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">Urban Grocers</CardTitle>
-                        <CardDescription>Boutique grocery stores</CardDescription>
+                        <CardTitle className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">{t('urban-grocers')}</CardTitle>
+                        <CardDescription>{t('boutique-grocery')}</CardDescription>
                       </CardHeader>
                       <CardContent>
                         <p className="text-foreground/70">
-                          "The platform has become our go-to source for discovering unique, locally-produced items that give our stores a competitive edge in the market."
+                          {t('urban-grocers-story')}
                         </p>
                       </CardContent>
                     </Card>
@@ -568,7 +570,7 @@ const Solutions = () => {
                 backgroundPosition: ["0%", "100%"]
               }}
             >
-              Ready to Transform Your Business?
+              {t('transform-business')}
             </motion.h2>
             <motion.p 
               className="text-lg text-foreground/70 mb-8 max-w-2xl mx-auto"
@@ -577,7 +579,7 @@ const Solutions = () => {
               viewport={{ once: true }}
               transition={{ delay: 0.3 }}
             >
-              Join our platform today and discover how our AI-powered solutions can help you grow in the Consumer Packaged Goods industry.
+              {t('join-solutions-platform')}
             </motion.p>
             <motion.div 
               className="flex flex-wrap justify-center gap-4"
@@ -596,7 +598,7 @@ const Solutions = () => {
                   whileHover={{ x: 2 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
-                  Get Started
+                  {t('solutions-get-started')}
                 </motion.span>
               </Button>
               <Button 
@@ -610,7 +612,7 @@ const Solutions = () => {
                   whileHover={{ x: 2 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
-                  Schedule a Demo
+                  {t('schedule-demo')}
                 </motion.span>
               </Button>
             </motion.div>
@@ -621,12 +623,12 @@ const Solutions = () => {
               viewport={{ once: true }}
               transition={{ delay: 0.5 }}
             >
-              Already have an account?{" "}
+              {t('already-account')}{" "}
               <Link 
                 to="/signin" 
                 className="text-primary hover:underline hover:text-primary/90 transition-colors"
               >
-                Sign in here
+                {t('sign-in-here')}
               </Link>
             </motion.p>
           </motion.div>

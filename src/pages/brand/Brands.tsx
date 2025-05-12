@@ -53,6 +53,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 // Mock brand partnership data
 const brands = [
@@ -152,6 +153,7 @@ const Brands = () => {
   const isDark = theme === "dark";
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   
   // State for search and filters
   const [searchQuery, setSearchQuery] = useState("");
@@ -173,7 +175,7 @@ const Brands = () => {
   });
   
   useEffect(() => {
-    document.title = "Brand Partnerships - CPG Matchmaker";
+    document.title = t("brands-title") + " - CPG Matchmaker";
     
     // If not authenticated or not a brand, redirect
     if (!isAuthenticated) {
@@ -181,7 +183,7 @@ const Brands = () => {
     } else if (role !== "brand") {
       navigate("/dashboard");
     }
-  }, [isAuthenticated, navigate, role]);
+  }, [isAuthenticated, navigate, role, t]);
 
   if (!isAuthenticated || role !== "brand") {
     return null;
@@ -239,21 +241,21 @@ const Brands = () => {
     setIsFindBrandOpen(false);
     
     toast({
-      title: "Search initiated",
-      description: `We're looking for brands that match your partnership criteria. You'll be notified when we find potential partners.`,
+      title: t("search-initiated"),
+      description: t("search-description"),
     });
   };
 
   const getStatusBadge = (status: string) => {
     switch(status) {
       case "Active Partner":
-        return <Badge className="bg-green-500 hover:bg-green-600">Active Partner</Badge>;
+        return <Badge className="bg-green-500 hover:bg-green-600">{t("active-partner")}</Badge>;
       case "Negotiating":
-        return <Badge variant="outline" className="text-blue-500 border-blue-500 hover:bg-blue-50 dark:hover:bg-transparent">Negotiating</Badge>;
+        return <Badge variant="outline" className="text-blue-500 border-blue-500 hover:bg-blue-50 dark:hover:bg-transparent">{t("negotiating")}</Badge>;
       case "Onboarding":
-        return <Badge variant="outline" className="text-yellow-500 border-yellow-500 hover:bg-yellow-50 dark:hover:bg-transparent">Onboarding</Badge>;
+        return <Badge variant="outline" className="text-yellow-500 border-yellow-500 hover:bg-yellow-50 dark:hover:bg-transparent">{t("onboarding")}</Badge>;
       case "Inactive":
-        return <Badge variant="secondary">Inactive</Badge>;
+        return <Badge variant="secondary">{t("inactive")}</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -267,7 +269,7 @@ const Brands = () => {
     return (
       <div className="flex items-center">
         <div className={`h-2.5 w-2.5 rounded-full ${colorClass} mr-1.5`}></div>
-        <span className="text-sm font-medium">{score}% Match</span>
+        <span className="text-sm font-medium">{score}% {t("match")}</span>
       </div>
     );
   };
@@ -310,9 +312,9 @@ const Brands = () => {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
                 <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/70 text-transparent bg-clip-text">
-                  Brands Management
+                  {t("brands-management")}
                 </h1>
-                <p className="text-muted-foreground">{user?.companyName} - Partner Brands Management</p>
+                <p className="text-muted-foreground">{user?.companyName} - {t("brands-find-manage")}</p>
               </div>
               
               <div className="flex gap-2">
@@ -320,13 +322,13 @@ const Brands = () => {
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" className="group">
                       <Filter className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
-                      Filter
+                      {t("filter")}
                       <ChevronDown className="ml-2 h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
                     <div className="p-2">
-                      <p className="text-sm font-medium mb-2">Category</p>
+                      <p className="text-sm font-medium mb-2">{t("category")}</p>
                       <div className="space-y-1">
                         {brandCategories.map(category => (
                           <div 
@@ -341,14 +343,14 @@ const Brands = () => {
                               filterCategory === category ? null : category
                             )}
                           >
-                            {category}
+                            {t(category.toLowerCase().replace(/\s+/g, '-'))}
                           </div>
                         ))}
                       </div>
                     </div>
                     <DropdownMenuSeparator />
                     <div className="p-2">
-                      <p className="text-sm font-medium mb-2">Status</p>
+                      <p className="text-sm font-medium mb-2">{t("status")}</p>
                       <div className="space-y-1">
                         {["Active Partner", "Negotiating", "Onboarding", "Inactive"].map(status => (
                           <div 
@@ -363,7 +365,7 @@ const Brands = () => {
                               filterStatus === status ? null : status
                             )}
                           >
-                            {status}
+                            {t(status.toLowerCase().replace(/\s+/g, '-'))}
                           </div>
                         ))}
                       </div>
@@ -373,13 +375,13 @@ const Brands = () => {
                       className="justify-center text-center cursor-pointer"
                       onClick={resetFilters}
                     >
-                      Reset Filters
+                      {t("reset-filters")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
                 <Button onClick={openFindBrandModal}>
                   <Plus className="mr-2 h-4 w-4" />
-                  Find Brand Partners
+                  {t("find-brand-partners")}
                 </Button>
               </div>
             </div>
@@ -390,7 +392,7 @@ const Brands = () => {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input 
-                placeholder="Search partners, categories, or descriptions..." 
+                placeholder={t("brands-search-placeholder")} 
                 className="pl-10" 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -451,11 +453,11 @@ const Brands = () => {
                         {brand.status !== "Negotiating" && brand.status !== "Inactive" && (
                           <div className="grid grid-cols-2 gap-2 mt-2">
                             <div className="flex flex-col">
-                              <div className="text-xs text-muted-foreground mb-1">Products</div>
+                              <div className="text-xs text-muted-foreground mb-1">{t("products")}</div>
                               <Badge variant="outline">{brand.products}</Badge>
                             </div>
                             <div className="flex flex-col">
-                              <div className="text-xs text-muted-foreground mb-1">Partner For</div>
+                              <div className="text-xs text-muted-foreground mb-1">{t("partner-for")}</div>
                               <div className="text-sm font-medium">{brand.relationship}</div>
                             </div>
                           </div>
@@ -469,12 +471,12 @@ const Brands = () => {
                             </Badge>
                           ))}
                           {brand.certifications && brand.certifications.length > 2 && (
-                            <Badge variant="outline">+{brand.certifications.length - 2} more</Badge>
+                            <Badge variant="outline">+{brand.certifications.length - 2} {t("more")}</Badge>
                           )}
                         </div>
                         
                         <div className="pt-1 flex justify-between items-center">
-                          <div className="text-xs text-muted-foreground">Rating</div>
+                          <div className="text-xs text-muted-foreground">{t("rating")}</div>
                           {getStarRating(brand.rating)}
                         </div>
                         
@@ -490,7 +492,7 @@ const Brands = () => {
                         className="gap-1 w-full justify-center hover:bg-background"
                         onClick={() => openBrandDetails(brand)}
                       >
-                        View Details <ArrowRight className="h-4 w-4 ml-1" />
+                        {t("view-details")} <ArrowRight className="h-4 w-4 ml-1" />
                       </Button>
                     </CardFooter>
                   </Card>
@@ -512,16 +514,16 @@ const Brands = () => {
                   <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                     <Plus className="h-6 w-6 text-primary" />
                   </div>
-                  <h3 className="font-medium mb-2">Find Brand Partners</h3>
+                  <h3 className="font-medium mb-2">{t("find-brand-partners-card")}</h3>
                   <p className="text-sm text-muted-foreground text-center mb-4">
-                    Discover complementary brands to establish strategic partnerships
+                    {t("discover-complementary-brands")}
                   </p>
                   <Button variant="outline" size="sm" className="mt-2" onClick={(e) => {
                     e.stopPropagation(); // Prevent card click from triggering twice
                     openFindBrandModal();
                   }}>
                     <Plus className="h-4 w-4 mr-2" />
-                    Start Search
+                    {t("start-search")}
                   </Button>
                 </CardContent>
               </Card>
@@ -538,11 +540,11 @@ const Brands = () => {
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                   <Building className="h-6 w-6 text-muted-foreground" />
                 </div>
-                <h3 className="mt-4 text-lg font-medium">No brand partners found</h3>
+                <h3 className="mt-4 text-lg font-medium">{t("no-brand-partners-found")}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">
                   {searchQuery || filterCategory || filterStatus 
-                    ? "Try adjusting your search or filter criteria." 
-                    : "Get started by finding new brand partners."}
+                    ? t("try-adjusting-search") 
+                    : t("get-started-brands")}
                 </p>
                 <div className="flex justify-center gap-3 mt-4">
                   <Button 
@@ -550,11 +552,11 @@ const Brands = () => {
                     onClick={resetFilters}
                   >
                     <Filter className="mr-2 h-4 w-4" />
-                    Reset Filters
+                    {t("reset-filters")}
                   </Button>
                   <Button onClick={openFindBrandModal}>
                     <Plus className="mr-2 h-4 w-4" />
-                    Find Partners
+                    {t("find-partners")}
                   </Button>
                 </div>
               </div>
@@ -591,9 +593,9 @@ const Brands = () => {
                     <Star className="h-5 w-5 text-yellow-500" />
                   </div>
                   <div>
-                    <h3 className="font-medium">Partnership Match Score</h3>
+                    <h3 className="font-medium">{t("partnership-match-score")}</h3>
                     <p className="text-sm text-muted-foreground">
-                      How well this brand complements your products
+                      {t("how-well-brand-complements")}
                     </p>
                   </div>
                 </div>
@@ -613,7 +615,7 @@ const Brands = () => {
               
               {/* Description */}
               <div className="space-y-2">
-                <h3 className="text-base font-medium">About</h3>
+                <h3 className="text-base font-medium">{t("about")}</h3>
                 <p className="text-sm text-muted-foreground">
                   {selectedBrand.description}
                 </p>
@@ -621,7 +623,7 @@ const Brands = () => {
               
               {/* Certifications */}
               <div className="space-y-2">
-                <h3 className="text-base font-medium">Certifications</h3>
+                <h3 className="text-base font-medium">{t("certifications")}</h3>
                 <div className="flex flex-wrap gap-2">
                   {selectedBrand.certifications && selectedBrand.certifications.map((cert: string, idx: number) => (
                     <Badge key={idx} className="bg-primary/10 text-primary border-none">
@@ -634,7 +636,7 @@ const Brands = () => {
               
               {/* Partnership Stats */}
               <div className="space-y-2">
-                <h3 className="text-base font-medium">Partnership Stats</h3>
+                <h3 className="text-base font-medium">{t("partnership-stats")}</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div className={cn(
                     "p-4 rounded-lg border",
@@ -645,14 +647,14 @@ const Brands = () => {
                         <ShoppingBag className="h-4 w-4 text-blue-500" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium">Products</p>
+                        <p className="text-sm font-medium">{t("products")}</p>
                         <p className="text-xl font-bold">{selectedBrand.products}</p>
                       </div>
                     </div>
                     <p className="text-xs text-muted-foreground">
                       {selectedBrand.products > 0 
-                        ? `You have ${selectedBrand.products} active products with this partner` 
-                        : "No active products with this partner yet"}
+                        ? t("products-active-partner", { products: selectedBrand.products })
+                        : t("no-active-products")}
                     </p>
                   </div>
                   
@@ -665,18 +667,18 @@ const Brands = () => {
                         <Clock className="h-4 w-4 text-green-500" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium">Relationship</p>
+                        <p className="text-sm font-medium">{t("relationship")}</p>
                         <p className="text-xl font-bold">{selectedBrand.relationship}</p>
                       </div>
                     </div>
                     <p className="text-xs text-muted-foreground">
                       {selectedBrand.status === "Active Partner" 
-                        ? "Ongoing active partnership" 
+                        ? t("ongoing-active-partnership")
                         : selectedBrand.status === "Negotiating"
-                        ? "Currently in negotiations"
+                        ? t("currently-negotiations")
                         : selectedBrand.status === "Onboarding"
-                        ? "Partnership being established"
-                        : "Partnership currently inactive"}
+                        ? t("partnership-establishing")
+                        : t("partnership-inactive")}
                     </p>
                   </div>
                 </div>
@@ -684,19 +686,19 @@ const Brands = () => {
               
               {/* Rating */}
               <div className="space-y-2">
-                <h3 className="text-base font-medium">Partner Rating</h3>
+                <h3 className="text-base font-medium">{t("partner-rating")}</h3>
                 <div className={cn(
                   "p-4 rounded-lg border",
                   isDark ? "bg-card" : "bg-slate-50"
                 )}>
                   <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium">Overall Performance</p>
+                    <p className="text-sm font-medium">{t("overall-performance")}</p>
                     <div className="scale-110">
                       {getStarRating(selectedBrand.rating)}
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground mt-2">
-                    Based on collaboration quality, reliability, and brand alignment
+                    {t("based-on-collaboration")}
                   </p>
                 </div>
               </div>
@@ -708,10 +710,10 @@ const Brands = () => {
                 onClick={() => setIsDetailsOpen(false)}
                 className="mr-2"
               >
-                Close
+                {t("close")}
               </Button>
               <Button>
-                Contact Brand
+                {t("contact-brand")}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -728,9 +730,9 @@ const Brands = () => {
       >
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-auto">
           <DialogHeader>
-            <DialogTitle>Find Brand Partners</DialogTitle>
+            <DialogTitle>{t("find-brand-partners-modal")}</DialogTitle>
             <DialogDescription>
-              Specify your partnership requirements to find brands that complement your business
+              {t("specify-partnership-requirements")}
             </DialogDescription>
           </DialogHeader>
           
@@ -738,20 +740,20 @@ const Brands = () => {
             {/* Category */}
             <div className="space-y-2">
               <Label htmlFor="category" className="text-base font-medium">
-                Product Category <span className="text-destructive">*</span>
+                {t("product-category")} <span className="text-destructive">*</span>
               </Label>
               <Select
                 value={searchCriteria.category}
                 onValueChange={(value) => setSearchCriteria({...searchCriteria, category: value})}
               >
                 <SelectTrigger id="category" className={!searchCriteria.category ? "text-muted-foreground" : ""}>
-                  <SelectValue placeholder="Select a category" />
+                  <SelectValue placeholder={t("select-category")} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectLabel>Categories</SelectLabel>
+                    <SelectLabel>{t("categories")}</SelectLabel>
                     {brandCategories.map(category => (
-                      <SelectItem key={category} value={category}>{category}</SelectItem>
+                      <SelectItem key={category} value={category}>{t(category.toLowerCase().replace(/\s+/g, '-'))}</SelectItem>
                     ))}
                   </SelectGroup>
                 </SelectContent>
@@ -760,25 +762,32 @@ const Brands = () => {
             
             {/* Market Presence */}
             <div className="space-y-2">
-              <Label className="text-base font-medium">Desired Market Presence</Label>
+              <Label className="text-base font-medium">{t("desired-market-presence")}</Label>
               <div className="grid grid-cols-2 gap-3 pt-1">
-                {["Online", "Retail Stores", "Direct-to-Consumer", "Subscription", "Wholesale", "International"].map(market => (
+                {[
+                  {key: "online", label: t("online")},
+                  {key: "retail-stores", label: t("retail-stores")},
+                  {key: "direct-to-consumer", label: t("direct-to-consumer")},
+                  {key: "subscription", label: t("subscription")},
+                  {key: "wholesale", label: t("wholesale")},
+                  {key: "international", label: t("international")}
+                ].map(market => (
                   <div 
-                    key={market}
+                    key={market.key}
                     className="flex items-center space-x-2"
                   >
                     <Checkbox 
-                      id={`market-${market}`}
-                      checked={searchCriteria.marketPresence.includes(market)}
+                      id={`market-${market.key}`}
+                      checked={searchCriteria.marketPresence.includes(market.key)}
                       onCheckedChange={(checked) => {
                         const updatedMarkets = checked 
-                          ? [...searchCriteria.marketPresence, market] 
-                          : searchCriteria.marketPresence.filter(m => m !== market);
+                          ? [...searchCriteria.marketPresence, market.key] 
+                          : searchCriteria.marketPresence.filter(m => m !== market.key);
                         setSearchCriteria({...searchCriteria, marketPresence: updatedMarkets});
                       }}
                     />
-                    <Label htmlFor={`market-${market}`} className="text-sm font-normal">
-                      {market}
+                    <Label htmlFor={`market-${market.key}`} className="text-sm font-normal">
+                      {market.label}
                     </Label>
                   </div>
                 ))}
@@ -793,7 +802,7 @@ const Brands = () => {
                   {searchCriteria.marketPresence.map(market => (
                     <Badge key={market} variant="secondary" className="flex items-center gap-1">
                       <Globe className="h-3 w-3" />
-                      {market}
+                      {t(market.replace(/\s+/g, '-'))}
                       <button 
                         className="ml-1 rounded-full hover:bg-secondary/80"
                         onClick={() => {
@@ -814,46 +823,53 @@ const Brands = () => {
             {/* Minimum Rating */}
             <div className="space-y-2">
               <Label htmlFor="minRating" className="text-base font-medium">
-                Minimum Brand Rating
+                {t("minimum-brand-rating")}
               </Label>
               <Select
                 value={searchCriteria.minRating.toString()}
                 onValueChange={(value) => setSearchCriteria({...searchCriteria, minRating: Number(value)})}
               >
                 <SelectTrigger id="minRating">
-                  <SelectValue placeholder="Select minimum rating" />
+                  <SelectValue placeholder={t("select-minimum-rating")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="0">Any Rating</SelectItem>
-                  <SelectItem value="3">3+ Stars</SelectItem>
-                  <SelectItem value="3.5">3.5+ Stars</SelectItem>
-                  <SelectItem value="4">4+ Stars</SelectItem>
-                  <SelectItem value="4.5">4.5+ Stars</SelectItem>
+                  <SelectItem value="0">{t("any-rating")}</SelectItem>
+                  <SelectItem value="3">3+ {t("stars")}</SelectItem>
+                  <SelectItem value="3.5">3.5+ {t("stars")}</SelectItem>
+                  <SelectItem value="4">4+ {t("stars")}</SelectItem>
+                  <SelectItem value="4.5">4.5+ {t("stars")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             
             {/* Product Types */}
             <div className="space-y-2">
-              <Label className="text-base font-medium">Product Types</Label>
+              <Label className="text-base font-medium">{t("product-types")}</Label>
               <div className="grid grid-cols-2 gap-3 pt-1">
-                {["Complementary", "Bundleable", "Cross-Promotional", "Co-Branded", "White Label", "Distribution"].map(type => (
+                {[
+                  {key: "complementary", label: t("complementary")},
+                  {key: "bundleable", label: t("bundleable")},
+                  {key: "cross-promotional", label: t("cross-promotional")},
+                  {key: "co-branded", label: t("co-branded")},
+                  {key: "white-label", label: t("white-label")},
+                  {key: "distribution", label: t("distribution")}
+                ].map(type => (
                   <div 
-                    key={type}
+                    key={type.key}
                     className="flex items-center space-x-2"
                   >
                     <Checkbox 
-                      id={`type-${type}`}
-                      checked={searchCriteria.productTypes.includes(type)}
+                      id={`type-${type.key}`}
+                      checked={searchCriteria.productTypes.includes(type.key)}
                       onCheckedChange={(checked) => {
                         const updatedTypes = checked 
-                          ? [...searchCriteria.productTypes, type] 
-                          : searchCriteria.productTypes.filter(t => t !== type);
+                          ? [...searchCriteria.productTypes, type.key] 
+                          : searchCriteria.productTypes.filter(t => t !== type.key);
                         setSearchCriteria({...searchCriteria, productTypes: updatedTypes});
                       }}
                     />
-                    <Label htmlFor={`type-${type}`} className="text-sm font-normal">
-                      {type}
+                    <Label htmlFor={`type-${type.key}`} className="text-sm font-normal">
+                      {type.label}
                     </Label>
                   </div>
                 ))}
@@ -863,11 +879,11 @@ const Brands = () => {
             {/* Additional Notes */}
             <div className="space-y-2">
               <Label htmlFor="notes" className="text-base font-medium">
-                Partnership Goals
+                {t("partnership-goals")}
               </Label>
               <Textarea 
                 id="notes" 
-                placeholder="Describe your brand partnership goals and any specific requirements"
+                placeholder={t("partnership-goals-placeholder")}
                 rows={4}
                 value={searchCriteria.notes}
                 onChange={(e) => setSearchCriteria({...searchCriteria, notes: e.target.value})}
@@ -881,14 +897,14 @@ const Brands = () => {
               onClick={() => setIsFindBrandOpen(false)}
               className="mr-2"
             >
-              Cancel
+              {t("cancel")}
             </Button>
             <Button 
               onClick={handleFindBrand}
               disabled={!searchCriteria.category}
             >
               <Search className="h-4 w-4 mr-2" />
-              Find Partners
+              {t("find-partners")}
             </Button>
           </DialogFooter>
         </DialogContent>

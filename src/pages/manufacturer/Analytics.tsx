@@ -9,6 +9,7 @@ import { useUser } from "@/contexts/UserContext";
 import { LineChart, BarChart, PieChart, AreaChart } from "@/components/charts";
 import { motion, AnimatePresence, MotionConfig } from "framer-motion";
 import ManufacturerLayout from "@/components/layouts/ManufacturerLayout";
+import { useTranslation } from "react-i18next";
 import { 
   Download, 
   Calendar, 
@@ -120,6 +121,7 @@ interface SavedView {
 }
 
 const Analytics = () => {
+  const { t } = useTranslation();
   const { isAuthenticated, user, role } = useUser();
   const navigate = useNavigate();
   
@@ -174,7 +176,7 @@ const Analytics = () => {
   const [selectedTab, setSelectedTab] = useState("data");
   
   useEffect(() => {
-    document.title = "Analytics - CPG Matchmaker";
+    document.title = t('analytics-title') + " - CPG Matchmaker";
     
     // If not authenticated or not a manufacturer, redirect
     if (!isAuthenticated) {
@@ -187,7 +189,7 @@ const Analytics = () => {
     setAlerts([
       {
         id: '1',
-        title: 'Line C Efficiency Drop',
+        title: t('analytics-critical'),
         description: 'Line C efficiency has dropped below 80% for the first time this week.',
         timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
         severity: 'warning',
@@ -195,7 +197,7 @@ const Analytics = () => {
       },
       {
         id: '2',
-        title: 'Line B Efficiency Improvement',
+        title: t('analytics-success'),
         description: 'Line B efficiency has improved by 5% after maintenance.',
         timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000),
         severity: 'success',
@@ -203,7 +205,7 @@ const Analytics = () => {
       },
       {
         id: '3',
-        title: 'Production Target Reached',
+        title: t('analytics-info'),
         description: 'Monthly production target has been reached 3 days ahead of schedule.',
         timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000),
         severity: 'info',
@@ -245,7 +247,7 @@ const Analytics = () => {
       
       return () => clearInterval(interval);
     }
-  }, [isAuthenticated, navigate, role, dataRefreshInterval]);
+  }, [isAuthenticated, navigate, role, dataRefreshInterval, t]);
 
   if (!isAuthenticated || role !== "manufacturer") {
     return null;
@@ -302,8 +304,8 @@ const Analytics = () => {
     setTimeout(() => {
       setIsLoading(false);
       toast({
-        title: "Data Refreshed",
-        description: "Analytics data has been updated successfully.",
+        title: t('analytics-data-updated'),
+        description: t('analytics-data-updated'),
         variant: "default",
       });
     }, 1000);
@@ -567,7 +569,7 @@ const Analytics = () => {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 sticky top-0 z-10 bg-background/80 backdrop-blur-sm py-4">
             <div>
                 <div className="flex items-center gap-2">
-                  <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-primary/90 to-primary/70 bg-clip-text text-transparent">Manufacturing Analytics</h1>
+                  <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-primary/90 to-primary/70 bg-clip-text text-transparent">{t('analytics-title')}</h1>
                   {showFullscreenMode && (
                     <Button variant="ghost" size="icon" onClick={handleToggleFullscreen}>
                       <ZoomOut className="h-4 w-4" />
@@ -575,7 +577,7 @@ const Analytics = () => {
                   )}
                 </div>
                 <p className="text-muted-foreground mt-1">
-                  {user?.companyName} - Production Performance and Insights
+                  {user?.companyName} - {t('analytics-subtitle')}
                 </p>
             </div>
             
@@ -601,7 +603,7 @@ const Analytics = () => {
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent side="bottom">
-                      <p>Refresh data</p>
+                      <p>{t('analytics-refresh')}</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -619,21 +621,21 @@ const Analytics = () => {
                   </PopoverTrigger>
                   <PopoverContent className="w-80 p-0" align="end">
                     <div className="flex items-center justify-between px-4 py-2 border-b">
-                      <h4 className="font-medium">Notifications</h4>
+                      <h4 className="font-medium">{t('analytics-alerts')}</h4>
                       <Button 
                         variant="ghost" 
                         size="sm" 
                         onClick={handleMarkAllAlertsAsRead}
                         disabled={unreadAlertsCount === 0}
                       >
-                        Mark all read
+                        {t('analytics-mark-all-read')}
                       </Button>
                     </div>
                     <ScrollArea className="h-80">
                       {alerts.length === 0 ? (
                         <div className="flex flex-col items-center justify-center p-6 text-center">
                           <Bell className="h-10 w-10 text-muted-foreground/50 mb-2" />
-                          <p className="text-sm text-muted-foreground">No notifications</p>
+                          <p className="text-sm text-muted-foreground">{t('analytics-no-alerts')}</p>
                         </div>
                       ) : (
                         <div className="grid gap-1 p-1">
@@ -672,7 +674,7 @@ const Analytics = () => {
                                       size="sm" 
                                       onClick={() => handleMarkAlertAsRead(alert.id)}
                                     >
-                                      Mark read
+                                      {t('analytics-mark-read')}
                                     </Button>
                                   )}
                                 </div>
@@ -689,15 +691,15 @@ const Analytics = () => {
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" className="gap-2">
                       <Bookmark className="h-4 w-4" />
-                      Saved Views
+                      {t('analytics-saved-views')}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuLabel>Saved Views</DropdownMenuLabel>
+                    <DropdownMenuLabel>{t('analytics-saved-views')}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     {savedViews.length === 0 ? (
                       <div className="px-2 py-4 text-center">
-                        <p className="text-sm text-muted-foreground">No saved views</p>
+                        <p className="text-sm text-muted-foreground">{t('analytics-no-saved-views')}</p>
                       </div>
                     ) : (
                       savedViews.map(view => (
@@ -723,7 +725,7 @@ const Analytics = () => {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onSelect={() => setShowSaveViewDialog(true)}>
                       <Plus className="h-4 w-4 mr-2" />
-                      Save Current View
+                      {t('analytics-save-view')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -734,7 +736,7 @@ const Analytics = () => {
                   className="gap-2"
                 >
                   <Filter className="h-4 w-4" />
-                  Filters
+                  {t('analytics-filter-data')}
                   <ChevronDown className={`h-4 w-4 transition-transform ${showFilters ? "rotate-180" : ""}`} />
                 </Button>
 
@@ -744,18 +746,18 @@ const Analytics = () => {
                   className={`gap-2 ${compareMode ? 'bg-primary/10' : ''}`}
                 >
                   <TrendingUp className="h-4 w-4" />
-                  Compare
+                  {t('analytics-compare')}
                 </Button>
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" className="gap-2">
                       <DownloadIcon className="h-4 w-4" />
-                      Export
+                      {t('analytics-export')}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    <DropdownMenuLabel>Export Options</DropdownMenuLabel>
+                    <DropdownMenuLabel>{t('analytics-export')}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 
                       onClick={() => {
@@ -764,7 +766,7 @@ const Analytics = () => {
                       }}
                     >
                       <FileText className="h-4 w-4 mr-2" />
-                      Export as PDF
+                      {t('analytics-download-report')} (PDF)
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       onClick={() => {
@@ -773,7 +775,7 @@ const Analytics = () => {
                       }}
                     >
                       <FileText className="h-4 w-4 mr-2" />
-                      Export as CSV
+                      {t('analytics-download-report')} (CSV)
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       onClick={() => {
@@ -782,7 +784,7 @@ const Analytics = () => {
                       }}
                     >
                       <FileText className="h-4 w-4 mr-2" />
-                      Export as Excel
+                      {t('analytics-download-report')} (Excel)
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       onClick={() => {
@@ -791,16 +793,16 @@ const Analytics = () => {
                       }}
                     >
                       <FileText className="h-4 w-4 mr-2" />
-                      Export as JSON
+                      {t('analytics-download-report')} (JSON)
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => setShowShareDialog(true)}>
                       <Share2 className="h-4 w-4 mr-2" />
-                      Share Dashboard
+                      {t('analytics-share-view')}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={handlePrint}>
                       <Printer className="h-4 w-4 mr-2" />
-                      Print Dashboard
+                      {t('analytics-print')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -815,55 +817,43 @@ const Analytics = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Dashboard Settings</DropdownMenuLabel>
+                    <DropdownMenuLabel>{t('analytics-chart-settings')}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => setShowSettings(!showSettings)}>
                       <Sliders className="h-4 w-4 mr-2" />
-                      Chart Settings
+                      {t('analytics-chart-settings')}
                     </DropdownMenuItem>
-                    {/* <DropdownMenuItem onClick={handleToggleFullscreen}>
-                      {showFullscreenMode ? (
-                        <>
-                          <ZoomOut className="h-4 w-4 mr-2" />
-                          Exit Fullscreen
-                        </>
-                      ) : (
-                        <>
-                          <ZoomIn className="h-4 w-4 mr-2" />
-                          Enter Fullscreen
-                        </>
-                      )}
-                    </DropdownMenuItem> */}
+
                     <DropdownMenuSeparator />
-                    <DropdownMenuLabel>Auto-refresh</DropdownMenuLabel>
+                    <DropdownMenuLabel>{t('analytics-auto-refresh')}</DropdownMenuLabel>
                     <DropdownMenuItem onClick={() => handleSetAutoRefresh(null)}>
                       <div className="flex items-center">
                         <div className={`h-2 w-2 rounded-full mr-2 ${dataRefreshInterval === null ? 'bg-primary' : 'bg-transparent'}`} />
-                        Off
+                        {t('analytics-off')}
                       </div>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => handleSetAutoRefresh(30)}>
                       <div className="flex items-center">
                         <div className={`h-2 w-2 rounded-full mr-2 ${dataRefreshInterval === 30 ? 'bg-primary' : 'bg-transparent'}`} />
-                        30 seconds
+                        {t('analytics-30-seconds')}
                       </div>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => handleSetAutoRefresh(60)}>
                       <div className="flex items-center">
                         <div className={`h-2 w-2 rounded-full mr-2 ${dataRefreshInterval === 60 ? 'bg-primary' : 'bg-transparent'}`} />
-                        1 minute
+                        {t('analytics-1-minute')}
                       </div>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => handleSetAutoRefresh(300)}>
                       <div className="flex items-center">
                         <div className={`h-2 w-2 rounded-full mr-2 ${dataRefreshInterval === 300 ? 'bg-primary' : 'bg-transparent'}`} />
-                        5 minutes
+                        {t('analytics-5-minutes')}
                       </div>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => setShowHelpDialog(true)}>
                       <HelpCircle className="h-4 w-4 mr-2" />
-                      Help & Documentation
+                      {t('analytics-help')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -880,7 +870,7 @@ const Analytics = () => {
                 >
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-medium">Chart Settings</h3>
+                      <h3 className="text-sm font-medium">{t('analytics-chart-settings')}</h3>
                       <HoverCard>
                         <HoverCardTrigger asChild>
                           <Button variant="ghost" size="icon">
@@ -889,9 +879,9 @@ const Analytics = () => {
                         </HoverCardTrigger>
                         <HoverCardContent className="w-80">
                           <div className="space-y-2">
-                            <h4 className="font-medium">Chart Customization</h4>
+                            <h4 className="font-medium">{t('analytics-chart-settings')}</h4>
                             <p className="text-sm text-muted-foreground">
-                              Customize your chart display settings. Changes apply to all charts in the dashboard.
+                              {t('analytics-adjust-filters')}
                             </p>
                           </div>
                         </HoverCardContent>

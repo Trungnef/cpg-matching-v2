@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from "react-i18next";
 import { 
   Settings as SettingsIcon, 
   Bell, 
@@ -85,6 +86,7 @@ const Settings = () => {
   const { isAuthenticated, user, role } = useUser();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   
   // Form states
   const [companyName, setCompanyName] = useState(user?.companyName || "GreenMart Retail");
@@ -142,7 +144,7 @@ const Settings = () => {
   const [autoSave, setAutoSave] = useState(true);
   
   useEffect(() => {
-    document.title = "Settings - CPG Matchmaker";
+    document.title = t("settings") + " - CPG Matchmaker";
     
     // If not authenticated or not a retailer, redirect
     if (!isAuthenticated) {
@@ -150,7 +152,7 @@ const Settings = () => {
     } else if (role !== "retailer") {
       navigate("/dashboard");
     }
-  }, [isAuthenticated, navigate, role]);
+  }, [isAuthenticated, navigate, role, t]);
   
   const handleAddTag = (e) => {
     e.preventDefault();
@@ -159,7 +161,7 @@ const Settings = () => {
       setNewTag("");
       
       // Log activity
-      addToActivityLog("Added new tag: " + newTag.trim());
+      addToActivityLog(t("added-new-tag") + ": " + newTag.trim());
     }
   };
   
@@ -167,7 +169,7 @@ const Settings = () => {
     setTags(tags.filter(tag => tag !== tagToRemove));
     
     // Log activity
-    addToActivityLog("Removed tag: " + tagToRemove);
+    addToActivityLog(t("removed-tag") + ": " + tagToRemove);
   };
   
   const handleAddLocation = (e) => {
@@ -177,7 +179,7 @@ const Settings = () => {
       setNewLocation("");
       
       // Log activity
-      addToActivityLog("Added new store location: " + newLocation.trim());
+      addToActivityLog(t("added-store-location") + ": " + newLocation.trim());
     }
   };
   
@@ -185,7 +187,7 @@ const Settings = () => {
     setStoreLocations(storeLocations.filter(location => location !== locationToRemove));
     
     // Log activity
-    addToActivityLog("Removed store location: " + locationToRemove);
+    addToActivityLog(t("removed-store-location") + ": " + locationToRemove);
   };
   
   const addToActivityLog = (action) => {
@@ -201,12 +203,12 @@ const Settings = () => {
     setTimeout(() => {
       setIsLoading(false);
       toast({
-        title: "Settings updated",
-        description: "Your company settings have been saved successfully.",
+        title: t("settings-updated"),
+        description: t("company-settings-saved"),
       });
       
       // Log activity
-      addToActivityLog("Updated general settings");
+      addToActivityLog(t("updated-general-settings"));
     }, 1000);
   };
 
@@ -216,12 +218,12 @@ const Settings = () => {
     setTimeout(() => {
       setIsLoading(false);
       toast({
-        title: "Notification preferences updated",
-        description: "Your notification settings have been saved.",
+        title: t("notification-preferences-updated"),
+        description: t("notification-settings-saved"),
       });
       
       // Log activity
-      addToActivityLog("Updated notification preferences");
+      addToActivityLog(t("updated-notification-preferences"));
     }, 1000);
   };
 
@@ -231,8 +233,8 @@ const Settings = () => {
     if (newPassword && newPassword !== confirmPassword) {
       setIsLoading(false);
       toast({
-        title: "Passwords don't match",
-        description: "Please ensure your passwords match and try again.",
+        title: t("passwords-dont-match"),
+        description: t("ensure-passwords-match"),
         variant: "destructive"
       });
       return;
@@ -242,12 +244,12 @@ const Settings = () => {
     setTimeout(() => {
       setIsLoading(false);
       toast({
-        title: "Security settings saved",
-        description: "Your security preferences have been updated successfully."
+        title: t("security-settings-saved"),
+        description: t("security-preferences-updated")
       });
       
       // Log activity
-      addToActivityLog("Updated security settings");
+      addToActivityLog(t("updated-security-settings"));
     }, 1000);
   };
 
@@ -257,12 +259,12 @@ const Settings = () => {
     setTimeout(() => {
       setIsLoading(false);
       toast({
-        title: "Retail details updated",
-        description: "Your retail information has been saved successfully.",
+        title: t("retail-details-updated"),
+        description: t("retail-information-saved"),
       });
       
       // Log activity
-      addToActivityLog("Updated retail details");
+      addToActivityLog(t("updated-retail-details"));
     }, 1000);
   };
 
@@ -285,9 +287,9 @@ const Settings = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
-              <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+              <h1 className="text-3xl font-bold tracking-tight">{t("settings")}</h1>
               <p className="text-muted-foreground">
-                Manage your account preferences and retail information
+                {t("manage-account-preferences")}
               </p>
             </motion.div>
             <motion.div 
@@ -297,12 +299,12 @@ const Settings = () => {
               transition={{ duration: 0.5, delay: 0.2 }}
             >
               <Badge variant="outline" className="text-xs px-2 py-1">
-                <span className="text-primary font-medium">Retailer</span>
+                <span className="text-primary font-medium">{t("retailer")}</span>
               </Badge>
               {autoSave && (
                 <Badge variant="secondary" className="text-xs px-2 py-1 flex items-center gap-1">
                   <Save className="h-3 w-3" />
-                  <span>Auto-save on</span>
+                  <span>{t("auto-save-on")}</span>
                 </Badge>
               )}
             </motion.div>
@@ -323,27 +325,27 @@ const Settings = () => {
               <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-1">
                 <TabsTrigger value="general" className="flex items-center gap-1.5">
                   <Building className="h-4 w-4" />
-                  <span>General</span>
+                  <span>{t("general")}</span>
                 </TabsTrigger>
                 <TabsTrigger value="retail" className="flex items-center gap-1.5">
                   <Store className="h-4 w-4" />
-                  <span>Retail</span>
+                  <span>{t("retail")}</span>
                 </TabsTrigger>
                 <TabsTrigger value="notification" className="flex items-center gap-1.5">
                   <Bell className="h-4 w-4" />
-                  <span>Notifications</span>
+                  <span>{t("notifications")}</span>
                 </TabsTrigger>
                 <TabsTrigger value="security" className="flex items-center gap-1.5">
                   <Shield className="h-4 w-4" />
-                  <span>Security</span>
+                  <span>{t("security")}</span>
                 </TabsTrigger>
                 <TabsTrigger value="preferences" className="flex items-center gap-1.5">
                   <SettingsIcon className="h-4 w-4" />
-                  <span>Preferences</span>
+                  <span>{t("preferences")}</span>
                 </TabsTrigger>
                 <TabsTrigger value="activity" className="flex items-center gap-1.5">
                   <UserCog className="h-4 w-4" />
-                  <span>Activity</span>
+                  <span>{t("activity")}</span>
                 </TabsTrigger>
               </TabsList>
             </motion.div>
@@ -358,21 +360,21 @@ const Settings = () => {
                   exit="exit"
                   variants={fadeIn}
                 >
-                  <TabsContent value="general" className="space-y-6">
-                    <motion.div variants={staggerContainer} initial="hidden" animate="visible">
+                  <motion.div variants={staggerContainer} initial="hidden" animate="visible">
+                    <TabsContent value="general" className="space-y-6">
                       <Card>
                         <CardHeader>
                           <motion.div variants={itemAnimation}>
-                            <CardTitle>Company Information</CardTitle>
+                            <CardTitle>{t("company-information")}</CardTitle>
                             <CardDescription>
-                              Update your company details and contact information
+                              {t("update-company-details")}
                             </CardDescription>
                           </motion.div>
                         </CardHeader>
                         <CardContent className="space-y-6">
                           <motion.div variants={itemAnimation} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                              <Label htmlFor="companyName">Company Name</Label>
+                              <Label htmlFor="companyName">{t("company-name")}</Label>
                               <div className="relative">
                                 <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                                 <Input
@@ -385,7 +387,7 @@ const Settings = () => {
                             </div>
                             
                             <div className="space-y-2">
-                              <Label htmlFor="email">Email Address</Label>
+                              <Label htmlFor="email">{t("email-address")}</Label>
                               <div className="relative">
                                 <AtSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                                 <Input
@@ -399,7 +401,7 @@ const Settings = () => {
                             </div>
                             
                             <div className="space-y-2">
-                              <Label htmlFor="phone">Phone Number</Label>
+                              <Label htmlFor="phone">{t("phone-number")}</Label>
                               <div className="relative">
                                 <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                                 <Input
@@ -412,7 +414,7 @@ const Settings = () => {
                             </div>
                             
                             <div className="space-y-2">
-                              <Label htmlFor="website">Website</Label>
+                              <Label htmlFor="website">{t("website")}</Label>
                               <div className="relative">
                                 <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                                 <Input
@@ -425,7 +427,7 @@ const Settings = () => {
                             </div>
 
                             <div className="space-y-2 md:col-span-2">
-                              <Label htmlFor="address">Address</Label>
+                              <Label htmlFor="address">{t("address")}</Label>
                               <Input
                                 id="address"
                                 value={address}
@@ -434,7 +436,7 @@ const Settings = () => {
                             </div>
                             
                             <div className="space-y-2">
-                              <Label htmlFor="city">City</Label>
+                              <Label htmlFor="city">{t("city")}</Label>
                               <Input
                                 id="city"
                                 value={city}
@@ -444,7 +446,7 @@ const Settings = () => {
                             
                             <div className="grid grid-cols-2 gap-4">
                               <div className="space-y-2">
-                                <Label htmlFor="state">State</Label>
+                                <Label htmlFor="state">{t("state")}</Label>
                                 <Input
                                   id="state"
                                   value={state}
@@ -453,7 +455,7 @@ const Settings = () => {
                               </div>
                               
                               <div className="space-y-2">
-                                <Label htmlFor="zipCode">Zip Code</Label>
+                                <Label htmlFor="zipCode">{t("zip-code")}</Label>
                                 <Input
                                   id="zipCode"
                                   value={zipCode}
@@ -463,7 +465,7 @@ const Settings = () => {
                             </div>
                             
                             <div className="space-y-2 md:col-span-2">
-                              <Label htmlFor="description">Company Description</Label>
+                              <Label htmlFor="description">{t("company-description")}</Label>
                               <Textarea
                                 id="description"
                                 value={description}
@@ -474,7 +476,7 @@ const Settings = () => {
                           </motion.div>
                           
                           <motion.div variants={itemAnimation} className="space-y-4">
-                            <Label>Company Tags</Label>
+                            <Label>{t("company-tags")}</Label>
                             <div className="flex flex-wrap gap-2 mb-4">
                               {tags.map((tag, index) => (
                                 <motion.div
@@ -497,12 +499,12 @@ const Settings = () => {
                             
                             <form onSubmit={handleAddTag} className="flex gap-2">
                               <Input 
-                                placeholder="Add a tag..." 
+                                placeholder={t("add-a-tag")}
                                 value={newTag}
                                 onChange={(e) => setNewTag(e.target.value)}
                                 className="max-w-xs"
                               />
-                              <Button type="submit" size="sm">Add</Button>
+                              <Button type="submit" size="sm">{t("add")}</Button>
                             </form>
                           </motion.div>
                           
@@ -517,13 +519,13 @@ const Settings = () => {
                               ) : (
                                 <Save className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
                               )}
-                              Save Changes
+                              {t("save-changes")}
                             </Button>
                           </motion.div>
                         </CardContent>
                       </Card>
-                    </motion.div>
-                  </TabsContent>
+                    </TabsContent>
+                  </motion.div>
                 </motion.div>
               )}
 
@@ -536,21 +538,21 @@ const Settings = () => {
                   exit="exit"
                   variants={fadeIn}
                 >
-                  <TabsContent value="retail" className="space-y-6">
-                    <motion.div variants={staggerContainer} initial="hidden" animate="visible">
+                  <motion.div variants={staggerContainer} initial="hidden" animate="visible">
+                    <TabsContent value="retail" className="space-y-6">
                       <Card>
                         <CardHeader>
                           <motion.div variants={itemAnimation}>
-                            <CardTitle>Retail Information</CardTitle>
+                            <CardTitle>{t("retail-information")}</CardTitle>
                             <CardDescription>
-                              Manage your retail details and store locations
+                              {t("manage-retail-details")}
                             </CardDescription>
                           </motion.div>
                         </CardHeader>
                         <CardContent className="space-y-6">
                           <motion.div variants={itemAnimation} className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div className="space-y-2">
-                              <Label htmlFor="storeCount">Number of Stores</Label>
+                              <Label htmlFor="storeCount">{t("number-of-stores")}</Label>
                               <div className="relative">
                                 <Store className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                                 <Input
@@ -564,7 +566,7 @@ const Settings = () => {
                             </div>
                             
                             <div className="space-y-2">
-                              <Label htmlFor="averageStoreSize">Average Store Size (sq ft)</Label>
+                              <Label htmlFor="averageStoreSize">{t("average-store-size")}</Label>
                               <div className="relative">
                                 <BarChart className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                                 <Input
@@ -578,7 +580,7 @@ const Settings = () => {
                             </div>
                             
                             <div className="space-y-2">
-                              <Label htmlFor="yearFounded">Year Founded</Label>
+                              <Label htmlFor="yearFounded">{t("year-founded")}</Label>
                               <div className="relative">
                                 <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                                 <Input
@@ -593,7 +595,7 @@ const Settings = () => {
                           </motion.div>
                           
                           <motion.div variants={itemAnimation} className="space-y-4">
-                            <Label>Store Locations</Label>
+                            <Label>{t("store-locations")}</Label>
                             <div className="flex flex-wrap gap-2 mb-4">
                               {storeLocations.map((location, index) => (
                                 <motion.div
@@ -617,36 +619,36 @@ const Settings = () => {
                             
                             <form onSubmit={handleAddLocation} className="flex gap-2">
                               <Input 
-                                placeholder="Add a store location..." 
+                                placeholder={t("add-store-location")}
                                 value={newLocation}
                                 onChange={(e) => setNewLocation(e.target.value)}
                                 className="max-w-xs"
                               />
-                              <Button type="submit" size="sm">Add</Button>
+                              <Button type="submit" size="sm">{t("add")}</Button>
                             </form>
                           </motion.div>
                           
                           <motion.div variants={itemAnimation} className="border rounded-md p-4 bg-muted/30">
                             <h3 className="font-medium mb-2 flex items-center gap-2">
                               <ShoppingCart className="h-4 w-4" />
-                              Store Features
+                              {t("store-features")}
                             </h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                               <div className="flex items-center space-x-2">
                                 <Switch id="feature-online" defaultChecked />
-                                <Label htmlFor="feature-online">Online Shopping</Label>
+                                <Label htmlFor="feature-online">{t("online-shopping")}</Label>
                               </div>
                               <div className="flex items-center space-x-2">
                                 <Switch id="feature-delivery" defaultChecked />
-                                <Label htmlFor="feature-delivery">Home Delivery</Label>
+                                <Label htmlFor="feature-delivery">{t("home-delivery")}</Label>
                               </div>
                               <div className="flex items-center space-x-2">
                                 <Switch id="feature-pickup" />
-                                <Label htmlFor="feature-pickup">Curbside Pickup</Label>
+                                <Label htmlFor="feature-pickup">{t("curbside-pickup")}</Label>
                               </div>
                               <div className="flex items-center space-x-2">
                                 <Switch id="feature-loyalty" defaultChecked />
-                                <Label htmlFor="feature-loyalty">Loyalty Program</Label>
+                                <Label htmlFor="feature-loyalty">{t("loyalty-program")}</Label>
                               </div>
                             </div>
                           </motion.div>
@@ -662,13 +664,13 @@ const Settings = () => {
                               ) : (
                                 <Save className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
                               )}
-                              Save Retail Details
+                              {t("save-retail-details")}
                             </Button>
                           </motion.div>
                         </CardContent>
                       </Card>
-                    </motion.div>
-                  </TabsContent>
+                    </TabsContent>
+                  </motion.div>
                 </motion.div>
               )}
 
@@ -681,14 +683,14 @@ const Settings = () => {
                   exit="exit"
                   variants={fadeIn}
                 >
-                  <TabsContent value="notification" className="space-y-6">
-                    <motion.div variants={staggerContainer} initial="hidden" animate="visible">
+                  <motion.div variants={staggerContainer} initial="hidden" animate="visible">
+                    <TabsContent value="notification" className="space-y-6">
                       <Card>
                         <CardHeader>
                           <motion.div variants={itemAnimation}>
-                            <CardTitle>Notification Preferences</CardTitle>
+                            <CardTitle>{t("notification-preferences")}</CardTitle>
                             <CardDescription>
-                              Choose how you want to receive notifications and updates
+                              {t("choose-notification-preferences")}
                             </CardDescription>
                           </motion.div>
                         </CardHeader>
@@ -698,10 +700,10 @@ const Settings = () => {
                               <div className="space-y-0.5">
                                 <Label htmlFor="emailNotifications" className="flex items-center gap-2">
                                   <AtSign className="h-4 w-4 text-primary" />
-                                  Email Notifications
+                                  {t("email-notifications")}
                                 </Label>
                                 <p className="text-sm text-muted-foreground">
-                                  Receive important updates via email
+                                  {t("receive-important-updates")}
                                 </p>
                               </div>
                               <Switch
@@ -717,10 +719,10 @@ const Settings = () => {
                               <div className="space-y-0.5">
                                 <Label htmlFor="messageNotifications" className="flex items-center gap-2">
                                   <Bell className="h-4 w-4 text-primary" />
-                                  Message Notifications
+                                  {t("message-notifications")}
                                 </Label>
                                 <p className="text-sm text-muted-foreground">
-                                  Get notified when you receive new messages
+                                  {t("notified-new-messages")}
                                 </p>
                               </div>
                               <Switch
@@ -736,10 +738,10 @@ const Settings = () => {
                               <div className="space-y-0.5">
                                 <Label htmlFor="inventoryNotifications" className="flex items-center gap-2">
                                   <Truck className="h-4 w-4 text-primary" />
-                                  Inventory Notifications
+                                  {t("inventory-notifications")}
                                 </Label>
                                 <p className="text-sm text-muted-foreground">
-                                  Get notified about inventory updates and deliveries
+                                  {t("notified-inventory-updates")}
                                 </p>
                               </div>
                               <Switch
@@ -755,10 +757,10 @@ const Settings = () => {
                               <div className="space-y-0.5">
                                 <Label htmlFor="marketingNotifications" className="flex items-center gap-2">
                                   <Megaphone className="h-4 w-4 text-primary" />
-                                  Marketing Emails
+                                  {t("marketing-emails")}
                                 </Label>
                                 <p className="text-sm text-muted-foreground">
-                                  Receive tips, product updates and offers
+                                  {t("receive-tips-updates")}
                                 </p>
                               </div>
                               <Switch
@@ -780,13 +782,13 @@ const Settings = () => {
                               ) : (
                                 <Save className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
                               )}
-                              Save Notification Settings
+                              {t("save-notification-settings")}
                             </Button>
                           </motion.div>
                         </CardContent>
                       </Card>
-                    </motion.div>
-                  </TabsContent>
+                    </TabsContent>
+                  </motion.div>
                 </motion.div>
               )}
 
@@ -799,21 +801,21 @@ const Settings = () => {
                   exit="exit"
                   variants={fadeIn}
                 >
-                  <TabsContent value="security" className="space-y-6">
-                    <motion.div variants={staggerContainer} initial="hidden" animate="visible">
+                  <motion.div variants={staggerContainer} initial="hidden" animate="visible">
+                    <TabsContent value="security" className="space-y-6">
                       <Card>
                         <CardHeader>
                           <motion.div variants={itemAnimation}>
-                            <CardTitle>Password & Security</CardTitle>
+                            <CardTitle>{t("password-security")}</CardTitle>
                             <CardDescription>
-                              Manage your password and security preferences
+                              {t("manage-password-security")}
                             </CardDescription>
                           </motion.div>
                         </CardHeader>
                         <CardContent className="space-y-6">
                           <motion.div variants={itemAnimation} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                              <Label htmlFor="currentPassword">Current Password</Label>
+                              <Label htmlFor="currentPassword">{t("current-password")}</Label>
                               <div className="relative">
                                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                                 <Input
@@ -828,7 +830,7 @@ const Settings = () => {
                             
                             <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
                               <div className="space-y-2">
-                                <Label htmlFor="newPassword">New Password</Label>
+                                <Label htmlFor="newPassword">{t("new-password")}</Label>
                                 <div className="relative">
                                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                                   <Input
@@ -842,7 +844,7 @@ const Settings = () => {
                               </div>
                               
                               <div className="space-y-2">
-                                <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                                <Label htmlFor="confirmPassword">{t("confirm-new-password")}</Label>
                                 <div className="relative">
                                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                                   <Input
@@ -865,10 +867,10 @@ const Settings = () => {
                                 <div className="space-y-0.5">
                                   <Label htmlFor="twoFactorEnabled" className="flex items-center gap-2">
                                     <Shield className="h-4 w-4 text-primary" />
-                                    Two-Factor Authentication
+                                    {t("two-factor-authentication")}
                                   </Label>
                                   <p className="text-sm text-muted-foreground">
-                                    Add an extra layer of security to your account
+                                    {t("add-extra-security")}
                                   </p>
                                 </div>
                                 <Switch
@@ -883,28 +885,28 @@ const Settings = () => {
                               <div className="p-4 rounded-md border bg-muted/30">
                                 <h3 className="font-medium mb-2 flex items-center gap-2">
                                   <ShieldAlert className="h-4 w-4 text-primary" />
-                                  Security Notifications
+                                  {t("security-notifications")}
                                 </h3>
                                 <p className="text-sm text-muted-foreground mb-4">
-                                  Choose how you want to be notified about security-related events
+                                  {t("choose-security-notifications")}
                                 </p>
                                 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                   <div className="flex items-center space-x-2">
                                     <Switch id="security-login" defaultChecked />
-                                    <Label htmlFor="security-login">New Login Alerts</Label>
+                                    <Label htmlFor="security-login">{t("new-login-alerts")}</Label>
                                   </div>
                                   <div className="flex items-center space-x-2">
                                     <Switch id="security-password" defaultChecked />
-                                    <Label htmlFor="security-password">Password Changes</Label>
+                                    <Label htmlFor="security-password">{t("password-changes")}</Label>
                                   </div>
                                   <div className="flex items-center space-x-2">
                                     <Switch id="security-device" />
-                                    <Label htmlFor="security-device">New Device Login</Label>
+                                    <Label htmlFor="security-device">{t("new-device-login")}</Label>
                                   </div>
                                   <div className="flex items-center space-x-2">
                                     <Switch id="security-suspicious" defaultChecked />
-                                    <Label htmlFor="security-suspicious">Suspicious Activity</Label>
+                                    <Label htmlFor="security-suspicious">{t("suspicious-activity")}</Label>
                                   </div>
                                 </div>
                               </div>
@@ -922,13 +924,13 @@ const Settings = () => {
                               ) : (
                                 <Save className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
                               )}
-                              Update Security Settings
+                              {t("update-security-settings")}
                             </Button>
                           </motion.div>
                         </CardContent>
                       </Card>
-                    </motion.div>
-                  </TabsContent>
+                    </TabsContent>
+                  </motion.div>
                 </motion.div>
               )}
 
@@ -941,98 +943,100 @@ const Settings = () => {
                   exit="exit"
                   variants={fadeIn}
                 >
-                  <TabsContent value="preferences" className="space-y-6">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Application Preferences</CardTitle>
-                        <CardDescription>
-                          Customize your application experience
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-6">
-                        <div className="space-y-4">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                              <Label htmlFor="language">Language</Label>
-                              <Select value={language} onValueChange={setLanguage}>
-                                <SelectTrigger id="language" className="w-full">
-                                  <div className="flex items-center gap-2">
-                                    <Languages className="h-4 w-4 text-muted-foreground" />
-                                    <SelectValue placeholder="Select language" />
-                                  </div>
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="en">English</SelectItem>
-                                  <SelectItem value="vi">Tiếng Việt</SelectItem>
-                                  <SelectItem value="fr">Français</SelectItem>
-                                  <SelectItem value="es">Español</SelectItem>
-                                </SelectContent>
-                              </Select>
+                  <motion.div variants={staggerContainer} initial="hidden" animate="visible">
+                    <TabsContent value="preferences" className="space-y-6">
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>{t("application-preferences")}</CardTitle>
+                          <CardDescription>
+                            {t("customize-app-experience")}
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                          <div className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                              <div className="space-y-2">
+                                <Label htmlFor="language">{t("language")}</Label>
+                                <Select value={language} onValueChange={setLanguage}>
+                                  <SelectTrigger id="language" className="w-full">
+                                    <div className="flex items-center gap-2">
+                                      <Languages className="h-4 w-4 text-muted-foreground" />
+                                      <SelectValue placeholder={t("select-language")} />
+                                    </div>
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="en">{t("english")}</SelectItem>
+                                    <SelectItem value="vi">{t("vietnamese")}</SelectItem>
+                                    <SelectItem value="fr">{t("french")}</SelectItem>
+                                    <SelectItem value="es">{t("spanish")}</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              
+                              <div className="space-y-2">
+                                <Label htmlFor="theme">{t("theme")}</Label>
+                                <Select value={theme} onValueChange={setTheme}>
+                                  <SelectTrigger id="theme" className="w-full">
+                                    <SelectValue placeholder={t("select-theme")} />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="light">{t("light")}</SelectItem>
+                                    <SelectItem value="dark">{t("dark")}</SelectItem>
+                                    <SelectItem value="system">{t("system")}</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
                             </div>
                             
-                            <div className="space-y-2">
-                              <Label htmlFor="theme">Theme</Label>
-                              <Select value={theme} onValueChange={setTheme}>
-                                <SelectTrigger id="theme" className="w-full">
-                                  <SelectValue placeholder="Select theme" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="light">Light</SelectItem>
-                                  <SelectItem value="dark">Dark</SelectItem>
-                                  <SelectItem value="system">System</SelectItem>
-                                </SelectContent>
-                              </Select>
+                            <Separator />
+                            
+                            <div className="flex items-center justify-between">
+                              <div className="space-y-0.5">
+                                <Label htmlFor="compact-sidebar">{t("compact-sidebar")}</Label>
+                                <p className="text-sm text-muted-foreground">
+                                  {t("use-compact-sidebar")}
+                                </p>
+                              </div>
+                              <Switch
+                                id="compact-sidebar"
+                                defaultChecked={true}
+                              />
                             </div>
                           </div>
                           
-                          <Separator />
-                          
-                          <div className="flex items-center justify-between">
-                            <div className="space-y-0.5">
-                              <Label htmlFor="compact-sidebar">Compact Sidebar</Label>
-                              <p className="text-sm text-muted-foreground">
-                                Use a more compact sidebar layout
-                              </p>
-                            </div>
-                            <Switch
-                              id="compact-sidebar"
-                              defaultChecked={true}
-                            />
-                          </div>
-                        </div>
-                        
-                        <div className="flex justify-end">
-                          <Button disabled={isLoading}>
-                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Save Preferences
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Help & Support</CardTitle>
-                        <CardDescription>
-                          Get help with using the platform
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="flex items-center gap-4">
-                          <LifeBuoy className="h-8 w-8 text-primary" />
-                          <div>
-                            <h3 className="text-lg font-medium">Need assistance?</h3>
-                            <p className="text-sm text-muted-foreground">
-                              Our support team is here to help you with any questions you may have.
-                            </p>
-                            <Button variant="outline" className="mt-2">
-                              Contact Support
+                          <div className="flex justify-end">
+                            <Button disabled={isLoading}>
+                              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                              {t("save-preferences")}
                             </Button>
                           </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </TabsContent>
+                        </CardContent>
+                      </Card>
+                      
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>{t("help-support")}</CardTitle>
+                          <CardDescription>
+                            {t("get-help-platform")}
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div className="flex items-center gap-4">
+                            <LifeBuoy className="h-8 w-8 text-primary" />
+                            <div>
+                              <h3 className="text-lg font-medium">{t("need-assistance")}</h3>
+                              <p className="text-sm text-muted-foreground">
+                                {t("support-team-help")}
+                              </p>
+                              <Button variant="outline" className="mt-2">
+                                {t("contact-support")}
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </TabsContent>
+                  </motion.div>
                 </motion.div>
               )}
             </AnimatePresence>

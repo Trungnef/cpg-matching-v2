@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Download, Calendar, TrendingUp, DollarSign, Users, ShoppingBag, ShoppingCart } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
+import { useTranslation } from "react-i18next";
 import {
   AreaChart,
   Area,
@@ -56,9 +57,10 @@ const topSellingProducts = [
 const Analytics = () => {
   const { isAuthenticated, user, role } = useUser();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
-    document.title = "Retail Analytics - CPG Matchmaker";
+    document.title = t("retail-analytics") + " - CPG Matchmaker";
 
     // If not authenticated or not a retailer, redirect
     if (!isAuthenticated) {
@@ -66,7 +68,7 @@ const Analytics = () => {
     } else if (role !== "retailer") {
       navigate("/dashboard");
     }
-  }, [isAuthenticated, navigate, role]);
+  }, [isAuthenticated, navigate, role, t]);
 
   if (!isAuthenticated || role !== "retailer") {
     return null;
@@ -85,20 +87,20 @@ const Analytics = () => {
           <div className="mb-8 px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
-                <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">Analytics Management</h1>
+                <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">{t("analytics-management")}</h1>
                 <p className="text-muted-foreground">
-                  {user?.companyName} - Sales & Performance Metrics
+                  {user?.companyName} - {t("sales-performance-metrics")}
                 </p>
               </div>
 
               <div className="flex gap-2">
                 <Button variant="outline" className="hover:shadow-md transition-shadow">
                   <Calendar className="mr-2 h-4 w-4" />
-                  Last 30 Days
+                  {t("last-30-days")}
                 </Button>
                 <Button variant="outline" className="hover:shadow-md transition-shadow">
                   <Download className="mr-2 h-4 w-4" />
-                  Export
+                  {t("export")}
                 </Button>
               </div>
             </div>
@@ -114,7 +116,7 @@ const Analytics = () => {
               <Card className="hover:shadow-md transition-all duration-300 hover:border-primary/50">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Monthly Revenue
+                    {t("monthly-revenue")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -122,7 +124,7 @@ const Analytics = () => {
                   <div className="flex items-center text-xs text-muted-foreground mt-1">
                     <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
                     <span className="text-green-500">+8.6%</span>
-                    <span className="ml-1">from last month</span>
+                    <span className="ml-1">{t("from-last-month")}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -136,7 +138,7 @@ const Analytics = () => {
               <Card className="hover:shadow-md transition-all duration-300 hover:border-primary/50">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Transactions
+                    {t("transactions")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -144,7 +146,7 @@ const Analytics = () => {
                   <div className="flex items-center text-xs text-muted-foreground mt-1">
                     <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
                     <span className="text-green-500">+7.7%</span>
-                    <span className="ml-1">from last month</span>
+                    <span className="ml-1">{t("from-last-month")}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -158,7 +160,7 @@ const Analytics = () => {
               <Card className="hover:shadow-md transition-all duration-300 hover:border-primary/50">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Avg. Order Value
+                    {t("avg-order-value")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -166,7 +168,7 @@ const Analytics = () => {
                   <div className="flex items-center text-xs text-muted-foreground mt-1">
                     <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
                     <span className="text-green-500">+0.8%</span>
-                    <span className="ml-1">from last month</span>
+                    <span className="ml-1">{t("from-last-month")}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -180,7 +182,7 @@ const Analytics = () => {
               <Card className="hover:shadow-md transition-all duration-300 hover:border-primary/50">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Active Customers
+                    {t("active-customers")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -188,7 +190,7 @@ const Analytics = () => {
                   <div className="flex items-center text-xs text-muted-foreground mt-1">
                     <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
                     <span className="text-green-500">+5.3%</span>
-                    <span className="ml-1">from last month</span>
+                    <span className="ml-1">{t("from-last-month")}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -199,16 +201,16 @@ const Analytics = () => {
           <div className="px-4 sm:px-6 lg:px-8">
             <Tabs defaultValue="sales" className="space-y-8">
               <TabsList className="grid grid-cols-3 w-full max-w-[400px] mb-4">
-                <TabsTrigger value="sales">Sales</TabsTrigger>
-                <TabsTrigger value="products">Products</TabsTrigger>
-                <TabsTrigger value="categories">Categories</TabsTrigger>
+                <TabsTrigger value="sales">{t("sales")}</TabsTrigger>
+                <TabsTrigger value="products">{t("products")}</TabsTrigger>
+                <TabsTrigger value="categories">{t("categories")}</TabsTrigger>
               </TabsList>
 
               <TabsContent value="sales" className="space-y-6">
                 <Card className="border-none shadow-lg">
                   <CardHeader>
-                    <CardTitle>Sales Performance</CardTitle>
-                    <CardDescription>Monthly revenue and transaction trends</CardDescription>
+                    <CardTitle>{t("sales-performance")}</CardTitle>
+                    <CardDescription>{t("monthly-revenue-transaction-trends")}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="h-[400px]">
@@ -237,7 +239,7 @@ const Analytics = () => {
                             yAxisId="left"
                             type="monotone"
                             dataKey="revenue"
-                            name="Revenue ($)"
+                            name={t("revenue-dollar")}
                             stroke="#0088FE"
                             fillOpacity={1}
                             fill="url(#colorRevenue)"
@@ -246,7 +248,7 @@ const Analytics = () => {
                             yAxisId="right"
                             type="monotone"
                             dataKey="transactions"
-                            name="Transactions"
+                            name={t("transactions")}
                             stroke="#00C49F"
                             fillOpacity={1}
                             fill="url(#colorTransactions)"
@@ -261,8 +263,8 @@ const Analytics = () => {
               <TabsContent value="products" className="space-y-6">
                 <Card className="border-none shadow-lg">
                   <CardHeader>
-                    <CardTitle>Top Selling Products</CardTitle>
-                    <CardDescription>Best performing products by sales volume</CardDescription>
+                    <CardTitle>{t("top-selling-products")}</CardTitle>
+                    <CardDescription>{t("best-performing-products")}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-6">
@@ -285,7 +287,7 @@ const Analytics = () => {
                             </div>
                           </div>
                           <div className="text-right">
-                            <p className="font-medium">{product.sales} units</p>
+                            <p className="font-medium">{product.sales} {t("units")}</p>
                             <div className="flex items-center justify-end">
                               <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
                               <span className="text-xs text-green-500">+{product.growth}%</span>
@@ -301,8 +303,8 @@ const Analytics = () => {
               <TabsContent value="categories" className="space-y-6">
                 <Card className="border-none shadow-lg">
                   <CardHeader>
-                    <CardTitle>Sales by Category</CardTitle>
-                    <CardDescription>Distribution of sales across product categories</CardDescription>
+                    <CardTitle>{t("sales-by-category")}</CardTitle>
+                    <CardDescription>{t("distribution-sales-across-categories")}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="h-[400px]">
@@ -316,7 +318,7 @@ const Analytics = () => {
                             outerRadius={150}
                             fill="#8884d8"
                             dataKey="value"
-                            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                            label={({ name, percent }) => `${t(name.toLowerCase().replace(/\s+/g, '-'))} ${(percent * 100).toFixed(0)}%`}
                           >
                             {categoryData.map((entry, index) => (
                               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

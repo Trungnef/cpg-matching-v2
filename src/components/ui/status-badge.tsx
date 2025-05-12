@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/contexts/ThemeContext";
 
-export type StatusType = 
+export type StatusType =
   | "In Stock" 
   | "Low Stock" 
   | "Out of Stock" 
@@ -17,7 +17,9 @@ export type StatusType =
   | "Operational"
   | "In Production"
   | "Completed"
-  | "Scheduled";
+  | "Scheduled"
+  | "Setup"
+  | "Offline";
 
 interface StatusBadgeProps {
   status: StatusType;
@@ -51,12 +53,14 @@ export const StatusBadge = ({ status, className }: StatusBadgeProps) => {
       case "inactive":
       case "Inactive":
       case "Idle":
+      case "Offline":
         return isDark
           ? "bg-rose-900/30 text-rose-300 border-rose-800/60 font-medium hover:bg-rose-900/50"
           : "bg-rose-50 text-rose-700 border-rose-200 font-medium hover:bg-rose-100";
       
       case "Development":
       case "In Production":
+      case "Setup":
         return isDark
           ? "bg-sky-900/30 text-sky-300 border-sky-800/60 font-medium hover:bg-sky-900/50"
           : "bg-sky-50 text-sky-700 border-sky-200 font-medium hover:bg-sky-100";

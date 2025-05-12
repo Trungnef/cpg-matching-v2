@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/contexts/UserContext";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -199,6 +200,7 @@ const RetailerInventory = () => {
   const { isAuthenticated, user, role } = useUser();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [inventoryData, setInventoryData] = useState(inventory);
   
@@ -242,7 +244,7 @@ const RetailerInventory = () => {
   });
 
   useEffect(() => {
-    document.title = "Inventory Management - CPG Matchmaker";
+    document.title = t("inventory-management") + " - CPG Matchmaker";
     
     // If not authenticated or not a retailer, redirect
     if (!isAuthenticated) {
@@ -250,7 +252,7 @@ const RetailerInventory = () => {
     } else if (role !== "retailer") {
       navigate("/dashboard");
     }
-  }, [isAuthenticated, navigate, role]);
+  }, [isAuthenticated, navigate, role, t]);
 
   if (!isAuthenticated || role !== "retailer") {
     return null;
@@ -311,8 +313,8 @@ const RetailerInventory = () => {
       setIsDeleting(null);
       
       toast({
-        title: "Product deleted",
-        description: "The product has been successfully removed from inventory",
+        title: t("product-deleted"),
+        description: t("product-deleted-message"),
         variant: "default"
       });
     }, 500);
@@ -349,8 +351,8 @@ const RetailerInventory = () => {
     setAddProductOpen(false);
     
     toast({
-      title: "Product added",
-      description: "New product has been added to inventory",
+      title: t("product-added"),
+      description: t("product-added-message"),
       variant: "default"
     });
   };
@@ -389,8 +391,8 @@ const RetailerInventory = () => {
     setEditProductOpen(false);
     
     toast({
-      title: "Product updated",
-      description: "Product information has been successfully updated",
+      title: t("product-updated"),
+      description: t("product-updated-message"),
       variant: "default"
     });
   };
@@ -418,7 +420,7 @@ const RetailerInventory = () => {
   return (
     <RetailerLayout>
       <motion.div 
-        className="w-full"
+        className="w-full no-scrollbar"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -427,8 +429,8 @@ const RetailerInventory = () => {
         <div className="mb-8 px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">Inventory Management</h1>
-              <p className="text-muted-foreground">{user?.companyName} - Track and Manage Stock Levels</p>
+              <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">{t("inventory-management")}</h1>
+              <p className="text-muted-foreground">{user?.companyName} - {t("track-manage-stock-levels")}</p>
             </div>
             
             {/* Add Product Dialog Trigger */}
@@ -436,19 +438,19 @@ const RetailerInventory = () => {
               <DialogTrigger asChild>
                 <Button className="group hover:shadow-md transition-shadow">
                   <PlusCircle className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
-                  Add New Product
+                  {t("add-new-product")}
                 </Button>
               </DialogTrigger>
               
               {/* Add Product Dialog Content */}
-              <DialogContent className="sm:max-w-[600px]">
+              <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto no-scrollbar">
                 <DialogHeader>
                   <DialogTitle className="flex items-center gap-2">
                     <Package className="h-5 w-5 text-primary" />
-                    Add New Product
+                    {t("add-new-product")}
                   </DialogTitle>
                   <DialogDescription>
-                    Fill in the product details below to add a new item to your inventory.
+                    {t("add-product-description")}
                   </DialogDescription>
                 </DialogHeader>
                 
@@ -460,9 +462,9 @@ const RetailerInventory = () => {
                         name="name"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Product Name</FormLabel>
+                            <FormLabel>{t("product-name")}</FormLabel>
                             <FormControl>
-                              <Input placeholder="e.g. Organic Cereal" {...field} />
+                              <Input placeholder={t("product-name-placeholder")} {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -474,9 +476,9 @@ const RetailerInventory = () => {
                         name="brand"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Brand</FormLabel>
+                            <FormLabel>{t("brand")}</FormLabel>
                             <FormControl>
-                              <Input placeholder="e.g. Green Earth Foods" {...field} />
+                              <Input placeholder={t("brand-placeholder")} {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -488,19 +490,19 @@ const RetailerInventory = () => {
                         name="category"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Category</FormLabel>
+                            <FormLabel>{t("category")}</FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                                 <SelectTrigger>
-                                  <SelectValue placeholder="Select a category" />
+                                  <SelectValue placeholder={t("select-category")} />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="Food">Food</SelectItem>
-                                <SelectItem value="Beverages">Beverages</SelectItem>
-                                <SelectItem value="Health">Health</SelectItem>
-                                <SelectItem value="Household">Household</SelectItem>
-                                <SelectItem value="Snacks">Snacks</SelectItem>
+                                <SelectItem value="Food">{t("category-food")}</SelectItem>
+                                <SelectItem value="Beverages">{t("category-beverages")}</SelectItem>
+                                <SelectItem value="Health">{t("category-health")}</SelectItem>
+                                <SelectItem value="Household">{t("category-household")}</SelectItem>
+                                <SelectItem value="Snacks">{t("category-snacks")}</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -513,17 +515,17 @@ const RetailerInventory = () => {
                         name="location"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Storage Location</FormLabel>
+                            <FormLabel>{t("storage-location")}</FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
                                 <SelectTrigger>
-                                  <SelectValue placeholder="Select a location" />
+                                  <SelectValue placeholder={t("select-location")} />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="Warehouse A">Warehouse A</SelectItem>
-                                <SelectItem value="Warehouse B">Warehouse B</SelectItem>
-                                <SelectItem value="Warehouse C">Warehouse C</SelectItem>
+                                <SelectItem value="Warehouse A">{t("warehouse-a")}</SelectItem>
+                                <SelectItem value="Warehouse B">{t("warehouse-b")}</SelectItem>
+                                <SelectItem value="Warehouse C">{t("warehouse-c")}</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -536,7 +538,7 @@ const RetailerInventory = () => {
                         name="quantity"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Quantity</FormLabel>
+                            <FormLabel>{t("quantity")}</FormLabel>
                             <FormControl>
                               <Input type="number" {...field} />
                             </FormControl>
@@ -550,12 +552,12 @@ const RetailerInventory = () => {
                         name="threshold"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Reorder Threshold</FormLabel>
+                            <FormLabel>{t("reorder-threshold")}</FormLabel>
                             <FormControl>
                               <Input type="number" {...field} />
                             </FormControl>
                             <FormDescription>
-                              Minimum stock level before reordering
+                              {t("threshold-description")}
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -567,7 +569,7 @@ const RetailerInventory = () => {
                         name="price"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Price ($)</FormLabel>
+                            <FormLabel>{t("price-usd")}</FormLabel>
                             <FormControl>
                               <Input type="number" step="0.01" {...field} />
                             </FormControl>
@@ -581,9 +583,9 @@ const RetailerInventory = () => {
                         name="sku"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>SKU</FormLabel>
+                            <FormLabel>{t("sku")}</FormLabel>
                             <FormControl>
-                              <Input placeholder="e.g. ORG-CER-001" {...field} />
+                              <Input placeholder={t("sku-placeholder")} {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -596,11 +598,11 @@ const RetailerInventory = () => {
                       name="description"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Description</FormLabel>
+                          <FormLabel>{t("description")}</FormLabel>
                           <FormControl>
                             <Textarea 
-                              placeholder="Enter product description..." 
-                              className="min-h-[100px]"
+                              placeholder={t("product-description-placeholder")} 
+                              className="min-h-[100px] no-scrollbar"
                               {...field} 
                             />
                           </FormControl>
@@ -610,7 +612,7 @@ const RetailerInventory = () => {
                     />
                     
                     <DialogFooter>
-                      <Button type="submit">Add Product</Button>
+                      <Button type="submit">{t("add-product")}</Button>
                     </DialogFooter>
                   </form>
                 </Form>
@@ -626,7 +628,7 @@ const RetailerInventory = () => {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input 
-                  placeholder="Search inventory..." 
+                  placeholder={t("search-inventory")} 
                   className="pl-10 shadow-sm hover:shadow transition-shadow" 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -637,27 +639,27 @@ const RetailerInventory = () => {
             <div className="flex gap-2 w-full md:w-2/3">
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Filter by category" />
+                  <SelectValue placeholder={t("filter-by-category")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  <SelectItem value="Food">Food</SelectItem>
-                  <SelectItem value="Beverages">Beverages</SelectItem>
-                  <SelectItem value="Health">Health</SelectItem>
-                  <SelectItem value="Household">Household</SelectItem>
-                  <SelectItem value="Snacks">Snacks</SelectItem>
+                  <SelectItem value="all">{t("all-categories")}</SelectItem>
+                  <SelectItem value="Food">{t("category-food")}</SelectItem>
+                  <SelectItem value="Beverages">{t("category-beverages")}</SelectItem>
+                  <SelectItem value="Health">{t("category-health")}</SelectItem>
+                  <SelectItem value="Household">{t("category-household")}</SelectItem>
+                  <SelectItem value="Snacks">{t("category-snacks")}</SelectItem>
                 </SelectContent>
               </Select>
               
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Filter by status" />
+                  <SelectValue placeholder={t("filter-by-status")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="In Stock">In Stock</SelectItem>
-                  <SelectItem value="Low Stock">Low Stock</SelectItem>
-                  <SelectItem value="Out of Stock">Out of Stock</SelectItem>
+                  <SelectItem value="all">{t("all-statuses")}</SelectItem>
+                  <SelectItem value="In Stock">{t("in-stock")}</SelectItem>
+                  <SelectItem value="Low Stock">{t("low-stock")}</SelectItem>
+                  <SelectItem value="Out of Stock">{t("out-of-stock")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -665,7 +667,7 @@ const RetailerInventory = () => {
         </div>
         
         {/* Inventory Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4 sm:px-6 lg:px-8 overflow-y-auto no-scrollbar">
           <AnimatePresence>
             {filteredInventory.map((item) => (
               <motion.div
@@ -701,7 +703,7 @@ const RetailerInventory = () => {
                         onClick={() => handleViewProduct(item)}
                       >
                         <Eye className="h-4 w-4 mr-1" />
-                        View Details
+                        {t("view-details")}
                       </Button>
                     </div>
                   </div>
@@ -719,9 +721,9 @@ const RetailerInventory = () => {
                   <CardContent className="space-y-3 pb-2">
                     <div className="space-y-1">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Stock Level</span>
+                        <span className="text-muted-foreground">{t("stock-level")}</span>
                         <span className="font-medium">
-                          {item.quantity} units
+                          {item.quantity} {t("units")}
                         </span>
                       </div>
                       <Progress 
@@ -729,17 +731,17 @@ const RetailerInventory = () => {
                         className="h-2 bg-muted [&>div]:bg-primary" 
                       />
                       <div className="flex justify-between items-center text-xs text-muted-foreground">
-                        <span>Min threshold: {item.threshold}</span>
+                        <span>{t("min-threshold")}: {item.threshold}</span>
                         {item.status === "Low Stock" && (
                           <span className="flex items-center text-yellow-600 dark:text-yellow-400 font-medium">
                             <AlertTriangle className="h-3 w-3 mr-1 drop-shadow-sm" />
-                            Reorder soon
+                            {t("reorder-soon")}
                           </span>
                         )}
                         {item.status === "Out of Stock" && (
                           <span className="flex items-center text-red-600 dark:text-red-400 font-medium">
                             <AlertTriangle className="h-3 w-3 mr-1 drop-shadow-sm" />
-                            Reorder now
+                            {t("reorder-now")}
                           </span>
                         )}
                       </div>
@@ -747,19 +749,19 @@ const RetailerInventory = () => {
                     
                     <div className="grid grid-cols-2 gap-2">
                       <div className="flex items-center text-sm">
-                        <span className="text-muted-foreground">Category:</span>
+                        <span className="text-muted-foreground">{t("category")}:</span>
                         <Badge variant="outline" className="ml-1 text-xs bg-primary/5 border-primary/20 text-primary dark:bg-primary/10 dark:border-primary/30 shadow-sm">
                           {item.category}
                         </Badge>
                       </div>
                       <div className="flex items-center text-sm">
-                        <span className="text-muted-foreground">Location:</span>
+                        <span className="text-muted-foreground">{t("location")}:</span>
                         <Badge variant="outline" className="ml-1 text-xs bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/20 dark:border-blue-800/40 dark:text-blue-400 shadow-sm">
                           {item.location}
                         </Badge>
                       </div>
                       <div className="flex items-center text-sm col-span-2">
-                        <span className="text-muted-foreground">SKU:</span>
+                        <span className="text-muted-foreground">{t("sku")}:</span>
                         <span className="ml-1 text-xs font-mono">{item.sku}</span>
                       </div>
                     </div>
@@ -767,7 +769,7 @@ const RetailerInventory = () => {
                   <CardFooter className="flex justify-between pt-0">
                     <Button size="sm" variant="outline" className="group" onClick={() => handleEditProduct(item)}>
                       <Pencil className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
-                      Edit Product
+                      {t("edit-product")}
                     </Button>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -778,34 +780,34 @@ const RetailerInventory = () => {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => handleViewProduct(item)}>
                           <Eye className="h-4 w-4 mr-2" />
-                          View Details
+                          {t("view-details")}
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleEditProduct(item)}>
                           <Pencil className="h-4 w-4 mr-2" />
-                          Edit Product
+                          {t("edit-product")}
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
                             <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-red-500">
                               <Trash2 className="h-4 w-4 mr-2" />
-                              Delete Product
+                              {t("delete-product")}
                             </DropdownMenuItem>
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                              <AlertDialogTitle>{t("are-you-sure")}</AlertDialogTitle>
                               <AlertDialogDescription>
-                                This will permanently delete {item.name} from your inventory. This action cannot be undone.
+                                {t("delete-product-confirmation", { name: item.name })}
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
                               <AlertDialogAction 
                                 className="bg-red-500 hover:bg-red-600"
                                 onClick={() => handleDeleteProduct(item.id)}
                               >
-                                Delete
+                                {t("delete")}
                               </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
@@ -839,9 +841,9 @@ const RetailerInventory = () => {
                     >
                       <PlusCircle className="h-6 w-6 text-primary drop-shadow-sm" />
                     </motion.div>
-                    <h3 className="font-medium mb-2">Add New Item</h3>
+                    <h3 className="font-medium mb-2">{t("add-new-item")}</h3>
                     <p className="text-sm text-muted-foreground text-center mb-4">
-                      Add a new product to your inventory
+                      {t("add-item-description")}
                     </p>
                   </CardContent>
                 </Card>
@@ -863,11 +865,11 @@ const RetailerInventory = () => {
                 <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
                   <Package className="h-8 w-8 text-muted-foreground" />
                 </div>
-                <h3 className="text-xl font-medium mb-2">No products found</h3>
+                <h3 className="text-xl font-medium mb-2">{t("no-products-found")}</h3>
                 <p className="text-muted-foreground text-center max-w-md mb-6">
                   {searchQuery || categoryFilter !== "all" || statusFilter !== "all"
-                    ? "Try adjusting your filters or search query"
-                    : "Start by adding some products to your inventory"
+                    ? t("adjust-filters")
+                    : t("start-by-adding-products")
                   }
                 </p>
                 {(searchQuery || categoryFilter !== "all" || statusFilter !== "all") && (
@@ -880,7 +882,7 @@ const RetailerInventory = () => {
                     }}
                   >
                     <X className="h-4 w-4 mr-2" />
-                    Clear Filters
+                    {t("clear-filters")}
                   </Button>
                 )}
               </CardContent>
@@ -895,7 +897,7 @@ const RetailerInventory = () => {
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   <Package className="h-5 w-5 text-primary" />
-                  Product Details
+                  {t("product-details")}
                 </DialogTitle>
               </DialogHeader>
               
@@ -921,12 +923,12 @@ const RetailerInventory = () => {
                   
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Stock Level</span>
+                      <span className="text-muted-foreground">{t("stock-level")}</span>
                       <span className={`font-medium ${
                         selectedProduct.status === "Out of Stock" ? "text-red-600 dark:text-red-400" : 
                         selectedProduct.status === "Low Stock" ? "text-yellow-600 dark:text-yellow-400" : "text-green-600 dark:text-green-400"
                       }`}>
-                        {selectedProduct.quantity} units
+                        {selectedProduct.quantity} {t("units")}
                       </span>
                     </div>
                     <Progress 
@@ -945,33 +947,33 @@ const RetailerInventory = () => {
               
               <div className="space-y-4 mt-4">
                 <div>
-                  <h4 className="text-sm font-medium text-muted-foreground mb-1">Description</h4>
+                  <h4 className="text-sm font-medium text-muted-foreground mb-1">{t("description")}</h4>
                   <p className="text-sm">{selectedProduct.description}</p>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Category</h4>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">{t("category")}</h4>
                     <Badge variant="outline" className="bg-primary/5 border-primary/20 text-primary">
                       {selectedProduct.category}
                     </Badge>
                   </div>
                   
                   <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Location</h4>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">{t("location")}</h4>
                     <Badge variant="outline" className="bg-blue-50 border-blue-200 text-blue-700">
                       {selectedProduct.location}
                     </Badge>
                   </div>
                   
                   <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-1">SKU</h4>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">{t("sku")}</h4>
                     <p className="text-sm font-mono">{selectedProduct.sku}</p>
                   </div>
                   
                   <div>
-                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Reorder Threshold</h4>
-                    <p className="text-sm">{selectedProduct.threshold} units</p>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">{t("reorder-threshold")}</h4>
+                    <p className="text-sm">{selectedProduct.threshold} {t("units")}</p>
                   </div>
                 </div>
               </div>
@@ -979,24 +981,24 @@ const RetailerInventory = () => {
               <DialogFooter className="gap-2">
                 <Button variant="outline" onClick={() => handleEditProduct(selectedProduct)}>
                   <Pencil className="h-4 w-4 mr-2" />
-                  Edit Product
+                  {t("edit-product")}
                 </Button>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button variant="destructive">
                       <Trash2 className="h-4 w-4 mr-2" />
-                      Delete
+                      {t("delete")}
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                      <AlertDialogTitle>{t("are-you-sure")}</AlertDialogTitle>
                       <AlertDialogDescription>
-                        This will permanently delete {selectedProduct.name} from your inventory. This action cannot be undone.
+                        {t("delete-product-confirmation", { name: selectedProduct.name })}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
                       <AlertDialogAction 
                         className="bg-red-500 hover:bg-red-600"
                         onClick={() => {
@@ -1004,7 +1006,7 @@ const RetailerInventory = () => {
                           setViewProductOpen(false);
                         }}
                       >
-                        Delete
+                        {t("delete")}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
@@ -1021,10 +1023,10 @@ const RetailerInventory = () => {
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   <Pencil className="h-5 w-5 text-primary" />
-                  Edit Product
+                  {t("edit-product")}
                 </DialogTitle>
                 <DialogDescription>
-                  Update the product details below.
+                  {t("edit-product-description")}
                 </DialogDescription>
               </DialogHeader>
               
@@ -1036,7 +1038,7 @@ const RetailerInventory = () => {
                       name="name"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Product Name</FormLabel>
+                          <FormLabel>{t("product-name")}</FormLabel>
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
@@ -1050,7 +1052,7 @@ const RetailerInventory = () => {
                       name="brand"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Brand</FormLabel>
+                          <FormLabel>{t("brand")}</FormLabel>
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
@@ -1064,19 +1066,19 @@ const RetailerInventory = () => {
                       name="category"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Category</FormLabel>
+                          <FormLabel>{t("category")}</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder="Select a category" />
+                                <SelectValue placeholder={t("select-category")} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="Food">Food</SelectItem>
-                              <SelectItem value="Beverages">Beverages</SelectItem>
-                              <SelectItem value="Health">Health</SelectItem>
-                              <SelectItem value="Household">Household</SelectItem>
-                              <SelectItem value="Snacks">Snacks</SelectItem>
+                              <SelectItem value="Food">{t("category-food")}</SelectItem>
+                              <SelectItem value="Beverages">{t("category-beverages")}</SelectItem>
+                              <SelectItem value="Health">{t("category-health")}</SelectItem>
+                              <SelectItem value="Household">{t("category-household")}</SelectItem>
+                              <SelectItem value="Snacks">{t("category-snacks")}</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -1089,17 +1091,17 @@ const RetailerInventory = () => {
                       name="location"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Storage Location</FormLabel>
+                          <FormLabel>{t("storage-location")}</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder="Select a location" />
+                                <SelectValue placeholder={t("select-location")} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="Warehouse A">Warehouse A</SelectItem>
-                              <SelectItem value="Warehouse B">Warehouse B</SelectItem>
-                              <SelectItem value="Warehouse C">Warehouse C</SelectItem>
+                              <SelectItem value="Warehouse A">{t("warehouse-a")}</SelectItem>
+                              <SelectItem value="Warehouse B">{t("warehouse-b")}</SelectItem>
+                              <SelectItem value="Warehouse C">{t("warehouse-c")}</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -1112,7 +1114,7 @@ const RetailerInventory = () => {
                       name="quantity"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Quantity</FormLabel>
+                          <FormLabel>{t("quantity")}</FormLabel>
                           <FormControl>
                             <Input type="number" {...field} />
                           </FormControl>
@@ -1126,7 +1128,7 @@ const RetailerInventory = () => {
                       name="threshold"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Reorder Threshold</FormLabel>
+                          <FormLabel>{t("reorder-threshold")}</FormLabel>
                           <FormControl>
                             <Input type="number" {...field} />
                           </FormControl>
@@ -1140,7 +1142,7 @@ const RetailerInventory = () => {
                       name="price"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Price ($)</FormLabel>
+                          <FormLabel>{t("price-usd")}</FormLabel>
                           <FormControl>
                             <Input type="number" step="0.01" {...field} />
                           </FormControl>
@@ -1154,7 +1156,7 @@ const RetailerInventory = () => {
                       name="sku"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>SKU</FormLabel>
+                          <FormLabel>{t("sku")}</FormLabel>
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
@@ -1169,10 +1171,10 @@ const RetailerInventory = () => {
                     name="description"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Description</FormLabel>
+                        <FormLabel>{t("description")}</FormLabel>
                         <FormControl>
                           <Textarea 
-                            className="min-h-[100px]"
+                            className="min-h-[100px] no-scrollbar"
                             {...field} 
                           />
                         </FormControl>
@@ -1182,7 +1184,7 @@ const RetailerInventory = () => {
                   />
                   
                   <DialogFooter>
-                    <Button type="submit">Update Product</Button>
+                    <Button type="submit">{t("update-product")}</Button>
                   </DialogFooter>
                 </form>
               </Form>

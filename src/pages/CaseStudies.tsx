@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -182,6 +183,7 @@ const staggerContainer = {
 };
 
 const CaseStudies = () => {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [savedStudies, setSavedStudies] = useState<number[]>([]);
@@ -298,13 +300,13 @@ const CaseStudies = () => {
                 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent"
                 variants={fadeInUp}
               >
-                Success Stories
+                {t('case-studies-title')}
               </motion.h1>
               <motion.p 
                 className="text-xl text-muted-foreground mb-8"
                 variants={fadeInUp}
               >
-                Real-world examples of how our platform has helped brands, manufacturers, and retailers achieve their goals
+                {t('case-studies-subtitle')}
               </motion.p>
               
               <motion.div 
@@ -313,7 +315,7 @@ const CaseStudies = () => {
               >
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input 
-                  placeholder="Search case studies..." 
+                  placeholder={t('search-case-studies')}
                   className="pl-10 pr-24 py-6 rounded-full"
                   value={searchQuery}
                   onChange={handleSearch}
@@ -338,13 +340,13 @@ const CaseStudies = () => {
                       <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                           <BookmarkCheck className="h-5 w-5 text-primary" />
-                          Saved Case Studies
+                          {t('saved-case-studies')}
                           <Badge variant="outline" className="ml-2">
-                            {savedStudies.length} saved
+                            {savedStudies.length} {t('case-studies-saved')}
                           </Badge>
                         </DialogTitle>
                         <DialogDescription>
-                          Your bookmarked case studies for quick access
+                          {t('bookmarked-case-studies')}
                         </DialogDescription>
                       </DialogHeader>
 
@@ -361,11 +363,11 @@ const CaseStudies = () => {
                                 <CardHeader className="pb-2">
                                   <div className="flex items-center justify-between mb-1">
                                     <Badge variant="outline" className="text-xs">
-                                      {study.category}
+                                      {t(`category-${study.category.toLowerCase()}`)}
                                     </Badge>
                                     <span className="text-xs text-muted-foreground flex items-center">
                                       <Clock className="h-3 w-3 mr-1" />
-                                      {study.readTime}
+                                      {t('case-studies-read-time', { time: study.readTime })}
                                     </span>
                                   </div>
                                   <CardTitle className="text-base hover:text-primary transition-colors line-clamp-2">
@@ -398,11 +400,11 @@ const CaseStudies = () => {
                                     <DropdownMenuContent align="start">
                                       <DropdownMenuItem onClick={() => handleShare(study)}>
                                         <Share2 className="h-4 w-4 mr-2" />
-                                        Share
+                                        {t('share-case-study')}
                                       </DropdownMenuItem>
                                       <DropdownMenuItem onClick={() => handleSaveStudy(study.id)}>
                                         <Bookmark className="h-4 w-4 mr-2" />
-                                        Remove from saved
+                                        {t('remove-saved')}
                                       </DropdownMenuItem>
                                     </DropdownMenuContent>
                                   </DropdownMenu>
@@ -413,7 +415,7 @@ const CaseStudies = () => {
                                     asChild
                                   >
                                     <Link to={`/case-studies/${study.id}`}>
-                                      Read Case Study
+                                      {t('read-case-study')}
                                       <ArrowRight className="h-3 w-3" />
                                     </Link>
                                   </Button>
@@ -425,15 +427,15 @@ const CaseStudies = () => {
                       ) : (
                         <div className="text-center py-8">
                           <Bookmark className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                          <h3 className="text-lg font-medium mb-2">No saved case studies</h3>
+                          <h3 className="text-lg font-medium mb-2">{t('no-saved-case-studies')}</h3>
                           <p className="text-muted-foreground mb-4">
-                            Click the bookmark icon on any case study to save it for later
+                            {t('click-bookmark-later')}
                           </p>
                           <Button 
                             variant="outline" 
                             onClick={() => setIsBookmarkDialogOpen(false)}
                           >
-                            Browse Case Studies
+                            {t('browse-case-studies')}
                           </Button>
                         </div>
                       )}
@@ -452,31 +454,31 @@ const CaseStudies = () => {
                     </SheetTrigger>
                     <SheetContent>
                       <SheetHeader>
-                        <SheetTitle>Filter Case Studies</SheetTitle>
+                        <SheetTitle>{t('filter-case-studies')}</SheetTitle>
                         <SheetDescription>
-                          Refine your search with these filters
+                          {t('refine-case-studies')}
                         </SheetDescription>
                       </SheetHeader>
                       <div className="py-4 space-y-4">
                         <div className="space-y-2">
-                          <h4 className="text-sm font-medium">Sort By</h4>
+                          <h4 className="text-sm font-medium">{t('sort-by-case-studies')}</h4>
                           <Select
                             value={sortBy}
                             onValueChange={setSortBy}
                           >
                             <SelectTrigger>
-                              <SelectValue placeholder="Sort by" />
+                              <SelectValue placeholder={t('sort-by-case-studies')} />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="latest">Latest First</SelectItem>
-                              <SelectItem value="impact">Highest Impact</SelectItem>
-                              <SelectItem value="popular">Most Popular</SelectItem>
+                              <SelectItem value="latest">{t('sort-latest-first')}</SelectItem>
+                              <SelectItem value="impact">{t('sort-highest-impact')}</SelectItem>
+                              <SelectItem value="popular">{t('sort-most-popular')}</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                         
                         <div className="space-y-2">
-                          <h4 className="text-sm font-medium">Categories</h4>
+                          <h4 className="text-sm font-medium">{t('categories-case-studies')}</h4>
                           <div className="flex flex-wrap gap-2">
                             {categories.map((category) => (
                               <Badge
@@ -485,7 +487,7 @@ const CaseStudies = () => {
                                 className="cursor-pointer"
                                 onClick={() => setSelectedCategory(category)}
                               >
-                                {category}
+                                {t(`category-${category.toLowerCase()}`)}
                               </Badge>
                             ))}
               </div>
@@ -499,10 +501,10 @@ const CaseStudies = () => {
                             setSortBy("latest");
                           }}
                         >
-                          Reset Filters
+                          {t('reset-filters-case-studies')}
                         </Button>
                         <Button onClick={() => setIsFiltersOpen(false)}>
-                          Apply Filters
+                          {t('apply-filters-case-studies')}
                         </Button>
                       </SheetFooter>
                     </SheetContent>
@@ -522,10 +524,10 @@ const CaseStudies = () => {
             viewport={{ once: true }}
           >
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl font-bold">Featured Success Stories</h2>
+              <h2 className="text-2xl font-bold">{t('featured-case-studies')}</h2>
               <Button variant="ghost" className="gap-2" asChild>
                 <Link to="/case-studies/featured">
-                  View All <ChevronRight className="h-4 w-4" />
+                  {t('view-all-case-studies')} <ChevronRight className="h-4 w-4" />
                 </Link>
               </Button>
             </div>
@@ -552,7 +554,7 @@ const CaseStudies = () => {
                       />
                     </div>
                     <Badge className="absolute top-4 right-4">
-                      {study.category}
+                      {t(`category-${study.category.toLowerCase()}`)}
                     </Badge>
                       <div className="absolute top-4 right-20 flex gap-2">
                         <Button
@@ -605,7 +607,7 @@ const CaseStudies = () => {
                       <div className="space-y-3">
                         <div className="text-sm font-medium flex items-center gap-2">
                           <Trophy className="h-4 w-4 text-primary" />
-                          Key Results:
+                          {t('key-results')}
                         </div>
                         {study.results.map((result, index) => (
                           <motion.div 
@@ -624,12 +626,14 @@ const CaseStudies = () => {
                   <CardFooter className="flex justify-between">
                     <div className="flex items-center">
                       <Clock className="h-4 w-4 mr-1 text-muted-foreground" />
-                      <span className="text-sm text-muted-foreground">{study.readTime} read</span>
+                      <span className="text-sm text-muted-foreground">
+                        {t('case-studies-read-time', { time: study.readTime })}
+                      </span>
                     </div>
                       <Button className="gap-1 group" asChild>
                       <Link to={`/case-studies/${study.id}`}>
                           <span className="group-hover:translate-x-1 transition-transform">
-                            Read Case Study
+                            {t('read-case-study')}
                           </span>
                           <ArrowRight className="h-4 w-4" />
                       </Link>
@@ -644,12 +648,12 @@ const CaseStudies = () => {
           {/* All case studies */}
           <div className="mb-12">
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl font-bold">All Case Studies</h2>
+              <h2 className="text-2xl font-bold">{t('all-case-studies')}</h2>
               <Tabs defaultValue={selectedCategory} onValueChange={setSelectedCategory}>
                 <TabsList>
                   {categories.slice(0, 4).map((category) => (
                     <TabsTrigger key={category} value={category}>
-                      {category}
+                      {t(`category-${category.toLowerCase()}`)}
                     </TabsTrigger>
                   ))}
                 </TabsList>
@@ -684,7 +688,7 @@ const CaseStudies = () => {
                             </div>
                             <div className="text-sm font-medium">{study.client}</div>
                       </div>
-                      <Badge variant="outline">{study.category}</Badge>
+                      <Badge variant="outline">{t(`category-${study.category.toLowerCase()}`)}</Badge>
                     </div>
                         <Link to={`/case-studies/${study.id}`}>
                           <h3 className="text-lg font-semibold line-clamp-2 hover:text-primary transition-colors mb-2">
@@ -697,7 +701,7 @@ const CaseStudies = () => {
                         <div className="space-y-2">
                           <div className="text-sm font-medium flex items-center gap-2">
                             <TrendingUp className="h-4 w-4 text-primary" />
-                            Key Achievements:
+                            {t('key-achievements')}
                           </div>
                       {study.results.slice(0, 2).map((result, index) => (
                             <motion.div 
@@ -717,7 +721,7 @@ const CaseStudies = () => {
                         <div className="flex items-center gap-4">
                           <span className="flex items-center text-xs text-muted-foreground">
                             <FileText className="h-3 w-3 mr-1" />
-                            {study.readTime}
+                            {t('case-studies-read-time', { time: study.readTime })}
                           </span>
                           <Button
                             variant="ghost"
@@ -735,7 +739,7 @@ const CaseStudies = () => {
                         <Button variant="ghost" size="sm" className="gap-1 group" asChild>
                       <Link to={`/case-studies/${study.id}`}>
                             <span className="group-hover:translate-x-1 transition-transform">
-                              Read More
+                              {t('read-more-case-study')}
                             </span>
                             <ArrowRight className="h-3 w-3" />
                       </Link>
@@ -757,17 +761,17 @@ const CaseStudies = () => {
           >
             <div className="text-center mb-8">
               <h2 className="text-2xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
-                Proven Results
+                {t('proven-results')}
               </h2>
-              <p className="text-muted-foreground">Success metrics from clients across our platform</p>
+              <p className="text-muted-foreground">{t('success-metrics')}</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               {[
-                { value: "35%", label: "Average Cost Reduction", icon: TrendingUp },
-                { value: "42%", label: "Faster Time to Market", icon: Clock },
-                { value: "250+", label: "Successful Partnerships", icon: Users },
-                { value: "89%", label: "Client Retention Rate", icon: Target }
+                { value: "35%", label: t('average-cost-reduction'), icon: TrendingUp },
+                { value: "42%", label: t('faster-time-to-market'), icon: Clock },
+                { value: "250+", label: t('successful-partnerships'), icon: Users },
+                { value: "89%", label: t('client-retention-rate'), icon: Target }
               ].map((stat, index) => (
                 <motion.div 
                   key={index}
@@ -812,7 +816,7 @@ const CaseStudies = () => {
               whileInView={{ y: 0, opacity: 1 }}
               viewport={{ once: true }}
             >
-              Ready to create your own success story?
+              {t('ready-success-story')}
             </motion.h2>
             <motion.p 
               className="text-muted-foreground mb-6 max-w-2xl mx-auto"
@@ -821,7 +825,7 @@ const CaseStudies = () => {
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
             >
-              Join thousands of brands, manufacturers, and retailers who are already using our platform to grow their businesses
+              {t('join-platform-growth')}
             </motion.p>
             <motion.div 
               className="flex gap-4 justify-center"
@@ -837,7 +841,7 @@ const CaseStudies = () => {
               >
                 <Link to="/manufacturers">
                   <span className="group-hover:translate-x-1 transition-transform">
-                    Browse Manufacturers
+                    {t('browse-manufacturers')}
                   </span>
                 </Link>
               </Button>
@@ -847,7 +851,7 @@ const CaseStudies = () => {
               >
                 <Link to="/auth?type=register">
                   <span className="group-hover:translate-x-1 transition-transform">
-                    Get Started
+                    {t('get-started-cta')}
                   </span>
                 </Link>
               </Button>

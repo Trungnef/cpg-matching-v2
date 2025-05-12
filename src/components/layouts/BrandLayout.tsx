@@ -27,7 +27,8 @@ import {
   User,
   ShoppingBag,
   ArrowRight,
-  HandHelpingIcon
+  HandHelpingIcon,
+  Globe
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
@@ -122,8 +123,8 @@ const BrandLayout: FC<BrandLayoutProps> = ({ children }) => {
     logout();
     navigate('/auth?type=signin');
     toast({
-      title: 'Logged out',
-      description: 'You have been successfully logged out.',
+      title: t('brand-layout-logged-out'),
+      description: t('brand-layout-logout-success'),
     });
   };
 
@@ -208,37 +209,37 @@ const BrandLayout: FC<BrandLayoutProps> = ({ children }) => {
   // Navigation items for brand
   const navigationItems = [
     {
-      name: 'Home',
+      name: t('brand-layout-home'),
       path: '/',
       icon: <Home className="h-5 w-5" />,
     },
     {
-      name: 'Dashboard',
+      name: t('brand-layout-dashboard'),
       path: '/dashboard',
       icon: <LayoutDashboard className="h-5 w-5" />,
     },
     {
-      name: 'Products',
+      name: t('brand-layout-products'),
       path: '/brand/products',
       icon: <Package className="h-5 w-5" />,
     },
     {
-      name: 'Manufacturers Partners',
+      name: t('brand-layout-manufacturers'),
       path: '/brand/manufacturers',
       icon: <Building className="h-5 w-5" />,
     },
     {
-      name: 'Brands Partners',
+      name: t('brand-layout-brands'),
       path: '/brand/brands',
       icon: <HandHelpingIcon className="h-5 w-5" />,
     },
     {
-      name: 'Retailers Partners',
+      name: t('brand-layout-retailers'),
       path: '/brand/retailers',
       icon: <Store className="h-5 w-5" />,
     },
     {
-      name: 'Analytics',
+      name: t('brand-layout-analytics'),
       path: '/brand/analytics',
       icon: <BarChart3 className="h-5 w-5" />,
     },
@@ -308,92 +309,7 @@ const BrandLayout: FC<BrandLayoutProps> = ({ children }) => {
     return null;
   }
 
-  // Enhanced Language Switcher Component
-  const EnhancedLanguageSwitcher = () => {
-    const [isOpen, setIsOpen] = useState(false);
-    const dropdownRef = useRef<HTMLDivElement>(null);
-    const { i18n, t } = useTranslation();
 
-    // Close dropdown when clicking outside
-    useEffect(() => {
-      const handleClickOutside = (event: MouseEvent) => {
-        if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-          setIsOpen(false);
-        }
-      };
-
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-      };
-    }, []);
-
-    // Languages available
-    const languages = [
-      { code: 'en', name: 'English', flag: '🇺🇸' },
-      { code: 'ja', name: '日本語', flag: '🇯🇵' },
-    ];
-
-    // Handle language change
-    const changeLanguage = (code: string) => {
-      i18n.changeLanguage(code);
-      setIsOpen(false);
-    };
-
-    // Get current language
-    const currentLang = languages.find(lang => lang.code === i18n.language) || languages[0];
-
-    return (
-      <div className="relative" ref={dropdownRef}>
-        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="relative hover:bg-primary/5 transition-colors"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            <span className="text-base">{currentLang.flag}</span>
-          </Button>
-        </motion.div>
-
-        <AnimatePresence>
-          {isOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: 5, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 5, scale: 0.95 }}
-              transition={{ duration: 0.15, ease: "easeOut" }}
-              className="absolute right-0 mt-2 z-50 min-w-[180px] overflow-hidden rounded-xl border border-border bg-popover text-popover-foreground shadow-lg"
-            >
-              <div className="p-1">
-                {languages.map((lang) => (
-                  <motion.button
-                    key={lang.code}
-                    className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-primary/10 ${
-                      lang.code === i18n.language ? "bg-primary/5" : ""
-                    }`}
-                    onClick={() => changeLanguage(lang.code)}
-                    whileHover={{ x: 3 }}
-                  >
-                    <span className="text-lg">{lang.flag}</span>
-                    <span>{lang.name}</span>
-                    {lang.code === i18n.language && (
-                      <motion.div 
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ type: "spring", stiffness: 500, damping: 20 }}
-                        className="ml-auto h-2 w-2 rounded-full bg-primary"
-                      />
-                    )}
-                  </motion.button>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    );
-  };
 
   return (
     <div className="flex h-screen bg-background">
@@ -514,7 +430,7 @@ const BrandLayout: FC<BrandLayoutProps> = ({ children }) => {
             >
               <Settings className="h-5 w-5" />
               {!sidebarCollapsed && (
-                <span className="ml-3">Settings</span>
+                <span className="ml-3">{t('brand-layout-settings')}</span>
               )}
             </Link>
           </div>
@@ -607,7 +523,7 @@ const BrandLayout: FC<BrandLayoutProps> = ({ children }) => {
                         onClick={handleLogout}
                       >
                         <LogOut className="h-5 w-5" />
-                        <span className="ml-3">Log Out</span>
+                        <span className="ml-3">{t('brand-layout-logout')}</span>
                       </Button>
                     </motion.div>
                   </AnimatePresence>
@@ -714,7 +630,7 @@ const BrandLayout: FC<BrandLayoutProps> = ({ children }) => {
                     </motion.div>
                     <Input 
                       type="text" 
-                      placeholder="Search dashboards, products, reports..." 
+                      placeholder={t('brand-layout-search-dashboards')}
                       className="w-full pl-10 pr-4 py-2 bg-background border-input focus:border-ring focus:ring-1 focus:ring-ring transition-colors shadow-sm"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
@@ -747,7 +663,7 @@ const BrandLayout: FC<BrandLayoutProps> = ({ children }) => {
                     onClick={() => setSearchOpen(true)}
                   >
                     <Search className="h-4 w-4 mr-2" />
-                    <span>Search...</span> 
+                    <span>{t('brand-layout-search')}</span> 
                     <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
                       <span className="text-xs">⌘</span>K
                     </kbd>
@@ -791,7 +707,7 @@ const BrandLayout: FC<BrandLayoutProps> = ({ children }) => {
                     initial={{ opacity: 0, y: -5 }}
                     whileHover={{ opacity: 1, y: 0 }}
                   >
-                    Help Center
+                    {t('brand-layout-help-center')}
                   </motion.span>
                 </Button>
               </motion.div>
@@ -814,8 +730,8 @@ const BrandLayout: FC<BrandLayoutProps> = ({ children }) => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-80">
                     <div className="flex items-center justify-between p-2">
-                      <DropdownMenuLabel>Notifications</DropdownMenuLabel>
-                      <Badge variant="secondary" className="ml-auto">New 2</Badge>
+                      <DropdownMenuLabel>{t('brand-layout-notifications')}</DropdownMenuLabel>
+                      <Badge variant="secondary" className="ml-auto">{t('new')} 2</Badge>
                     </div>
                     <DropdownMenuSeparator />
                     <div className="max-h-80 overflow-y-auto no-scrollbar">
@@ -823,22 +739,22 @@ const BrandLayout: FC<BrandLayoutProps> = ({ children }) => {
                         className="p-3 hover:bg-muted rounded-md cursor-pointer transition-colors"
                         whileHover={{ x: 2, backgroundColor: "rgba(var(--muted), 0.5)" }}
                       >
-                        <p className="font-medium">New partnership opportunity</p>
-                        <p className="text-sm text-muted-foreground">Eco Foods Inc. wants to feature your products in their stores.</p>
-                        <p className="text-xs text-muted-foreground mt-1">2 minutes ago</p>
+                        <p className="font-medium">{t('brand-layout-new-partnership')}</p>
+                        <p className="text-sm text-muted-foreground">{t('brand-layout-feature-products')}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{t('brand-layout-minutes-ago')}</p>
                       </motion.div>
                       <motion.div 
                         className="p-3 hover:bg-muted rounded-md cursor-pointer transition-colors"
                         whileHover={{ x: 2, backgroundColor: "rgba(var(--muted), 0.5)" }}
                       >
-                        <p className="font-medium">Product analytics updated</p>
-                        <p className="text-sm text-muted-foreground">June sales reports are now available.</p>
-                        <p className="text-xs text-muted-foreground mt-1">2 hours ago</p>
+                        <p className="font-medium">{t('brand-layout-product-analytics')}</p>
+                        <p className="text-sm text-muted-foreground">{t('brand-layout-sales-reports')}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{t('brand-layout-hours-ago')}</p>
                       </motion.div>
                     </div>
                     <DropdownMenuSeparator />
                     <Button variant="ghost" className="w-full justify-center" size="sm">
-                      View all notifications
+                      {t('brand-layout-view-all')}
                     </Button>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -863,7 +779,7 @@ const BrandLayout: FC<BrandLayoutProps> = ({ children }) => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-80">
-                    <DropdownMenuLabel>Messages</DropdownMenuLabel>
+                    <DropdownMenuLabel>{t('brand-layout-messages')}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <div className="max-h-80 overflow-y-auto no-scrollbar">
                       <motion.div 
@@ -876,9 +792,9 @@ const BrandLayout: FC<BrandLayoutProps> = ({ children }) => {
                             <AvatarFallback>NS</AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-medium">Natural Selects Inc.</p>
-                            <p className="text-sm line-clamp-1 text-muted-foreground">We'd like to discuss placing a large order...</p>
-                            <p className="text-xs text-muted-foreground mt-1">10 minutes ago</p>
+                            <p className="font-medium">{t('brand-layout-natural-selects')}</p>
+                            <p className="text-sm line-clamp-1 text-muted-foreground">{t('brand-layout-discuss-order')}</p>
+                            <p className="text-xs text-muted-foreground mt-1">{t('brand-layout-minutes-ago-msg')}</p>
                           </div>
                         </div>
                       </motion.div>
@@ -892,16 +808,16 @@ const BrandLayout: FC<BrandLayoutProps> = ({ children }) => {
                             <AvatarFallback>MF</AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-medium">Modern Foods Manufacturing</p>
-                            <p className="text-sm line-clamp-1 text-muted-foreground">Your request for production samples has been...</p>
-                            <p className="text-xs text-muted-foreground mt-1">Yesterday</p>
+                            <p className="font-medium">{t('brand-layout-modern-foods')}</p>
+                            <p className="text-sm line-clamp-1 text-muted-foreground">{t('brand-layout-samples-request')}</p>
+                            <p className="text-xs text-muted-foreground mt-1">{t('brand-layout-yesterday')}</p>
                           </div>
                         </div>
                       </motion.div>
                     </div>
                     <DropdownMenuSeparator />
                     <Button variant="ghost" className="w-full justify-center" size="sm">
-                      View all messages
+                      {t('brand-layout-view-all-messages')}
                     </Button>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -940,6 +856,7 @@ const UserProfileDropdown = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   // Close the dropdown when clicking outside
   useEffect(() => {
@@ -1021,8 +938,8 @@ const UserProfileDropdown = () => {
                               user?.status === "online" ? "bg-green-500" : 
                               user?.status === "away" ? "bg-yellow-500" : "bg-red-500"
                             }`} />
-                            {user?.status === "online" ? "Online" : 
-                              user?.status === "away" ? "Away" : "Busy"}
+                            {user?.status === "online" ? t('brand-layout-online') : 
+                              user?.status === "away" ? t('brand-layout-away') : t('brand-layout-busy')}
                             <ChevronDown className="h-3.5 w-3.5 ml-1" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -1030,25 +947,25 @@ const UserProfileDropdown = () => {
                           <DropdownMenuItem onClick={() => handleStatusChange("online")}>
                             <div className="flex items-center">
                               <span className="h-2 w-2 rounded-full bg-green-500 mr-2" />
-                              <span>Online</span>
+                              <span>{t('brand-layout-online')}</span>
                             </div>
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleStatusChange("away")}>
                             <div className="flex items-center">
                               <span className="h-2 w-2 rounded-full bg-yellow-500 mr-2" />
-                              <span>Away</span>
+                              <span>{t('brand-layout-away')}</span>
                             </div>
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleStatusChange("busy")}>
                             <div className="flex items-center">
                               <span className="h-2 w-2 rounded-full bg-red-500 mr-2" />
-                              <span>Busy</span>
+                              <span>{t('brand-layout-busy')}</span>
                             </div>
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                       <Badge variant="secondary" className="text-xs px-2 py-0 h-5">
-                        Brand
+                        {t('brand-layout-brand')}
                       </Badge>
                     </div>
                   </div>
@@ -1058,15 +975,15 @@ const UserProfileDropdown = () => {
                 <div className="grid grid-cols-3 gap-2 mt-4 text-center">
                   <div className="bg-muted rounded-lg p-2">
                     <p className="text-lg font-semibold">{user?.brandSettings?.productCategories?.length || "0"}</p>
-                    <p className="text-xs text-muted-foreground">Categories</p>
+                    <p className="text-xs text-muted-foreground">{t('brand-layout-categories')}</p>
                   </div>
                   <div className="bg-muted rounded-lg p-2">
                     <p className="text-lg font-semibold">12</p>
-                    <p className="text-xs text-muted-foreground">Products</p>
+                    <p className="text-xs text-muted-foreground">{t('brand-layout-products-count')}</p>
                   </div>
                   <div className="bg-muted rounded-lg p-2">
                     <p className="text-lg font-semibold">8</p>
-                    <p className="text-xs text-muted-foreground">Retailers</p>
+                    <p className="text-xs text-muted-foreground">{t('brand-layout-retailers-count')}</p>
                   </div>
                 </div>
               </div>
@@ -1082,8 +999,8 @@ const UserProfileDropdown = () => {
                   >
                     <LayoutDashboard className="h-4 w-4" />
                     <div className="flex-1 text-left">
-                      <p>Dashboard</p>
-                      <p className="text-xs text-muted-foreground">Brands overview</p>
+                      <p>{t('brand-layout-dashboard-overview')}</p>
+                      <p className="text-xs text-muted-foreground">{t('brand-layout-brands-overview')}</p>
                     </div>
                   </motion.button>
 
@@ -1093,8 +1010,8 @@ const UserProfileDropdown = () => {
                   >
                     <User className="h-4 w-4" />
                     <div className="flex-1 text-left">
-                      <p>Profile</p>
-                      <p className="text-xs text-muted-foreground">Manage your information</p>
+                      <p>{t('brand-layout-profile')}</p>
+                      <p className="text-xs text-muted-foreground">{t('brand-layout-manage-information')}</p>
                     </div>
                   </button>
 
@@ -1107,8 +1024,8 @@ const UserProfileDropdown = () => {
                       <Settings className="h-4 w-4" />
                     </div>
                     <div className="flex-1 text-left">
-                      <p>Settings</p>
-                      <p className="text-xs text-muted-foreground">Account preferences</p>
+                      <p>{t('brand-layout-settings')}</p>
+                      <p className="text-xs text-muted-foreground">{t('brand-layout-account-preferences')}</p>
                     </div>
                   </motion.button>
                 </div>
@@ -1125,8 +1042,8 @@ const UserProfileDropdown = () => {
                     <LogOut className="h-4 w-4" />
                   </div>
                   <div className="flex-1 text-left">
-                    <p className="font-bold text-destructive dark:text-red-400">Log out</p>
-                    <p className="text-xs text-muted-foreground">Sign out of your account</p>
+                    <p className="font-bold text-destructive dark:text-red-400">{t('brand-layout-logout')}</p>
+                    <p className="text-xs text-muted-foreground">{t('brand-layout-sign-out')}</p>
                   </div>
                 </motion.button>
               </div>
@@ -1137,3 +1054,81 @@ const UserProfileDropdown = () => {
     </div>
   );
 }; 
+
+// Enhanced Language Switcher Component
+export const EnhancedLanguageSwitcher = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const { i18n } = useTranslation();
+  const { t } = useTranslation();
+
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang);
+    setIsOpen(false);
+  };
+
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, []);
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setIsOpen(!isOpen)}
+        className="gap-1 px-2"
+      >
+        <Globe className="h-4 w-4" />
+        <ChevronDown className="h-3 w-3 opacity-50" />
+      </Button>
+
+      {isOpen && (
+        <div className="absolute right-0 top-full mt-2 w-40 rounded-md border bg-popover shadow-md z-10">
+          <div className="p-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`w-full justify-start gap-2 ${
+                i18n.language === "en" ? "bg-muted" : ""
+              }`}
+              onClick={() => changeLanguage("en")}
+            >
+              <img
+                src="/flags/us.svg"
+                alt="English"
+                className="h-4 w-4 rounded-sm"
+              />
+              {t('english')}
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`w-full justify-start gap-2 ${
+                i18n.language === "ja" ? "bg-muted" : ""
+              }`}
+              onClick={() => changeLanguage("ja")}
+            >
+              <img
+                src="/flags/jp.svg"
+                alt="Japanese"
+                className="h-4 w-4 rounded-sm"
+              />
+              {t('japanese')}
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
