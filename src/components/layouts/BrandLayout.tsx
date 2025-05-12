@@ -228,11 +228,11 @@ const BrandLayout: FC<BrandLayoutProps> = ({ children }) => {
       path: '/brand/manufacturers',
       icon: <Building className="h-5 w-5" />,
     },
-    {
-      name: t('brand-layout-brands'),
-      path: '/brand/brands',
-      icon: <HandHelpingIcon className="h-5 w-5" />,
-    },
+    // {
+    //   name: t('brand-layout-partnerships'),
+    //   path: '/brand/parterships',
+    //   icon: <HandHelpingIcon className="h-5 w-5" />,
+    // },
     {
       name: t('brand-layout-retailers'),
       path: '/brand/retailers',

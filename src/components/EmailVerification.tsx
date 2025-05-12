@@ -82,7 +82,7 @@ const EmailVerification = () => {
       });
       
       // Redirect to profile setup
-      navigate("/profile-setup");
+      navigate("/dashboard");
     } catch (error) {
       console.error("Verification error:", error);
       toast({

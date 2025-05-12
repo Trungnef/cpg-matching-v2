@@ -14,10 +14,17 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { useUser } from "@/contexts/UserContext";
+import { useUser, UserRole } from "@/contexts/UserContext";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { Separator } from "@/components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const RegisterForm = () => {
   const { t } = useTranslation();
@@ -32,6 +39,9 @@ const RegisterForm = () => {
     email: z.string().email({ message: t('invalid-email', "Please enter a valid email address") }),
     password: z.string().min(8, { message: t('password-min-length', "Password must be at least 8 characters") }),
     confirmPassword: z.string().min(8, { message: t('password-min-length', "Password must be at least 8 characters") }),
+    role: z.enum(["manufacturer", "brand", "retailer"] as const, {
+      required_error: t('role-required', "Please select a role"),
+    }),
   }).refine((data) => data.password === data.confirmPassword, {
     message: t('passwords-do-not-match', "Passwords do not match"),
     path: ["confirmPassword"],
@@ -47,6 +57,7 @@ const RegisterForm = () => {
       email: "",
       password: "",
       confirmPassword: "",
+      role: "manufacturer",
     },
   });
 
@@ -61,7 +72,7 @@ const RegisterForm = () => {
         email: data.email,
         password: data.password,
         status: 'online',
-        role: 'manufacturer',
+        role: data.role,
         companyName: 'pending',
       });
       
@@ -367,6 +378,32 @@ const RegisterForm = () => {
                     className="bg-background/70 dark:bg-background/50 border-border/50 dark:border-border/30 focus:border-primary focus:ring-1 focus:ring-primary" 
                   />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="role"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-foreground">{t('role', 'Role')}</FormLabel>
+                <Select 
+                  onValueChange={field.onChange} 
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger className="bg-background/70 dark:bg-background/50 border-border/50 dark:border-border/30 focus:border-primary focus:ring-1 focus:ring-primary">
+                      <SelectValue placeholder={t('select-role', 'Select a role')} />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="manufacturer">{t('manufacturer', 'Manufacturer')}</SelectItem>
+                    <SelectItem value="brand">{t('brand', 'Brand')}</SelectItem>
+                    <SelectItem value="retailer">{t('retailer', 'Retailer')}</SelectItem>
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}

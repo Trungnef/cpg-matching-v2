@@ -1,7 +1,10 @@
 import axios from 'axios';
 
+// Sử dụng biến môi trường đúng chuẩn Vite
+const VITE_API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 // Base URL của API - nên được cấu hình từ biến môi trường
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL = 'http://localhost:5000/api';
 
 // Tạo một instance axios với cấu hình chung
 const api = axios.create({
@@ -205,4 +208,4 @@ export const productApi = {
   getCatalogFilters: () => api.get('/catalog/filters'),
 };
 
-export default api; 
+export default api;

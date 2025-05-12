@@ -237,7 +237,8 @@ const Suppliers = () => {
       yearEstablished: Math.floor(Math.random() * 30) + 1990,
       contractEndDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toLocaleDateString(),
       termsAndConditions: t("suppliers-standard-terms"),
-      notes: ""
+      notes: "",
+      materials: [] // Empty materials array
     };
     
     setSuppliers([...suppliers, newSupplier]);
@@ -1478,7 +1479,6 @@ const AddSupplierDialog = ({ onAdd }: AddSupplierProps) => {
   const [location, setLocation] = useState("");
   const [category, setCategory] = useState("raw materials");
   const [description, setDescription] = useState("");
-  const [materialsInput, setMaterialsInput] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const prefersReducedMotion = useReducedMotion();
   
@@ -1498,11 +1498,6 @@ const AddSupplierDialog = ({ onAdd }: AddSupplierProps) => {
       return;
     }
     
-    const materials = materialsInput
-      .split(",")
-      .map(m => m.trim())
-      .filter(m => m.length > 0);
-    
     const newSupplier: Supplier = {
       id: `supplier-${Date.now()}`,
       name,
@@ -1513,7 +1508,7 @@ const AddSupplierDialog = ({ onAdd }: AddSupplierProps) => {
       location,
       category,
       description,
-      materials,
+      materials: [], // Empty materials array
       status: "pending",
       reliability: Math.floor(Math.random() * 20) + 70, // 70-90%
       leadTime: `${Math.floor(Math.random() * 7) + 1}-${Math.floor(Math.random() * 14) + 7} days`,
@@ -1548,7 +1543,7 @@ const AddSupplierDialog = ({ onAdd }: AddSupplierProps) => {
       <form onSubmit={handleSubmit} className="space-y-6 mt-4">
         <motion.div 
           className="space-y-4"
-          initial={{ opacity: 0, y: 5 }} // Reduced from 10 to 5
+          initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
           transition={getTransition()}
         >
@@ -1592,7 +1587,7 @@ const AddSupplierDialog = ({ onAdd }: AddSupplierProps) => {
         
         <motion.div 
           className="space-y-4"
-          initial={{ opacity: 0, y: 5 }} // Reduced from 10 to 5
+          initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
           transition={getTransition(0.1)}
         >
@@ -1635,7 +1630,7 @@ const AddSupplierDialog = ({ onAdd }: AddSupplierProps) => {
         
         <motion.div 
           className="grid grid-cols-1 md:grid-cols-2 gap-4"
-          initial={{ opacity: 0, y: 5 }} // Reduced from 10 to 5
+          initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
           transition={getTransition(0.2)}
         >
@@ -1677,7 +1672,7 @@ const AddSupplierDialog = ({ onAdd }: AddSupplierProps) => {
         
         <motion.div 
           className="space-y-2"
-          initial={{ opacity: 0, y: 5 }} // Reduced from 10 to 5
+          initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
           transition={getTransition(0.3)}
         >
@@ -1693,26 +1688,9 @@ const AddSupplierDialog = ({ onAdd }: AddSupplierProps) => {
         
         <motion.div 
           className="space-y-2"
-          initial={{ opacity: 0, y: 5 }} // Reduced from 10 to 5
+          initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={getTransition(0.4)}
-        >
-          <Label htmlFor="materialsInput" className="font-medium text-foreground transition-colors duration-300">{t("suppliers-materials-provided")}</Label>
-          <Input
-            id="materialsInput"
-            value={materialsInput}
-            onChange={(e) => setMaterialsInput(e.target.value)}
-            placeholder={t("suppliers-materials-comma")}
-            className="bg-background border-input shadow-sm focus-visible:ring-primary/30 focus-visible:border-primary/30 transition-colors duration-300"
-          />
-          <p className="text-xs text-muted-foreground mt-1 transition-colors duration-300">{t("suppliers-materials-comma")}</p>
-        </motion.div>
-        
-        <motion.div 
-          className="space-y-2"
-          initial={{ opacity: 0, y: 5 }} // Reduced from 10 to 5
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.5 }} // Reduced from 0.5, 0.3
+          transition={{ duration: 0.3, delay: 0.4 }}
         >
           <Label htmlFor="description" className="font-medium text-foreground transition-colors duration-300">{t("suppliers-description")}</Label>
           <Textarea

@@ -510,7 +510,7 @@ const resources = {
       "brands-description": "Innovative consumer product brands",
       "suppliers-title": "Suppliers",
       "suppliers-count": "300+",
-      "suppliers-description": "Specialized ingredient and packaging suppliers",
+      "suppliers-description": "Description details",
       "retailers-title": "Retailers",
       "retailers-count": "200+",
       "retailers-description": "Leading retail partners nationwide",
@@ -3151,7 +3151,9 @@ const resources = {
   "removed-store-location": "Removed store location",
   "updated-notification-preferences": "Updated notification preferences",
   "updated-security-settings": "Security settings updated",
-  "updated-retail-details": "Retail details updated"
+  "updated-retail-details": "Retail details updated",
+  "brand-layout-parnerships":"Partnerships",
+  
 
 
 
@@ -3663,7 +3665,7 @@ const resources = {
       "brands-description": "革新的な消費者向け製品ブランド",
       "suppliers-title": "サプライヤー",
       "suppliers-count": "300+",
-      "suppliers-description": "専門の原料とパッケージングサプライヤー",
+      // "suppliers-description": "専門のグサプライヤー",
       "retailers-title": "小売業者",
       "retailers-count": "200+",
       "retailers-description": "全国の主要小売パートナー",
@@ -4667,7 +4669,7 @@ const resources = {
       "suppliers-since": "設立年：",
       "suppliers-supplier-details": "サプライヤー詳細",
       "suppliers-view-detailed": "このサプライヤーに関する詳細情報を表示",
-      // "suppliers-description": "説明",
+      "suppliers-description": "説明",
       "suppliers-contact-person": "担当者",
       "suppliers-email": "メール",
       "suppliers-phone": "電話",
@@ -6134,7 +6136,8 @@ const resources = {
   "removed-store-location": "店舗の場所を削除しました",
   "updated-notification-preferences": "通知設定を更新しました",
   "updated-security-settings": "セキュリティ設定を更新しました",
-  "updated-retail-details": "小売詳細を更新しました"
+  "updated-retail-details": "小売詳細を更新しました",
+  "brand-layout-partnerships": "パートナーシップ",
 
 
 
