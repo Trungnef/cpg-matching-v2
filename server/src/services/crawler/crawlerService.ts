@@ -1,4 +1,6 @@
-import puppeteer, { Browser, Page, PuppeteerLaunchOptions } from 'puppeteer';
+import puppeteer from 'puppeteer-extra';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import { Browser, Page, PuppeteerLaunchOptions } from 'puppeteer';
 import { CrawlTaskDocument } from '../../models/crawler/crawlTask';
 import CrawlResult, { ProductData } from '../../models/crawler/crawlResult';
 import logger from '../../utils/logger';
@@ -7,6 +9,8 @@ import path from 'path';
 import fs from 'fs';
 import { randomInt } from 'crypto';
 import { CrawledProduct } from '../../models/product';
+
+puppeteer.use(StealthPlugin());
 
 class CrawlerService {
   private browser: Browser | null = null;
@@ -44,13 +48,53 @@ class CrawlerService {
   async initBrowser(): Promise<Browser> {
     if (!this.browser) {
       logger.info('Initializing Puppeteer browser');
-      
-      // Set up browser launch options with advanced stealth settings
-      const launchOptions: PuppeteerLaunchOptions = {
+      // Tự động phát hiện executablePath phù hợp
+      let executablePath: string | undefined = '/usr/bin/chromium-browser';
+      try {
+        if (process.platform === 'win32') {
+          // Windows: thử các đường dẫn phổ biến
+          const winPaths = [
+            'C:/Program Files/Google/Chrome/Application/chrome.exe',
+            'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
+            'C:/Program Files/Chromium/Application/chromium.exe',
+            'C:/Program Files (x86)/Chromium/Application/chromium.exe'
+          ];
+          for (const p of winPaths) {
+            if (fs.existsSync(p)) {
+              executablePath = p;
+              break;
+            }
+          }
+        } else {
+          // Linux: thử các đường dẫn phổ biến
+          const linuxPaths = [
+            '/usr/bin/chromium-browser',
+            '/usr/bin/chromium',
+            '/usr/bin/google-chrome',
+            '/usr/bin/google-chrome-stable'
+          ];
+          let found = false;
+          for (const p of linuxPaths) {
+            if (fs.existsSync(p)) {
+              executablePath = p;
+              found = true;
+              break;
+            }
+          }
+          if (!found) {
+            executablePath = undefined; // Để Puppeteer tự chọn
+          }
+        }
+      } catch (e) {
+        logger.warn('Error detecting browser executable: ' + e);
+        executablePath = undefined;
+      }
+      // Set up browser launch options
+      const launchOptions: any = {
         headless: true,
         args: [
-          '--no-sandbox', 
-          '--disable-setuid-sandbox', 
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
           '--disable-dev-shm-usage',
           '--disable-accelerated-2d-canvas',
           '--window-size=1920,1080',
@@ -72,28 +116,43 @@ class CrawlerService {
           '--ignore-certificate-errors-spki-list',
           `--window-size=${1440 + Math.floor(Math.random() * 100)},${900 + Math.floor(Math.random() * 100)}`,
         ],
-        defaultViewport: { width: 1440, height: 900 }
+        defaultViewport: { width: 1440, height: 900 },
+        protocolTimeout: 300000, // 5 phút
+        timeout: 300000,         // 5 phút
       };
-      
+      if (executablePath) {
+        launchOptions.executablePath = executablePath;
+      }
       // Add proxy if configured
       if (config.crawler.useProxy && config.crawler.proxyUrl) {
         logger.info('Using proxy for browser');
         launchOptions.args?.push(`--proxy-server=${config.crawler.proxyUrl}`);
       }
-      
-      this.browser = await puppeteer.launch(launchOptions);
-      
+      // Remove env if undefined or has undefined values
+      if (launchOptions.env) {
+        Object.keys(launchOptions.env).forEach(key => {
+          if (launchOptions.env && launchOptions.env[key] === undefined) {
+            delete launchOptions.env[key];
+          }
+        });
+      }
+      this.browser = (await puppeteer.launch(launchOptions)) as unknown as Browser;
       // If we have proxy authentication, set it up
       if (config.crawler.useProxy && 
           config.crawler.proxyUsername && 
           config.crawler.proxyPassword) {
-        const pages = await this.browser.pages();
-        const page = pages.length > 0 ? pages[0] : await this.browser.newPage();
-        await page.authenticate({
-          username: config.crawler.proxyUsername,
-          password: config.crawler.proxyPassword
-        });
+        if (this.browser) {
+          const pages = await this.browser.pages();
+          const page = pages.length > 0 ? pages[0] : await this.browser.newPage();
+          await page.authenticate({
+            username: config.crawler.proxyUsername,
+            password: config.crawler.proxyPassword
+          });
+        }
       }
+    }
+    if (!this.browser) {
+      throw new Error('Failed to initialize Puppeteer browser');
     }
     return this.browser;
   }
@@ -106,6 +165,68 @@ class CrawlerService {
       logger.info('Closing Puppeteer browser');
       await this.browser.close();
       this.browser = null;
+    }
+  }
+
+  /**
+   * Try to bypass simple CAPTCHA if present (checkbox, image, etc.)
+   * Bổ sung: Nếu có ảnh CAPTCHA và ô input, lưu ảnh và log selector input để hỗ trợ giải mã tự động hoặc nhập tay.
+   */
+  private async handleCaptchaIfPresent(page: Page): Promise<boolean> {
+    try {
+      // Try clicking reCAPTCHA checkbox if present
+      const checkboxFrame = await page.frames().find(f => f.url().includes('google.com/recaptcha'));
+      if (checkboxFrame) {
+        const checkbox = await checkboxFrame.$('#recaptcha-anchor');
+        if (checkbox) {
+          await checkbox.click();
+          logger.info('Clicked reCAPTCHA checkbox');
+          await new Promise(resolve => setTimeout(resolve, 3000 + Math.random() * 2000));
+          return true;
+        }
+      }
+      // Try clicking Amazon CAPTCHA continue/submit button if present
+      const submitBtn = await page.$('button[type="submit"], input[type="submit"]');
+      if (submitBtn) {
+        await submitBtn.click();
+        logger.info('Clicked CAPTCHA submit button');
+        await new Promise(resolve => setTimeout(resolve, 3000 + Math.random() * 2000));
+        return true;
+      }
+      // Nếu có ảnh CAPTCHA và ô input, lưu ảnh và log selector input
+      const captchaImg = await page.$('img[src*="captcha"], .captcha-image');
+      if (captchaImg) {
+        const captchaPath = `captcha_${Date.now()}.png`;
+        await captchaImg.screenshot({ path: captchaPath });
+        logger.warn(`Saved CAPTCHA image to ${captchaPath} for manual solving.`);
+        // Tìm ô input nhập mã
+        const inputSelectors = [
+          'input[name="field-keywords"]',
+          'input[name="captcha"]',
+          'input[type="text"]',
+          '#captchacharacters',
+          'input[name*="captcha"]',
+          'input[id*="captcha"]',
+        ];
+        for (const selector of inputSelectors) {
+          const input = await page.$(selector);
+          if (input) {
+            logger.warn(`Found CAPTCHA input field: ${selector}. Bạn có thể nhập mã tay hoặc tích hợp giải mã tự động.`);
+            // Nếu muốn nhập tay, có thể dùng: await input.type('MÃ_CAPTCHA');
+            break;
+          }
+        }
+      }
+      // Try to reload with a new user-agent
+      const randomUserAgent = this.USER_AGENTS[Math.floor(Math.random() * this.USER_AGENTS.length)];
+      await page.setUserAgent(randomUserAgent);
+      await page.reload({ waitUntil: 'domcontentloaded', timeout: this.NAVIGATION_TIMEOUT });
+      logger.info('Reloaded page with new user-agent to try bypassing CAPTCHA');
+      await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 2000));
+      return false;
+    } catch (error) {
+      logger.warn(`Error in handleCaptchaIfPresent: ${error}`);
+      return false;
     }
   }
 
@@ -218,7 +339,8 @@ class CrawlerService {
             // Khởi tạo lại browser không dùng proxy
             await this.closeBrowser();
             this.browser = null;
-            const directLaunchOptions: PuppeteerLaunchOptions = {
+            // Fix: Remove env if undefined or has undefined values, and cast to correct type
+            const directLaunchOptions: any = {
               headless: true,
               args: [
                 '--no-sandbox', 
@@ -243,9 +365,26 @@ class CrawlerService {
                 '--ignore-certificate-errors-spki-list',
                 `--window-size=${1440 + Math.floor(Math.random() * 100)},${900 + Math.floor(Math.random() * 100)}`,
               ],
-              defaultViewport: { width: 1440, height: 900 }
+              defaultViewport: { width: 1440, height: 900 },
+              protocolTimeout: 300000, // 5 phút
+              timeout: 300000,         // 5 phút
             };
-            this.browser = await puppeteer.launch(directLaunchOptions);
+
+            // Remove env if undefined or has undefined values
+            if (directLaunchOptions.env) {
+              Object.keys(directLaunchOptions.env).forEach(key => {
+                if (directLaunchOptions.env && directLaunchOptions.env[key] === undefined) {
+                  delete directLaunchOptions.env[key];
+                }
+              });
+            }
+
+            this.browser = (await puppeteer.launch(directLaunchOptions)) as unknown as Browser;
+
+            if (!this.browser) {
+              throw new Error('Failed to initialize Puppeteer browser (direct connection)');
+            }
+
             page = await this.browser.newPage();
             await page.setViewport({ width: viewportWidth, height: viewportHeight });
             await page.setUserAgent(randomUserAgent);
@@ -700,23 +839,23 @@ class CrawlerService {
         if (content.toLowerCase().includes(keyword)) {
           return true;
         }
-      }
-      
-      // Also check for common CAPTCHA elements
-      const captchaSelectors = [
-        '[id*="captcha"]', 
-        '[class*="captcha"]', 
-        '[id*="robot"]',
-        '[class*="robot"]',
-        '#captchacharacters',
-        'img[src*="captcha"]',
-        'form[action*="validateCaptcha"]'
-      ];
-      
-      for (const selector of captchaSelectors) {
-        const element = await page.$(selector);
-        if (element) {
-          return true;
+        
+        // Also check for common CAPTCHA elements
+        const captchaSelectors = [
+          '[id*="captcha"]', 
+          '[class*="captcha"]', 
+          '[id*="robot"]',
+          '[class*="robot"]',
+          '#captchacharacters',
+          'img[src*="captcha"]',
+          'form[action*="validateCaptcha"]'
+        ];
+        
+        for (const selector of captchaSelectors) {
+          const element = await page.$(selector);
+          if (element) {
+            return true;
+          }
         }
       }
       
@@ -1033,8 +1172,8 @@ class CrawlerService {
           
           if (priceData.discountedFrom) {
             productData.metadata.original_price = priceData.discountedFrom;
-            productData.metadata.discount_amount = priceData.discountedFrom - priceData.price;
-            productData.metadata.discount_percentage = Math.round((priceData.discountedFrom - priceData.price) / priceData.discountedFrom * 100);
+            productData.metadata.discount_amount = priceData.discountedFrom - productData.price;
+            productData.metadata.discount_percentage = Math.round((priceData.discountedFrom - productData.price) / priceData.discountedFrom * 100);
           }
           
           if (priceData.salePrices && Object.keys(priceData.salePrices).length > 0) {
@@ -4644,9 +4783,10 @@ class CrawlerService {
     // Clean variants similarly
     if (optionsData.variants && optionsData.variants.length > 0) {
       const formRelatedPatterns = [
-        /price.*availability/i, /website/i, /url/i, /shipping/i, /cost/i, 
-        /date/i, /store/i, /city/i, /state/i, /province/i, /submit/i, 
-        /feedback/i, /mm\/dd/i, /\d{2}\/\d{2}/i, /online/i, /offline/i
+        /price.*availability/i, /website/i, /url/i, /shipping cost/i, 
+        /date of.*price/i, /store name/i, /city/i, /state/i, /province/i, /submit/i, 
+        /feedback/i, /mm\/dd/i, /\d{2}\/\d{2}\/\d{4}/i, 
+        /online/i, /offline/i, /please select/i, /enter the/i, /where you found/i
       ];
       
       const cleanedVariants = optionsData.variants.filter(variant => {
@@ -5458,4 +5598,4 @@ export default function getCrawlerService(): CrawlerService {
     instance = new CrawlerService();
   }
   return instance;
-} 
+}

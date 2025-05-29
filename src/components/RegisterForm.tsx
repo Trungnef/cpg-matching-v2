@@ -383,7 +383,7 @@ const RegisterForm = () => {
             )}
           />
           
-          <FormField
+          {/* <FormField
             control={form.control}
             name="role"
             render={({ field }) => (
@@ -407,7 +407,7 @@ const RegisterForm = () => {
                 <FormMessage />
               </FormItem>
             )}
-          />
+          /> */}
           
           <FormField
             control={form.control}

@@ -15,7 +15,7 @@ import Profile from "./pages/Profile";
 import Solutions from "./pages/Solutions";
 import NotFound from "./pages/NotFound";
 import VerifyEmail from "./pages/VerifyEmail";
-// import ProfileSetupPage from "./pages/ProfileSetupPage"; // BỎ TẠM THỜI: không cần bước này
+import ProfileSetupPage from "./pages/ProfileSetupPage"; // BỎ TẠM THỜI: không cần bước này
 
 // Resource pages
 import Blog from "./pages/Blog";
@@ -118,7 +118,7 @@ const App = () => (
                             <Route path="/verify-email" element={<VerifyEmail />} />
 
                             {/* BỎ TẠM THỜI: Không dùng bước profile-setup */}
-                            {/* <Route 
+                            <Route 
                               path="/profile-setup" 
                               element={
                                 <ProtectedRoute 
@@ -126,7 +126,7 @@ const App = () => (
                                   allowedRoles={["manufacturer", "brand", "retailer"]} 
                                 />
                               } 
-                            /> */}
+                            />
 
                             {/* Pages with footer */}
                             <Route path="/products" element={<PageWithFooter Component={Products} />} />

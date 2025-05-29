@@ -197,9 +197,10 @@ const CrawlerJobList: React.FC<CrawlerJobListProps> = ({
         )
       );
 
-      // If found any, refresh the queue status to get the latest data
+      // If found any, refresh BOTH the queue status and the main task list to ensure full sync
       if (completedProcessingTasks.length > 0) {
         fetchQueueStatus();
+        onRefreshList(); // <-- force refresh the main list as well
       }
     }
   }, [tasks, queueStatus]);
@@ -1006,4 +1007,4 @@ const CrawlerJobList: React.FC<CrawlerJobListProps> = ({
   );
 };
 
-export default CrawlerJobList; 
+export default CrawlerJobList;

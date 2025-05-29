@@ -84,11 +84,11 @@ interface FilterState {
 
 const ProductCatalog: React.FC = () => {
   // State
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalProducts, setTotalProducts] = useState(0);
+  const [availableFilters, setAvailableFilters] = useState({
+    brands: [] as string[],
+    categories: [] as string[],
+    priceRange: { min: 0, max: 1000 }
+  });
   const [filters, setFilters] = useState<FilterState>(() => {
     const savedFilters = localStorage.getItem('catalog-filters');
     if (savedFilters) {
@@ -98,7 +98,7 @@ const ProductCatalog: React.FC = () => {
           ...parsed,
           priceRange: Array.isArray(parsed.priceRange) && parsed.priceRange.length === 2 
             ? parsed.priceRange as [number, number] 
-            : [0, availableFilters.priceRange?.max || 1000] as [number, number],
+            : [0, 1000] as [number, number], // Dùng giá trị mặc định
           category: parsed.category === '' ? 'all' : parsed.category,
           brand: parsed.brand === '' ? 'all' : parsed.brand
         } as FilterState;
@@ -110,16 +110,16 @@ const ProductCatalog: React.FC = () => {
       search: '',
       category: 'all',
       brand: 'all',
-      priceRange: [0, availableFilters.priceRange?.max || 1000] as [number, number],
+      priceRange: [0, 1000] as [number, number], // Dùng giá trị mặc định
       sortBy: 'createdAt',
       sortOrder: 'desc'
     };
   });
-  const [availableFilters, setAvailableFilters] = useState({
-    brands: [] as string[],
-    categories: [] as string[],
-    priceRange: { min: 0, max: 1000 }
-  });
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(0);
   const [showFilters, setShowFilters] = useState(() => window.innerWidth >= 768);
   const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -1741,4 +1741,4 @@ const ProductCatalog: React.FC = () => {
   );
 };
 
-export default ProductCatalog; 
+export default ProductCatalog;
